@@ -1,8 +1,9 @@
-# cuacfm
+# radiocom-flutter
 
-A new Flutter project.
+This is a flutter application for Community Media Stations.
 
 ## Getting Started
 
-For help getting started with Flutter, view our online
-[documentation](http://flutter.io/).
+This app is supposed to be configurable.
+
+This app has a newsreader, live broadcast , podcast, photo gallery and integrations with twitter and facebook.
