@@ -1,9 +1,13 @@
+import 'package:cuacfm/models/Program.dart';
+import 'package:cuacfm/models/now.dart';
+import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/ui/home/homePresenter.dart';
 import 'package:cuacfm/utils/IphoneXPadding.dart';
 import 'package:cuacfm/utils/RadiocomColors.dart';
 import 'package:cuacfm/utils/RadiocomUtils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -20,7 +24,6 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   MediaQueryData queryData;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<
       ScaffoldState>();
-  String _myText = "Benvida a CUAC FM";
   int _currentIndex = 0;
   List newsObj = [];
   double _margin = 20.0;
@@ -28,6 +31,12 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   VoidCallback _showBottomSheetCallback;
   PersistentBottomSheetController<Null> persistentBottomSheetController;
   IconData _iconBottom = Icons.play_arrow;
+  Now _nowProgram;
+  List<Program> _podcast = new List<Program>();
+  RadioStation _station = new RadioStation.base();
+  String _myText = "Benvida a ";
+  final FlutterWebviewPlugin flutterWebviewPlugin = new FlutterWebviewPlugin();
+
 
   _MyHomePageState() {
     _presenter = new HomePresenter(this);
@@ -58,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
           return new Container(
               margin: new EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
               width: queryData.size.width,
-              height: queryData.size.height / 3,
+              height: queryData.size.height / 2.5,
               color: RadiocomColors.platinumlight,
               child: new Column(
                   children: [new Row(mainAxisAlignment: MainAxisAlignment.end,
@@ -78,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
                           fontWeight: FontWeight.w700,
                           color: RadiocomColors.fontH1,
                           textBaseline: TextBaseline.alphabetic)),
-                  new Text("Spoiler",
+                  new Text(_nowProgram.name,
                       style: new TextStyle(inherit: false,
                           fontSize: RadiocomUtils.mediumFontSize,
                           fontFamily: RadiocomUtils.fontFamily,
@@ -94,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
                       color: RadiocomColors.orange,
                       image: new DecorationImage(
                         image: new NetworkImage(
-                            "http://www.billboard.com/files/styles/900_wide/public/media/Green-Day-American-Idiot-album-covers-billboard-1000x1000.jpg"),
+                            _nowProgram.logo_url),
                         fit: BoxFit.cover,
                       ),
                       border: new Border.all(
@@ -134,7 +143,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
     return new IPhoneXPadding(child: new Scaffold(
       key: scaffoldKey,
       appBar: new AppBar(
-        title: new Text(widget.title),
+        title: new Text(_station.station_name),
       ),
       body: new Center(
         child: new Column(
@@ -154,6 +163,8 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   @override
   void initState() {
     super.initState();
+    _nowProgram = new Now.mock();
+    _presenter.getRadioStationData();
   }
 
   /**
@@ -162,7 +173,8 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   getData(index) {
     setState(() => _currentIndex = index);
     if (index == 0) {
-      setState(() => _myText = "Benvida a CUAC FM");
+      setState(() => _myText = _station.history);
+      flutterWebviewPlugin.launch("https://cuacfm.org",fullScreen: false);
     } else if (index == 1) {
       _showBottomSheet();
     } else if (index == 2) {
@@ -173,6 +185,29 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   }
 
   //view actions
+
+  @override
+  void onLoadLiveData(Now now) {
+    setState(() {
+      _nowProgram = now;
+    });
+  }
+
+  @override
+  void onLoadPodcasts(List<Program> podcasts) {
+    setState(() {
+      _podcast = podcasts;
+    });
+  }
+
+  @override
+  void onLoadRadioStation(RadioStation station) {
+    setState(() {
+      _station = station;
+    });
+    _presenter.getLiveProgram();
+    _presenter.getAllPodcasts();
+  }
 
   @override
   void onLoadNews(List news) {
@@ -192,4 +227,5 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
       });
     }
   }
+
 }

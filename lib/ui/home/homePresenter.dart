@@ -1,14 +1,19 @@
 import 'dart:convert';
 
 import 'package:audioplayer/audioplayer.dart';
+import 'package:cuacfm/models/Program.dart';
+import 'package:cuacfm/models/now.dart';
+import 'package:cuacfm/models/radiostation.dart';
+import 'package:cuacfm/repository/CuacRepository.dart';
 import 'package:xml2json/xml2json.dart';
 import 'package:flutter/services.dart';
 
 abstract class HomeView {
+  void onLoadRadioStation(RadioStation station);
   void onLoadNews(List newsObj);
-
+  void onLoadLiveData(Now now);
+  void onLoadPodcasts(List<Program> podcasts);
   void onPlayerReady();
-
   void onPlayerStopped();
 }
 
@@ -23,9 +28,11 @@ class HomePresenter {
   HomeView _homeView;
   AudioPlayer audioPlayer;
   var _playerState;
+  CuacRepository _repository;
 
-  HomePresenter(this._homeView) {
+  HomePresenter(this._homeView, [CuacRepository repository]) {
     audioPlayer = new AudioPlayer();
+    _repository = _repository != null ? repository : new CuacRepository();
   }
 
   getNews() async {
@@ -43,10 +50,40 @@ class HomePresenter {
     }
   }
 
+  getRadioStationData(){
+    _repository.getRadioStationData()
+        .catchError((err){
+      //todo use error
+    })
+        .then((station){
+      _homeView.onLoadRadioStation(station);
+    });
+  }
+
+  getLiveProgram(){
+    _repository.getLiveBroadcast()
+        .catchError((err){
+          //todo use error
+        })
+        .then((now){
+          _homeView.onLoadLiveData(now);
+        });
+  }
+
+  getAllPodcasts(){
+    _repository.getAllPodcasts()
+        .catchError((err){
+      //todo use error
+    })
+        .then((podcasts){
+      _homeView.onLoadPodcasts(podcasts);
+    });
+  }
+
   play() async {
     if (_playerState != PlayerState.play) {
       final result = await audioPlayer.play(
-          "https://streaming.cuacfm.org/cuacfm.aac", isLocal: false);
+          "https://streaming.cuacfm.org/cuacfm.mp3", isLocal: false);
       if (result == 1) _playerState = PlayerState.play;
       _homeView.onPlayerReady();
     } else {

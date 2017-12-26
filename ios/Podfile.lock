@@ -2,20 +2,26 @@ PODS:
   - audioplayer (0.0.1):
     - Flutter
   - Flutter (1.0.0)
+  - flutter_webview_plugin (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - audioplayer (from `/Users/f.souto.gonzalez/.pub-cache/hosted/pub.dartlang.org/audioplayer-0.3.0/ios`)
   - Flutter (from `/Users/f.souto.gonzalez/Documents/FlutterProjects/flutter/bin/cache/artifacts/engine/ios`)
+  - flutter_webview_plugin (from `/Users/f.souto.gonzalez/.pub-cache/hosted/pub.dartlang.org/flutter_webview_plugin-0.0.9+1/ios`)
 
 EXTERNAL SOURCES:
   audioplayer:
     :path: /Users/f.souto.gonzalez/.pub-cache/hosted/pub.dartlang.org/audioplayer-0.3.0/ios
   Flutter:
     :path: /Users/f.souto.gonzalez/Documents/FlutterProjects/flutter/bin/cache/artifacts/engine/ios
+  flutter_webview_plugin:
+    :path: /Users/f.souto.gonzalez/.pub-cache/hosted/pub.dartlang.org/flutter_webview_plugin-0.0.9+1/ios
 
 SPEC CHECKSUMS:
   audioplayer: f4462b84216b9c55f02bbbdc7ab60eec7427b2d4
   Flutter: d674e78c937094a75ac71dd77e921e840bea3dbf
+  flutter_webview_plugin: ed9e8a6a96baf0c867e90e1bce2673913eeac694
 
 PODFILE CHECKSUM: 351e02e34b831289961ec3558a535cbd2c4965d2
 
