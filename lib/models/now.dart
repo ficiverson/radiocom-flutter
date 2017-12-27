@@ -8,7 +8,7 @@ class Now {
   Now.mock()
       :
         name = "CUAC",
-        logo_url = "https://i2.wp.com/cuacfm.org/wp-content/uploads/2017/09/logo-escola-de-ver%C3%A1n.png?resize=500%2C500&ssl=1";
+        logo_url = "https://cuacfm.org/radioco/media/photos/cuac.png";
 
   Now.fromInstance(Map<String, dynamic> map)
       :

@@ -2,6 +2,7 @@ name: cuacfm
 description: A new Flutter project.
 
 dependencies:
+  verbal_expressions: "^0.3.1"
   flutter_webview_plugin: "^0.0.9+1"
   audioplayer: "^0.3.0"
   xml2json: "^2.0.9"

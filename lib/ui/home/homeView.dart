@@ -1,4 +1,5 @@
-import 'package:cuacfm/models/Program.dart';
+import 'package:cuacfm/models/new.dart';
+import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/ui/home/homePresenter.dart';
@@ -33,9 +34,14 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   IconData _iconBottom = Icons.play_arrow;
   Now _nowProgram;
   List<Program> _podcast = new List<Program>();
+  List<New> _news = new List<New>();
   RadioStation _station = new RadioStation.base();
   String _myText = "Benvida a ";
   final FlutterWebviewPlugin flutterWebviewPlugin = new FlutterWebviewPlugin();
+  var _body;
+  Color homeColorState = RadiocomColors.orangeDark;
+  Color newsColorState = RadiocomColors.orangegradient;
+  Color podcastColorState = RadiocomColors.orangegradient;
 
 
   _MyHomePageState() {
@@ -47,13 +53,37 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   List getButtons() {
     List buttons = new List();
     buttons.add(new BottomNavigationBarItem(
-        icon: new Icon(Icons.home), title: new Text("Inicio")));
+        icon: new Icon(Icons.home, color: homeColorState,),
+        title: new Text("Inicio", style: new TextStyle(inherit: false,
+            fontSize: RadiocomUtils.mediumFontSize,
+            fontFamily: RadiocomUtils.fontFamily,
+            fontWeight: FontWeight.w500,
+            color: homeColorState,
+            textBaseline: TextBaseline.alphabetic))));
     buttons.add(new BottomNavigationBarItem(
-        icon: new Icon(Icons.play_arrow), title: new Text("Directo")));
+        icon: new Icon(_iconBottom, color: RadiocomColors.orangegradient),
+        title: new Text("Directo", style: new TextStyle(inherit: false,
+            fontSize: RadiocomUtils.mediumFontSize,
+            fontFamily: RadiocomUtils.fontFamily,
+            fontWeight: FontWeight.w500,
+            color: RadiocomColors.orangegradient,
+            textBaseline: TextBaseline.alphabetic))));
     buttons.add(new BottomNavigationBarItem(
-        icon: new Icon(Icons.description), title: new Text("Novas")));
+        icon: new Icon(Icons.description, color: newsColorState),
+        title: new Text("Novas", style: new TextStyle(inherit: false,
+            fontSize: RadiocomUtils.mediumFontSize,
+            fontFamily: RadiocomUtils.fontFamily,
+            fontWeight: FontWeight.w500,
+            color: newsColorState,
+            textBaseline: TextBaseline.alphabetic))));
     buttons.add(new BottomNavigationBarItem(
-        icon: new Icon(Icons.translate), title: new Text("Podcast")));
+        icon: new Icon(Icons.translate, color: podcastColorState),
+        title: new Text("Podcast", style: new TextStyle(inherit: false,
+            fontSize: RadiocomUtils.mediumFontSize,
+            fontFamily: RadiocomUtils.fontFamily,
+            fontWeight: FontWeight.w500,
+            color: podcastColorState,
+            textBaseline: TextBaseline.alphabetic))));
     return buttons;
   }
 
@@ -63,7 +93,6 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
     });
     persistentBottomSheetController =
         scaffoldKey.currentState.showBottomSheet<Null>((BuildContext context) {
-          final ThemeData themeData = Theme.of(context);
           return new Container(
               margin: new EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
               width: queryData.size.width,
@@ -96,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
                           textBaseline: TextBaseline.alphabetic)),
                   new Container(
                     margin: new EdgeInsets.fromLTRB(
-                        0.0, _margin / 2, 0.0, _margin),
+                        0.0, _margin, 0.0, _margin),
                     width: _margin * 5,
                     height: _margin * 5,
                     decoration: new BoxDecoration(
@@ -113,10 +142,11 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
                     ),
                   ),
                   new IconButton(
-                      icon: new Icon(_iconBottom, size: 40.0,
+                      icon: new Icon(_iconBottom, size: 50.0,
                           color: RadiocomColors.orange),
                       onPressed: () {
                         _presenter.play();
+                        persistentBottomSheetController.setState((){_iconBottom = Icons.stop;});
                         setState(() {
                           _iconBottom = Icons.stop;
                         });
@@ -135,24 +165,216 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   }
 
 
+  //Home carrousel
+
+  _buildItem(String imageUrl, BuildContext context) {
+    return new GestureDetector(
+        onTap: () {
+          //TODO
+        }, child: new Container(
+        child: new Container(
+            child: new Column(
+                children: [
+                  new Container(
+                      width: queryData.size.width,
+                      height: 340.0,
+                      decoration: new BoxDecoration(
+                          color: RadiocomColors.whitegradient,
+                          shape: BoxShape.rectangle,
+                          image: new DecorationImage(image: new NetworkImage(
+                              imageUrl),
+                              fit: BoxFit.fitHeight))),
+                ]))));
+  }
+
+
+  Widget _buildCarrousel(List<Widget> items) {
+    PageController controller = new PageController(
+        viewportFraction: 1.0,
+        initialPage: 0,
+        keepPage: false
+    );
+
+    PageView pager = new PageView(
+        scrollDirection: Axis.horizontal,
+        reverse: false,
+        controller: controller,
+        onPageChanged: (int index) {},
+        children: items
+    );
+
+    return new SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        scrollDirection: Axis.vertical,
+        child: new Column(
+            children: <Widget>[new Container(color: RadiocomColors.orange,
+                child: new Row(
+                    children: <Widget>[
+                      new Container(
+                          width: 150.0,
+                          height: 270.0,
+                          decoration: new BoxDecoration(
+                              color: RadiocomColors.whitegradient,
+                              shape: BoxShape.rectangle,
+                              image: new DecorationImage(
+                                  image: new NetworkImage(
+                                      _station.big_icon_url),
+                                  fit: BoxFit.fitHeight))),
+                      new Container(height: _margin / 4),
+                      new Column(mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: <Widget>[
+                            new Container(
+                                padding: new EdgeInsets.all(10.0),
+                                width: queryData.size.width - 150,
+                                child: new Text(
+                                    "Benvid@ a radio comunitaria da Coruña",
+                                    style: new TextStyle(inherit: false,
+                                        fontFamily: RadiocomUtils.fontFamily,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 2.0,
+                                        color: RadiocomColors.white,
+                                        textBaseline: TextBaseline
+                                            .alphabetic))),
+                            new Container(
+                                padding: new EdgeInsets.all(10.0),
+                                width: queryData.size.width - 150,
+                                child: new Text(
+                                    "Cuac FM é unha radio comunitaria. Unha radio comunitaria é unha emisora privada, sen ánimo de lucro, que ten un fin social: garantir o exercicio do dereito de acceso á comunicación e a liberdade de expresión da cidadanía.",
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 8,
+                                    style: new TextStyle(inherit: false,
+                                        fontFamily: RadiocomUtils.fontFamily,
+                                        fontWeight: FontWeight.w400,
+                                        letterSpacing: 1.0,
+                                        color: RadiocomColors.white,
+                                        textBaseline: TextBaseline.alphabetic)))
+                          ]),
+                    ])),
+            new Container(
+                height: 340.0,
+                width: queryData.size.width,
+                child: pager
+            )
+            ]));
+  }
+
+  Widget _buildContainer(Widget content) {
+    return new Container(
+        width: queryData.size.width,
+        child: content
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     queryData = MediaQuery.of(context);
     _margin = RadiocomUtils.getMargin(
         queryData.size.height, queryData.devicePixelRatio);
+    if (_currentIndex == 0) { //home
+      List<Widget> items = _station.station_photos.map((p) =>
+          _buildItem(p, context)).toList();
+
+      Widget content = _buildCarrousel(items);
+      _body = _buildContainer(content);
+    } else if (_currentIndex == 2) { //news
+      _body = new ListView.builder(
+        padding: new EdgeInsets.all(8.0),
+        reverse: false,
+        itemExtent: 200.0,
+        itemBuilder: (BuildContext context, int index) {
+          return new GestureDetector(
+              onTap: () {
+                flutterWebviewPlugin.launch(
+                    _news[index].link, fullScreen: false);
+              }, child: new Row(children: <Widget>[new Container(
+              margin: new EdgeInsets.fromLTRB(
+                  0.0, _margin / 2, 0.0, _margin),
+              width: 60.0,
+              height: 60.0,
+              decoration: new BoxDecoration(
+                  borderRadius: new BorderRadius.all(
+                      new Radius.circular(120.0)),
+                  color: RadiocomColors.orange,
+                  image: new DecorationImage(
+                    image: new NetworkImage(
+                        _news[index].image),
+                    fit: BoxFit.cover,
+                  ),
+                  border: new Border.all(
+                    color: RadiocomColors.orangeDark,
+                    width: 0.5,
+                  ))),
+          new Container(
+              margin: new EdgeInsets.fromLTRB(
+                  _margin, 0.0, _margin, 0.0),
+              width: 2.0,
+              height: 120.0,
+              decoration: new BoxDecoration(
+                  color: RadiocomColors.orangeDark,
+                  border: new Border.all(
+                    color: RadiocomColors.orangeDark,
+                    width: 0.5,
+                  ))),
+          new Flexible(
+              child: new Container(padding: new EdgeInsets.only(right: 13.0),
+                  child: new Text(_news[index].title, maxLines: 2,
+                      style: new TextStyle(inherit: false,
+                          fontFamily: RadiocomUtils.fontFamily,
+                          fontWeight: FontWeight.w400,
+                          letterSpacing: 1.0,
+                          color: RadiocomColors.blackgradient,
+                          textBaseline: TextBaseline.alphabetic),
+                      overflow: TextOverflow.ellipsis)))
+          ]));
+        },
+        itemCount: _news.length,
+      );
+    } else if (_currentIndex == 3) {
+      _body = new ListView.builder(
+        reverse: false,
+        itemExtent: 220.0,
+        itemBuilder: (BuildContext context, int index) {
+          return new GestureDetector(
+              onTap: () {
+                //open podcast detail view
+
+              }, child: new Stack(children: <Widget>[new Container(
+              width: queryData.size.width,
+              height: 220.0,
+              foregroundDecoration: new BoxDecoration(
+                color: RadiocomColors.blackgradient65,
+                image: new DecorationImage(
+                  image: new NetworkImage(
+                      _podcast[index].logo_url),
+                  fit: BoxFit.cover,
+                ),
+              )), new Container(width: queryData.size.width,
+              height: 220.0, color: RadiocomColors.orangegradient),
+          new Center(child: new Text(_podcast[index].name, maxLines: 2,
+              style: new TextStyle(inherit: false,
+                  fontFamily: RadiocomUtils.fontFamily,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 20.0,
+                  letterSpacing: 2.0,
+                  color: RadiocomColors.white,
+                  textBaseline: TextBaseline.alphabetic),
+              overflow: TextOverflow.ellipsis))
+          ]));
+        },
+        itemCount: _news.length,
+      );
+    }
+
     return new IPhoneXPadding(child: new Scaffold(
       key: scaffoldKey,
+      primary: true,
+      resizeToAvoidBottomPadding: true,
       appBar: new AppBar(
         title: new Text(_station.station_name),
       ),
-      body: new Center(
-        child: new Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            new Text(_myText)
-          ],
-        ),
-      ),
+      body: _body,
       bottomNavigationBar: new CupertinoTabBar(items: getButtons(),
           currentIndex: _currentIndex,
           onTap: (index) => getData(index)),
@@ -173,14 +395,19 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   getData(index) {
     setState(() => _currentIndex = index);
     if (index == 0) {
-      setState(() => _myText = _station.history);
-      flutterWebviewPlugin.launch("https://cuacfm.org",fullScreen: false);
-    } else if (index == 1) {
+      homeColorState = RadiocomColors.orangeDark;
+      newsColorState = RadiocomColors.orangegradient;
+      podcastColorState = RadiocomColors.orangegradient;
+    } else if (index == 1) { //show player
       _showBottomSheet();
     } else if (index == 2) {
-      _presenter.getNews();
+      homeColorState = RadiocomColors.orangegradient;
+      newsColorState = RadiocomColors.orangeDark;
+      podcastColorState = RadiocomColors.orangegradient;
     } else if (index == 3) {
-
+      homeColorState = RadiocomColors.orangegradient;
+      newsColorState = RadiocomColors.orangegradient;
+      podcastColorState = RadiocomColors.orangeDark;
     }
   }
 
@@ -205,13 +432,15 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
     setState(() {
       _station = station;
     });
+
+    _presenter.getNews();
     _presenter.getLiveProgram();
     _presenter.getAllPodcasts();
   }
 
   @override
-  void onLoadNews(List news) {
-    setState(() => _myText = news[0]["title"].toString());
+  void onLoadNews(List<New> news) {
+    setState(() => _news = news);
   }
 
   @override
@@ -220,12 +449,10 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
 
   @override
   void onPlayerStopped() {
-    if (_showBottomSheetCallback == null) {
-      persistentBottomSheetController.close();
-      setState(() {
-        _iconBottom = Icons.play_arrow;
-      });
-    }
+    persistentBottomSheetController.setState((){_iconBottom = Icons.play_arrow;});
+    setState(() {
+      _iconBottom = Icons.play_arrow;
+    });
   }
 
 }

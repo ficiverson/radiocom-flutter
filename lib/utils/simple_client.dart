@@ -42,7 +42,7 @@ class SimpleClient {
     }
   }
 
-  Future<dynamic> get(Uri url, { Map<String, String> headers}) {
+  Future<dynamic> get(Uri url, {Map<String, String> headers}) {
     return sendRequest(
         new SimpleRequest(
             HTTPMethod.GET,
@@ -70,7 +70,8 @@ class SimpleClient {
         : null;
 
     Map<String, String> headers = {
-      HttpHeaders.CONTENT_TYPE: 'application/json'
+      HttpHeaders.CONTENT_TYPE: 'application/json',
+      HttpHeaders.ACCEPT_CHARSET: 'utf-8'
     };
 
     headers.addAll(request.headers);
@@ -81,6 +82,8 @@ class SimpleClient {
         methodClient(
             request.url,
             headers: headers,
+            //body: reqBody
+          //TODO REVIEW ENCODING OF REQUESTS
         )
     );
   }
@@ -97,8 +100,7 @@ class SimpleClient {
         throw new HttpException(
             'Unexpected status code [$statusCode]: ${response.body}');
       }
-
-      dynamic respBody = JSON.decode(response.body);
+      dynamic respBody = JSON.decode(response.body.toString());
 
       if (respBody == null) {
         throw new HttpException('Error parsing response');

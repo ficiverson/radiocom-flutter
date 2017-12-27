@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:audioplayer/audioplayer.dart';
-import 'package:cuacfm/models/Program.dart';
+import 'package:cuacfm/models/new.dart';
+import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/repository/CuacRepository.dart';
@@ -10,10 +11,15 @@ import 'package:flutter/services.dart';
 
 abstract class HomeView {
   void onLoadRadioStation(RadioStation station);
-  void onLoadNews(List newsObj);
+
+  void onLoadNews(List<New> news);
+
   void onLoadLiveData(Now now);
+
   void onLoadPodcasts(List<Program> podcasts);
+
   void onPlayerReady();
+
   void onPlayerStopped();
 }
 
@@ -42,40 +48,47 @@ class HomePresenter {
 
     var response = await httpClient.get("https://cuacfm.org/feed/");
     xml2json.parse(response.body);
+    xml2json.toBadgerfish();
+    xml2json.toParker();
+    xml2json.xmlParserResult.findAllElements("img");
+
     Map news = JSON.decode(xml2json.toGData());
 
     if (news.containsKey("rss")) {
       newsObj = news["rss"]["channel"]["item"];
-      _homeView.onLoadNews(newsObj);
+      List<New> newsList = newsObj
+          .map((n) => new New.fromInstance(n))
+          .toList();
+      _homeView.onLoadNews(newsList);
     }
   }
 
-  getRadioStationData(){
+  getRadioStationData() {
     _repository.getRadioStationData()
-        .catchError((err){
+        .catchError((err) {
       //todo use error
     })
-        .then((station){
+        .then((station) {
       _homeView.onLoadRadioStation(station);
     });
   }
 
-  getLiveProgram(){
+  getLiveProgram() {
     _repository.getLiveBroadcast()
-        .catchError((err){
-          //todo use error
-        })
-        .then((now){
-          _homeView.onLoadLiveData(now);
-        });
-  }
-
-  getAllPodcasts(){
-    _repository.getAllPodcasts()
-        .catchError((err){
+        .catchError((err) {
       //todo use error
     })
-        .then((podcasts){
+        .then((now) {
+      _homeView.onLoadLiveData(now);
+    });
+  }
+
+  getAllPodcasts() {
+    _repository.getAllPodcasts()
+        .catchError((err) {
+      //todo use error
+    })
+        .then((podcasts) {
       _homeView.onLoadPodcasts(podcasts);
     });
   }

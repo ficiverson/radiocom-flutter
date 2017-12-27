@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:cuacfm/models/Program.dart';
+import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/repository/NetworkUtils.dart';
