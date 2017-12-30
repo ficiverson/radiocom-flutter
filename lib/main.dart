@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
       title: 'CUAC FM',
       theme: new ThemeData(
         primarySwatch: Colors.orange,
+        primaryColorBrightness: Brightness.light,
       ),
       home: new MyHomePage(title: 'Benvida a CUAC FM'),
     );

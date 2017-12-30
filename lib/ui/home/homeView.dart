@@ -3,6 +3,7 @@ import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/ui/home/homePresenter.dart';
+import 'package:cuacfm/ui/podcast/DetailPodcastView.dart';
 import 'package:cuacfm/utils/IphoneXPadding.dart';
 import 'package:cuacfm/utils/RadiocomColors.dart';
 import 'package:cuacfm/utils/RadiocomUtils.dart';
@@ -145,8 +146,10 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
                       icon: new Icon(_iconBottom, size: 50.0,
                           color: RadiocomColors.orange),
                       onPressed: () {
-                        _presenter.play();
-                        persistentBottomSheetController.setState((){_iconBottom = Icons.stop;});
+                        _presenter.play(_station.stream_url);
+                        persistentBottomSheetController.setState(() {
+                          _iconBottom = Icons.stop;
+                        });
                         setState(() {
                           _iconBottom = Icons.stop;
                         });
@@ -339,7 +342,14 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
           return new GestureDetector(
               onTap: () {
                 //open podcast detail view
+                DetailPodcastPage detailView = new DetailPodcastPage(
+                    program: _podcast[index]
+                );
 
+                Navigator.push(context, new MaterialPageRoute(
+                    builder: (BuildContext context) => detailView,
+                    fullscreenDialog: false
+                ));
               }, child: new Stack(children: <Widget>[new Container(
               width: queryData.size.width,
               height: 220.0,
@@ -363,7 +373,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
               overflow: TextOverflow.ellipsis))
           ]));
         },
-        itemCount: _news.length,
+        itemCount: _podcast.length,
       );
     }
 
@@ -372,8 +382,15 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
       primary: true,
       resizeToAvoidBottomPadding: true,
       appBar: new AppBar(
-        title: new Text(_station.station_name),
-      ),
+          title: new Text(
+              _station.station_name, style: new TextStyle(inherit: false,
+              fontFamily: RadiocomUtils.fontFamily,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 2.0,
+              fontSize: 20.0,
+              color: RadiocomColors.white,
+              textBaseline: TextBaseline.alphabetic),
+              overflow: TextOverflow.ellipsis)),
       body: _body,
       bottomNavigationBar: new CupertinoTabBar(items: getButtons(),
           currentIndex: _currentIndex,
@@ -415,9 +432,11 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
 
   @override
   void onLoadLiveData(Now now) {
-    setState(() {
-      _nowProgram = now;
-    });
+    if (now != null) {
+      setState(() {
+        _nowProgram = now;
+      });
+    }
   }
 
   @override
@@ -449,7 +468,9 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
 
   @override
   void onPlayerStopped() {
-    persistentBottomSheetController.setState((){_iconBottom = Icons.play_arrow;});
+    persistentBottomSheetController.setState(() {
+      _iconBottom = Icons.play_arrow;
+    });
     setState(() {
       _iconBottom = Icons.play_arrow;
     });

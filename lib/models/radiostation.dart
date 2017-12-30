@@ -35,7 +35,7 @@ class RadioStation {
         latitude = map["latitude"],
         longitude = map["longitude"],
         news_rss = map["news_rss"],
-        stream_url = map["newstream_urls_rss"],
+        stream_url = map["stream_url"],
         facebook_url = map["facebook_url"],
         twitter_url = map["twitter_url"];
 }

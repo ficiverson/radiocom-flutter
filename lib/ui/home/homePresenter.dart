@@ -48,10 +48,6 @@ class HomePresenter {
 
     var response = await httpClient.get("https://cuacfm.org/feed/");
     xml2json.parse(response.body);
-    xml2json.toBadgerfish();
-    xml2json.toParker();
-    xml2json.xmlParserResult.findAllElements("img");
-
     Map news = JSON.decode(xml2json.toGData());
 
     if (news.containsKey("rss")) {
@@ -93,10 +89,10 @@ class HomePresenter {
     });
   }
 
-  play() async {
+  play(String url) async {
     if (_playerState != PlayerState.play) {
       final result = await audioPlayer.play(
-          "https://streaming.cuacfm.org/cuacfm.mp3", isLocal: false);
+          url, isLocal: false);
       if (result == 1) _playerState = PlayerState.play;
       _homeView.onPlayerReady();
     } else {
