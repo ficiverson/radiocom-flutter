@@ -6,6 +6,7 @@ class CuacClient extends SimpleClient {
 
   @override
   Future sendRequest (SimpleRequest request) {
+    //ISO-8859-1
     return super.sendRequest(request);
   }
 

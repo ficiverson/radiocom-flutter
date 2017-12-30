@@ -83,7 +83,7 @@ class _DetailPodcastState extends State<DetailPodcastPage>
               forceElevated: true,
               elevation: 2.0,
               backgroundColor: RadiocomColors.orange,
-              expandedHeight: 240.0,
+              expandedHeight: 200.0,
               flexibleSpace: new FlexibleSpaceBar(
                   background: new Stack(children: <Widget>[new Container(
                       width: queryData.size.width,
@@ -93,7 +93,7 @@ class _DetailPodcastState extends State<DetailPodcastPage>
                         image: new DecorationImage(
                           image: new NetworkImage(
                               _program.logo_url),
-                          fit: BoxFit.cover,
+                          fit: BoxFit.fitHeight,
                         ),
                       )), new Container(width: queryData.size.width,
                       height: 240.0, color: RadiocomColors.orangegradient),
@@ -103,6 +103,7 @@ class _DetailPodcastState extends State<DetailPodcastPage>
                       style: new TextStyle(inherit: false,
                           fontFamily: RadiocomUtils.fontFamily,
                           fontWeight: FontWeight.w600,
+                          fontSize: 20.0,
                           letterSpacing: 1.5,
                           color: RadiocomColors.white,
                           textBaseline: TextBaseline.alphabetic),
