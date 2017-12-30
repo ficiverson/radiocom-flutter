@@ -6,6 +6,7 @@ import 'package:cuacfm/utils/RadiocomColors.dart';
 import 'package:cuacfm/utils/RadiocomUtils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 class DetailPodcastPage extends StatefulWidget {
 
@@ -28,6 +29,7 @@ class _DetailPodcastState extends State<DetailPodcastPage>
   double _margin = 20.0;
   IconData _iconBottom = Icons.play_arrow;
   List<Episode> _episodes = new List<Episode>();
+  final FlutterWebviewPlugin flutterWebviewPlugin = new FlutterWebviewPlugin();
 
   _DetailPodcastState() {
     _presenter = new DetailPodcastPresenter(this);
@@ -39,19 +41,49 @@ class _DetailPodcastState extends State<DetailPodcastPage>
   getContentRss() {
     if (_episodes.length > 0) {
       return new SliverFixedExtentList(
-          itemExtent: 80.0,
+          itemExtent: 200.0,
           key: sliverKey,
           delegate: new SliverChildBuilderDelegate((BuildContext context,
               int index) {
-            return new Center(
-                child: new Text(
-                    _episodes[index].title, style: new TextStyle(inherit: false,
-                    fontFamily: RadiocomUtils.fontFamily,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 2.0,
-                    color: RadiocomColors.blackgradient,
-                    textBaseline: TextBaseline.alphabetic),
-                    overflow: TextOverflow.ellipsis));
+            return new GestureDetector(
+                onTap: () {
+                  flutterWebviewPlugin.launch(
+                      _episodes[index].link, fullScreen: false);
+                }, child: new Row(children: <Widget>[
+              new Flexible(
+                  child: new Container(
+                      width: queryData.size.width * 0.80,
+                      padding: new EdgeInsets.only(left: 15.0, right: 15.0),
+                      child: new Text(
+                          _episodes[index].title,
+                          maxLines: 2,
+                          style: new TextStyle(inherit: false,
+                              fontFamily: RadiocomUtils.fontFamily,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1.5,
+                              color: RadiocomColors.blackgradient,
+                              textBaseline: TextBaseline.alphabetic),
+                          overflow: TextOverflow.ellipsis))),
+              new Container(
+                  width: 2.0,
+                  height: 120.0,
+                  decoration: new BoxDecoration(
+                      color: RadiocomColors.orangeDark,
+                      border: new Border.all(
+                        color: RadiocomColors.orangeDark,
+                        width: 0.5,
+                      ))),
+              new Container(
+                height: 120.0,
+                child: new Center(child: new IconButton(
+                    icon: new Icon(_iconBottom, size: queryData.size.width * 0.12,
+                        color: RadiocomColors.orange),
+                    onPressed: () {
+                      _presenter.play(_episodes[index].audio);
+                    }
+                )),
+              ),
+            ]));
           }, childCount: _episodes.length));
     } else {
       return new SliverFixedExtentList(
@@ -68,7 +100,7 @@ class _DetailPodcastState extends State<DetailPodcastPage>
                         color: RadiocomColors.blackgradient,
                         textBaseline: TextBaseline.alphabetic),
                     overflow: TextOverflow.ellipsis));
-          }, childCount: 65));
+          }, childCount: 1));
     }
   }
 
