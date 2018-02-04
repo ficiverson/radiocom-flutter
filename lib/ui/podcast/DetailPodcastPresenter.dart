@@ -21,6 +21,7 @@ class DetailPodcastPresenter {
   var _playerState;
 
   DetailPodcastPresenter(this._view, [CuacRepository repository]) {
+    audioPlayer = new AudioPlayer();
     _repository = _repository != null ? repository : new CuacRepository();
   }
 

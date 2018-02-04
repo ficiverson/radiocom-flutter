@@ -7,6 +7,9 @@ import 'package:cuacfm/ui/podcast/DetailPodcastView.dart';
 import 'package:cuacfm/utils/IphoneXPadding.dart';
 import 'package:cuacfm/utils/RadiocomColors.dart';
 import 'package:cuacfm/utils/RadiocomUtils.dart';
+import 'package:cuacfm/utils/data.dart';
+import 'package:cuacfm/utils/intro_page_item.dart';
+import 'package:cuacfm/utils/page_transformer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
@@ -142,18 +145,21 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
                       ),
                     ),
                   ),
-                  new IconButton(
-                      icon: new Icon(_iconBottom, size: 50.0,
-                          color: RadiocomColors.orange),
-                      onPressed: () {
-                        _presenter.play(_station.stream_url);
-                        persistentBottomSheetController.setState(() {
-                          _iconBottom = Icons.stop;
-                        });
-                        setState(() {
-                          _iconBottom = Icons.stop;
-                        });
-                      }
+                  new Container(
+                      width: _margin * 5,
+                      child: new IconButton(
+                          icon: new Icon(_iconBottom, size: 50.0,
+                              color: RadiocomColors.orange),
+                          onPressed: () {
+                            _presenter.play(_station.stream_url);
+                            persistentBottomSheetController.setState(() {
+                              _iconBottom = Icons.stop;
+                            });
+                            setState(() {
+                              _iconBottom = Icons.stop;
+                            });
+                          }
+                      )
                   ),
                   ])
           );
@@ -176,6 +182,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
           //TODO
         }, child: new Container(
         child: new Container(
+            color: RadiocomColors.orange,
             child: new Column(
                 children: [
                   new Container(
@@ -193,17 +200,32 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
 
   Widget _buildCarrousel(List<Widget> items) {
     PageController controller = new PageController(
-        viewportFraction: 1.0,
+        viewportFraction: 0.9,
         initialPage: 0,
         keepPage: false
     );
 
-    PageView pager = new PageView(
-        scrollDirection: Axis.horizontal,
-        reverse: false,
-        controller: controller,
-        onPageChanged: (int index) {},
-        children: items
+    var carrouselItems = [];
+    for (int i = 0; i < _station.station_photos.length; i++) {
+      carrouselItems.add(new IntroItem(imageUrl: _station.station_photos[i]));
+    }
+
+    PageTransformer transformer = new PageTransformer(
+      pageViewBuilder: (context, pageVisibilityResolver) {
+        return new PageView.builder(
+          controller: controller,
+          itemCount: carrouselItems.length,
+          itemBuilder: (context, index) {
+            final item = carrouselItems[index];
+            final pageVisibility =
+            pageVisibilityResolver.resolvePageVisibility(index);
+            return new IntroPageItem(
+              item: item,
+              pageVisibility: pageVisibility,
+            );
+          },
+        );
+      },
     );
 
     return new SingleChildScrollView(
@@ -258,7 +280,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
             new Container(
                 height: 340.0,
                 width: queryData.size.width,
-                child: pager
+                child: transformer
             )
             ]));
   }

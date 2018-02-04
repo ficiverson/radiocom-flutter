@@ -80,6 +80,9 @@ class _DetailPodcastState extends State<DetailPodcastPage>
                         color: RadiocomColors.orange),
                     onPressed: () {
                       _presenter.play(_episodes[index].audio);
+                      setState((){
+                        _iconBottom = Icons.stop;
+                      });
                     }
                 )),
               ),
