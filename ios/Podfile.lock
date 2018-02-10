@@ -19,10 +19,10 @@ EXTERNAL SOURCES:
     :path: /Users/f.souto.gonzalez/.pub-cache/hosted/pub.dartlang.org/flutter_webview_plugin-0.0.9+1/ios
 
 SPEC CHECKSUMS:
-  audioplayer: f4462b84216b9c55f02bbbdc7ab60eec7427b2d4
-  Flutter: d674e78c937094a75ac71dd77e921e840bea3dbf
-  flutter_webview_plugin: ed9e8a6a96baf0c867e90e1bce2673913eeac694
+  audioplayer: 3cc64e4f5f3e231c715c8923a9bc26a19dc5da3b
+  Flutter: 7eb41cd1fd524b90d7f22bceb20da2c39338b089
+  flutter_webview_plugin: 116575b48572029304775b768e9f15ebfc316274
 
 PODFILE CHECKSUM: 351e02e34b831289961ec3558a535cbd2c4965d2
 
-COCOAPODS: 1.3.1
+COCOAPODS: 1.4.0

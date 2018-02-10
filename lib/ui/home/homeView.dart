@@ -1,3 +1,4 @@
+import 'package:cuacfm/injector/dependecy_injector.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
@@ -38,11 +39,13 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   IconData _iconBottom = Icons.play_arrow;
   Now _nowProgram;
   List<Program> _podcast = new List<Program>();
+  List<Program> _podcastWithFilter = new List<Program>();
   List<New> _news = new List<New>();
   RadioStation _station = new RadioStation.base();
   String _myText = "Benvida a ";
   final FlutterWebviewPlugin flutterWebviewPlugin = new FlutterWebviewPlugin();
   var _body;
+  var _hideFloating = false;
   Color homeColorState = RadiocomColors.orangeDark;
   Color newsColorState = RadiocomColors.orangegradient;
   Color podcastColorState = RadiocomColors.orangegradient;
@@ -94,6 +97,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   void _showBottomSheet() {
     setState(() { // disable the button
       _showBottomSheetCallback = null;
+      _hideFloating = true;
     });
     persistentBottomSheetController =
         scaffoldKey.currentState.showBottomSheet<Null>((BuildContext context) {
@@ -109,6 +113,8 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
                           onPressed: () {
                             if (_showBottomSheetCallback == null) {
                               persistentBottomSheetController.close();
+                              _hideFloating = false;
+                              getData(_currentIndex);
                             }
                           }
                       )
@@ -151,13 +157,30 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
                           icon: new Icon(_iconBottom, size: 50.0,
                               color: RadiocomColors.orange),
                           onPressed: () {
-                            _presenter.play(_station.stream_url);
-                            persistentBottomSheetController.setState(() {
-                              _iconBottom = Icons.stop;
-                            });
-                            setState(() {
-                              _iconBottom = Icons.stop;
-                            });
+                            //check if a podcast playing
+                            if (Injector.getPodcast() != null) {
+                              _presenter.stopAndPlay(_station.stream_url);
+                              Injector.setPodcast(null);
+                              persistentBottomSheetController.setState(() {
+                                _iconBottom = Icons.stop;
+                              });
+                              setState(() {
+                                _iconBottom = Icons.stop;
+                              });
+                            } else {
+                              //play or stop streaming
+                              if (_presenter.isPlaying()) {
+                                _presenter.stop();
+                              } else {
+                                _presenter.play(_station.stream_url);
+                                persistentBottomSheetController.setState(() {
+                                  _iconBottom = Icons.stop;
+                                });
+                                setState(() {
+                                  _iconBottom = Icons.stop;
+                                });
+                              }
+                            }
                           }
                       )
                   ),
@@ -292,6 +315,199 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
     );
   }
 
+  getPodcastPlayerDrawer() {
+    return new Drawer(
+        child: new Container(color: RadiocomColors.platinumdark, child:
+        new Container(
+            margin: new EdgeInsets.fromLTRB(
+                10.0, queryData.size.height / 4, 10.0, 10.0),
+            child: new Column(
+                children: [
+                  new Row(mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[new IconButton(
+                          icon: new Icon(Icons.close, size: 38.0),
+                          onPressed: () {
+                            if (scaffoldKey.currentState.hasEndDrawer) {
+                              if (Navigator.of(scaffoldKey.currentContext)
+                                  .canPop()) {
+                                Navigator.of(scaffoldKey.currentContext).pop();
+                              }
+                            }
+                          }
+                      )
+                      ]),
+                  new Container(margin: new EdgeInsets.fromLTRB(
+                      0.0, _margin, 0.0, 0.0)),
+                  new Container(color: RadiocomColors.orangeDark,
+                    width: queryData.size.width,
+                    height: 1.0,),
+                  new Container(margin: new EdgeInsets.fromLTRB(
+                      0.0, _margin * 2, 0.0, 0.0)),
+                  new Text("Ahora mismo reproduciendo:",
+                      style: new TextStyle(inherit: false,
+                          fontSize: RadiocomUtils.largeFontSize,
+                          fontFamily: RadiocomUtils.fontFamily,
+                          fontWeight: FontWeight.w700,
+                          color: RadiocomColors.fontH1,
+                          textBaseline: TextBaseline.alphabetic)),
+                  new Text(Injector
+                      .getPodcast()
+                      .name,
+                      style: new TextStyle(inherit: false,
+                          fontSize: RadiocomUtils.mediumFontSize,
+                          fontFamily: RadiocomUtils.fontFamily,
+                          fontWeight: FontWeight.w500,
+                          color: RadiocomColors.font,
+                          textBaseline: TextBaseline.alphabetic)),
+                  new Container(
+                    margin: new EdgeInsets.fromLTRB(
+                        0.0, _margin, 0.0, _margin),
+                    width: _margin * 5,
+                    height: _margin * 5,
+                    decoration: new BoxDecoration(
+                      color: RadiocomColors.orange,
+                      image: new DecorationImage(
+                        image: new NetworkImage(
+                            Injector
+                                .getPodcast()
+                                .image),
+                        fit: BoxFit.cover,
+                      ),
+                      border: new Border.all(
+                        color: RadiocomColors.orange,
+                        width: 0.5,
+                      ),
+                    ),
+                  ),
+                  new Text(Injector
+                      .getPodcast()
+                      .episodeTitle,
+                      style: new TextStyle(inherit: false,
+                          fontSize: RadiocomUtils.largeFontSize,
+                          fontFamily: RadiocomUtils.fontFamily,
+                          fontWeight: FontWeight.w700,
+                          color: RadiocomColors.fontH1,
+                          textBaseline: TextBaseline.alphabetic)),
+                  new Container(
+                      width: _margin * 5,
+                      child: new IconButton(
+                          icon: new Icon(Icons.stop, size: 50.0,
+                              color: RadiocomColors.orange),
+                          onPressed: () {
+                            if (scaffoldKey.currentState.hasEndDrawer) {
+                              if (Navigator.of(scaffoldKey.currentContext)
+                                  .canPop()) {
+                                Navigator.of(scaffoldKey.currentContext).pop();
+                              }
+                            }
+                            _presenter.stop();
+                            Injector.setPodcast(null);
+                            getData(_currentIndex);
+                          }
+                      )
+                  ),
+                  new Container(
+                    margin: new EdgeInsets.fromLTRB(
+                        0.0, _margin, 0.0, 0.0),
+                    color: RadiocomColors.orangeDark,
+                    width: queryData.size.width,
+                    height: 1.0,)
+                ]))));
+  }
+
+  final TextEditingController _searchQuery = new TextEditingController();
+  bool _isSearching = false;
+
+  //search view
+  void _handleSearchBegin() {
+    ModalRoute.of(context).addLocalHistoryEntry(new LocalHistoryEntry(
+      onRemove: () {
+        setState(() {
+          _isSearching = false;
+          _searchQuery.clear();
+        });
+      },
+    ));
+    setState(() {
+      _isSearching = true;
+    });
+  }
+
+  Iterable<Program> _filterBySearchQuery(Iterable<Program> podcasts) {
+    if (_searchQuery.text.isEmpty)
+      return podcasts;
+    final RegExp regexp = new RegExp(_searchQuery.text, caseSensitive: false);
+    return podcasts.where((Program program) => program.name.contains(regexp));
+  }
+
+  AppBar buildAppBarPodcast(Widget actionPodcast) {
+    return new AppBar(
+        title: new Text(
+            _station.station_name, style: new TextStyle(inherit: false,
+            fontFamily: RadiocomUtils.fontFamily,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 2.0,
+            fontSize: 20.0,
+            color: RadiocomColors.white,
+            textBaseline: TextBaseline.alphabetic),
+            overflow: TextOverflow.ellipsis),
+        actions: <Widget>[
+          actionPodcast
+        ]);
+  }
+
+  AppBar buildSearchBarPodcast(Widget actionPodcast) {
+    return new AppBar(
+        leading: new IconButton(icon: const Icon(Icons.close),
+            onPressed: () {
+              if (Navigator.of(scaffoldKey.currentContext).canPop()) {
+                Navigator.of(scaffoldKey.currentContext).pop();
+              }
+              _searchQuery.clear();
+              _isSearching = false;
+              setState(() {
+                _podcastWithFilter = _filterBySearchQuery(_podcast).toList();
+              });
+            },
+            color: RadiocomColors.white),
+        title: new TextField(
+          maxLines: 1,
+          style: new TextStyle(inherit: false,
+              fontFamily: RadiocomUtils.fontFamily,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.2,
+              color: RadiocomColors.white,
+              textBaseline: TextBaseline.alphabetic),
+          onSubmitted: (queryText) {
+            if (queryText != null && queryText.length > 2) {
+              setState(() {
+                _podcastWithFilter = _filterBySearchQuery(_podcast).toList();
+              });
+            } else {
+              setState(() {
+                _podcastWithFilter = _podcast;
+              });
+            }
+          },
+          onChanged: (queryText) {
+            if (queryText != null && queryText.length > 2) {
+              setState(() {
+                _podcastWithFilter = _filterBySearchQuery(_podcast).toList();
+              });
+            } else {
+              setState(() {
+                _podcastWithFilter = _podcast;
+              });
+            }
+          },
+          controller: _searchQuery,
+          autofocus: true,
+          decoration: const InputDecoration(
+            hintText: 'Buscar podcast',
+          ),
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     queryData = MediaQuery.of(context);
@@ -356,7 +572,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
         },
         itemCount: _news.length,
       );
-    } else if (_currentIndex == 3) {
+    } else if (_currentIndex == 3) { //podcast
       _body = new ListView.builder(
         reverse: false,
         itemExtent: 220.0,
@@ -365,7 +581,8 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
               onTap: () {
                 //open podcast detail view
                 DetailPodcastPage detailView = new DetailPodcastPage(
-                    program: _podcast[index]
+                    program: _podcastWithFilter[index],
+                    podcast_index: index
                 );
 
                 Navigator.push(context, new MaterialPageRoute(
@@ -379,45 +596,100 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
                 color: RadiocomColors.blackgradient65,
                 image: new DecorationImage(
                   image: new NetworkImage(
-                      _podcast[index].logo_url),
+                      _podcastWithFilter[index].logo_url),
                   fit: BoxFit.cover,
                 ),
               )), new Container(width: queryData.size.width,
               height: 220.0, color: RadiocomColors.orangegradient),
-          new Center(child: new Text(_podcast[index].name, maxLines: 2,
-              style: new TextStyle(inherit: false,
-                  fontFamily: RadiocomUtils.fontFamily,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 20.0,
-                  letterSpacing: 2.0,
-                  color: RadiocomColors.white,
-                  textBaseline: TextBaseline.alphabetic),
-              overflow: TextOverflow.ellipsis))
+          new Center(
+              child: new Text(" " + _podcastWithFilter[index].name, maxLines: 1,
+                  style: new TextStyle(inherit: false,
+                      fontFamily: RadiocomUtils.fontFamily,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 20.0,
+                      letterSpacing: 2.0,
+                      color: RadiocomColors.white,
+                      textBaseline: TextBaseline.alphabetic),
+                  overflow: TextOverflow.ellipsis))
           ]));
         },
-        itemCount: _podcast.length,
+        itemCount: _podcastWithFilter.length,
       );
     }
 
-    return new IPhoneXPadding(child: new Scaffold(
-      key: scaffoldKey,
-      primary: true,
-      resizeToAvoidBottomPadding: true,
-      appBar: new AppBar(
-          title: new Text(
-              _station.station_name, style: new TextStyle(inherit: false,
-              fontFamily: RadiocomUtils.fontFamily,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 2.0,
-              fontSize: 20.0,
-              color: RadiocomColors.white,
-              textBaseline: TextBaseline.alphabetic),
-              overflow: TextOverflow.ellipsis)),
-      body: _body,
-      bottomNavigationBar: new CupertinoTabBar(items: getButtons(),
-          currentIndex: _currentIndex,
-          onTap: (index) => getData(index)),
-    ));
+    if (_currentIndex == 3) {
+      IconButton actionPodcast;
+      actionPodcast = new IconButton(
+          icon: const Icon(Icons.search),
+          onPressed: _handleSearchBegin,
+          tooltip: 'Buscar',
+          color: RadiocomColors.white,
+          iconSize: 35.0);
+
+      if (Injector.getPodcast() != null && !_hideFloating) {
+        setState(() {
+          _iconBottom = Icons.play_arrow;
+        });
+
+        FloatingActionButton floatingActionButton = new FloatingActionButton(
+            elevation: 7.0,
+            child: new Icon(Icons.stop),
+            backgroundColor: RadiocomColors.orangeDark,
+            onPressed: () {
+              if (scaffoldKey.currentState.hasEndDrawer) {
+                scaffoldKey.currentState.openEndDrawer();
+              }
+            }
+        );
+        return new IPhoneXPadding(child: new Scaffold(
+          key: scaffoldKey,
+          primary: true,
+          resizeToAvoidBottomPadding: true,
+          appBar: _isSearching
+              ? buildSearchBarPodcast(actionPodcast)
+              : buildAppBarPodcast(actionPodcast),
+          body: _body,
+          floatingActionButton: floatingActionButton,
+          endDrawer: getPodcastPlayerDrawer(),
+          bottomNavigationBar: new CupertinoTabBar(items: getButtons(),
+              currentIndex: _currentIndex,
+              onTap: (index) => getData(index)),
+        ));
+      } else {
+        return new IPhoneXPadding(child: new Scaffold(
+          key: scaffoldKey,
+          primary: true,
+          resizeToAvoidBottomPadding: true,
+          appBar: _isSearching
+              ? buildSearchBarPodcast(actionPodcast)
+              : buildAppBarPodcast(actionPodcast),
+          body: _body,
+          bottomNavigationBar: new CupertinoTabBar(items: getButtons(),
+              currentIndex: _currentIndex,
+              onTap: (index) => getData(index)),
+        ));
+      }
+    } else {
+      return new IPhoneXPadding(child: new Scaffold(
+        key: scaffoldKey,
+        primary: true,
+        resizeToAvoidBottomPadding: true,
+        appBar: new AppBar(
+            title: new Text(
+                _station.station_name, style: new TextStyle(inherit: false,
+                fontFamily: RadiocomUtils.fontFamily,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 2.0,
+                fontSize: 20.0,
+                color: RadiocomColors.white,
+                textBaseline: TextBaseline.alphabetic),
+                overflow: TextOverflow.ellipsis)),
+        body: _body,
+        bottomNavigationBar: new CupertinoTabBar(items: getButtons(),
+            currentIndex: _currentIndex,
+            onTap: (index) => getData(index)),
+      ));
+    }
   }
 
 
@@ -432,7 +704,6 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
    * Handle menu options
    */
   getData(index) {
-    setState(() => _currentIndex = index);
     if (index == 0) {
       homeColorState = RadiocomColors.orangeDark;
       newsColorState = RadiocomColors.orangegradient;
@@ -448,6 +719,11 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
       newsColorState = RadiocomColors.orangegradient;
       podcastColorState = RadiocomColors.orangeDark;
     }
+    setState(() {
+      if (index != 1) {
+        _currentIndex = index;
+      }
+    });
   }
 
   //view actions
@@ -464,6 +740,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   @override
   void onLoadPodcasts(List<Program> podcasts) {
     setState(() {
+      _podcastWithFilter = podcasts;
       _podcast = podcasts;
     });
   }
@@ -473,7 +750,6 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
     setState(() {
       _station = station;
     });
-
     _presenter.getNews();
     _presenter.getLiveProgram();
     _presenter.getAllPodcasts();
@@ -490,12 +766,14 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
 
   @override
   void onPlayerStopped() {
-    persistentBottomSheetController.setState(() {
-      _iconBottom = Icons.play_arrow;
-    });
-    setState(() {
-      _iconBottom = Icons.play_arrow;
-    });
+    if (_iconBottom != Icons.play_arrow) {
+      persistentBottomSheetController.setState(() {
+        _iconBottom = Icons.play_arrow;
+      });
+      setState(() {
+        _iconBottom = Icons.play_arrow;
+      });
+    }
   }
 
 }

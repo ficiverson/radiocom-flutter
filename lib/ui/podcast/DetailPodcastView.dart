@@ -1,7 +1,8 @@
+import 'package:cuacfm/injector/dependecy_injector.dart';
+import 'package:cuacfm/models/current_podcast.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/ui/podcast/DetailPodcastPresenter.dart';
-import 'package:cuacfm/utils/IphoneXPadding.dart';
 import 'package:cuacfm/utils/RadiocomColors.dart';
 import 'package:cuacfm/utils/RadiocomUtils.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,8 +11,10 @@ import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 class DetailPodcastPage extends StatefulWidget {
 
-  DetailPodcastPage({Key key, this.program}) : super(key: key);
+  DetailPodcastPage({Key key, this.program, this.podcast_index})
+      : super(key: key);
   Program program;
+  int podcast_index;
 
   @override
   State createState() => new _DetailPodcastState();
@@ -30,6 +33,10 @@ class _DetailPodcastState extends State<DetailPodcastPage>
   IconData _iconBottom = Icons.play_arrow;
   List<Episode> _episodes = new List<Episode>();
   final FlutterWebviewPlugin flutterWebviewPlugin = new FlutterWebviewPlugin();
+  int _currentPlayerIndex = -1;
+  int _podcast_index = -1;
+  CurrentPodcast _currentPodcast;
+  String _loadingMessage = "Cargando podcast...";
 
   _DetailPodcastState() {
     _presenter = new DetailPodcastPresenter(this);
@@ -45,6 +52,11 @@ class _DetailPodcastState extends State<DetailPodcastPage>
           key: sliverKey,
           delegate: new SliverChildBuilderDelegate((BuildContext context,
               int index) {
+            if (_currentPlayerIndex == index) {
+              _iconBottom = Icons.stop;
+            } else {
+              _iconBottom = Icons.play_arrow;
+            }
             return new GestureDetector(
                 onTap: () {
                   flutterWebviewPlugin.launch(
@@ -76,11 +88,34 @@ class _DetailPodcastState extends State<DetailPodcastPage>
               new Container(
                 height: 120.0,
                 child: new Center(child: new IconButton(
-                    icon: new Icon(_iconBottom, size: queryData.size.width * 0.12,
+                    icon: new Icon(
+                        _iconBottom, size: queryData.size.width * 0.12,
                         color: RadiocomColors.orange),
                     onPressed: () {
-                      _presenter.play(_episodes[index].audio);
-                      setState((){
+                      if (_currentPlayerIndex != index) {
+                        if (_presenter.isPlaying()) {
+                          _presenter.stopAndPlay(_episodes[index].audio);
+                        } else {
+                          _presenter.play(_episodes[index].audio);
+                        }
+                        _currentPlayerIndex = index;
+                        //set podcast playing
+                        _currentPodcast = new CurrentPodcast(
+                            name: _program.name,
+                            image: _program.logo_url,
+                            podcast_index: _podcast_index,
+                            episodeTitle: _episodes[_currentPlayerIndex].title,
+                            audio_index: index);
+                      } else {
+                        if (_presenter.isPlaying()) {
+                          _presenter.stop();
+                          _currentPlayerIndex = -1;
+                          _currentPodcast = null;
+                        }
+                      }
+                      Injector.setPodcast(_currentPodcast);
+
+                      setState(() {
                         _iconBottom = Icons.stop;
                       });
                     }
@@ -95,7 +130,7 @@ class _DetailPodcastState extends State<DetailPodcastPage>
           delegate: new SliverChildBuilderDelegate((BuildContext context,
               int index) {
             return new Center(
-                child: new Text("No hay episodios en este podcast",
+                child: new Text(_loadingMessage,
                     style: new TextStyle(inherit: false,
                         fontFamily: RadiocomUtils.fontFamily,
                         fontWeight: FontWeight.w800,
@@ -164,12 +199,20 @@ class _DetailPodcastState extends State<DetailPodcastPage>
   void initState() {
     super.initState();
     _program = widget.program;
+    _podcast_index = widget.podcast_index;
+    _currentPodcast = Injector.getPodcast();
+    if(_currentPodcast!=null && _currentPodcast.name == _program.name){
+      _currentPlayerIndex = _currentPodcast.audio_index;
+    }
     _presenter.loadEpisodes(_program.rss_url);
   }
 
   @override
   void onLoadEpidoses(List<Episode> episodes) {
     setState(() {
+      if(episodes.length == 0){
+        _loadingMessage = "No hay episodios en este podcast";
+      }
       _episodes = episodes;
     });
   }
@@ -181,7 +224,9 @@ class _DetailPodcastState extends State<DetailPodcastPage>
 
   @override
   void onErrorLoadingEpisodes(String err) {
-    // TODO: implement errorLoadingEpisodes
+    setState(() {
+      _loadingMessage = "No hay episodios en este podcast";
+    });
   }
 
 

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:audioplayer/audioplayer.dart';
+import 'package:cuacfm/injector/dependecy_injector.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
@@ -23,21 +24,14 @@ abstract class HomeView {
   void onPlayerStopped();
 }
 
-enum PlayerState {
-  play,
-  stop,
-  pause
-}
+
 
 class HomePresenter {
 
   HomeView _homeView;
-  AudioPlayer audioPlayer;
-  var _playerState;
   CuacRepository _repository;
 
   HomePresenter(this._homeView, [CuacRepository repository]) {
-    audioPlayer = new AudioPlayer();
     _repository = _repository != null ? repository : new CuacRepository();
   }
 
@@ -89,17 +83,37 @@ class HomePresenter {
     });
   }
 
+
   play(String url) async {
-    if (_playerState != PlayerState.play) {
-      final result = await audioPlayer.play(
+    if (Injector.playerState != PlayerState.play) {
+      final result = await Injector.player.play(
           url, isLocal: false);
-      if (result == 1) _playerState = PlayerState.play;
+      if (result == 1) Injector.playerState = PlayerState.play;
       _homeView.onPlayerReady();
-    } else {
-      final result = await audioPlayer.stop();
-      if (result == 1) _playerState = PlayerState.stop;
+    }
+  }
+
+  stopAndPlay(String url) async {
+    if (Injector.playerState == PlayerState.play || Injector.playerState == PlayerState.pause) {
+      final result = await Injector.player.stop();
+      if (result == 1) Injector.playerState = PlayerState.stop;
+      final playResult = await Injector.player.play(
+          url, isLocal: false);
+      if (playResult == 1) Injector.playerState = PlayerState.play;
+      _homeView.onPlayerReady();
+    }
+  }
+
+  stop() async {
+    if (Injector.playerState == PlayerState.play || Injector.playerState == PlayerState.pause) {
+      final result = await Injector.player.stop();
+      if (result == 1) Injector.playerState = PlayerState.stop;
       _homeView.onPlayerStopped();
     }
+  }
+
+  bool isPlaying() {
+    return Injector.playerState == PlayerState.play;
   }
 
 }

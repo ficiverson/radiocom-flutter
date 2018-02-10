@@ -18,6 +18,10 @@ flutter:
 
   uses-material-design: true
 
+  assets:
+      - assets/graphics/icon_info.png
+      - assets/graphics/play_podcast.png
+
   fonts:
       - family: Montserrat
         fonts:
