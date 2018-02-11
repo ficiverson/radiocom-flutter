@@ -67,6 +67,7 @@ class DetailPodcastPresenter {
       final result = await Injector.player.stop();
       if (result == 1) Injector.playerState = PlayerState.stop;
       _view.onPlayerStopped();
+      Injector.resetPlayer();
       final playResult = await Injector.player.play(
           url, isLocal: false);
       if (playResult == 1) Injector.playerState = PlayerState.play;
@@ -80,6 +81,7 @@ class DetailPodcastPresenter {
       final result = await Injector.player.stop();
       if (result == 1) Injector.playerState = PlayerState.stop;
       _view.onPlayerStopped();
+      Injector.resetPlayer();
     }
   }
 

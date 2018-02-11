@@ -29,13 +29,27 @@ class Injector {
   }
 
   static AudioPlayer get player {
-    if(audioPlayer == null) {
+    if (audioPlayer == null) {
       AudioPlayer.logEnabled = false;
       audioPlayer = new AudioPlayer();
-      audioPlayer.setCompletionHandler((){
+      audioPlayer.setCompletionHandler(() {
         playerState = PlayerState.stop;
       });
     }
+    return audioPlayer;
+  }
+
+  static AudioPlayer resetPlayer() {
+    TimeChangeHandler durationHandler = audioPlayer.durationHandler;
+    TimeChangeHandler positionHandler = audioPlayer.positionHandler;
+    audioPlayer = null;
+    AudioPlayer.players.clear();
+    audioPlayer = new AudioPlayer();
+    audioPlayer.setCompletionHandler(() {
+      playerState = PlayerState.stop;
+    });
+    audioPlayer.setDurationHandler(durationHandler);
+    audioPlayer.setPositionHandler(positionHandler);
     return audioPlayer;
   }
 

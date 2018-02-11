@@ -28,6 +28,19 @@ class CuacRepository {
     });
   }
 
+  Future<List<Program>> getTimetableData() {
+    Uri url = Uri.parse(NetworkUtils.baseUrl + NetworkUtils.timetable +
+        NetworkUtils.timetableAfter + "11/02/2018" + NetworkUtils.timetableBefore + "12/02/2018");
+    return this.client.get(url)
+        .then((res) {
+      List<Map<String, dynamic>> items = res;
+      List<Program> programs = items
+          .map((g) => new Program.fromInstance(g))
+          .toList();
+      return programs;
+    });
+  }
+
   Future<List<Program>> getAllPodcasts() {
     Uri url = Uri.parse(NetworkUtils.baseUrl + NetworkUtils.podcast);
     return this.client.get(url)
@@ -37,6 +50,6 @@ class CuacRepository {
           .map((g) => new Program.fromInstance(g))
           .toList();
       return programs;
-        });
+    });
   }
 }

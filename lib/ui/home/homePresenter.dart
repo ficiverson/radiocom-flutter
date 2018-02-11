@@ -18,6 +18,8 @@ abstract class HomeView {
 
   void onLoadPodcasts(List<Program> podcasts);
 
+  void onLoadTimetable(List<Program> programs);
+
   void onPlayerReady();
 
   void onPlayerStopped();
@@ -85,6 +87,18 @@ class HomePresenter {
     });
   }
 
+  getTimatable() {
+    _repository.getTimetableData()
+        .catchError((err) {
+      //todo use error
+    })
+        .then((programs) {
+      if (programs != null) {
+        _homeView.onLoadTimetable(programs);
+      }
+    });
+  }
+
   getAllPodcasts() {
     _repository.getAllPodcasts()
         .catchError((err) {
@@ -112,6 +126,7 @@ class HomePresenter {
         Injector.playerState == PlayerState.pause) {
       final result = await Injector.player.stop();
       if (result == 1) Injector.playerState = PlayerState.stop;
+      Injector.resetPlayer();
       final playResult = await Injector.player.play(
           url, isLocal: false);
       if (playResult == 1) Injector.playerState = PlayerState.play;
@@ -125,6 +140,7 @@ class HomePresenter {
       final result = await Injector.player.stop();
       if (result == 1) Injector.playerState = PlayerState.stop;
       _homeView.onPlayerStopped();
+      Injector.resetPlayer();
     }
   }
 

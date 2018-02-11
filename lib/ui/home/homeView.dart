@@ -50,6 +50,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   Color homeColorState = RadiocomColors.orangeDark;
   Color newsColorState = RadiocomColors.orangegradient;
   Color podcastColorState = RadiocomColors.orangegradient;
+  Color timetableColorState = RadiocomColors.orangegradient;
 
 
   _MyHomePageState() {
@@ -67,6 +68,14 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
             fontFamily: RadiocomUtils.fontFamily,
             fontWeight: FontWeight.w500,
             color: homeColorState,
+            textBaseline: TextBaseline.alphabetic))));
+    buttons.add(new BottomNavigationBarItem(
+        icon: new Icon(Icons.timelapse, color: timetableColorState),
+        title: new Text("Parrilla", style: new TextStyle(inherit: false,
+            fontSize: RadiocomUtils.mediumFontSize,
+            fontFamily: RadiocomUtils.fontFamily,
+            fontWeight: FontWeight.w500,
+            color: RadiocomColors.orangegradient,
             textBaseline: TextBaseline.alphabetic))));
     buttons.add(new BottomNavigationBarItem(
         icon: new Icon(_iconBottom, color: RadiocomColors.orangegradient),
@@ -410,7 +419,6 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
                           valueColor:
                           new AlwaysStoppedAnimation(RadiocomColors.orange),
                         ), onTapUp: (position) {
-                          print(position.globalPosition.dx);
                           double seek = ((position.globalPosition.dx - 125.0) /
                               200.0) * _playerDuration.toDouble();
                           if (seek < 0.0) {
@@ -552,7 +560,9 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
 
       Widget content = _buildCarrousel(items);
       _body = _buildContainer(content);
-    } else if (_currentIndex == 2) { //news
+    } else if (_currentIndex == 1) {
+      _body = new Text("aa");//timetable
+    } else if (_currentIndex == 3) { //news
       _body = new ListView.builder(
         padding: new EdgeInsets.all(8.0),
         reverse: false,
@@ -605,7 +615,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
         },
         itemCount: _news.length,
       );
-    } else if (_currentIndex == 3) { //podcast
+    } else if (_currentIndex == 4) { //podcast
       _body = new ListView.builder(
         reverse: false,
         itemExtent: 220.0,
@@ -650,7 +660,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
       );
     }
 
-    if (_currentIndex == 3) {
+    if (_currentIndex == 4) {
       IconButton actionPodcast;
       actionPodcast = new IconButton(
           icon: const Icon(Icons.search),
@@ -743,19 +753,27 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
       homeColorState = RadiocomColors.orangeDark;
       newsColorState = RadiocomColors.orangegradient;
       podcastColorState = RadiocomColors.orangegradient;
-    } else if (index == 1) { //show player
+      timetableColorState = RadiocomColors.orangegradient;
+    } else if (index == 1) { //show timatable
+      homeColorState = RadiocomColors.orangegradient;
+      newsColorState = RadiocomColors.orangegradient;
+      podcastColorState = RadiocomColors.orangegradient;
+      timetableColorState = RadiocomColors.orangeDark;
+    }else if (index == 2) { //show player
       _showBottomSheet();
-    } else if (index == 2) {
+    } else if (index == 3) {
       homeColorState = RadiocomColors.orangegradient;
       newsColorState = RadiocomColors.orangeDark;
       podcastColorState = RadiocomColors.orangegradient;
-    } else if (index == 3) {
+      timetableColorState = RadiocomColors.orangegradient;
+    } else if (index == 4) {
       homeColorState = RadiocomColors.orangegradient;
       newsColorState = RadiocomColors.orangegradient;
       podcastColorState = RadiocomColors.orangeDark;
+      timetableColorState = RadiocomColors.orangegradient;
     }
     setState(() {
-      if (index != 1) {
+      if (index != 2) {
         _currentIndex = index;
       }
     });
@@ -786,8 +804,14 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
       _station = station;
     });
     _presenter.getNews();
+   // _presenter.getTimatable();
     _presenter.getLiveProgram();
     _presenter.getAllPodcasts();
+  }
+
+  @override
+  void onLoadTimetable(List<Program> programs) {
+    // TODO: implement onLoadTimetable
   }
 
   @override
