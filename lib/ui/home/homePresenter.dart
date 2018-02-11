@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:audioplayer/audioplayer.dart';
 import 'package:cuacfm/injector/dependecy_injector.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/program.dart';
@@ -22,8 +21,11 @@ abstract class HomeView {
   void onPlayerReady();
 
   void onPlayerStopped();
-}
 
+  void playerDuration(int durationMS);
+
+  void playerPosition(int positionMS);
+}
 
 
 class HomePresenter {
@@ -36,20 +38,26 @@ class HomePresenter {
   }
 
   getNews() async {
-    List newsObj = [];
-    var xml2json = new Xml2Json();
-    var httpClient = createHttpClient();
+    try {
+      List newsObj = [];
+      var xml2json = new Xml2Json();
+      var httpClient = createHttpClient();
 
-    var response = await httpClient.get("https://cuacfm.org/feed/");
-    xml2json.parse(response.body);
-    Map news = JSON.decode(xml2json.toGData());
+      var response = await httpClient.get("https://cuacfm.org/feed/");
+      xml2json.parse(response.body);
+      Map news = JSON.decode(xml2json.toGData());
 
-    if (news.containsKey("rss")) {
-      newsObj = news["rss"]["channel"]["item"];
-      List<New> newsList = newsObj
-          .map((n) => new New.fromInstance(n))
-          .toList();
-      _homeView.onLoadNews(newsList);
+      if (news.containsKey("rss")) {
+        newsObj = news["rss"]["channel"]["item"];
+        List<New> newsList = newsObj
+            .map((n) => new New.fromInstance(n))
+            .toList();
+        if (newsList != null) {
+          _homeView.onLoadNews(newsList);
+        }
+      }
+    } catch (err) {
+
     }
   }
 
@@ -59,7 +67,9 @@ class HomePresenter {
       //todo use error
     })
         .then((station) {
-      _homeView.onLoadRadioStation(station);
+      if (station != null) {
+        _homeView.onLoadRadioStation(station);
+      }
     });
   }
 
@@ -69,7 +79,9 @@ class HomePresenter {
       //todo use error
     })
         .then((now) {
-      _homeView.onLoadLiveData(now);
+      if (now != null) {
+        _homeView.onLoadLiveData(now);
+      }
     });
   }
 
@@ -79,7 +91,9 @@ class HomePresenter {
       //todo use error
     })
         .then((podcasts) {
-      _homeView.onLoadPodcasts(podcasts);
+      if (podcasts != null) {
+        _homeView.onLoadPodcasts(podcasts);
+      }
     });
   }
 
@@ -94,7 +108,8 @@ class HomePresenter {
   }
 
   stopAndPlay(String url) async {
-    if (Injector.playerState == PlayerState.play || Injector.playerState == PlayerState.pause) {
+    if (Injector.playerState == PlayerState.play ||
+        Injector.playerState == PlayerState.pause) {
       final result = await Injector.player.stop();
       if (result == 1) Injector.playerState = PlayerState.stop;
       final playResult = await Injector.player.play(
@@ -105,7 +120,8 @@ class HomePresenter {
   }
 
   stop() async {
-    if (Injector.playerState == PlayerState.play || Injector.playerState == PlayerState.pause) {
+    if (Injector.playerState == PlayerState.play ||
+        Injector.playerState == PlayerState.pause) {
       final result = await Injector.player.stop();
       if (result == 1) Injector.playerState = PlayerState.stop;
       _homeView.onPlayerStopped();
@@ -114,6 +130,21 @@ class HomePresenter {
 
   bool isPlaying() {
     return Injector.playerState == PlayerState.play;
+  }
+
+  seekTo(double position) async {
+    final result = await Injector.player.seek(position);
+    if (result == 1) Injector.playerState = PlayerState.play;
+  }
+
+
+  setHandlers() {
+    Injector.player.setDurationHandler((duration) {
+      _homeView.playerDuration(duration.inMilliseconds);
+    });
+    Injector.player.setPositionHandler((position) {
+      _homeView.playerPosition(position.inMilliseconds);
+    });
   }
 
 }

@@ -1,4 +1,4 @@
-import 'package:audioplayer/audioplayer.dart';
+import 'package:audioplayers/audioplayer.dart';
 import 'package:cuacfm/models/current_podcast.dart';
 
 enum PlayerState {
@@ -30,7 +30,11 @@ class Injector {
 
   static AudioPlayer get player {
     if(audioPlayer == null) {
+      AudioPlayer.logEnabled = false;
       audioPlayer = new AudioPlayer();
+      audioPlayer.setCompletionHandler((){
+        playerState = PlayerState.stop;
+      });
     }
     return audioPlayer;
   }

@@ -32,8 +32,9 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
       ScaffoldState>();
   int _currentIndex = 0;
   List newsObj = [];
+  int _playerDuration = 0;
+  int _playerPosition = 0;
   double _margin = 20.0;
-  FloatingActionButton _floatingActionButton;
   VoidCallback _showBottomSheetCallback;
   PersistentBottomSheetController<Null> persistentBottomSheetController;
   IconData _iconBottom = Icons.play_arrow;
@@ -41,7 +42,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   List<Program> _podcast = new List<Program>();
   List<Program> _podcastWithFilter = new List<Program>();
   List<New> _news = new List<New>();
-  RadioStation _station = new RadioStation.base();
+  RadioStation _station;
   String _myText = "Benvida a ";
   final FlutterWebviewPlugin flutterWebviewPlugin = new FlutterWebviewPlugin();
   var _body;
@@ -391,6 +392,36 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
                           color: RadiocomColors.fontH1,
                           textBaseline: TextBaseline.alphabetic)),
                   new Container(
+                      margin: new EdgeInsets.fromLTRB(
+                          0.0, _margin, 0.0, 0.0), child: new SizedBox(
+                      width: 200.0,
+                      height: 12.0,
+                      child: new Stack(fit: StackFit.expand,children: [
+                        new LinearProgressIndicator(
+                            value: 1.0,
+                            valueColor: new AlwaysStoppedAnimation(
+                                RadiocomColors.platinumdark)),
+                        new GestureDetector(child: new LinearProgressIndicator(
+                          value: _playerPosition != null &&
+                              _playerPosition > 0 && _playerDuration > 0
+                              ? _playerPosition /
+                              _playerDuration
+                              : 0.0,
+                          valueColor:
+                          new AlwaysStoppedAnimation(RadiocomColors.orange),
+                        ), onTapUp: (position) {
+                          print(position.globalPosition.dx);
+                          double seek = ((position.globalPosition.dx - 125.0) /
+                              200.0) * _playerDuration.toDouble();
+                          if (seek < 0.0) {
+                            seek = 0.0;
+                          } else if (seek > _playerDuration) {
+                            seek = _playerDuration.toDouble();
+                          }
+                          _presenter.seekTo(seek / 1000);
+                        })
+                      ]))),
+                  new Container(
                       width: _margin * 5,
                       child: new IconButton(
                           icon: new Icon(Icons.stop, size: 50.0,
@@ -698,6 +729,8 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   @override
   void initState() {
     super.initState();
+    _station = new RadioStation.base();
+    _presenter.setHandlers();
     _nowProgram = new Now.mock();
     _presenter.getRadioStationData();
   }
@@ -778,4 +811,17 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
     }
   }
 
+  @override
+  void playerDuration(int durationMS) {
+    setState(() {
+      _playerDuration = durationMS;
+    });
+  }
+
+  @override
+  void playerPosition(int positionMS) {
+    setState(() {
+      _playerPosition = positionMS;
+    });
+  }
 }

@@ -1,10 +1,8 @@
 import 'dart:convert';
 
-import 'package:audioplayer/audioplayer.dart';
 import 'package:cuacfm/injector/dependecy_injector.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/repository/RadiocomRepository.dart';
-import 'package:cuacfm/ui/home/homePresenter.dart';
 import 'package:xml2json/xml2json.dart';
 import 'package:flutter/services.dart';
 
