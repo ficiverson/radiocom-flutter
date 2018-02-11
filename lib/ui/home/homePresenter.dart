@@ -6,7 +6,7 @@ import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
-import 'package:cuacfm/repository/CuacRepository.dart';
+import 'package:cuacfm/repository/RadiocomRepository.dart';
 import 'package:xml2json/xml2json.dart';
 import 'package:flutter/services.dart';
 

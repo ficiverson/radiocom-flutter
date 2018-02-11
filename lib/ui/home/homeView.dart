@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   List getButtons() {
     List buttons = new List();
     buttons.add(new BottomNavigationBarItem(
-        icon: new Icon(Icons.home, color: homeColorState,),
+        icon: new Icon(Icons.home, color: homeColorState),
         title: new Text("Inicio", style: new TextStyle(inherit: false,
             fontSize: RadiocomUtils.mediumFontSize,
             fontFamily: RadiocomUtils.fontFamily,
@@ -84,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
             color: newsColorState,
             textBaseline: TextBaseline.alphabetic))));
     buttons.add(new BottomNavigationBarItem(
-        icon: new Icon(Icons.translate, color: podcastColorState),
+        icon: new Icon(Icons.rss_feed, color: podcastColorState),
         title: new Text("Podcast", style: new TextStyle(inherit: false,
             fontSize: RadiocomUtils.mediumFontSize,
             fontFamily: RadiocomUtils.fontFamily,
@@ -382,10 +382,12 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
                   new Text(Injector
                       .getPodcast()
                       .episodeTitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: new TextStyle(inherit: false,
                           fontSize: RadiocomUtils.largeFontSize,
                           fontFamily: RadiocomUtils.fontFamily,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           color: RadiocomColors.fontH1,
                           textBaseline: TextBaseline.alphabetic)),
                   new Container(
@@ -632,7 +634,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
         });
 
         FloatingActionButton floatingActionButton = new FloatingActionButton(
-            elevation: 7.0,
+            elevation: 0.0,
             child: new Icon(Icons.stop),
             backgroundColor: RadiocomColors.orangeDark,
             onPressed: () {

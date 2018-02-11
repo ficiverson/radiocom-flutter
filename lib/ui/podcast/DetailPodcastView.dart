@@ -169,15 +169,16 @@ class _DetailPodcastState extends State<DetailPodcastPage>
                       height: 240.0, color: RadiocomColors.orangegradient),
                   ]),
                   centerTitle: true,
-                  title: new Text(_program.name, maxLines: 1,
-                      style: new TextStyle(inherit: false,
-                          fontFamily: RadiocomUtils.fontFamily,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 20.0,
-                          letterSpacing: 1.5,
-                          color: RadiocomColors.white,
-                          textBaseline: TextBaseline.alphabetic),
-                      overflow: TextOverflow.ellipsis))
+                  title: new Container(width: queryData.size.width-_margin*7,
+                      child: new Text(_program.name, maxLines: 1,textAlign: TextAlign.center,
+                          style: new TextStyle(inherit: false,
+                              fontFamily: RadiocomUtils.fontFamily,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 18.0,
+                              letterSpacing: 1.2,
+                              color: RadiocomColors.white,
+                              textBaseline: TextBaseline.alphabetic),
+                          overflow: TextOverflow.ellipsis)))
           ),
           getContentRss()
         ]);
@@ -201,7 +202,7 @@ class _DetailPodcastState extends State<DetailPodcastPage>
     _program = widget.program;
     _podcast_index = widget.podcast_index;
     _currentPodcast = Injector.getPodcast();
-    if(_currentPodcast!=null && _currentPodcast.name == _program.name){
+    if (_currentPodcast != null && _currentPodcast.name == _program.name) {
       _currentPlayerIndex = _currentPodcast.audio_index;
     }
     _presenter.loadEpisodes(_program.rss_url);
@@ -210,7 +211,7 @@ class _DetailPodcastState extends State<DetailPodcastPage>
   @override
   void onLoadEpidoses(List<Episode> episodes) {
     setState(() {
-      if(episodes.length == 0){
+      if (episodes.length == 0) {
         _loadingMessage = "No hay episodios en este podcast";
       }
       _episodes = episodes;

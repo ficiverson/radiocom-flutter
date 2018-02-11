@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
+import 'package:http_parser/src/media_type.dart';
 
 enum HTTPMethod {
   GET,
@@ -71,7 +72,8 @@ class SimpleClient {
 
     Map<String, String> headers = {
       HttpHeaders.CONTENT_TYPE: 'application/json',
-      HttpHeaders.ACCEPT_CHARSET: 'utf-8'
+      HttpHeaders.ACCEPT_ENCODING: 'utf-8',
+      HttpHeaders.ACCEPT_CHARSET : 'utf-8'
     };
 
     headers.addAll(request.headers);
@@ -83,7 +85,6 @@ class SimpleClient {
             request.url,
             headers: headers,
             //body: reqBody
-          //TODO REVIEW ENCODING OF REQUESTS
         )
     );
   }
@@ -100,7 +101,11 @@ class SimpleClient {
         throw new HttpException(
             'Unexpected status code [$statusCode]: ${response.body}');
       }
-      dynamic respBody = JSON.decode(response.body.toString());
+      //decode due to a radioco problem with utf8 encoding
+      var encoding = Encoding.getByName("utf-8");
+      String responseUTF8 = encoding.decode(response.bodyBytes);
+
+      dynamic respBody = JSON.decode(responseUTF8);
 
       if (respBody == null) {
         throw new HttpException('Error parsing response');

@@ -10,6 +10,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
+      debugShowCheckedModeBanner: false,
+      showPerformanceOverlay: false,
+      showSemanticsDebugger: false,
+      checkerboardOffscreenLayers: false,
       title: 'CUAC FM',
       theme: new ThemeData(
         primarySwatch: Colors.orange,
@@ -19,3 +23,8 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+//TODO TO PRODUCTION
+//add scheduling??
+//progress bar on side menu
+
