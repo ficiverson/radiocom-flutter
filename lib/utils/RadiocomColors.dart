@@ -12,6 +12,7 @@ class RadiocomColors {
   static final Color white = new Color(0x9FFFFFFFF);
 
   static final Color orangegradient = new Color(0xD9ff9900);
+  static final Color orangeDarkgradient = new Color(0xD95f3900);
   static final Color blackgradient = new Color(0x99000000);
   static final Color blackgradient65 = new Color(0xA6000000);
   static final Color whitegradient = new Color(0x99FFFFFF);

@@ -1,10 +1,12 @@
 import 'dart:convert';
 
+import 'package:intl/intl.dart';
 import 'package:cuacfm/injector/dependecy_injector.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
+import 'package:cuacfm/models/time_table.dart';
 import 'package:cuacfm/repository/RadiocomRepository.dart';
 import 'package:xml2json/xml2json.dart';
 import 'package:flutter/services.dart';
@@ -18,7 +20,7 @@ abstract class HomeView {
 
   void onLoadPodcasts(List<Program> podcasts);
 
-  void onLoadTimetable(List<Program> programs);
+  void onLoadTimetable(List<TimeTable> programsTimeTable);
 
   void onPlayerReady();
 
@@ -87,14 +89,18 @@ class HomePresenter {
     });
   }
 
-  getTimatable() {
-    _repository.getTimetableData()
+  getTimetable() {
+    DateTime nowDate = new DateTime.now();
+    var formatter = new DateFormat('dd/MM/yyyy');
+    String now = formatter.format(nowDate);
+    String tomorrow =  formatter.format(nowDate.toUtc().add(new Duration(days: 1)));
+    _repository.getTimetableData(now,tomorrow)
         .catchError((err) {
       //todo use error
     })
-        .then((programs) {
-      if (programs != null) {
-        _homeView.onLoadTimetable(programs);
+        .then((programsTimetable) {
+      if (programsTimetable != null) {
+        _homeView.onLoadTimetable(programsTimetable);
       }
     });
   }

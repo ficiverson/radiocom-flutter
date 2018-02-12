@@ -3,6 +3,7 @@ import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
+import 'package:cuacfm/models/time_table.dart';
 import 'package:cuacfm/ui/home/homePresenter.dart';
 import 'package:cuacfm/ui/podcast/DetailPodcastView.dart';
 import 'package:cuacfm/utils/IphoneXPadding.dart';
@@ -41,9 +42,10 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   Now _nowProgram;
   List<Program> _podcast = new List<Program>();
   List<Program> _podcastWithFilter = new List<Program>();
+  List<TimeTable> _programsTimetable = new List<TimeTable>();
   List<New> _news = new List<New>();
   RadioStation _station;
-  String _myText = "Benvida a ";
+  String _appTitle = "CUAC FM";
   final FlutterWebviewPlugin flutterWebviewPlugin = new FlutterWebviewPlugin();
   var _body;
   var _hideFloating = false;
@@ -87,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
             textBaseline: TextBaseline.alphabetic))));
     buttons.add(new BottomNavigationBarItem(
         icon: new Icon(Icons.description, color: newsColorState),
-        title: new Text("Novas", style: new TextStyle(inherit: false,
+        title: new Text("Noticias", style: new TextStyle(inherit: false,
             fontSize: RadiocomUtils.mediumFontSize,
             fontFamily: RadiocomUtils.fontFamily,
             fontWeight: FontWeight.w500,
@@ -405,7 +407,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
                           0.0, _margin, 0.0, 0.0), child: new SizedBox(
                       width: 200.0,
                       height: 12.0,
-                      child: new Stack(fit: StackFit.expand,children: [
+                      child: new Stack(fit: StackFit.expand, children: [
                         new LinearProgressIndicator(
                             value: 1.0,
                             valueColor: new AlwaysStoppedAnimation(
@@ -484,7 +486,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   AppBar buildAppBarPodcast(Widget actionPodcast) {
     return new AppBar(
         title: new Text(
-            _station.station_name, style: new TextStyle(inherit: false,
+            _appTitle, style: new TextStyle(inherit: false,
             fontFamily: RadiocomUtils.fontFamily,
             fontWeight: FontWeight.w700,
             letterSpacing: 2.0,
@@ -555,14 +557,86 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
     _margin = RadiocomUtils.getMargin(
         queryData.size.height, queryData.devicePixelRatio);
     if (_currentIndex == 0) { //home
+      _appTitle = _station.station_name;
       List<Widget> items = _station.station_photos.map((p) =>
           _buildItem(p, context)).toList();
 
       Widget content = _buildCarrousel(items);
       _body = _buildContainer(content);
     } else if (_currentIndex == 1) {
-      _body = new Text("aa");//timetable
+      _appTitle = "Parrilla";
+      _body = new ListView.builder(
+        scrollDirection: Axis.vertical,
+        shrinkWrap: true,
+        itemExtent: 150.0,
+        itemBuilder: (BuildContext context, int index) {
+          Color background = RadiocomColors.orangegradient;
+          if (_programsTimetable[index].start.hour == new DateTime.now().hour &&
+              _programsTimetable[index].start.day == new DateTime.now().day) {
+            background = RadiocomColors.orangeDarkgradient;
+          }
+          return new GestureDetector(
+              onTap: () { //TODO end this
+                //open podcast detail view
+                Program program = new Program.fromInstance(
+                    _programsTimetable[index].toMap());
+                DetailPodcastPage detailView = new DetailPodcastPage(
+                    program: program,
+                    podcast_index: index
+                );
+
+                Navigator.push(context, new MaterialPageRoute(
+                    builder: (BuildContext context) => detailView,
+                    fullscreenDialog: false
+                ));
+              }, child: new Stack(children: <Widget>[new Container(
+              width: queryData.size.width,
+              height: 150.0,
+              foregroundDecoration: new BoxDecoration(
+                color: RadiocomColors.blackgradient65,
+                image: new DecorationImage(
+                  image: new NetworkImage(
+                      _programsTimetable[index].logo_url),
+                  fit: BoxFit.cover,
+                ),
+              )), new Container(width: queryData.size.width,
+              height: 150.0, color: background),
+          new Container(
+              width: queryData.size.width,
+              height: 150.0,
+              child: new Column(mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max, children: <Widget>[
+                    new Text(" " + _programsTimetable[index].name, maxLines: 1,
+                      style: new TextStyle(inherit: false,
+                          fontFamily: RadiocomUtils.fontFamily,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 16.0,
+                          letterSpacing: 2.0,
+                          color: RadiocomColors.white,
+                          textBaseline: TextBaseline.alphabetic),
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,),
+                    new Text(
+                      _programsTimetable[index].start.hour.toString() +
+                          ":00 - " +
+                          _programsTimetable[index].end.hour.toString() + ":00",
+                      maxLines: 1,
+                      style: new TextStyle(inherit: false,
+                          fontFamily: RadiocomUtils.fontFamily,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 25.0,
+                          letterSpacing: 2.0,
+                          color: RadiocomColors.white,
+                          textBaseline: TextBaseline.alphabetic),
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,)
+                  ]))
+          ]));
+        },
+        itemCount: _programsTimetable.length,
+      );
     } else if (_currentIndex == 3) { //news
+      _appTitle = "Noticias";
       _body = new ListView.builder(
         padding: new EdgeInsets.all(8.0),
         reverse: false,
@@ -616,6 +690,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
         itemCount: _news.length,
       );
     } else if (_currentIndex == 4) { //podcast
+      _appTitle = "Podcast";
       _body = new ListView.builder(
         reverse: false,
         itemExtent: 220.0,
@@ -719,7 +794,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
         resizeToAvoidBottomPadding: true,
         appBar: new AppBar(
             title: new Text(
-                _station.station_name, style: new TextStyle(inherit: false,
+                _appTitle, style: new TextStyle(inherit: false,
                 fontFamily: RadiocomUtils.fontFamily,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 2.0,
@@ -759,7 +834,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
       newsColorState = RadiocomColors.orangegradient;
       podcastColorState = RadiocomColors.orangegradient;
       timetableColorState = RadiocomColors.orangeDark;
-    }else if (index == 2) { //show player
+    } else if (index == 2) { //show player
       _showBottomSheet();
     } else if (index == 3) {
       homeColorState = RadiocomColors.orangegradient;
@@ -804,14 +879,25 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
       _station = station;
     });
     _presenter.getNews();
-   // _presenter.getTimatable();
+    _presenter.getTimetable();
     _presenter.getLiveProgram();
     _presenter.getAllPodcasts();
   }
 
   @override
-  void onLoadTimetable(List<Program> programs) {
-    // TODO: implement onLoadTimetable
+  void onLoadTimetable(List<TimeTable> programsTimeTable) {
+    _programsTimetable = programsTimeTable;
+    int firstElement = 0;
+    for (int i = 0; i < _programsTimetable.length; i++) {
+      if (_programsTimetable[i].start.hour == new DateTime.now().hour &&
+          _programsTimetable[i].start.day == new DateTime.now().day) {
+        firstElement = i;
+      }
+    }
+    setState(() {
+      _programsTimetable =
+          _programsTimetable.sublist(firstElement, _programsTimetable.length);
+    });
   }
 
   @override

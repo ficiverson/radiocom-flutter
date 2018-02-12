@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
+import 'package:cuacfm/models/time_table.dart';
 import 'package:cuacfm/repository/NetworkUtils.dart';
 import 'package:cuacfm/utils/cuac_client.dart';
 
@@ -28,16 +29,16 @@ class CuacRepository {
     });
   }
 
-  Future<List<Program>> getTimetableData() {
+  Future<List<TimeTable>> getTimetableData(String after, String before) {
     Uri url = Uri.parse(NetworkUtils.baseUrl + NetworkUtils.timetable +
-        NetworkUtils.timetableAfter + "11/02/2018" + NetworkUtils.timetableBefore + "12/02/2018");
+        NetworkUtils.timetableAfter + after + NetworkUtils.timetableBefore + before);
     return this.client.get(url)
         .then((res) {
       List<Map<String, dynamic>> items = res;
-      List<Program> programs = items
-          .map((g) => new Program.fromInstance(g))
+      List<TimeTable> programsTimeTable = items
+          .map((g) => new TimeTable.fromInstance(g))
           .toList();
-      return programs;
+      return programsTimeTable;
     });
   }
 

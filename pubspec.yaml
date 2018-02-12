@@ -6,6 +6,8 @@ dependencies:
   flutter_webview_plugin: "^0.0.9+1"
   audioplayers: "^0.4.1"
   xml2json: "^2.0.9"
+  intl: "^0.15.2"
+
   flutter:
     sdk: flutter
   cupertino_icons: ^0.1.0
