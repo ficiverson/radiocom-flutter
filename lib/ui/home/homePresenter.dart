@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cuacfm/repository/NetworkUtils.dart';
 import 'package:intl/intl.dart';
 import 'package:cuacfm/injector/dependecy_injector.dart';
 import 'package:cuacfm/models/new.dart';
@@ -47,7 +48,7 @@ class HomePresenter {
       var xml2json = new Xml2Json();
       var httpClient = createHttpClient();
 
-      var response = await httpClient.get("https://cuacfm.org/feed/");
+      var response = await httpClient.get(NetworkUtils.feedUrl);
       xml2json.parse(response.body);
       Map news = JSON.decode(xml2json.toGData());
 

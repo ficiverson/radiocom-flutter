@@ -6,4 +6,5 @@ class NetworkUtils {
   static String timetableAfter = "&after=";
   static String timetableBefore = "&before=";
   static String live = "transmissions/now?format=json";
+  static String feedUrl = "https://cuacfm.org/feed/";
 }

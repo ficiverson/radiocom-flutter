@@ -894,15 +894,13 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
         firstElement = i;
       }
     }
-    setState(() {
-      _programsTimetable =
-          _programsTimetable.sublist(firstElement, _programsTimetable.length);
-    });
+    _programsTimetable =
+        _programsTimetable.sublist(firstElement, _programsTimetable.length);
   }
 
   @override
   void onLoadNews(List<New> news) {
-    setState(() => _news = news);
+    _news = news;
   }
 
   @override
