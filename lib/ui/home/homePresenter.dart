@@ -15,6 +15,8 @@ import 'package:flutter/services.dart';
 abstract class HomeView {
   void onLoadRadioStation(RadioStation station);
 
+  void onRadioStationError(dynamic error);
+
   void onLoadNews(List<New> news);
 
   void onLoadLiveData(Now now);
@@ -37,9 +39,15 @@ class HomePresenter {
 
   HomeView _homeView;
   CuacRepository _repository;
+  RadioStation _station;
 
   HomePresenter(this._homeView, [CuacRepository repository]) {
+    _station = new RadioStation.base();
     _repository = _repository != null ? repository : new CuacRepository();
+  }
+
+  setStation(RadioStation station){
+    _station = station;
   }
 
   getNews() async {
@@ -48,7 +56,7 @@ class HomePresenter {
       var xml2json = new Xml2Json();
       var httpClient = createHttpClient();
 
-      var response = await httpClient.get(NetworkUtils.feedUrl);
+      var response = await httpClient.get(_station.news_rss);
       xml2json.parse(response.body);
       Map news = JSON.decode(xml2json.toGData());
 
@@ -69,7 +77,7 @@ class HomePresenter {
   getRadioStationData() {
     _repository.getRadioStationData()
         .catchError((err) {
-      //todo use error
+       _homeView.onRadioStationError(err);
     })
         .then((station) {
       if (station != null) {

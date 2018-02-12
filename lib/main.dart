@@ -24,6 +24,5 @@ class MyApp extends StatelessWidget {
   }
 }
 
-//TODO TO PRODUCTION
-//refresh all webservices ??
-//check internet connection launching a pop up -->https://pub.dartlang.org/packages/connectivity
+//TODO PRODUCTION
+//empty state when no internet

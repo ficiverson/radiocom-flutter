@@ -45,6 +45,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   List<TimeTable> _programsTimetable = new List<TimeTable>();
   List<New> _news = new List<New>();
   RadioStation _station;
+  int _currentTimeLasUpdate = 0;
   String _appTitle = "CUAC FM";
   final FlutterWebviewPlugin flutterWebviewPlugin = new FlutterWebviewPlugin();
   var _body;
@@ -829,12 +830,21 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
       newsColorState = RadiocomColors.orangegradient;
       podcastColorState = RadiocomColors.orangegradient;
       timetableColorState = RadiocomColors.orangegradient;
-    } else if (index == 1) { //show timatable
+    } else if (index == 1) { //show timatable and reload every hour
+      if (_programsTimetable.length > 0 &&
+          _programsTimetable[0].start.hour < new DateTime.now().hour &&
+          _programsTimetable[0].start.day == new DateTime.now().day) {
+        _presenter.getTimetable();
+      }
       homeColorState = RadiocomColors.orangegradient;
       newsColorState = RadiocomColors.orangegradient;
       podcastColorState = RadiocomColors.orangegradient;
       timetableColorState = RadiocomColors.orangeDark;
     } else if (index == 2) { //show player
+      if (_currentTimeLasUpdate <
+          new DateTime.now().hour) { //refresh current info old data
+        _presenter.getLiveProgram();
+      }
       _showBottomSheet();
     } else if (index == 3) {
       homeColorState = RadiocomColors.orangegradient;
@@ -860,6 +870,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   void onLoadLiveData(Now now) {
     if (now != null) {
       setState(() {
+        _currentTimeLasUpdate = new DateTime.now().hour;
         _nowProgram = now;
       });
     }
@@ -878,10 +889,11 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
     setState(() {
       _station = station;
     });
-    _presenter.getNews();
+    _presenter.setStation(_station);
     _presenter.getTimetable();
-    _presenter.getLiveProgram();
+    _presenter.getNews();
     _presenter.getAllPodcasts();
+    _presenter.getLiveProgram();
   }
 
   @override
@@ -931,5 +943,23 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
     setState(() {
       _playerPosition = positionMS;
     });
+  }
+
+  @override
+  void onRadioStationError(dynamic error) {
+    var alert = new AlertDialog(
+      title: new Text("Problemas de conectividad"),
+      content: new Text("Hubo un error conectando con cuacfm.org"),
+      actions: [
+        new CupertinoButton(child: new Text("Reintentar"), onPressed: () {
+          _presenter.getRadioStationData();
+          Navigator.of(scaffoldKey.currentContext).pop();
+        }),
+        new CupertinoButton(child: new Text("Cerrar"), onPressed: () {
+          Navigator.of(scaffoldKey.currentContext).pop();
+        })
+      ],
+    );
+    showDialog(context: context, child: alert);
   }
 }
