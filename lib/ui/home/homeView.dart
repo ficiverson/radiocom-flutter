@@ -576,7 +576,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
             background = RadiocomColors.orangeDarkgradient;
           }
           return new GestureDetector(
-              onTap: () { //TODO end this
+              onTap: () {
                 //open podcast detail view
                 Program program = new Program.fromInstance(
                     _programsTimetable[index].toMap());
