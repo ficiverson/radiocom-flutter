@@ -116,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
           return new Container(
               margin: new EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
               width: queryData.size.width,
-              height: queryData.size.height / 2.5,
+              height: queryData.size.height / 2,
               color: RadiocomColors.platinumlight,
               child: new Column(
                   children: [new Row(mainAxisAlignment: MainAxisAlignment.end,

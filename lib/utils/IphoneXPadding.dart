@@ -15,6 +15,7 @@ class IPhoneXPadding extends Container {
   @override
   Widget build(BuildContext context) {
     var mediaQueryData = MediaQuery.of(context);
+
     if (!_isIPhoneX(mediaQueryData)) {
       // fallback for all non iPhone X
       return child;
@@ -22,10 +23,11 @@ class IPhoneXPadding extends Container {
 
     var homeIndicatorHeight =
     // TODO verify exact values
-    mediaQueryData.orientation == Orientation.portrait ? 22.0 : 20.0;
+    mediaQueryData.orientation == Orientation.portrait ? 6.0 : 5.0;
 
     var outer = mediaQueryData.padding;
     var bottom = outer.bottom + homeIndicatorHeight;
+
     return new MediaQuery(data: new MediaQueryData(
         padding: new EdgeInsets.fromLTRB(
             outer.left, outer.top, outer.right, bottom)),

@@ -25,5 +25,5 @@ class MyApp extends StatelessWidget {
 }
 
 //TODO TO PRODUCTION
-//set icon cuac and splash screen
+//refresh all webservices ??
 //check internet connection launching a pop up -->https://pub.dartlang.org/packages/connectivity
