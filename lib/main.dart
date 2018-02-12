@@ -23,6 +23,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-//TODO PRODUCTION
-//empty state when no internet

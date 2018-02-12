@@ -46,6 +46,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   List<New> _news = new List<New>();
   RadioStation _station;
   int _currentTimeLasUpdate = 0;
+  bool NO_DATA_NETWORK = false;
   String _appTitle = "CUAC FM";
   final FlutterWebviewPlugin flutterWebviewPlugin = new FlutterWebviewPlugin();
   var _body;
@@ -736,6 +737,21 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
       );
     }
 
+    //empty state
+    if (NO_DATA_NETWORK) {
+      _body = new Container(
+          color: RadiocomColors.orangeDarkgradient, width: queryData.size.width,
+          height: queryData.size.height, child: new Center(child: new Text(
+          "No es posible descargar los datos en este momento",
+          style: new TextStyle(inherit: false,
+              fontFamily: RadiocomUtils.fontFamily,
+              fontWeight: FontWeight.w900,
+              fontSize: 23.0,
+              letterSpacing: 2.0,
+              color: RadiocomColors.white,
+              textBaseline: TextBaseline.alphabetic))));
+    }
+
     if (_currentIndex == 4) {
       IconButton actionPodcast;
       actionPodcast = new IconButton(
@@ -889,6 +905,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
     setState(() {
       _station = station;
     });
+    NO_DATA_NETWORK = false;
     _presenter.setStation(_station);
     _presenter.getTimetable();
     _presenter.getNews();
@@ -947,6 +964,35 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
 
   @override
   void onRadioStationError(dynamic error) {
+    loadEmptyState(false);
+  }
+
+  @override
+  void onLiveDataError(error) {
+    print("error on live data");
+  }
+
+  @override
+  void onNewsError(error) {
+    loadEmptyState(true);
+  }
+
+  @override
+  void onPodcastError(error) {
+    loadEmptyState(true);
+  }
+
+  @override
+  void onTimetableError(error) {
+    loadEmptyState(true);
+  }
+
+  loadEmptyState(bool onlyPopup) {
+    if(!onlyPopup) {
+      setState(() {
+        NO_DATA_NETWORK = true;
+      });
+    }
     var alert = new AlertDialog(
       title: new Text("Problemas de conectividad"),
       content: new Text("Hubo un error conectando con cuacfm.org"),

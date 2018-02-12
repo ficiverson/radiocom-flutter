@@ -19,11 +19,19 @@ abstract class HomeView {
 
   void onLoadNews(List<New> news);
 
+  void onNewsError(dynamic error);
+
   void onLoadLiveData(Now now);
+
+  void onLiveDataError(dynamic error);
 
   void onLoadPodcasts(List<Program> podcasts);
 
+  void onPodcastError(dynamic error);
+
   void onLoadTimetable(List<TimeTable> programsTimeTable);
+
+  void onTimetableError(dynamic error);
 
   void onPlayerReady();
 
@@ -46,7 +54,7 @@ class HomePresenter {
     _repository = _repository != null ? repository : new CuacRepository();
   }
 
-  setStation(RadioStation station){
+  setStation(RadioStation station) {
     _station = station;
   }
 
@@ -70,14 +78,14 @@ class HomePresenter {
         }
       }
     } catch (err) {
-
+      _homeView.onNewsError(err);
     }
   }
 
   getRadioStationData() {
     _repository.getRadioStationData()
         .catchError((err) {
-       _homeView.onRadioStationError(err);
+      _homeView.onRadioStationError(err);
     })
         .then((station) {
       if (station != null) {
@@ -89,7 +97,7 @@ class HomePresenter {
   getLiveProgram() {
     _repository.getLiveBroadcast()
         .catchError((err) {
-      //todo use error
+      _homeView.onLiveDataError(err);
     })
         .then((now) {
       if (now != null) {
@@ -102,10 +110,11 @@ class HomePresenter {
     DateTime nowDate = new DateTime.now();
     var formatter = new DateFormat('dd/MM/yyyy');
     String now = formatter.format(nowDate);
-    String tomorrow =  formatter.format(nowDate.toUtc().add(new Duration(days: 1)));
-    _repository.getTimetableData(now,tomorrow)
+    String tomorrow = formatter.format(
+        nowDate.toUtc().add(new Duration(days: 1)));
+    _repository.getTimetableData(now, tomorrow)
         .catchError((err) {
-      //todo use error
+      _homeView.onTimetableError(err);
     })
         .then((programsTimetable) {
       if (programsTimetable != null) {
@@ -117,7 +126,7 @@ class HomePresenter {
   getAllPodcasts() {
     _repository.getAllPodcasts()
         .catchError((err) {
-      //todo use error
+      _homeView.onPodcastError(err);
     })
         .then((podcasts) {
       if (podcasts != null) {
