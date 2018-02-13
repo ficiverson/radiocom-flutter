@@ -7,7 +7,7 @@ class Now {
 
   Now.mock()
       :
-        name = "CUAC",
+        name = "Continuidad CUAC FM",
         logo_url = "https://cuacfm.org/radioco/media/photos/cuac.png";
 
   Now.fromInstance(Map<String, dynamic> map)
