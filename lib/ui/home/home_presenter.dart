@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:cuacfm/repository/NetworkUtils.dart';
+import 'package:cuacfm/repository/network_utils.dart';
 import 'package:intl/intl.dart';
 import 'package:cuacfm/injector/dependecy_injector.dart';
 import 'package:cuacfm/models/new.dart';
@@ -8,7 +8,7 @@ import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/models/time_table.dart';
-import 'package:cuacfm/repository/RadiocomRepository.dart';
+import 'package:cuacfm/repository/radiocom-repository.dart';
 import 'package:xml2json/xml2json.dart';
 import 'package:flutter/services.dart';
 

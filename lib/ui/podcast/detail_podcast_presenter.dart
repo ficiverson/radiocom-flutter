@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:cuacfm/injector/dependecy_injector.dart';
 import 'package:cuacfm/models/episode.dart';
-import 'package:cuacfm/repository/RadiocomRepository.dart';
+import 'package:cuacfm/repository/radiocom-repository.dart';
 import 'package:xml2json/xml2json.dart';
 import 'package:flutter/services.dart';
 

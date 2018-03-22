@@ -4,7 +4,7 @@ import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/models/time_table.dart';
-import 'package:cuacfm/repository/NetworkUtils.dart';
+import 'package:cuacfm/repository/network_utils.dart';
 import 'package:cuacfm/utils/cuac_client.dart';
 
 class CuacRepository {

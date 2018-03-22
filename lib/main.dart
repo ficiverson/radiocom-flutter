@@ -1,4 +1,4 @@
-import 'package:cuacfm/ui/home/homeView.dart';
+import 'package:cuacfm/ui/home/home_view.dart';
 import 'package:flutter/material.dart';
 
 void main() {
