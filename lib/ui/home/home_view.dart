@@ -291,7 +291,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
                                 padding: new EdgeInsets.all(10.0),
                                 width: queryData.size.width - 150,
                                 child: new Text(
-                                    "Benvid@ a radio comunitaria da Coruña",
+                                    "Bienvenid@ a la radio comunitaria de A Coruña",
                                     style: new TextStyle(inherit: false,
                                         fontFamily: RadiocomUtils.fontFamily,
                                         fontWeight: FontWeight.w800,
@@ -303,7 +303,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
                                 padding: new EdgeInsets.all(10.0),
                                 width: queryData.size.width - 150,
                                 child: new Text(
-                                    "Cuac FM é unha radio comunitaria. Unha radio comunitaria é unha emisora privada, sen ánimo de lucro, que ten un fin social: garantir o exercicio do dereito de acceso á comunicación e a liberdade de expresión da cidadanía.",
+                                    "Cuac FM es una radio comunitaria. Una radio comunitaria es una emisora privada, sin ánimo de lucro, que tiene un fin social: garantizar el enercicio del derecho de acceso a la comunicación y a libertad de expresión de la ciudadanía.",
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 8,
                                     style: new TextStyle(inherit: false,
@@ -517,7 +517,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
             color: RadiocomColors.white),
         title: new TextField(
           maxLines: 1,
-          style: new TextStyle(inherit: false,
+          style: new TextStyle(inherit: true,
               fontFamily: RadiocomUtils.fontFamily,
               fontWeight: FontWeight.w900,
               letterSpacing: 1.2,
