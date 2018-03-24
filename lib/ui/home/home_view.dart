@@ -113,12 +113,17 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
       _showBottomSheetCallback = null;
       _hideFloating = true;
     });
+
+    double heighBootomSheet = queryData.size.height / 1.5;
+    if(RadiocomUtils.isIPhoneX(queryData)){
+      heighBootomSheet = queryData.size.height / 2;
+    }
     persistentBottomSheetController =
         scaffoldKey.currentState.showBottomSheet<Null>((BuildContext context) {
           return new Container(
               margin: new EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
               width: queryData.size.width,
-              height: queryData.size.height / 2,
+              height: heighBootomSheet,
               color: RadiocomColors.platinumlight,
               child: new Column(
                   children: [new Row(mainAxisAlignment: MainAxisAlignment.end,
@@ -330,11 +335,15 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   }
 
   getPodcastPlayerDrawer() {
+    double drawrTop = 25.0;
+    if(RadiocomUtils.isIPhoneX(queryData)){
+      drawrTop = queryData.size.height / 4;
+    }
     return new Drawer(
         child: new Container(color: RadiocomColors.platinumdark, child:
         new Container(
             margin: new EdgeInsets.fromLTRB(
-                10.0, queryData.size.height / 4, 10.0, 10.0),
+                10.0, drawrTop, 10.0, 10.0),
             child: new Column(
                 children: [
                   new Row(mainAxisAlignment: MainAxisAlignment.end,

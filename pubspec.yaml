@@ -11,6 +11,7 @@ dependencies:
   intl: "^0.15.2"
   xml2json: "^2.0.8"
   cupertino_icons: "^0.1.0"
+  device_info: "^0.2.0"
 
 dev_dependencies:
   flutter_test:
