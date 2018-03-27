@@ -7,7 +7,7 @@ dependencies:
 
   verbal_expressions: "^0.3.1"
   flutter_webview_plugin: "^0.0.9+1"
-  audioplayers: "^0.4.1"
+  audioplayers: "^0.5.0"
   intl: "^0.15.2"
   xml2json: "^2.0.8"
   cupertino_icons: "^0.1.0"

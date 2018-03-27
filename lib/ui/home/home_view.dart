@@ -44,6 +44,9 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   List<Program> _podcastWithFilter = new List<Program>();
   List<TimeTable> _programsTimetable = new List<TimeTable>();
   List<New> _news = new List<New>();
+  GlobalKey _podcastKey = new GlobalKey();
+  GlobalKey _newsKey = new GlobalKey();
+  GlobalKey _programsTimetableKey = new GlobalKey();
   RadioStation _station;
   int _currentTimeLasUpdate = 0;
   bool NO_DATA_NETWORK = false;
@@ -115,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
     });
 
     double heighBootomSheet = queryData.size.height / 1.5;
-    if(RadiocomUtils.isIPhoneX(queryData)){
+    if (RadiocomUtils.isIPhoneX(queryData)) {
       heighBootomSheet = queryData.size.height / 2;
     }
     persistentBottomSheetController =
@@ -336,7 +339,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
 
   getPodcastPlayerDrawer() {
     double drawrTop = 25.0;
-    if(RadiocomUtils.isIPhoneX(queryData)){
+    if (RadiocomUtils.isIPhoneX(queryData)) {
       drawrTop = queryData.size.height / 4;
     }
     return new Drawer(
@@ -579,6 +582,8 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
       _body = new ListView.builder(
         scrollDirection: Axis.vertical,
         shrinkWrap: true,
+        key: _programsTimetableKey,
+        reverse: false,
         itemExtent: 150.0,
         itemBuilder: (BuildContext context, int index) {
           Color background = RadiocomColors.orangegradient;
@@ -650,7 +655,10 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
       _appTitle = "Noticias";
       _body = new ListView.builder(
         padding: new EdgeInsets.all(8.0),
+        scrollDirection: Axis.vertical,
+        key: _newsKey,
         reverse: false,
+        shrinkWrap: true,
         itemExtent: 200.0,
         itemBuilder: (BuildContext context, int index) {
           return new GestureDetector(
@@ -704,6 +712,9 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
       _appTitle = "Podcast";
       _body = new ListView.builder(
         reverse: false,
+        key: _podcastKey,
+        scrollDirection: Axis.vertical,
+        shrinkWrap: true,
         itemExtent: 220.0,
         itemBuilder: (BuildContext context, int index) {
           return new GestureDetector(
@@ -997,7 +1008,7 @@ class _MyHomePageState extends State<MyHomePage> implements HomeView {
   }
 
   loadEmptyState(bool onlyPopup) {
-    if(!onlyPopup) {
+    if (!onlyPopup) {
       setState(() {
         NO_DATA_NETWORK = true;
       });
