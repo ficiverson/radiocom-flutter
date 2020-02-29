@@ -1,7 +1,3 @@
-import 'package:verbal_expressions/verbal_expressions.dart';
-import 'package:html/parser.dart' show parse;
-import 'package:html/dom.dart';
-
 class Episode {
   String title;
   String link;

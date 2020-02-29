@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cuacfm/utils/simple_client.dart';
-class CuacClient extends SimpleClient {
-
+import 'package:flutter/foundation.dart';
+class CUACClient extends SimpleClient {
   @override
-  Future sendRequest (SimpleRequest request) {
-    return super.sendRequest(request);
+  Future sendRequest (SimpleRequest request, HTTPResponseType responseType) {
+    return super.sendRequest(request,responseType);
   }
 
 }

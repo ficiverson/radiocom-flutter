@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:http/http.dart';
-import 'package:http_parser/src/media_type.dart';
+import 'package:xml2json/xml2json.dart';
 
 enum HTTPMethod {
   GET,
@@ -11,6 +10,8 @@ enum HTTPMethod {
   PUT,
   DELETE
 }
+
+enum HTTPResponseType { JSON, XML, HTML, EMPTY }
 
 class SimpleRequest {
   final HTTPMethod method;
@@ -43,31 +44,32 @@ class SimpleClient {
     }
   }
 
-  Future<dynamic> get(Uri url, {Map<String, String> headers}) {
+  Future<dynamic> get(Uri url, {Map<String, String> headers, responseType = HTTPResponseType.JSON}) {
     return sendRequest(
         new SimpleRequest(
             HTTPMethod.GET,
             url,
-            headers: headers
-        )
+            headers: headers),
+            responseType
+
     );
   }
 
-  Future<dynamic> post(Uri url, { dynamic body, Map<String, String> headers}) {
+  Future<dynamic> post(Uri url, { dynamic body, Map<String, String> headers,responseType = HTTPResponseType.JSON}) {
     return sendRequest(
         new SimpleRequest(
           HTTPMethod.POST,
           url,
           body: body,
-          headers: headers,
-        )
+          headers: headers),
+        responseType
     );
   }
 
 
-  Future sendRequest(SimpleRequest request) {
+  Future sendRequest(SimpleRequest request,  HTTPResponseType responseType) {
     String reqBody = request.body != null
-        ? JSON.encoder.convert(request.body)
+        ? json.encoder.convert(request.body)
         : null;
 
     Map<String, String> headers = {
@@ -85,11 +87,11 @@ class SimpleClient {
             request.url,
             headers: headers,
             //body: reqBody
-        )
+        ),responseType
     );
   }
 
-  Future processResponse(Future<Response> response) {
+  Future processResponse(Future<Response> response, HTTPResponseType responseType) {
     return response
         .catchError((err) {
       throw new HttpException('Error sending request');
@@ -101,11 +103,31 @@ class SimpleClient {
         throw new HttpException(
             'Unexpected status code [$statusCode]: ${response.body}');
       }
-      //decode due to a radioco problem with utf8 encoding
-      var encoding = Encoding.getByName("utf-8");
-      String responseUTF8 = encoding.decode(response.bodyBytes);
+      dynamic respBody;
+      if (responseType == HTTPResponseType.JSON) {
+        //decode due to a radioco problem with utf8 encoding
+        var encoding = Encoding.getByName("utf-8");
+        String responseUTF8 = encoding.decode(response.bodyBytes);
 
-      dynamic respBody = JSON.decode(responseUTF8);
+        respBody = json.decode(responseUTF8);
+      } else if (responseType == HTTPResponseType.XML) {
+        var xml2json = new Xml2Json();
+        xml2json.parse(response.body);
+        var resultDecode = json.decode(xml2json.toGData());
+        if (resultDecode.containsKey("rss")) {
+          if(resultDecode["rss"]["channel"]["item"] is List){
+            respBody = resultDecode["rss"]["channel"]["item"];
+          } else {
+            List tempList = new List<dynamic>();
+            tempList.add(resultDecode["rss"]["channel"]["item"]);
+            respBody = tempList;
+          }
+        }
+      } else if (responseType == HTTPResponseType.HTML) {
+        respBody = "";
+      } else if(responseType == HTTPResponseType.EMPTY){
+        respBody = "";
+      }
 
       if (respBody == null) {
         throw new HttpException('Error parsing response');
