@@ -1,70 +1,61 @@
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:injector/injector.dart';
 
 import 'custom_image.dart';
 
-Color mC = Colors.grey.shade100;
-Color mCL = Colors.white;
-Color mCD = Colors.black.withOpacity(0.075);
-Color mCC = Colors.lightGreenAccent.withOpacity(0.65);
-Color fCD = Colors.grey.shade700;
-Color fCL = Colors.grey;
+BoxDecoration neumorphicBox(RadiocomColorsConract _colors) {
+  return BoxDecoration(
+      borderRadius: BorderRadius.circular(15),
+      color: _colors.neuPalidGrey,
+      boxShadow: [
+        BoxShadow(
+          color: _colors.neuBlackOpacity,
+          offset: Offset(10, 10),
+          blurRadius: 10,
+        ),
+        BoxShadow(
+          color: _colors.neuWhite,
+          offset: Offset(-10, -10),
+          blurRadius: 10,
+        ),
+      ]);
+}
 
-BoxDecoration nMbox = BoxDecoration(
-    borderRadius: BorderRadius.circular(15),
-    color: mC,
-    boxShadow: [
-      BoxShadow(
-        color: mCD,
-        offset: Offset(10, 10),
-        blurRadius: 10,
-      ),
-      BoxShadow(
-        color: mCL,
-        offset: Offset(-10, -10),
-        blurRadius: 10,
-      ),
-    ]);
+BoxDecoration neumorphicInverseBox(RadiocomColorsConract _colors) {
+  return BoxDecoration(
+      borderRadius: BorderRadius.circular(15),
+      color: _colors.neuBlackOpacity,
+      boxShadow: [
+        BoxShadow(
+            color: _colors.neuWhite,
+            offset: Offset(3, 3),
+            blurRadius: 3,
+            spreadRadius: -3),
+      ]);
+}
 
-BoxDecoration nMboxInvert = BoxDecoration(
-    borderRadius: BorderRadius.circular(15),
-    color: mCD,
-    boxShadow: [
-      BoxShadow(
-          color: mCL, offset: Offset(3, 3), blurRadius: 3, spreadRadius: -3),
-    ]);
 
-BoxDecoration nMboxInvertActive = nMboxInvert.copyWith(color: mCC);
-
-BoxDecoration nMbtn = BoxDecoration(
-    borderRadius: BorderRadius.circular(10),
-    color: mC,
-    boxShadow: [
-      BoxShadow(
-        color: mCD,
-        offset: Offset(2, 2),
-        blurRadius: 2,
-      )
-    ]);
-
-class NMVIew extends StatelessWidget {
+class NeumorphicView extends StatelessWidget {
+  RadiocomColorsConract _colors;
   final Widget child;
   final bool isFullScreen;
-  const NMVIew({this.child, this.isFullScreen = false});
+  NeumorphicView({this.child, this.isFullScreen = false});
   @override
   Widget build(BuildContext context) {
+    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     return Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(isFullScreen ? 0 : 25),
-            color: mC,
+            color: _colors.neuPalidGrey,
             boxShadow: [
               BoxShadow(
-                color: mCD,
+                color: _colors.neuBlackOpacity,
                 offset: Offset(2, 2),
                 blurRadius: 2,
               ),
               BoxShadow(
-                color: isFullScreen ? RadiocomColors.transparent : mCL,
+                color: isFullScreen ? _colors.transparent : _colors.neuWhite,
                 offset: Offset(-2, -2),
                 blurRadius: 2,
               ),
@@ -73,32 +64,35 @@ class NMVIew extends StatelessWidget {
   }
 }
 
-class NMButton extends StatelessWidget {
+class NeumorphicButton extends StatelessWidget {
   final bool down;
   final IconData icon;
-  const NMButton({this.down, this.icon});
+  RadiocomColorsConract _colors;
+  NeumorphicButton({this.down, this.icon});
   @override
   Widget build(BuildContext context) {
+    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     return Container(
       width: 55,
       height: 55,
-      decoration: down ? nMboxInvert : nMbox,
+      decoration: down ? neumorphicInverseBox(_colors) : neumorphicBox(_colors),
       child: Icon(
         icon,
-        color: down ? RadiocomColors.yellow : fCL,
+        color: down ? _colors.yellow : _colors.grey,
       ),
     );
   }
 }
 
-class NMCardVertical extends StatelessWidget {
+class NeumorphicCardVertical extends StatelessWidget {
   final bool active;
   final IconData icon;
   final String label;
   final String image;
   final bool imageOverLay;
   final String subtitle;
-  const NMCardVertical(
+  RadiocomColorsConract _colors;
+  NeumorphicCardVertical(
       {this.active,
       this.icon,
       this.label,
@@ -107,6 +101,7 @@ class NMCardVertical extends StatelessWidget {
       this.imageOverLay = false});
   @override
   Widget build(BuildContext context) {
+    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     var queryData = MediaQuery.of(context);
     List<Widget> elements = [];
     Widget imageContent =
@@ -118,7 +113,7 @@ class NMCardVertical extends StatelessWidget {
               return RadialGradient(
                 center: Alignment.center,
                 radius: 1.0,
-                colors: <Color>[RadiocomColors.yellow, RadiocomColors.orange],
+                colors: <Color>[_colors.yellow, _colors.orange],
                 tileMode: TileMode.mirror,
               ).createShader(bounds);
             },
@@ -129,7 +124,7 @@ class NMCardVertical extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: TextStyle(
-                  color: RadiocomColors.fontWhite,
+                  color: _colors.fontWhite,
                   fontWeight: FontWeight.w900,
                   fontSize: 24),
             )),
@@ -138,8 +133,8 @@ class NMCardVertical extends StatelessWidget {
     elements.add(Container(
         foregroundDecoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(15.0)),
-            color: RadiocomColors.transparent),
-        decoration: nMbox,
+            color: _colors.transparent),
+        decoration: neumorphicBox(_colors),
         width: imageOverLay ? 260.0 : 170.0,
         height: imageOverLay ? 180.0 : 170.0,
         child: imageContent));
@@ -151,7 +146,7 @@ class NMCardVertical extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.left,
         style: TextStyle(
-            color: RadiocomColors.font,
+            color: _colors.font,
             fontWeight: FontWeight.w700,
             fontSize: 15),
       ));
@@ -161,7 +156,7 @@ class NMCardVertical extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.left,
         style: TextStyle(
-            color: RadiocomColors.font,
+            color: _colors.font,
             fontWeight: FontWeight.w400,
             fontSize: 14),
       ));
@@ -177,23 +172,28 @@ class NMCardVertical extends StatelessWidget {
   }
 }
 
-class NMCardHorizontal extends StatelessWidget {
+class NeumorphicCardHorizontal extends StatelessWidget {
   final bool active;
   final IconData icon;
   final String label;
   final String image;
   final double size;
   final VoidCallback onElementClicked;
-  const NMCardHorizontal(
+  RadiocomColorsConract _colors;
+  NeumorphicCardHorizontal(
       {this.active, this.icon, this.label, this.image, this.size,this.onElementClicked});
+
+  _onElementClicked() {
+    if(onElementClicked !=null){
+      onElementClicked();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    _onElementClicked() {
-      if(onElementClicked !=null){
-        onElementClicked();
-      }
-    }
-    Widget iconCard = Icon(icon, color: RadiocomColors.yellow, size: 40.0);
+    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+
+    Widget iconCard = Icon(icon, color: _colors.yellow, size: 40.0);
     if (image != null) {
       iconCard = new Container(
           width: 60.0,
@@ -204,7 +204,7 @@ class NMCardHorizontal extends StatelessWidget {
     return GestureDetector(child: Container(
       height: size == null ? 80.0 : size,
       padding: EdgeInsets.symmetric(horizontal: 11, vertical: 7),
-      decoration: nMbox,
+      decoration: neumorphicBox(_colors),
       child: Row(
         children: <Widget>[
           iconCard,
@@ -215,18 +215,18 @@ class NMCardHorizontal extends StatelessWidget {
               textAlign: TextAlign.left,
               style: size == null
                   ? TextStyle(
-                  color: RadiocomColors.font,
+                  color: _colors.font,
                   fontWeight: FontWeight.w700,
                   fontSize: 16)
                   : TextStyle(
                   wordSpacing: 3.0,
-                  color: RadiocomColors.font,
+                  color: _colors.font,
                   fontWeight: FontWeight.w700,
                   fontSize: 20)),
           Spacer(),
           image != null
               ? Icon(Icons.keyboard_arrow_right,
-              color: RadiocomColors.yellow, size: 40.0)
+              color: _colors.yellow, size: 40.0)
               : Spacer(),
         ],
       ),

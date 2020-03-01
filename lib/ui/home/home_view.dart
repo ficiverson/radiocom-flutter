@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:ui';
 
 import 'package:animations/animations.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
@@ -13,11 +13,11 @@ import 'package:cuacfm/utils/custom_image.dart';
 import 'package:cuacfm/utils/neumorfism.dart';
 import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
-import 'package:flappy_search_bar/flappy_search_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:injector/injector.dart';
+import 'dart:io';
+
 import 'package:intl/intl.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -29,12 +29,11 @@ class MyHomePage extends StatefulWidget {
   MyHomePageState createState() => new MyHomePageState();
 }
 
-class MyHomePageState extends State<MyHomePage> implements HomeView {
+class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver implements HomeView {
   HomePresenter _presenter;
   MediaQueryData queryData;
   BuildContext context;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
-  final FlutterWebviewPlugin flutterWebviewPlugin = new FlutterWebviewPlugin();
   BottomBarOption bottomBarOption = BottomBarOption.HOME;
   bool shouldShowPlayer = false;
   bool isMini = true;
@@ -57,9 +56,7 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
   List<Program> podcast9 = [];
   List<Program> podcast10 = [];
   List<Program> podcast11 = [];
-
-  final SearchBarController<Map<String, String>> _searchBarController =
-      SearchBarController();
+  RadiocomColorsConract _colors;
 
   MyHomePageState() {
     DependencyInjector().injectByView(this);
@@ -69,8 +66,9 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
   Widget build(BuildContext context) {
     this.context = context;
     queryData = MediaQuery.of(context);
+    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     return Scaffold(
-        backgroundColor: RadiocomColors.palidwhite,
+        backgroundColor: _colors.palidwhite,
         body: PageTransitionSwitcher(
             transitionBuilder: (
               Widget child,
@@ -83,7 +81,21 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
                 child: child,
               );
             },
-            child: _getBodyLayout()),
+            child: Platform.isIOS
+                ? Stack(children: [
+                    _getBodyLayout(),
+                    ClipRect(
+                        child: BackdropFilter(
+                            filter: ImageFilter.blur(
+                              sigmaX: 5.0,
+                              sigmaY: 5.0,
+                            ),
+                            child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                height: MediaQuery.of(context).padding.top,
+                                color: _colors.palidwhitegradient)))
+                  ])
+                : _getBodyLayout()),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: PlayerView(
             isMini: isMini,
@@ -108,10 +120,14 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
               });
             }),
         bottomNavigationBar: BottomBar(
-          onOptionSelected: (option) {
-            setState(() {
-              bottomBarOption = option;
-            });
+          onOptionSelected: (option, isMenu) {
+            if (isMenu) {
+              _presenter.onMenuClicked();
+            } else {
+              setState(() {
+                bottomBarOption = option;
+              });
+            }
           },
         ));
   }
@@ -121,10 +137,44 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
     super.initState();
     _presenter = Injector.appInstance.getDependency<HomePresenter>();
     _nowProgram = new Now.mock();
-    _station = new RadioStation.base();
+    _station = Injector.appInstance.getDependency<RadioStation>();
 
     categories.addAll(ProgramCategories.values);
     categories.shuffle();
+    setBrightness();
+
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        setBrightness();
+        setState((){});
+        break;
+      case AppLifecycleState.paused:
+        break;
+      default:
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  void setBrightness() {
+    final Brightness brightness = WidgetsBinding.instance.window.platformBrightness;
+    if(brightness == Brightness.light){
+      Injector.appInstance
+          .registerSingleton<RadiocomColorsConract>((_) => RadiocomColorsLight(), override: true);
+    } else {
+      Injector.appInstance
+          .registerSingleton<RadiocomColorsConract>((_) => RadiocomColorsDark(), override: true);
+    }
   }
 
   @override
@@ -151,6 +201,8 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
 
   @override
   void onLoadRadioStation(RadioStation station) {
+    Injector.appInstance
+        .registerSingleton<RadioStation>((_) => station, override: true);
     setState(() {
       _station = station;
     });
@@ -222,7 +274,7 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
   Widget _getHomeLayout() {
     return Container(
       key: ValueKey<String>(BottomBarOption.HOME.toString()),
-      color: RadiocomColors.palidwhitedark,
+      color: _colors.palidwhitedark,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,7 +293,7 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
                 _getWelcomeText(),
                 style: TextStyle(
                     letterSpacing: 1.2,
-                    color: RadiocomColors.fontH1,
+                    color: _colors.fontH1,
                     fontSize: 30,
                     fontWeight: FontWeight.w900),
               )),
@@ -251,13 +303,13 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
                 'Ahora suena',
                 style: TextStyle(
                     letterSpacing: 1.2,
-                    color: RadiocomColors.font,
+                    color: _colors.font,
                     fontSize: 20,
                     fontWeight: FontWeight.w500),
               )),
           Padding(
               padding: const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
-              child: NMCardHorizontal(
+              child: NeumorphicCardHorizontal(
                 onElementClicked: () {
                   _presenter.nowPlayingClicked(_timeTable);
                 },
@@ -271,12 +323,12 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
                 'Podcast recientes',
                 style: TextStyle(
                     letterSpacing: 1.2,
-                    color: RadiocomColors.font,
+                    color: _colors.font,
                     fontSize: 20,
                     fontWeight: FontWeight.w500),
               )),
           Container(
-              color: Colors.transparent,
+              color: _colors.transparent,
               width: queryData.size.width,
               height: 280.0,
               child: ListView.builder(
@@ -285,7 +337,7 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
                   itemCount: _recentPodcast.length,
                   itemBuilder: (_, int index) => Row(children: [
                         SizedBox(width: 15.0),
-                        NMCardVertical(
+                        NeumorphicCardVertical(
                           active: false,
                           image: _recentPodcast[index].logo_url,
                           label: _recentPodcast[index].name,
@@ -304,7 +356,7 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
                       background: false))
               : Padding(
                   padding: const EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
-                  child: NMCardHorizontal(
+                  child: NeumorphicCardHorizontal(
                       onElementClicked: () {
                         setState(() {
                           shouldShowPlayer = true;
@@ -334,7 +386,7 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
   Widget _getNewsLayout() {
     return Container(
         key: PageStorageKey<String>(BottomBarOption.NEWS.toString()),
-        color: Colors.transparent,
+        color: _colors.palidwhitedark,
         width: queryData.size.width,
         height: queryData.size.height,
         child: ListView.builder(
@@ -350,48 +402,50 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
                       'Noticias',
                       style: TextStyle(
                           letterSpacing: 1.2,
-                          color: RadiocomColors.font,
+                          color: _colors.font,
                           fontSize: 30,
                           fontWeight: FontWeight.w900),
                     ));
               } else if (index < _lastNews.length + 1) {
-                element = GestureDetector(
-                  child: Padding(
-                      padding: EdgeInsets.all(13.0),
-                      child: ListTile(
-                        leading: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 1),
-                            width: 50.0,
-                            height: 50.0,
-                            child: CustomImage(
-                                resPath: _lastNews[index - 1].image,
-                                fit: BoxFit.fitHeight,
-                                radius: 5.0)),
-                        title: Text(
-                          _lastNews[index - 1].title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              color: RadiocomColors.font,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16),
-                        ),
-                        subtitle: Text(
-                          _lastNews[index - 1].pubDate.toString(),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              color: RadiocomColors.font,
-                              fontWeight: FontWeight.w200,
-                              fontSize: 13),
-                        ),
-                        trailing: Icon(Icons.keyboard_arrow_right,
-                            color: RadiocomColors.yellow, size: 40.0),
-                      )),
-                  onTap: () {
-                    _presenter.onNewClicked(_lastNews[index - 1]);
-                  },
-                );
+                element = Material(
+                    color: _colors.transparent,
+                    child: InkWell(
+                      child: Padding(
+                          padding: EdgeInsets.all(13.0),
+                          child: ListTile(
+                            leading: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 1),
+                                width: 50.0,
+                                height: 50.0,
+                                child: CustomImage(
+                                    resPath: _lastNews[index - 1].image,
+                                    fit: BoxFit.fitHeight,
+                                    radius: 5.0)),
+                            title: Text(
+                              _lastNews[index - 1].title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  color: _colors.font,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16),
+                            ),
+                            subtitle: Text(
+                              _lastNews[index - 1].pubDate.toString(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  color: _colors.font,
+                                  fontWeight: FontWeight.w200,
+                                  fontSize: 13),
+                            ),
+                            trailing: Icon(Icons.keyboard_arrow_right,
+                                color: _colors.yellow, size: 40.0),
+                          )),
+                      onTap: () {
+                        _presenter.onNewClicked(_lastNews[index - 1]);
+                      },
+                    ));
               } else {
                 element = SizedBox(height: shouldShowPlayer ? 60.0 : 10.0);
               }
@@ -402,45 +456,46 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
   Widget _getSearchLayout() {
     return Container(
         key: PageStorageKey<String>(BottomBarOption.SEARCH.toString()),
-        color: Colors.transparent,
+        color: _colors.palidwhitedark,
         width: queryData.size.width,
         height: queryData.size.height,
         child: SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-              SizedBox(height: 40.0),
-              Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: Text(
-                    'Podcast',
-                    style: TextStyle(
-                        letterSpacing: 1.2,
-                        color: RadiocomColors.font,
-                        fontSize: 30,
-                        fontWeight: FontWeight.w900),
-                  )),
-              _getPodcastByCategory(categories[0], podcast0),
-              _getCategoriesLayout(),
-              _getPodcastByCategory(categories[1], podcast1),
-              _getPodcastByCategory(categories[2], podcast2),
-              _getPodcastByCategory(categories[3], podcast3),
-              _getPodcastByCategory(categories[4], podcast4),
-              _getPodcastByCategory(categories[5], podcast5),
-              _getPodcastByCategory(categories[6], podcast6),
-              _getPodcastByCategory(categories[7], podcast7),
-              _getPodcastByCategory(categories[8], podcast8),
-              _getPodcastByCategory(categories[9], podcast9),
-              _getPodcastByCategory(categories[10], podcast10),
-              _getPodcastByCategory(categories[11], podcast11),
-              SizedBox(height: shouldShowPlayer ? 60.0 : 10.0),
-            ])));
+                  SizedBox(height: 40.0),
+                  Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: Text(
+                        'Podcast',
+                        style: TextStyle(
+                            letterSpacing: 1.2,
+                            color: _colors.font,
+                            fontSize: 30,
+                            fontWeight: FontWeight.w900),
+                      )),
+                  _getPodcastByCategory(categories[0], podcast0),
+                  _getCategoriesLayout(),
+                  _getPodcastByCategory(categories[1], podcast1),
+                  _getPodcastByCategory(categories[2], podcast2),
+                  _getPodcastByCategory(categories[3], podcast3),
+                  _getPodcastByCategory(categories[4], podcast4),
+                  _getPodcastByCategory(categories[5], podcast5),
+                  _getPodcastByCategory(categories[6], podcast6),
+                  _getPodcastByCategory(categories[7], podcast7),
+                  _getPodcastByCategory(categories[8], podcast8),
+                  _getPodcastByCategory(categories[9], podcast9),
+                  _getPodcastByCategory(categories[10], podcast10),
+                  _getPodcastByCategory(categories[11], podcast11),
+                  SizedBox(height: shouldShowPlayer ? 60.0 : 10.0),
+                ])));
   }
 
   Widget _getCategoriesLayout() {
     return Container(
-        color: RadiocomColors.white,
+        color: _colors.white,
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -455,7 +510,7 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
                           textAlign: TextAlign.left,
                           style: TextStyle(
                               letterSpacing: 1.2,
-                              color: RadiocomColors.font,
+                              color: _colors.font,
                               fontSize: 23,
                               fontWeight: FontWeight.w700),
                         ),
@@ -464,7 +519,7 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
                           child: Text(
                             "Ver todos",
                             style: TextStyle(
-                                color: RadiocomColors.fontGrey,
+                                color: _colors.fontGrey,
                                 fontSize: 19,
                                 fontWeight: FontWeight.w600),
                           ),
@@ -482,16 +537,20 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
                       itemCount: categories.length,
                       itemBuilder: (_, int index) => Row(children: [
                             SizedBox(width: 15.0),
-                      GestureDetector(
-                          child:NMCardVertical(
-                              imageOverLay: true,
-                              active: false,
-                              image: Program.getImages(categories[index]),
-                              label: Program.getCategory(categories[index]),
-                              subtitle: "",
-                          ),onTap: (){
-                            _presenter.onSeeCategory(podcastByCategory(index), Program.getCategory(categories[index]));
-                      },),
+                            GestureDetector(
+                              child: NeumorphicCardVertical(
+                                imageOverLay: true,
+                                active: false,
+                                image: Program.getImages(categories[index]),
+                                label: Program.getCategory(categories[index]),
+                                subtitle: "",
+                              ),
+                              onTap: () {
+                                _presenter.onSeeCategory(
+                                    podcastByCategory(index),
+                                    Program.getCategory(categories[index]));
+                              },
+                            ),
                           ]))),
             ]));
   }
@@ -508,7 +567,7 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     letterSpacing: 1.2,
-                    color: RadiocomColors.font,
+                    color: _colors.font,
                     fontSize: 23,
                     fontWeight: FontWeight.w700),
               )),
@@ -521,7 +580,7 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
                   itemCount: podcast.length,
                   itemBuilder: (_, int index) => Row(children: [
                         SizedBox(width: 15.0),
-                        NMCardVertical(
+                        NeumorphicCardVertical(
                           active: false,
                           image: podcast[index].logo_url,
                           label: podcast[index].name,
@@ -594,7 +653,7 @@ class MyHomePageState extends State<MyHomePage> implements HomeView {
     });
   }
 
-  List<Program> podcastByCategory(int index){
+  List<Program> podcastByCategory(int index) {
     if (index == 0) {
       return podcast0;
     } else if (index == 1) {

@@ -25,6 +25,7 @@ class TimetableState extends State<Timetable> implements TimeTableView {
   TimeTablePresenter _presenter;
   MediaQueryData queryData;
   ScrollController _scrollController = ScrollController();
+  RadiocomColorsConract _colors;
 
   TimetableState() {
     DependencyInjector().injectByView(this);
@@ -33,10 +34,11 @@ class TimetableState extends State<Timetable> implements TimeTableView {
   @override
   Widget build(BuildContext context) {
     queryData = MediaQuery.of(context);
+    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     return Scaffold(
       appBar:
           TopBar(title: "Programas de hoy", topBarOption: TopBarOption.NORMAL),
-      backgroundColor: RadiocomColors.palidwhite,
+      backgroundColor: _colors.palidwhite,
       body: _getBodyLayout(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: PlayerView(
@@ -65,18 +67,19 @@ class TimetableState extends State<Timetable> implements TimeTableView {
     super.initState();
     _presenter = Injector.appInstance.getDependency<TimeTablePresenter>();
     int currentIndex = 0;
-    widget.timeTables.forEach((element){
-      if(getCurrentTime() >=
-          element.start.hour &&
-          getCurrentTime() <
-              element.end.hour){
+    int jumpIndex = 0;
+    widget.timeTables.forEach((element) {
+      if (getCurrentTime() >= element.start.hour &&
+          getCurrentTime() < element.end.hour) {
+        jumpIndex = currentIndex;
         return;
       }
-      currentIndex = currentIndex +1;
+      currentIndex = currentIndex + 1;
     });
-    if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.persistentCallbacks) {
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        _scrollController.jumpTo(50.0 * currentIndex);
+        _scrollController.jumpTo(50.0 * jumpIndex);
       });
     }
   }
@@ -93,7 +96,7 @@ class TimetableState extends State<Timetable> implements TimeTableView {
   Widget _getBodyLayout() {
     return Container(
         key: PageStorageKey<String>("timeTableList"),
-        color: Colors.transparent,
+        color: _colors.transparent,
         width: queryData.size.width,
         height: queryData.size.height,
         child: ListView.builder(
@@ -104,12 +107,7 @@ class TimetableState extends State<Timetable> implements TimeTableView {
             itemBuilder: (_, int index) {
               return (index < widget.timeTables.length)
                   ? Container(
-                      color: (getCurrentTime() >=
-                                  widget.timeTables[index].start.hour &&
-                              getCurrentTime() <
-                                  widget.timeTables[index].end.hour)
-                          ? RadiocomColors.palidwhiteverydark
-                          : RadiocomColors.palidwhite,
+                      color: _colors.palidwhite,
                       child: ListTile(
                           leading: Container(
                               padding: EdgeInsets.symmetric(horizontal: 1),
@@ -129,8 +127,8 @@ class TimetableState extends State<Timetable> implements TimeTableView {
                                                 .timeTables[index].start.hour &&
                                         getCurrentTime() <
                                             widget.timeTables[index].end.hour)
-                                    ? RadiocomColors.yellow
-                                    : RadiocomColors.font,
+                                    ? _colors.yellow
+                                    : _colors.font,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16),
                           ),
@@ -140,7 +138,7 @@ class TimetableState extends State<Timetable> implements TimeTableView {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                                color: RadiocomColors.font,
+                                color: _colors.font,
                                 fontWeight: FontWeight.w200,
                                 fontSize: 13),
                           )))

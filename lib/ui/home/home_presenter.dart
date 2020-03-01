@@ -65,7 +65,6 @@ class HomePresenter {
   getRadioStationData() {
     invoker.execute(getStationUseCase).listen((result){
       if(result is Success){
-        Injector.appInstance.registerSingleton<RadioStation>((_) => result.data, override : true);
         _homeView.onLoadRadioStation(result.data);
       }else {
         _homeView.onRadioStationError((result as Error).status);
@@ -142,5 +141,7 @@ class HomePresenter {
     router.goToNewDetail(newItem);
   }
 
-
+  onMenuClicked(){
+    router.goToSettings();
+  }
 }

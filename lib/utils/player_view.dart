@@ -1,6 +1,7 @@
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:injector/injector.dart';
 
 import 'custom_image.dart';
 import 'neumorfism.dart';
@@ -34,6 +35,7 @@ class PlayerView extends StatefulWidget {
 
 class PlayerViewState extends State<PlayerView> {
   bool isPlaying = true;
+  RadiocomColorsConract _colors;
 
   _onMultimediaClicked() {
     setState(() {
@@ -50,6 +52,7 @@ class PlayerViewState extends State<PlayerView> {
 
   @override
   Widget build(BuildContext context) {
+    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     var queryData = MediaQuery.of(context);
     return widget.isExpanded
         ? Opacity(
@@ -60,7 +63,7 @@ class PlayerViewState extends State<PlayerView> {
               width: queryData.size.width,
               height: widget.isAtBottom ? 80.0 : 60.0,
               child: _getContentView(true),
-              color: RadiocomColors.palidwhiteverydark,
+              color: _colors.palidwhiteverydark,
             ))
         : Opacity(
             opacity: widget.shouldShow ? 1 : 0,
@@ -73,36 +76,64 @@ class PlayerViewState extends State<PlayerView> {
   }
 
   Widget _getContentView(bool isFullScreen) {
-    return Center(child:NMVIew(
+    return NeumorphicView(
         isFullScreen: isFullScreen,
         child: GestureDetector(
             onTap: () {
               _onDetailClicked();
             },
-            child: ListTile(
-                leading: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 1),
-                    width: 40.0,
-                    height: 40.0,
-                    child: CustomImage(
-                        resPath: widget.multimediaImage,
-                        fit: BoxFit.fitHeight,
-                        radius: 20.0)),
-                title: Text(
-                  widget.currentSong,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      color: RadiocomColors.font,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 13),
-                ),
-                trailing: new GestureDetector(
-                  onTap: () {
-                    _onMultimediaClicked();
-                  },
-                  child: Icon(isPlaying ? Icons.pause : Icons.play_arrow,
-                      color: RadiocomColors.yellow, size: 40.0),
-                )))));
+            child: getPlayerContent()));
+  }
+
+  Widget getPlayerContent(){
+    return widget.isAtBottom? Center(child:ListTile(
+        leading: Container(
+            padding: EdgeInsets.symmetric(horizontal: 1),
+            width: 40.0,
+            height: 40.0,
+            child: CustomImage(
+                resPath: widget.multimediaImage,
+                fit: BoxFit.fitHeight,
+                radius: 20.0)),
+        title: Text(
+          widget.currentSong,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+              color: _colors.font,
+              fontWeight: FontWeight.w500,
+              fontSize: 13),
+        ),
+        trailing: new GestureDetector(
+          onTap: () {
+            _onMultimediaClicked();
+          },
+          child: Icon(isPlaying ? Icons.pause : Icons.play_arrow,
+              color: _colors.yellow, size: 40.0),
+        ))) : ListTile(
+        leading: Container(
+            padding: EdgeInsets.symmetric(horizontal: 1),
+            width: 40.0,
+            height: 40.0,
+            child: CustomImage(
+                resPath: widget.multimediaImage,
+                fit: BoxFit.fitHeight,
+                radius: 20.0)),
+        title: Text(
+          widget.currentSong,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+              color: _colors.font,
+              fontWeight: FontWeight.w500,
+              fontSize: 13),
+        ),
+        trailing: new GestureDetector(
+          onTap: () {
+            _onMultimediaClicked();
+          },
+          child: Icon(isPlaying ? Icons.pause : Icons.play_arrow,
+              color: _colors.yellow, size: 40.0),
+        ));
   }
 }

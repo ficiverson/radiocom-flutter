@@ -3,6 +3,7 @@ import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/time_table.dart';
 import 'package:cuacfm/ui/new-detail/new_detail.dart';
 import 'package:cuacfm/ui/podcast/all_podcast/all_podcast_view.dart';
+import 'package:cuacfm/ui/settings/settings.dart';
 import 'package:cuacfm/ui/timetable/time_table_view.dart';
 import 'package:flutter/material.dart';
 import 'package:injector/injector.dart';
@@ -11,6 +12,7 @@ abstract class HomeRouterContract{
   goToTimeTable(List<TimeTable> timeTables);
   goToAllPodcast(List<Program> podcasts, {String category});
   goToNewDetail(New itemNew);
+  goToSettings();
 }
 
 class HomeRouter implements HomeRouterContract {
@@ -41,6 +43,15 @@ class HomeRouter implements HomeRouterContract {
         .push(MaterialPageRoute(
         settings: RouteSettings(name: "newdetail"),
         builder: (BuildContext context) => NewDetail(newItem: itemNew),
+        fullscreenDialog: false));
+  }
+
+  @override
+  goToSettings() {
+    Navigator.of(Injector.appInstance.getDependency<BuildContext>())
+        .push(MaterialPageRoute(
+        settings: RouteSettings(name: "settings"),
+        builder: (BuildContext context) => Settings(),
         fullscreenDialog: false));
   }
 

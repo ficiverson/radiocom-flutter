@@ -20,9 +20,8 @@ class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
   }
 
   Future<RadioStation> getRadioStationData() async {
-    Uri url;
+    Uri url = Uri.parse(radiocoAPI.baseUrl + radiocoAPI.radioStation);
     try {
-      Uri.parse(radiocoAPI.baseUrl + radiocoAPI.radioStation);
       var res = await this.client.get(url);
       return new RadioStation.fromInstance(res);
     } catch (Exception) {

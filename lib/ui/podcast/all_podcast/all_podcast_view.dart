@@ -26,6 +26,7 @@ class AllPodcastState extends State<AllPodcast> implements AllPodcastView {
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   List<Program> _podcasts = new List<Program>();
   List<Program> _podcastWithFilter = new List<Program>();
+  RadiocomColorsConract _colors;
 
   AllPodcastState() {
     DependencyInjector().injectByView(this);
@@ -34,6 +35,7 @@ class AllPodcastState extends State<AllPodcast> implements AllPodcastView {
   @override
   Widget build(BuildContext context) {
     queryData = MediaQuery.of(context);
+    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     return Scaffold(
       key: scaffoldKey,
       appBar: TopBar(
@@ -78,7 +80,7 @@ class AllPodcastState extends State<AllPodcast> implements AllPodcastView {
               });
             }
           }),
-      backgroundColor: RadiocomColors.palidwhite,
+      backgroundColor: _colors.palidwhite,
       body: _getBodyLayout(),
     );
   }
@@ -102,7 +104,7 @@ class AllPodcastState extends State<AllPodcast> implements AllPodcastView {
   Widget _getBodyLayout() {
     return Container(
         key: PageStorageKey<String>("allpodcastview"),
-        color: Colors.transparent,
+        color: _colors.transparent,
         width: queryData.size.width,
         height: queryData.size.height,
         child: GridView.builder(
@@ -116,7 +118,7 @@ class AllPodcastState extends State<AllPodcast> implements AllPodcastView {
             itemBuilder: (BuildContext context, int index) {
               return Padding(
                   padding: EdgeInsets.fromLTRB(20.0, 0.0, 30.0, 0.0),
-                  child: NMCardVertical(
+                  child: NeumorphicCardVertical(
                     active: false,
                     image: _podcastWithFilter[index].logo_url,
                     label: _podcastWithFilter[index].name,

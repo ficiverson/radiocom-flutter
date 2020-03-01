@@ -17,9 +17,15 @@ import 'package:cuacfm/ui/new-detail/new_detail.dart';
 import 'package:cuacfm/ui/new-detail/new_detail_presenter.dart';
 import 'package:cuacfm/ui/podcast/all_podcast/all_podcast_presenter.dart';
 import 'package:cuacfm/ui/podcast/all_podcast/all_podcast_view.dart';
+import 'package:cuacfm/ui/settings/settings-detail/settings_detail.dart';
+import 'package:cuacfm/ui/settings/settings-detail/settings_presenter_detail.dart';
+import 'package:cuacfm/ui/settings/settings.dart';
+import 'package:cuacfm/ui/settings/settings_presenter.dart';
+import 'package:cuacfm/ui/settings/settings_router.dart';
 import 'package:cuacfm/ui/timetable/time_table_presenter.dart';
 import 'package:cuacfm/ui/timetable/time_table_view.dart';
 import 'package:cuacfm/utils/cuac_client.dart';
+import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:flutter/widgets.dart';
 import 'package:injector/injector.dart';
 
@@ -49,6 +55,11 @@ class DependencyInjector {
       injector.registerDependency<AllPodcastView>((Injector injector) => view);
     } else if (view is NewDetailState) {
       injector.registerDependency<NewDetailView>((Injector injector) => view);
+    } else if (view is SettingsState) {
+      injector.registerDependency<SettingsView>((Injector injector) => view);
+    }
+    else if (view is SettingsDetailState) {
+      injector.registerDependency<SettingsDetailView>((Injector injector) => view);
     }
   }
 
@@ -63,12 +74,19 @@ class DependencyInjector {
   }
 
   loadPresentationModules() {
+    injector.registerSingleton<RadiocomColorsConract>((Injector injector){
+      return RadiocomColorsLight();
+    });
     injector.registerSingleton<Invoker>((Injector injector) {
       return Invoker();
     });
 
     injector.registerDependency<HomeRouterContract>((Injector injector) {
       return HomeRouter();
+    });
+
+    injector.registerDependency<SettingsRouterContract>((Injector injector) {
+      return SettingsRouter();
     });
 
     injector.registerDependency<HomePresenter>((Injector injector) {
@@ -91,6 +109,14 @@ class DependencyInjector {
     });
     injector.registerDependency<NewDetailPresenter>((Injector injector) {
       return new NewDetailPresenter();
+    });
+    injector.registerDependency<SettingsPresenter>((Injector injector) {
+      return new SettingsPresenter(injector.getDependency<SettingsView>(),
+        invoker: injector.getDependency<Invoker>(),
+        router: injector.getDependency<SettingsRouterContract>());
+    });
+    injector.registerDependency<SettingsDetailPresenter>((Injector injector) {
+      return new SettingsDetailPresenter();
     });
   }
 

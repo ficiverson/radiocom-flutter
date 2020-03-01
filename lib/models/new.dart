@@ -9,6 +9,10 @@ class New {
   String description;
   String image;
   String pubDate;
+
+  New(this.title, this.link,this.description,this.image,this.pubDate);
+
+
   New.fromInstance(Map<String, dynamic> map)
       : title = map["title"]["\$t"],
         link = map["link"]["\$t"],
@@ -68,5 +72,9 @@ class New {
       }
       return baseImage;
     }
+  }
+
+  static New fromHistory(String content) {
+    return New("Historia de CUAC FM","https://cuacfm.org/asociacion-cuac/cuacfm/",content,"",getDate("Wed, 20 Mar 1996 12:00:00 +0000"));
   }
 }

@@ -1,7 +1,9 @@
+
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:injector/injector.dart';
 
 import 'jumping_dots.dart';
 
@@ -26,8 +28,10 @@ class CustomImage extends StatefulWidget {
 }
 
 class CustomImageState extends State<CustomImage> {
+  RadiocomColorsConract _colors;
   @override
   Widget build(BuildContext context) {
+    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     var customImage;
     if (widget.resPath == null) {
       customImage = new Icon(Icons.warning);
@@ -42,7 +46,7 @@ class CustomImageState extends State<CustomImage> {
           alignment: widget.alignment,
           placeholder: (context, url) => JumpingDotsProgressIndicator(
                 numberOfDots: 3,
-                color: RadiocomColors.white,
+                color: _colors.white,
                 fontSize: 30.0,
               ),
           errorWidget: (context, url, error) => new Icon(Icons.error));
@@ -60,7 +64,7 @@ class CustomImageState extends State<CustomImage> {
     return Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(widget.radius),
-            color: widget.background?RadiocomColors.blackgradient65:RadiocomColors.transparent),
+            color: widget.background?_colors.blackgradient65:_colors.transparent),
         child: ClipRRect(
             borderRadius: BorderRadius.circular(widget.radius),
             child: customImage));

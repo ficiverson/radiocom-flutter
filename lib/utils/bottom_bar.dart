@@ -1,10 +1,12 @@
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:injector/injector.dart';
 
 import 'neumorfism.dart';
 
-typedef void MenuOptionCallback(BottomBarOption option);
+typedef void MenuOptionCallback(BottomBarOption option, bool isMenu);
 
 enum BottomBarOption { HOME, SEARCH, NEWS }
 
@@ -18,16 +20,18 @@ class BottomBar extends StatefulWidget {
 }
 
 class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
+  RadiocomColorsConract _colors;
   AnimationController _resizableController;
   var bottomBarOption = BottomBarOption.HOME;
 
-  _onOptionSelected() {
-    widget.onOptionSelected(bottomBarOption);
+  _onOptionSelected(bool isMenu) {
+    widget.onOptionSelected(bottomBarOption, isMenu);
   }
 
   @override
   Widget build(BuildContext context) {
     var queryData = MediaQuery.of(context);
+    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     if (bottomBarOption != BottomBarOption.HOME) {
       _resizableController.reverse(from: 25.0);
     } else {
@@ -41,12 +45,12 @@ class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
               topLeft: Radius.circular(25.0 - _resizableController.value)),
           boxShadow: <BoxShadow>[
             BoxShadow(
-              color: RadiocomColors.yellow,
+              color: _colors.yellow,
               blurRadius: 3.0,
               offset: Offset(0.5, 1.5),
             )
           ],
-          color: RadiocomColors.palidwhite,
+          color: _colors.palidwhite,
         ),
         width: queryData.size.width,
         height: 100.0,
@@ -61,10 +65,10 @@ class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
                       onTap: () {
                         setState(() {
                           bottomBarOption = BottomBarOption.HOME;
-                          _onOptionSelected();
+                          _onOptionSelected(false);
                         });
                       },
-                      child: NMButton(
+                      child: NeumorphicButton(
                         down: bottomBarOption == BottomBarOption.HOME
                             ? true
                             : false,
@@ -74,10 +78,10 @@ class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
                       onTap: () {
                         setState(() {
                           bottomBarOption = BottomBarOption.SEARCH;
-                          _onOptionSelected();
+                          _onOptionSelected(false);
                         });
                       },
-                      child: NMButton(
+                      child: NeumorphicButton(
                         down: bottomBarOption == BottomBarOption.SEARCH
                             ? true
                             : false,
@@ -87,19 +91,25 @@ class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
                       onTap: () {
                         setState(() {
                           bottomBarOption = BottomBarOption.NEWS;
-                          _onOptionSelected();
+                          _onOptionSelected(false);
                         });
                       },
-                      child: NMButton(
+                      child: NeumorphicButton(
                         down: bottomBarOption == BottomBarOption.NEWS
                             ? true
                             : false,
-                        icon: Icons.library_books,
+                        icon: FontAwesomeIcons.newspaper,
                       )),
-                  NMButton(
-                    down: false,
-                    icon: Icons.menu,
-                  ),
+                  GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _onOptionSelected(true);
+                        });
+                      },
+                      child: NeumorphicButton(
+                        down: false,
+                        icon: Icons.menu,
+                      )),
                 ],
               ))
         ]));
@@ -114,6 +124,5 @@ class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
         value: 25.0,
         upperBound: 25.0,
         lowerBound: 0.0);
-
   }
 }

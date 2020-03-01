@@ -18,6 +18,7 @@ class NewDetailState extends State<NewDetail> implements NewDetailView {
   MediaQueryData _queryData;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   NewDetailPresenter _presenter;
+  RadiocomColorsConract _colors;
 
   NewDetailState() {
     DependencyInjector().injectByView(this);
@@ -26,6 +27,7 @@ class NewDetailState extends State<NewDetail> implements NewDetailView {
   @override
   Widget build(BuildContext context) {
     _queryData = MediaQuery.of(context);
+    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     return Scaffold(
       key: scaffoldKey,
       appBar: TopBar(
@@ -35,7 +37,7 @@ class NewDetailState extends State<NewDetail> implements NewDetailView {
           onRightClicked: () {
             _presenter.onShareClicked(widget.newItem);
           }),
-      backgroundColor: RadiocomColors.palidwhite,
+      backgroundColor: _colors.palidwhite,
       body: _getBodyLayout(),
     );
     ;
@@ -57,15 +59,18 @@ class NewDetailState extends State<NewDetail> implements NewDetailView {
 
   Widget _getBodyLayout() {
     return new Container(
-        color: Color(0xFFF9F9F9),
+        color: _colors.palidwhitedark,
         height: _queryData.size.height,
         child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
+            physics: BouncingScrollPhysics(),
             child: Container(
                 child: Column(children: <Widget>[
+                  SizedBox(height: 20),
+              Padding(padding: EdgeInsets.fromLTRB(20.0, 00.0, 20.0, 0.0),child:
               Stack(children: <Widget>[
                 Container(
-                    color: RadiocomColors.blackgradient65,
+                    color: _colors.blackgradient65,
                     width: _queryData.size.width,
                     padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
                     child: Column(mainAxisAlignment: MainAxisAlignment.start,crossAxisAlignment: CrossAxisAlignment.start,children: <Widget>[
@@ -76,7 +81,7 @@ class NewDetailState extends State<NewDetail> implements NewDetailView {
                           style: TextStyle(
                             fontSize: 22.0,
                             letterSpacing: 2.0,
-                            color: Color(0xFFFFFFFF),
+                            color: _colors.fontWhite,
                           )),
                       SizedBox(height: 5),
                       Text(widget.newItem.pubDate.toString(),
@@ -86,13 +91,13 @@ class NewDetailState extends State<NewDetail> implements NewDetailView {
                           style: TextStyle(
                             fontSize: 16.0,
                             letterSpacing: 2.0,
-                            color: Color(0xFFFFFFFF),
+                            color: _colors.fontWhite,
                           )),
                     ]))
-              ]),
+              ])),
               SizedBox(height: 20),
               ListTile(
-                  title: Html(
+                  title: Html(defaultTextStyle: TextStyle(color: _colors.font),
                 useRichText: true,
                 data: widget.newItem.description,
                 linkStyle: const TextStyle(
@@ -103,7 +108,7 @@ class NewDetailState extends State<NewDetail> implements NewDetailView {
                 onLinkTap: (url) {
                   _presenter.onLinkClicked(url);
                 },
-              ))
+              )),SizedBox(height: 20),
             ]))));
   }
 }

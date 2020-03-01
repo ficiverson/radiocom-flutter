@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:injector/injector.dart';
+
+import 'neumorfism.dart';
 
 typedef void QueryCallback(String query);
 
@@ -36,6 +39,7 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
 class TopBarState extends State<TopBar> {
   MediaQueryData queryData;
   String currentQuery;
+  RadiocomColorsConract _colors;
   final TextEditingController _searchQuery = new TextEditingController();
 
   _onRightClicked() {
@@ -58,24 +62,42 @@ class TopBarState extends State<TopBar> {
 
   @override
   Widget build(BuildContext context) {
+    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     queryData = MediaQuery.of(context);
     return Container(
         width: MediaQuery.of(context).size.width,
-        height: 100.0,
+        height: Platform.isAndroid ? 100.0 : 90.0,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+                bottomRight: Radius.circular(25.0),
+                bottomLeft: Radius.circular(25.0)),
+            color: _colors.neuPalidGrey,
+            boxShadow: [
+              BoxShadow(
+                color: _colors.neuBlackOpacity,
+                offset: Offset(2, 2),
+                blurRadius: 2,
+              ),
+              BoxShadow(
+                color: _colors.neuWhite,
+                offset: Offset(-2, -2),
+                blurRadius: 2,
+              ),
+            ]),
         child: ShaderMask(
             shaderCallback: (Rect bounds) {
               return RadialGradient(
                 center: Alignment.centerRight,
                 radius: 4.0,
                 colors: <Color>[
-                  RadiocomColors.white,
-                  RadiocomColors.palidwhiteverydark
+                  _colors.reallypadilwhite,
+                  _colors.palidwhiteverydark
                 ],
                 tileMode: TileMode.clamp,
               ).createShader(bounds);
             },
             child: Container(
-              margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+              margin: EdgeInsets.fromLTRB(0, 30, 0, 0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -87,9 +109,9 @@ class TopBarState extends State<TopBar> {
                             : Platform.isIOS
                                 ? Icons.navigate_before
                                 : Icons.arrow_back,
-                        color: RadiocomColors.font,
+                        color: _colors.font,
                         size: widget.topBarOption == TopBarOption.MODAL
-                            ? 32
+                            ? Platform.isIOS ? 28 : 27
                             : Platform.isIOS ? 35 : 30),
                     onPressed: () {
                       if (widget.isSearch) {
@@ -107,18 +129,19 @@ class TopBarState extends State<TopBar> {
                   ),
                   widget.isSearch
                       ? buildSearchBarPodcast()
-                      : Center(child:Text(
+                      : Center(
+                          child: Text(
                           widget.title,
                           style: TextStyle(
                               letterSpacing: 1.5,
-                              fontSize: 24,
-                              color: RadiocomColors.font,
+                              fontSize: 20,
+                              color: _colors.font,
                               fontWeight: FontWeight.w600),
                         )),
                   widget.rightIcon != null && !widget.isSearch
                       ? IconButton(
                           icon: Icon(widget.rightIcon,
-                              color: RadiocomColors.font, size: 30),
+                              color: _colors.font, size: 30),
                           onPressed: () {
                             _onRightClicked();
                           },
@@ -143,7 +166,7 @@ class TopBarState extends State<TopBar> {
           style: TextStyle(
               fontWeight: FontWeight.w700,
               letterSpacing: 1.1,
-              color: RadiocomColors.font),
+              color: _colors.font),
           onSubmitted: (queryText) {
             currentQuery = queryText;
             _onQuerySubmit();
