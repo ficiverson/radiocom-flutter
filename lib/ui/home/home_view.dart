@@ -316,6 +316,7 @@ class MyHomePageState extends State<MyHomePage>
 
   @override
   void onLoadRecentsError(error) {
+    isLoadingHome = false;
     isEmptyHome = true;
     if (bottomBarOption == BottomBarOption.HOME) {
       setState(() {});
@@ -329,6 +330,7 @@ class MyHomePageState extends State<MyHomePage>
 
   @override
   void onNewsError(error) {
+    isLoadingNews = false;
     isEmptyNews = true;
     if (bottomBarOption == BottomBarOption.NEWS) {
       setState(() {});
@@ -337,6 +339,7 @@ class MyHomePageState extends State<MyHomePage>
 
   @override
   void onPodcastError(error) {
+    isLoadingPodcast = false;
     isEmptyPodcast = true;
     if (bottomBarOption == BottomBarOption.SEARCH) {
       setState(() {});

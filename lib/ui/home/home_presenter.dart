@@ -64,11 +64,16 @@ class HomePresenter {
     bool isConnectionAvailable = await connection.isConnectionAvailable();
     if (isConnectionAvailable) {
       _homeView.onConnectionSuccess();
+      getRadioStationData();
+      getLiveProgram();
     } else {
       _homeView.onConnectionError();
+      _homeView.onLoadRecentsError("connectionerror");
+      _homeView.onNewsError("connectionerror");
+      _homeView.onPodcastError("connectionerror");
+      _homeView.onTimetableError("connectionerror");
     }
-    getRadioStationData();
-    getLiveProgram();
+
   }
 
   onHomeResumed(){
