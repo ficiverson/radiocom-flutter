@@ -1,3 +1,4 @@
+import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/program.dart';
@@ -14,4 +15,6 @@ abstract class RadiocoRemoteDataSourceContract{
   Future<List<Program>> getAllPodcasts();
 
   Future<List<New>> getNews();
+
+  Future<List<Episode>> getEpisodes(String feedUrl);
 }

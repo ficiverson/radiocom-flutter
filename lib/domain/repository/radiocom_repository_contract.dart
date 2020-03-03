@@ -1,4 +1,5 @@
 import 'package:cuacfm/domain/result/result.dart';
+import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/program.dart';
@@ -11,4 +12,5 @@ abstract class CuacRepositoryContract {
   Future<Result<List<TimeTable>>> getTimetableData(String after, String before);
   Future<Result<List<Program>>> getAllPodcasts();
   Future<Result<List<New>>> getNews();
+  Future<Result<List<Episode>>> getEpisodes(String feedUrl);
 }

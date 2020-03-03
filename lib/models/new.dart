@@ -77,4 +77,8 @@ class New {
   static New fromHistory(String content) {
     return New("Historia de CUAC FM","https://cuacfm.org/asociacion-cuac/cuacfm/",content,"",getDate("Wed, 20 Mar 1996 12:00:00 +0000"));
   }
+
+  static New fromPodcast(String title, String subtitle, String content, String link){
+    return New(title,link,content,"",subtitle);
+  }
 }

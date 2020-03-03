@@ -40,7 +40,7 @@ class SettingsDetailState extends State<SettingsDetail>
       key: scaffoldKey,
       appBar: TopBar(
           title: getTitle(widget.legalType), topBarOption: TopBarOption.MODAL),
-      backgroundColor: widget.legalType == LegalType.NONE ? _colors.blackgradient:_colors.palidwhite,
+      backgroundColor: widget.legalType == LegalType.NONE ? _colors.transparent:_colors.palidwhite,
       body: _getBodyLayout(widget.legalType),
     );
   }

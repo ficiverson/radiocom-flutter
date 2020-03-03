@@ -53,7 +53,7 @@ class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
           color: _colors.palidwhite,
         ),
         width: queryData.size.width,
-        height: 100.0,
+        height: queryData.size.height *0.13,
         child: Column(children: [
           SizedBox(height: 10.0),
           Container(

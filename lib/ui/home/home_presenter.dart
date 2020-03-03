@@ -10,6 +10,7 @@ import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/models/time_table.dart';
+import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:injector/injector.dart';
 import 'package:intl/intl.dart';
@@ -34,11 +35,14 @@ abstract class HomeView {
 
   void onLoadRecents(List<TimeTable> programsTimeTable);
   void onLoadRecentsError(dynamic error);
+
+  void onConnectionError();
+  void onConnectionSuccess();
 }
 
 
 class HomePresenter {
-
+  Now _liveData;
   HomeView _homeView;
   Invoker invoker;
   GetAllPodcastUseCase getAllPodcastUseCase;
@@ -47,9 +51,28 @@ class HomePresenter {
   GetTimetableUseCase getTimetableUseCase;
   GetNewsUseCase getNewsUseCase;
   HomeRouterContract router;
+  ConnectionContract connection;
+
   HomePresenter(this._homeView, {@required this.invoker, @required this.router,@required this.getAllPodcastUseCase, @required this.getStationUseCase, @required this.getLiveDataUseCase,
-  @required this.getTimetableUseCase, @required this.getNewsUseCase}) {
+  @required this.getTimetableUseCase, @required this.getNewsUseCase})  {
+    connection = Injector.appInstance.getDependency<ConnectionContract>();
+
+    init();
+  }
+
+  init() async {
+    bool isConnectionAvailable = await connection.isConnectionAvailable();
+    if (isConnectionAvailable) {
+      _homeView.onConnectionSuccess();
+    } else {
+      _homeView.onConnectionError();
+    }
     getRadioStationData();
+    getLiveProgram();
+  }
+
+  onHomeResumed(){
+    getLiveProgram();
   }
 
   getNews() {
@@ -69,18 +92,18 @@ class HomePresenter {
       }else {
         _homeView.onRadioStationError((result as Error).status);
       }
-      getRecentPodcast();
-      getLiveProgram();
     });
   }
 
   getLiveProgram() {
     invoker.execute(getLiveDataUseCase).listen((result){
       if(result is Success){
+        _liveData = result.data;
         _homeView.onLoadLiveData(result.data);
       }else {
         _homeView.onLiveDataError((result as Error).status);
       }
+      getRecentPodcast();
     });
   }
 
@@ -94,6 +117,7 @@ class HomePresenter {
       }else {
         _homeView.onTimetableError((result as Error).status);
       }
+      getAllPodcasts();
     });
   }
 
@@ -109,8 +133,6 @@ class HomePresenter {
       }else {
         _homeView.onLoadRecentsError((result as Error).status);
       }
-      getNews();
-      getAllPodcasts();
       getTimetable();
     });
   }
@@ -122,6 +144,7 @@ class HomePresenter {
         } else {
           _homeView.onPodcastError("Imposible recuperar los podcast en este momento");
         }
+        getNews();
     });
   }
 
@@ -143,5 +166,9 @@ class HomePresenter {
 
   onMenuClicked(){
     router.goToSettings();
+  }
+
+  onPodcastClicked(Program podcast){
+    router.goToPodcastDetail(podcast);
   }
 }

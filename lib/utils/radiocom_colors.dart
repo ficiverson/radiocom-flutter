@@ -49,7 +49,7 @@ class RadiocomColorsLight implements RadiocomColorsConract {
   @override
   Color reallypadilwhite = Color(0x9FFBBBBBB);
   @override
-  Color white = Color(0x9FFFFFFFF);
+  Color white = Color(0xFFFFFFFF);
   @override
   Color black = Color(0xFF000000);
 
@@ -65,7 +65,7 @@ class RadiocomColorsLight implements RadiocomColorsConract {
   Color palidwhitegradient = Color(0x99F9F9F9);
 
   @override
-  Color yellow = Color(0xFFf4c720);
+  Color yellow = Color(0xFFFDCC03); //f4c720
 
   @override
   Color fontH1 = Color(0xFFf4c720);
@@ -85,11 +85,11 @@ class RadiocomColorsLight implements RadiocomColorsConract {
   Color darkGrey = Color(0xFF535254);
 
   @override
-  Color neuPalidGrey = Colors.grey.shade50; //shade100
+  Color neuPalidGrey = Colors.grey.shade100;
   @override
-  Color neuWhite = Colors.white;
+  Color neuWhite = Colors.white.withOpacity(0.075);
   @override
-  Color neuBlackOpacity = Colors.black.withOpacity(0.030);//0.075
+  Color neuBlackOpacity = Colors.black.withOpacity(0.075);
 }
 
 class RadiocomColorsDark implements RadiocomColorsConract {

@@ -31,7 +31,11 @@ class License {
       License("font_awesome_flutter",
           "https://pub.dev/packages/font_awesome_flutter/versions/8.0.1 \n\nThe MIT License (MIT) Copyright (c) 2017 Brian Egan"),
       License("url_launcher",
-          "https://pub.dev/packages/url_launcher \n\nBSD(3) Copyright 2017 The Chromium Authors. All rights reserved.")
+          "https://pub.dev/packages/url_launcher \n\nBSD(3) Copyright 2017 The Chromium Authors. All rights reserved."),
+      License("progress_indicators",
+          "https://pub.dev/packages/progress_indicators \n\nFree to use for all :)"),
+      License("connectivity",
+          "https://pub.dev/packages/connectivity \n\nCopyright 2017 The Chromium Authors. All rights reserved.")
     ];
   }
 }

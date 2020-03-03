@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/domain/result/result.dart';
+import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
@@ -12,14 +13,13 @@ import 'package:flutter/cupertino.dart';
 import 'datasource/radioco_remote_datasource.dart';
 
 class CuacRepository implements CuacRepositoryContract {
-
   final RadiocoRemoteDataSourceContract remoteDataSource;
   CuacRepository({@required this.remoteDataSource});
 
   Future<Result<RadioStation>> getRadioStationData() async {
     RadioStation station = await remoteDataSource.getRadioStationData();
-    if(station == null){
-      return Error(RadioStation.base(),Status.fail,"cannot connect");
+    if (station == null) {
+      return Error(RadioStation.base(), Status.fail, "cannot connect");
     } else {
       return Success(station, Status.ok);
     }
@@ -27,17 +27,19 @@ class CuacRepository implements CuacRepositoryContract {
 
   Future<Result<Now>> getLiveBroadcast() async {
     Now nowPlaying = await remoteDataSource.getLiveBroadcast();
-    if(nowPlaying == null){
-      return Error(Now.mock(),Status.fail,"cannot connect");
+    if (nowPlaying == null) {
+      return Error(Now.mock(), Status.fail, "cannot connect");
     } else {
       return Success(nowPlaying, Status.ok);
     }
   }
 
-  Future<Result<List<TimeTable>>> getTimetableData(String after, String before) async {
-    List<TimeTable> timetables = await remoteDataSource.getTimetableData(after, before);
-    if(timetables == null || timetables.isEmpty){
-      return Error([],Status.fail,"cannot connect");
+  Future<Result<List<TimeTable>>> getTimetableData(
+      String after, String before) async {
+    List<TimeTable> timetables =
+        await remoteDataSource.getTimetableData(after, before);
+    if (timetables == null || timetables.isEmpty) {
+      return Error([], Status.fail, "cannot connect");
     } else {
       return Success(timetables, Status.ok);
     }
@@ -45,8 +47,8 @@ class CuacRepository implements CuacRepositoryContract {
 
   Future<Result<List<Program>>> getAllPodcasts() async {
     List<Program> podcasts = await remoteDataSource.getAllPodcasts();
-    if(podcasts == null || podcasts.isEmpty){
-      return Error([],Status.fail,"cannot connect");
+    if (podcasts == null || podcasts.isEmpty) {
+      return Error([], Status.fail, "cannot connect");
     } else {
       return Success(podcasts, Status.ok);
     }
@@ -55,10 +57,20 @@ class CuacRepository implements CuacRepositoryContract {
   @override
   Future<Result<List<New>>> getNews() async {
     List<New> news = await remoteDataSource.getNews();
-    if(news == null || news.isEmpty){
-      return Error([],Status.fail,"cannot connect");
+    if (news == null || news.isEmpty) {
+      return Error([], Status.fail, "cannot connect");
     } else {
       return Success(news, Status.ok);
+    }
+  }
+
+  @override
+  Future<Result<List<Episode>>> getEpisodes(String feedUrl) async {
+    List<Episode> episodes = await remoteDataSource.getEpisodes(feedUrl);
+    if (episodes == null || episodes.isEmpty) {
+      return Error([], Status.fail, "cannot connect");
+    } else {
+      return Success(episodes, Status.ok);
     }
   }
 }

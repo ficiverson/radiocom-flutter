@@ -1,92 +1,47 @@
-//import 'dart:convert';
-//
-//import 'package:cuacfm/injector/dependecy_injector.dart';
-//import 'package:cuacfm/models/episode.dart';
-//import 'package:cuacfm/data/radiocom-repository.dart';
-//import 'package:xml2json/xml2json.dart';
-//import 'package:http/http.dart';
-//
-//abstract class DetailPodcastContract {
-//  void onLoadEpidoses(List<Episode> episodes);
-//
-//  onErrorLoadingEpisodes(String err);
-//
-//  void onPlayerReady();
-//
-//  void onPlayerStopped();
-//}
-//
-//class DetailPodcastPresenter {
-//  DetailPodcastContract _view;
-//  CuacRepository _repository;
-//
-//  DetailPodcastPresenter(this._view, [CuacRepository repository]) {
-//    _repository = _repository != null ? repository : new CuacRepository();
-//  }
-//
-//  loadEpisodes(String feedProgram) async {
-//    List newsObj = [];
-//    var xml2json = new Xml2Json();
-//    var httpClient = new Client();
-//    try {
-//      var response = await httpClient.get(feedProgram);
-//      xml2json.parse(response.body);
-//
-//      Map news = json.decode(xml2json.toGData());
-//
-//      if (news.containsKey("rss")) {
-//        newsObj = news["rss"]["channel"]["item"];
-//        if (newsObj != null) {
-//          List<Episode> newsList = newsObj
-//              .map((n) => new Episode.fromInstance(n))
-//              .toList();
-//          _view.onLoadEpidoses(newsList);
-//        } else {
-//          _view.onErrorLoadingEpisodes("Could not load");
-//        }
-//      } else {
-//        _view.onErrorLoadingEpisodes("Could not load");
-//      }
-//    } catch (err) {
-//      _view.onErrorLoadingEpisodes("Could not load");
-//    }
-//  }
-//
-//  play(String url) async {
-//    if (Injector.playerState != PlayerState.play) {
-//      final result = await Injector.player.play(
-//          url, isLocal: false);
-//      if (result == 1) Injector.playerState = PlayerState.play;
-//      _view.onPlayerReady();
-//    }
-//  }
-//
-//  stopAndPlay(String url) async {
-//    if (Injector.playerState == PlayerState.play ||
-//        Injector.playerState == PlayerState.pause) {
-//      final result = await Injector.player.stop();
-//      if (result == 1) Injector.playerState = PlayerState.stop;
-//      _view.onPlayerStopped();
-//      Injector.resetPlayer();
-//      final playResult = await Injector.player.play(
-//          url, isLocal: false);
-//      if (playResult == 1) Injector.playerState = PlayerState.play;
-//      _view.onPlayerReady();
-//    }
-//  }
-//
-//  stop() async {
-//    if (Injector.playerState == PlayerState.play ||
-//        Injector.playerState == PlayerState.pause) {
-//      final result = await Injector.player.stop();
-//      if (result == 1) Injector.playerState = PlayerState.stop;
-//      _view.onPlayerStopped();
-//      Injector.resetPlayer();
-//    }
-//  }
-//
-//  bool isPlaying() {
-//    return Injector.playerState == PlayerState.play;
-//  }
-//
-//}
+import 'dart:convert';
+
+import 'package:cuacfm/domain/invoker/invoker.dart';
+import 'package:cuacfm/domain/result/result.dart';
+import 'package:cuacfm/domain/usecase/get_episodes_use_case.dart';
+import 'package:cuacfm/models/episode.dart';
+import 'package:cuacfm/models/new.dart';
+import 'package:cuacfm/models/program.dart';
+import 'package:flutter/cupertino.dart';
+
+import 'detail_podcast_router.dart';
+
+abstract class DetailPodcastView {
+  void onLoadEpidoses(List<Episode> episodes);
+  onErrorLoadingEpisodes(String err);
+}
+
+class DetailPodcastPresenter {
+  DetailPodcastView _view;
+  Invoker invoker;
+  DetailPodcastRouter router;
+  GetEpisodesUseCase getEpisodesUseCase;
+
+  DetailPodcastPresenter(this._view, {@required this.invoker, @required this.router, @required this.getEpisodesUseCase});
+
+  loadEpisodes(String feedProgram) async {
+    invoker.execute(getEpisodesUseCase.withParams(GetEpisodesUseCaseParams(feedProgram))).listen((result){
+        if(result is Success){
+          _view.onLoadEpidoses(result.data);
+        } else {
+          _view.onErrorLoadingEpisodes((result as Error).status.toString());
+        }
+    });
+  }
+
+  onShareClicked(Program podcast){
+
+  }
+
+  onDetailPodcast(String title, String subtitle, String content, String link) {
+    router.goToNewDetail(New.fromPodcast(title, subtitle, content, link));
+  }
+
+  onDetailEpisode(String title, String subtitle, String content, String link) {
+    router.goToNewDetail(New.fromPodcast(title, subtitle, content, link));
+  }
+}

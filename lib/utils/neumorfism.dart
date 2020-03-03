@@ -35,7 +35,6 @@ BoxDecoration neumorphicInverseBox(RadiocomColorsConract _colors) {
       ]);
 }
 
-
 class NeumorphicView extends StatelessWidget {
   RadiocomColorsConract _colors;
   final Widget child;
@@ -61,6 +60,35 @@ class NeumorphicView extends StatelessWidget {
               ),
             ]),
         child: child);
+  }
+}
+
+class NeumorphicEmptyView extends StatelessWidget {
+  String text;
+  RadiocomColorsConract _colors;
+  double width;
+  double height;
+  NeumorphicEmptyView(this.text, {this.width = 300, this.height = 300});
+  @override
+  Widget build(BuildContext context) {
+    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    return Container(
+      width: width,
+      height: height,
+      decoration: neumorphicInverseBox(_colors),
+      child: Column(children: <Widget>[Padding(padding: EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),child:Text(text,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.left,
+          style: TextStyle(
+              wordSpacing: 3.0,
+              color: _colors.font,
+              fontWeight: FontWeight.w500,
+              fontSize: 20))),CustomImage(width: 200,height: 200,
+          resPath: "assets/graphics/empty-logo.png",
+          radius: 0.0,
+          background: false),])
+    );
   }
 }
 
@@ -91,6 +119,7 @@ class NeumorphicCardVertical extends StatelessWidget {
   final String image;
   final bool imageOverLay;
   final String subtitle;
+  final bool removeShader;
   RadiocomColorsConract _colors;
   NeumorphicCardVertical(
       {this.active,
@@ -98,6 +127,7 @@ class NeumorphicCardVertical extends StatelessWidget {
       this.label,
       this.image,
       this.subtitle,
+      this.removeShader = false,
       this.imageOverLay = false});
   @override
   Widget build(BuildContext context) {
@@ -105,10 +135,11 @@ class NeumorphicCardVertical extends StatelessWidget {
     var queryData = MediaQuery.of(context);
     List<Widget> elements = [];
     Widget imageContent =
-        CustomImage(resPath: image, fit: BoxFit.fitHeight, radius: 15.0);
+        CustomImage(resPath: image, fit: BoxFit.cover, radius: 15.0);
     if (imageOverLay) {
       imageContent = Stack(fit: StackFit.passthrough, children: <Widget>[
-        ShaderMask(
+        removeShader? CustomImage(
+            resPath: image, fit: BoxFit.cover, radius: 15.0): ShaderMask(
             shaderCallback: (Rect bounds) {
               return RadialGradient(
                 center: Alignment.center,
@@ -117,17 +148,19 @@ class NeumorphicCardVertical extends StatelessWidget {
                 tileMode: TileMode.mirror,
               ).createShader(bounds);
             },
-            child:CustomImage(resPath: image, fit: BoxFit.fitHeight, radius: 15.0)),
-         Center(child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: _colors.fontWhite,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 24),
-            )),
+            child: CustomImage(
+                resPath: image, fit: BoxFit.fitHeight, radius: 15.0)),
+        Center(
+            child: Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              color: _colors.fontWhite,
+              fontWeight: FontWeight.w900,
+              fontSize: 24),
+        )),
       ]);
     }
     elements.add(Container(
@@ -146,9 +179,7 @@ class NeumorphicCardVertical extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.left,
         style: TextStyle(
-            color: _colors.font,
-            fontWeight: FontWeight.w700,
-            fontSize: 15),
+            color: _colors.font, fontWeight: FontWeight.w700, fontSize: 15),
       ));
       elements.add(Text(
         subtitle,
@@ -156,15 +187,13 @@ class NeumorphicCardVertical extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.left,
         style: TextStyle(
-            color: _colors.font,
-            fontWeight: FontWeight.w400,
-            fontSize: 14),
+            color: _colors.font, fontWeight: FontWeight.w400, fontSize: 14),
       ));
       elements.add(Spacer());
     }
     return Container(
       height: imageOverLay ? 200.0 : 250.0,
-      width: imageOverLay ? 260.0 :queryData.size.width * 0.42,
+      width: imageOverLay ? 260.0 : queryData.size.width * 0.42,
       padding: EdgeInsets.symmetric(horizontal: 11, vertical: 7),
       child: Column(
           crossAxisAlignment: CrossAxisAlignment.start, children: elements),
@@ -181,10 +210,15 @@ class NeumorphicCardHorizontal extends StatelessWidget {
   final VoidCallback onElementClicked;
   RadiocomColorsConract _colors;
   NeumorphicCardHorizontal(
-      {this.active, this.icon, this.label, this.image, this.size,this.onElementClicked});
+      {this.active,
+      this.icon,
+      this.label,
+      this.image,
+      this.size,
+      this.onElementClicked});
 
   _onElementClicked() {
-    if(onElementClicked !=null){
+    if (onElementClicked != null) {
       onElementClicked();
     }
   }
@@ -201,37 +235,39 @@ class NeumorphicCardHorizontal extends StatelessWidget {
           child:
               CustomImage(resPath: image, fit: BoxFit.fitHeight, radius: 15.0));
     }
-    return GestureDetector(child: Container(
-      height: size == null ? 80.0 : size,
-      padding: EdgeInsets.symmetric(horizontal: 11, vertical: 7),
-      decoration: neumorphicBox(_colors),
-      child: Row(
-        children: <Widget>[
-          iconCard,
-          SizedBox(width: 15),
-          Text(label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.left,
-              style: size == null
-                  ? TextStyle(
-                  color: _colors.font,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16)
-                  : TextStyle(
-                  wordSpacing: 3.0,
-                  color: _colors.font,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 20)),
-          Spacer(),
-          image != null
-              ? Icon(Icons.keyboard_arrow_right,
-              color: _colors.yellow, size: 40.0)
-              : Spacer(),
-        ],
-      ),
-    ),onTap: (){
-      _onElementClicked();
-    });
+    return GestureDetector(
+        child: Container(
+          height: size == null ? 80.0 : size,
+          padding: EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+          decoration: neumorphicBox(_colors),
+          child: Row(
+            children: <Widget>[
+              iconCard,
+              SizedBox(width: 15),
+              Text(label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.left,
+                  style: size == null
+                      ? TextStyle(
+                          color: _colors.font,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16)
+                      : TextStyle(
+                          wordSpacing: 3.0,
+                          color: _colors.font,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 20)),
+              Spacer(),
+              image != null
+                  ? Icon(Icons.keyboard_arrow_right,
+                      color: _colors.yellow, size: 40.0)
+                  : Spacer(),
+            ],
+          ),
+        ),
+        onTap: () {
+          _onElementClicked();
+        });
   }
 }

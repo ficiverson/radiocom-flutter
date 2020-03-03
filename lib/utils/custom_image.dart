@@ -4,8 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:injector/injector.dart';
-
-import 'jumping_dots.dart';
+import 'package:progress_indicators/progress_indicators.dart';
 
 class CustomImage extends StatefulWidget {
   CustomImage(
@@ -47,7 +46,8 @@ class CustomImageState extends State<CustomImage> {
           placeholder: (context, url) => JumpingDotsProgressIndicator(
                 numberOfDots: 3,
                 color: _colors.white,
-                fontSize: 30.0,
+                fontSize: 20.0,
+                dotSpacing: 5.0
               ),
           errorWidget: (context, url, error) => new Icon(Icons.error));
     } else if (widget.resPath.isNotEmpty) {

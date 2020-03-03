@@ -66,7 +66,7 @@ class TopBarState extends State<TopBar> {
     queryData = MediaQuery.of(context);
     return Container(
         width: MediaQuery.of(context).size.width,
-        height: Platform.isAndroid ? 100.0 : 90.0,
+        height: Platform.isAndroid ? queryData.size.height *0.13: queryData.size.height *0.117,//100,90
         decoration: BoxDecoration(
             borderRadius: BorderRadius.only(
                 bottomRight: Radius.circular(25.0),
@@ -112,7 +112,7 @@ class TopBarState extends State<TopBar> {
                         color: _colors.font,
                         size: widget.topBarOption == TopBarOption.MODAL
                             ? Platform.isIOS ? 28 : 27
-                            : Platform.isIOS ? 35 : 30),
+                            : Platform.isIOS ? 35 : 27),
                     onPressed: () {
                       if (widget.isSearch) {
                         if (currentQuery == null || currentQuery.isEmpty) {

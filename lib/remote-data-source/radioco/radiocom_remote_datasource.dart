@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:cuacfm/data/datasource/radioco_remote_datasource.dart';
+import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
@@ -61,7 +62,8 @@ class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
     try {
       List<dynamic> res = await this.client.get(url);
 
-      List<Program> programs = res.map((g) => new Program.fromInstance(g)).toList();
+      List<Program> programs =
+          res.map((g) => new Program.fromInstance(g)).toList();
       return programs;
     } catch (Exception) {
       return [];
@@ -74,9 +76,25 @@ class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
       RadioStation radioStation =
           Injector.appInstance.getDependency<RadioStation>();
 
-      List<dynamic> res = await this.client.get(Uri.parse(radioStation.news_rss), responseType : HTTPResponseType.XML);
+      List<dynamic> res = await this.client.get(
+          Uri.parse(radioStation.news_rss),
+          responseType: HTTPResponseType.XML);
       List<New> newsList = res.map((n) => new New.fromInstance(n)).toList();
       return newsList;
+    } catch (err) {
+      return [];
+    }
+  }
+
+  @override
+  Future<List<Episode>> getEpisodes(String feedUrl) async {
+    try {
+      List<dynamic> res = await this
+          .client
+          .get(Uri.parse(feedUrl), responseType: HTTPResponseType.XML);
+      List<Episode> episodesList =
+          res.map((n) => new Episode.fromInstance(n)).toList();
+      return episodesList;
     } catch (err) {
       return [];
     }

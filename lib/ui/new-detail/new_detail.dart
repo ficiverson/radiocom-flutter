@@ -96,10 +96,10 @@ class NewDetailState extends State<NewDetail> implements NewDetailView {
                     ]))
               ])),
               SizedBox(height: 20),
-              ListTile(
+                Padding(padding: EdgeInsets.fromLTRB(5.0, 00.0, 5.0, 0.0),child:ListTile(
                   title: Html(defaultTextStyle: TextStyle(color: _colors.font),
-                useRichText: true,
-                data: widget.newItem.description,
+                useRichText: true,renderNewlines: true,
+                data: widget.newItem.description.replaceAll("\\r", "").replaceAll("\\n", "").replaceAll("\\", ""),
                 linkStyle: const TextStyle(
                   color: Colors.grey,
                   decorationColor: Colors.grey,
@@ -108,7 +108,7 @@ class NewDetailState extends State<NewDetail> implements NewDetailView {
                 onLinkTap: (url) {
                   _presenter.onLinkClicked(url);
                 },
-              )),SizedBox(height: 20),
+              ))),SizedBox(height: 20),
             ]))));
   }
 }

@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:animations/animations.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/program.dart';
@@ -19,6 +21,7 @@ import 'package:injector/injector.dart';
 import 'dart:io';
 
 import 'package:intl/intl.dart';
+import 'package:progress_indicators/progress_indicators.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -29,7 +32,9 @@ class MyHomePage extends StatefulWidget {
   MyHomePageState createState() => new MyHomePageState();
 }
 
-class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver implements HomeView {
+class MyHomePageState extends State<MyHomePage>
+    with WidgetsBindingObserver
+    implements HomeView {
   HomePresenter _presenter;
   MediaQueryData queryData;
   BuildContext context;
@@ -57,6 +62,16 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver impl
   List<Program> podcast10 = [];
   List<Program> podcast11 = [];
   RadiocomColorsConract _colors;
+  bool isLoadingHome = true;
+  bool isLoadingPodcast = true;
+  bool isLoadingNews = true;
+  bool isEmptyHome = false;
+  bool isEmptyPodcast = false;
+  bool isEmptyNews = false;
+  bool isTimeTableEmpty = false;
+  SnackBar snackBarConnection;
+  var connectionSubscription;
+  bool isContentUpdated = true;
 
   MyHomePageState() {
     DependencyInjector().injectByView(this);
@@ -68,6 +83,7 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver impl
     queryData = MediaQuery.of(context);
     _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     return Scaffold(
+        key: scaffoldKey,
         backgroundColor: _colors.palidwhite,
         body: PageTransitionSwitcher(
             transitionBuilder: (
@@ -143,6 +159,25 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver impl
     categories.shuffle();
     setBrightness();
 
+
+    connectionSubscription =
+        Connectivity().onConnectivityChanged.listen((connection) {
+          if (connection == ConnectivityResult.none) {
+            new Timer(new Duration(milliseconds: 1200), () {
+              Connectivity().checkConnectivity().then((currentValue) {
+                if (currentValue == ConnectivityResult.none) {
+                 // _presenter.currentPlayer.restorePlayer(currentValue);
+                  setState(() {});
+                  onConnectionError();
+                }
+              });
+            });
+          } else {
+            //_presenter.currentPlayer.restorePlayer(connection);
+            onConnectionSuccess();
+          }
+        });
+
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -150,10 +185,15 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver impl
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        setBrightness();
-        setState((){});
+        if(!isContentUpdated) {
+          isContentUpdated = true;
+          setBrightness();
+          setState(() {});
+          _presenter.onHomeResumed();
+        }
         break;
       case AppLifecycleState.paused:
+        isContentUpdated = false;
         break;
       default:
         break;
@@ -162,95 +202,183 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver impl
 
   @override
   void dispose() {
+    connectionSubscription.cancel();
+    Injector.appInstance.removeByKey<HomeView>();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   void setBrightness() {
-    final Brightness brightness = WidgetsBinding.instance.window.platformBrightness;
-    if(brightness == Brightness.light){
-      Injector.appInstance
-          .registerSingleton<RadiocomColorsConract>((_) => RadiocomColorsLight(), override: true);
+    final Brightness brightness =
+        WidgetsBinding.instance.window.platformBrightness;
+    if (brightness == Brightness.light) {
+      Injector.appInstance.registerSingleton<RadiocomColorsConract>(
+          (_) => RadiocomColorsLight(),
+          override: true);
     } else {
-      Injector.appInstance
-          .registerSingleton<RadiocomColorsConract>((_) => RadiocomColorsDark(), override: true);
+      Injector.appInstance.registerSingleton<RadiocomColorsConract>(
+          (_) => RadiocomColorsDark(),
+          override: true);
+    }
+  }
+
+  @override
+  void onConnectionSuccess() {
+    scaffoldKey.currentState..removeCurrentSnackBar();
+    snackBarConnection = null;
+  }
+
+  @override
+  void onConnectionError() {
+    if (snackBarConnection == null) {
+      scaffoldKey.currentState..removeCurrentSnackBar();
+      snackBarConnection = SnackBar(
+        duration: Duration(seconds: 3),
+        content: Text("No dispones de conexión a internet"),
+      );
+      scaffoldKey.currentState..showSnackBar(snackBarConnection);
     }
   }
 
   @override
   void onLoadLiveData(Now now) {
-    setState(() {
-      _nowProgram = now;
-    });
+    _nowProgram = now;
   }
 
   @override
   void onLoadNews(List<New> news) {
-    setState(() {
+    isLoadingNews = false;
+    isEmptyNews = news.isEmpty;
+    if (bottomBarOption == BottomBarOption.NEWS) {
+      setState(() {
+        _lastNews = news;
+      });
+    } else {
       _lastNews = news;
-    });
+    }
   }
 
   @override
   void onLoadPodcasts(List<Program> podcasts) {
-    setState(() {
+    isLoadingPodcast = false;
+    isEmptyPodcast = podcasts.isEmpty;
+    if (bottomBarOption == BottomBarOption.SEARCH) {
+      setState(() {
+        _podcast = podcasts;
+        generatePodcast();
+      });
+    } else {
       _podcast = podcasts;
       generatePodcast();
-    });
+    }
   }
 
   @override
   void onLoadRadioStation(RadioStation station) {
     Injector.appInstance
         .registerSingleton<RadioStation>((_) => station, override: true);
-    setState(() {
-      _station = station;
-    });
+    _station = station;
   }
 
   @override
   void onLoadTimetable(List<TimeTable> programsTimeTable) {
-    setState(() {
-      _timeTable = programsTimeTable;
-    });
+    isTimeTableEmpty = programsTimeTable.isEmpty;
+    _timeTable = programsTimeTable;
   }
 
   @override
   void onLoadRecents(List<TimeTable> programsTimeTable) {
-    setState(() {
+    isLoadingHome = false;
+    isEmptyHome = programsTimeTable.isEmpty;
+    if (bottomBarOption == BottomBarOption.HOME) {
+      setState(() {
+        _recentPodcast = programsTimeTable;
+        _recentPodcast.removeWhere((element) => element.type == "S");
+        _recentPodcast = _recentPodcast
+            .where((element) =>
+                element.start
+                    .isBefore(DateTime.now().subtract(Duration(hours: 1))) &&
+                element.start
+                    .isAfter(DateTime.now().subtract(Duration(hours: 12))))
+            .toList();
+      });
+    } else {
       _recentPodcast = programsTimeTable;
       _recentPodcast.removeWhere((element) => element.type == "S");
-    });
+      _recentPodcast = _recentPodcast
+          .where((element) =>
+              element.start.isBefore(DateTime.now()) &&
+              element.start
+                  .isAfter(DateTime.now().subtract(Duration(hours: 12))))
+          .toList();
+    }
   }
 
   @override
   void onLoadRecentsError(error) {
-    // TODO: implement onLoadRecentsError
+    isEmptyHome = true;
+    if (bottomBarOption == BottomBarOption.HOME) {
+      setState(() {});
+    }
   }
 
   @override
   void onLiveDataError(error) {
-    // TODO: implement onLiveDataError
+    _nowProgram = Now.mock();
   }
 
   @override
   void onNewsError(error) {
-    // TODO: implement onNewsError
+    isEmptyNews = true;
+    if (bottomBarOption == BottomBarOption.NEWS) {
+      setState(() {});
+    }
   }
 
   @override
   void onPodcastError(error) {
-    // TODO: implement onPodcastError
+    isEmptyPodcast = true;
+    if (bottomBarOption == BottomBarOption.SEARCH) {
+      setState(() {});
+    }
   }
 
   @override
   void onRadioStationError(error) {
-    // TODO: implement onRadioStationError
+    if(snackBarConnection == null){
+      scaffoldKey.currentState..removeCurrentSnackBar();
+      final snackBar = SnackBar(
+        content: Text("No podemos conectar con el servidor en este momemto"),
+        action: SnackBarAction(
+          label: "Cerrar",
+          onPressed: () {
+            scaffoldKey.currentState.hideCurrentSnackBar();
+          },
+        ),
+      );
+      scaffoldKey.currentState..showSnackBar(snackBar);
+    }
   }
 
   @override
   void onTimetableError(error) {
-    // TODO: implement onTimetableError
+    isTimeTableEmpty = true;
+  }
+
+  showTimeTableEmptySnackbar() {
+    if(snackBarConnection == null){
+      scaffoldKey.currentState..removeCurrentSnackBar();
+      final snackBar = SnackBar(
+        content: Text("No podemos conectar con el servidor en este momemto"),
+        action: SnackBarAction(
+          label: "Cerrar",
+          onPressed: () {
+            scaffoldKey.currentState.hideCurrentSnackBar();
+          },
+        ),
+      );
+      scaffoldKey.currentState..showSnackBar(snackBar);
+    }
   }
 
   //view generation
@@ -262,125 +390,163 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver impl
         content = _getHomeLayout();
         break;
       case BottomBarOption.SEARCH:
-        content = _getSearchLayout();
+        content = isLoadingPodcast ? getLoadingState() : _getSearchLayout();
         break;
       case BottomBarOption.NEWS:
-        content = _getNewsLayout();
+        content = isLoadingNews ? getLoadingState() : _getNewsLayout();
         break;
     }
     return content;
   }
 
-  Widget _getHomeLayout() {
-    return Container(
-      key: ValueKey<String>(BottomBarOption.HOME.toString()),
-      color: _colors.palidwhitedark,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-//          Row(
-//            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//            children: <Widget>[
-//              //NMButton(down: false, icon: Icons.arrow_back),
-//              //NMButton(down: false, icon: Icons.search),
-//            ],
-//          ),
-          SizedBox(height: 40.0),
-          Padding(
-              padding: EdgeInsets.fromLTRB(22.0, 10.0, 25.0, 0.0),
-              child: Text(
-                _getWelcomeText(),
-                style: TextStyle(
-                    letterSpacing: 1.2,
-                    color: _colors.fontH1,
-                    fontSize: 30,
-                    fontWeight: FontWeight.w900),
-              )),
-          Padding(
-              padding: const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
-              child: Text(
-                'Ahora suena',
-                style: TextStyle(
-                    letterSpacing: 1.2,
-                    color: _colors.font,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500),
-              )),
-          Padding(
-              padding: const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
-              child: NeumorphicCardHorizontal(
-                onElementClicked: () {
-                  _presenter.nowPlayingClicked(_timeTable);
-                },
-                active: false,
-                image: _nowProgram.logo_url,
-                label: _nowProgram.name,
-              )),
-          Padding(
-              padding: const EdgeInsets.fromLTRB(25.0, 30.0, 25.0, 0.0),
-              child: Text(
-                'Podcast recientes',
-                style: TextStyle(
-                    letterSpacing: 1.2,
-                    color: _colors.font,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500),
-              )),
-          Container(
-              color: _colors.transparent,
-              width: queryData.size.width,
-              height: 280.0,
-              child: ListView.builder(
-                  physics: BouncingScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _recentPodcast.length,
-                  itemBuilder: (_, int index) => Row(children: [
-                        SizedBox(width: 15.0),
-                        NeumorphicCardVertical(
-                          active: false,
-                          image: _recentPodcast[index].logo_url,
-                          label: _recentPodcast[index].name,
-                          subtitle: _recentPodcast[index].duration + " minutos",
-                        ),
-                        SizedBox(width: 22.0)
-                      ]))),
+  Widget getLoadingState() {
+    return Center(
+        child: JumpingDotsProgressIndicator(
+      numberOfDots: 3,
+      color: _colors.black,
+      fontSize: 20.0,
+      dotSpacing: 5.0,
+    ));
+  }
 
-          shouldShowPlayer
-              ? Container(
-                  width: queryData.size.width,
-                  padding: EdgeInsets.fromLTRB(80.0, 30.0, 80.0, 0.0),
-                  child: CustomImage(
-                      resPath: "assets/graphics/cuac-logo.png",
-                      radius: 0.0,
-                      background: false))
-              : Padding(
-                  padding: const EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
+  Widget _getHomeLayout() {
+    return SingleChildScrollView(
+        key: ValueKey<String>(BottomBarOption.HOME.toString()),
+        physics: BouncingScrollPhysics(),
+        child: Container(
+          color: _colors.palidwhite,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              SizedBox(height: 40.0),
+              Padding(
+                  padding: EdgeInsets.fromLTRB(22.0, 10.0, 25.0, 0.0),
+                  child: Text(
+                    _getWelcomeText(),
+                    style: TextStyle(
+                        letterSpacing: 1.5,
+                        color: _colors.fontH1,
+                        fontSize: 30,
+                        fontWeight: FontWeight.w900),
+                  )),
+              Padding(
+                  padding: EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
+                  child: Text(
+                    'Ahora suena',
+                    style: TextStyle(
+                        letterSpacing: 1.2,
+                        color: _colors.font,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500),
+                  )),
+              Padding(
+                  padding: const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
                   child: NeumorphicCardHorizontal(
-                      onElementClicked: () {
-                        setState(() {
-                          shouldShowPlayer = true;
-                        });
-                      },
-                      icon: Icons.play_arrow,
-                      active: true,
-                      label: "Escuchar en Directo",
-                      size: 80.0)),
-          shouldShowPlayer
-              ? SizedBox(height: 80)
-              : Container(
-                  width: queryData.size.width,
-                  padding: EdgeInsets.fromLTRB(80.0, 30.0, 80.0, 0.0),
-                  child: CustomImage(
-                      resPath: "assets/graphics/cuac-logo.png",
-                      radius: 0.0,
-                      background: false)),
-          SizedBox(
-            height: 20.0,
-          )
-        ],
-      ),
-    );
+                    onElementClicked: () {
+                      if (isTimeTableEmpty) {
+                        showTimeTableEmptySnackbar();
+                      } else {
+                        _presenter.nowPlayingClicked(_timeTable);
+                      }
+                    },
+                    active: false,
+                    image: _nowProgram.logo_url,
+                    label: _nowProgram.name,
+                  )),
+              Padding(
+                  padding: const EdgeInsets.fromLTRB(25.0, 30.0, 25.0, 0.0),
+                  child: Text(
+                    'Podcast recientes',
+                    style: TextStyle(
+                        letterSpacing: 1.5,
+                        color: _colors.font,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500),
+                  )),
+              isEmptyHome
+                  ? Padding(
+                      padding: EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 20.0),
+                      child: NeumorphicEmptyView(
+                        "No hay podcast recientes ahora mismo.",
+                        width: queryData.size.width,
+                        height: 280.0,
+                      ))
+                  : Container(
+                      color: _colors.transparent,
+                      width: queryData.size.width,
+                      height: 280.0,
+                      child: isLoadingHome
+                          ? Container(height: 280.0, child: getLoadingState())
+                          : ListView.builder(
+                              physics: BouncingScrollPhysics(),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: _recentPodcast.length,
+                              itemBuilder: (_, int index) => Row(children: [
+                                    SizedBox(width: 15.0),
+                                    GestureDetector(
+                                        onTap: () {
+                                          _presenter.onPodcastClicked(
+                                              findPodcastByName(
+                                                  _recentPodcast[index]
+                                                      .rss_url));
+                                        },
+                                        child: NeumorphicCardVertical(
+                                          active: false,
+                                          image: _recentPodcast[index].logo_url,
+                                          label: _recentPodcast[index].name,
+                                          subtitle:
+                                              _recentPodcast[index].duration +
+                                                  " minutos",
+                                        )),
+                                    SizedBox(width: 22.0)
+                                  ]))),
+              shouldShowPlayer
+                  ? Container(
+                      width: queryData.size.width,
+                      padding: EdgeInsets.fromLTRB(80.0, 30.0, 80.0, 0.0),
+                      child: CustomImage(
+                          resPath: "assets/graphics/cuac-logo.png",
+                          radius: 0.0,
+                          background: false))
+                  : Padding(
+                      padding: const EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
+                      child: NeumorphicCardHorizontal(
+                          onElementClicked: () {
+                            setState(() {
+                              shouldShowPlayer = true;
+                            });
+                          },
+                          icon: Icons.play_arrow,
+                          active: true,
+                          label: "Escuchar en Directo",
+                          size: 80.0)),
+              shouldShowPlayer
+                  ? SizedBox(height: 80)
+                  : isLoadingHome
+                      ? GlowingProgressIndicator(
+                          child: Container(
+                              width: queryData.size.width,
+                              padding:
+                                  EdgeInsets.fromLTRB(80.0, 30.0, 80.0, 0.0),
+                              child: CustomImage(
+                                  resPath: "assets/graphics/cuac-logo.png",
+                                  radius: 0.0,
+                                  background: false)),
+                        )
+                      : Container(
+                          width: queryData.size.width,
+                          padding: EdgeInsets.fromLTRB(80.0, 30.0, 80.0, 0.0),
+                          child: CustomImage(
+                              resPath: "assets/graphics/cuac-logo.png",
+                              radius: 0.0,
+                              background: false)),
+              SizedBox(
+                height: 20.0,
+              )
+            ],
+          ),
+        ));
   }
 
   Widget _getNewsLayout() {
@@ -401,7 +567,7 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver impl
                     child: Text(
                       'Noticias',
                       style: TextStyle(
-                          letterSpacing: 1.2,
+                          letterSpacing: 1.5,
                           color: _colors.font,
                           fontSize: 30,
                           fontWeight: FontWeight.w900),
@@ -447,7 +613,13 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver impl
                       },
                     ));
               } else {
-                element = SizedBox(height: shouldShowPlayer ? 60.0 : 10.0);
+                element = isEmptyNews
+                    ? Padding(
+                        padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 0.0),
+                        child: NeumorphicEmptyView(
+                          "No podemos cargar las noticias ahora mismo.",
+                        ))
+                    : SizedBox(height: shouldShowPlayer ? 60.0 : 10.0);
               }
               return element;
             }));
@@ -461,36 +633,59 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver impl
         height: queryData.size.height,
         child: SingleChildScrollView(
             physics: BouncingScrollPhysics(),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  SizedBox(height: 40.0),
-                  Padding(
-                      padding: EdgeInsets.all(20.0),
-                      child: Text(
-                        'Podcast',
-                        style: TextStyle(
-                            letterSpacing: 1.2,
-                            color: _colors.font,
-                            fontSize: 30,
-                            fontWeight: FontWeight.w900),
-                      )),
-                  _getPodcastByCategory(categories[0], podcast0),
-                  _getCategoriesLayout(),
-                  _getPodcastByCategory(categories[1], podcast1),
-                  _getPodcastByCategory(categories[2], podcast2),
-                  _getPodcastByCategory(categories[3], podcast3),
-                  _getPodcastByCategory(categories[4], podcast4),
-                  _getPodcastByCategory(categories[5], podcast5),
-                  _getPodcastByCategory(categories[6], podcast6),
-                  _getPodcastByCategory(categories[7], podcast7),
-                  _getPodcastByCategory(categories[8], podcast8),
-                  _getPodcastByCategory(categories[9], podcast9),
-                  _getPodcastByCategory(categories[10], podcast10),
-                  _getPodcastByCategory(categories[11], podcast11),
-                  SizedBox(height: shouldShowPlayer ? 60.0 : 10.0),
-                ])));
+            child: isEmptyPodcast
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                        SizedBox(height: 45.0),
+                        Padding(
+                            padding: EdgeInsets.all(20.0),
+                            child: Text(
+                              'Podcast',
+                              style: TextStyle(
+                                  letterSpacing: 1.5,
+                                  color: _colors.font,
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.w900),
+                            )),
+                        Padding(
+                            padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 0.0),
+                            child: NeumorphicEmptyView(
+                              "No podemos cargar los podcast en este momento",
+                              width: queryData.size.width,
+                            ))
+                      ])
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                        SizedBox(height: 30.0),
+                        Padding(
+                            padding: EdgeInsets.all(20.0),
+                            child: Text(
+                              'Podcast',
+                              style: TextStyle(
+                                  letterSpacing: 1.5,
+                                  color: _colors.font,
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.w900),
+                            )),
+                        _getPodcastByCategory(categories[0], podcast0),
+                        _getCategoriesLayout(),
+                        _getPodcastByCategory(categories[1], podcast1),
+                        _getPodcastByCategory(categories[2], podcast2),
+                        _getPodcastByCategory(categories[3], podcast3),
+                        _getPodcastByCategory(categories[4], podcast4),
+                        _getPodcastByCategory(categories[5], podcast5),
+                        _getPodcastByCategory(categories[6], podcast6),
+                        _getPodcastByCategory(categories[7], podcast7),
+                        _getPodcastByCategory(categories[8], podcast8),
+                        _getPodcastByCategory(categories[9], podcast9),
+                        _getPodcastByCategory(categories[10], podcast10),
+                        _getPodcastByCategory(categories[11], podcast11),
+                        SizedBox(height: shouldShowPlayer ? 60.0 : 10.0),
+                      ])));
   }
 
   Widget _getCategoriesLayout() {
@@ -580,17 +775,21 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver impl
                   itemCount: podcast.length,
                   itemBuilder: (_, int index) => Row(children: [
                         SizedBox(width: 15.0),
-                        NeumorphicCardVertical(
-                          active: false,
-                          image: podcast[index].logo_url,
-                          label: podcast[index].name,
-                          subtitle: (DateFormat("hh:mm:ss")
-                                          .parse(podcast[index].duration)
-                                          .hour *
-                                      60)
-                                  .toString() +
-                              " minutos.",
-                        ),
+                        GestureDetector(
+                            onTap: () {
+                              _presenter.onPodcastClicked(podcast[index]);
+                            },
+                            child: NeumorphicCardVertical(
+                              active: false,
+                              image: podcast[index].logo_url,
+                              label: podcast[index].name,
+                              subtitle: (DateFormat("hh:mm:ss")
+                                              .parse(podcast[index].duration)
+                                              .hour *
+                                          60)
+                                      .toString() +
+                                  " minutos.",
+                            )),
                         SizedBox(width: 22.0)
                       ]))),
         ]);
@@ -610,6 +809,18 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver impl
   }
 
   generatePodcast() {
+    podcast0 = [];
+    podcast1 = [];
+    podcast2 = [];
+    podcast3 = [];
+    podcast4 = [];
+    podcast5 = [];
+    podcast6 = [];
+    podcast7 = [];
+    podcast8 = [];
+    podcast9 = [];
+    podcast10 = [];
+    podcast11 = [];
     List<Program> categoryPodcast = [];
     int index = 0;
     categories.forEach((category) {
@@ -679,5 +890,9 @@ class MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver impl
     } else if (index == 11) {
       return podcast11;
     }
+  }
+
+  Program findPodcastByName(String url) {
+    return _podcast.where((element) => url == element.rss_url).first;
   }
 }

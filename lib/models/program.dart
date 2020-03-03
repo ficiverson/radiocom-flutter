@@ -20,6 +20,7 @@ class Program {
   String rss_url;
   String duration;
   String category;
+  String language;
   ProgramCategories categoryType;
 
   Program.fromInstance(Map<String, dynamic> map)
@@ -28,9 +29,20 @@ class Program {
         logo_url = map["photo_url"],
         duration = map["runtime"],
         rss_url = map["rss_url"],
+        language = getLanguage(map["language"]),
         categoryType = mapCategoryType(
             map["category"] != null ? map["category"] : "Otros"),
         category = mapCategory(map["category"] != null ? map["category"] : "");
+
+  static String getLanguage(String language){
+    var language = "Español";
+    if(language == "es"){
+      language = "Español";
+    } else if(language == "gl"){
+      language = "Galego";
+    }
+    return language;
+  }
 
   static ProgramCategories mapCategoryType(String content) {
     //THINK about shows

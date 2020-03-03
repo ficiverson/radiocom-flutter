@@ -24,11 +24,12 @@ class MyApp extends StatelessWidget {
       checkerboardOffscreenLayers: false,
       title: 'CUAC FM',
       theme: new ThemeData(
-        canvasColor: Injector.appInstance.getDependency<RadiocomColorsConract>().palidwhite,
+        canvasColor: Colors.white,
         primarySwatch: Colors.grey,
         primaryColorBrightness: Brightness.light,
       ),
       darkTheme: ThemeData(primaryColorBrightness: Brightness.dark,
+        canvasColor: Colors.black,primarySwatch: Colors.blue,
       ),
       home: new MyHomePage(title: 'Benvida a CUAC FM'),
     );
@@ -38,11 +39,11 @@ class MyApp extends StatelessWidget {
 Widget errorScreen(dynamic detailsException) {
   return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Injector.appInstance.getDependency<RadiocomColorsConract>().white,
         title: Text('Error'),
       ),
       body: Container(
-          color: Colors.white,
+          color: Injector.appInstance.getDependency<RadiocomColorsConract>().white,
           child: Padding(
             padding: EdgeInsets.all(20.0),
             child: Foundation.kReleaseMode
@@ -56,15 +57,9 @@ Widget errorScreen(dynamic detailsException) {
 
 /*
 
-- TODO in backend updagte icon radiostation in radioco
+- TODO in backend updagte icon radiostation
 
 migration steps to be a HERO:
 
-- no connection error handling
-- loading states and error handling in a good way  in home:)
-- refresh foreground/background
-
-- put player
-
-- podcast detail
+- put player with - refresh foreground/background with now and player others??
 */

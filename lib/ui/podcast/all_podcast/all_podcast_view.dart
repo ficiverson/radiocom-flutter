@@ -6,6 +6,7 @@ import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:injector/injector.dart';
+import 'package:intl/intl.dart';
 
 import 'all_podcast_presenter.dart';
 
@@ -40,7 +41,8 @@ class AllPodcastState extends State<AllPodcast> implements AllPodcastView {
       key: scaffoldKey,
       appBar: TopBar(
           isSearch: _isSearching,
-          title: widget.category !=null ? widget.category :"Todos los podcasts",
+          title:
+              widget.category != null ? widget.category : "Todos los podcasts",
           topBarOption: TopBarOption.MODAL,
           rightIcon: Icons.search,
           onRightClicked: () {
@@ -90,7 +92,7 @@ class AllPodcastState extends State<AllPodcast> implements AllPodcastView {
     super.initState();
     _presenter = Injector.appInstance.getDependency<AllPodcastPresenter>();
     _podcasts = widget.podcasts;
-    _podcastWithFilter= widget.podcasts;
+    _podcastWithFilter = widget.podcasts;
   }
 
   @override
@@ -103,6 +105,7 @@ class AllPodcastState extends State<AllPodcast> implements AllPodcastView {
 
   Widget _getBodyLayout() {
     return Container(
+        margin: EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
         key: PageStorageKey<String>("allpodcastview"),
         color: _colors.transparent,
         width: queryData.size.width,
@@ -118,12 +121,21 @@ class AllPodcastState extends State<AllPodcast> implements AllPodcastView {
             itemBuilder: (BuildContext context, int index) {
               return Padding(
                   padding: EdgeInsets.fromLTRB(20.0, 0.0, 30.0, 0.0),
-                  child: NeumorphicCardVertical(
-                    active: false,
-                    image: _podcastWithFilter[index].logo_url,
-                    label: _podcastWithFilter[index].name,
-                    subtitle: _podcastWithFilter[index].category,
-                  ));
+                  child: GestureDetector(
+                      onTap: () {
+                        _presenter.onPodcastClicked(_podcastWithFilter[index]);
+                      },
+                      child: NeumorphicCardVertical(
+                        active: false,
+                        image: _podcastWithFilter[index].logo_url,
+                        label: _podcastWithFilter[index].name,
+                        subtitle: (DateFormat("hh:mm:ss")
+                            .parse(_podcastWithFilter[index].duration)
+                            .hour *
+                            60)
+                            .toString() +
+                            " minutos.",
+                      )));
             }));
   }
 

@@ -1,5 +1,6 @@
 import 'package:cuacfm/data/datasource/radioco_remote_datasource.dart';
 import 'package:cuacfm/domain/usecase/get_all_podcast_use_case.dart';
+import 'package:cuacfm/domain/usecase/get_episodes_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_live_program_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_news_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_station_use_case.dart';
@@ -16,7 +17,11 @@ import 'package:cuacfm/ui/home/home_view.dart';
 import 'package:cuacfm/ui/new-detail/new_detail.dart';
 import 'package:cuacfm/ui/new-detail/new_detail_presenter.dart';
 import 'package:cuacfm/ui/podcast/all_podcast/all_podcast_presenter.dart';
+import 'package:cuacfm/ui/podcast/all_podcast/all_podcast_router.dart';
 import 'package:cuacfm/ui/podcast/all_podcast/all_podcast_view.dart';
+import 'package:cuacfm/ui/podcast/detail_podcast_presenter.dart';
+import 'package:cuacfm/ui/podcast/detail_podcast_router.dart';
+import 'package:cuacfm/ui/podcast/detail_podcast_view.dart';
 import 'package:cuacfm/ui/settings/settings-detail/settings_detail.dart';
 import 'package:cuacfm/ui/settings/settings-detail/settings_presenter_detail.dart';
 import 'package:cuacfm/ui/settings/settings.dart';
@@ -24,6 +29,7 @@ import 'package:cuacfm/ui/settings/settings_presenter.dart';
 import 'package:cuacfm/ui/settings/settings_router.dart';
 import 'package:cuacfm/ui/timetable/time_table_presenter.dart';
 import 'package:cuacfm/ui/timetable/time_table_view.dart';
+import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:cuacfm/utils/cuac_client.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:flutter/widgets.dart';
@@ -57,9 +63,12 @@ class DependencyInjector {
       injector.registerDependency<NewDetailView>((Injector injector) => view);
     } else if (view is SettingsState) {
       injector.registerDependency<SettingsView>((Injector injector) => view);
-    }
-    else if (view is SettingsDetailState) {
-      injector.registerDependency<SettingsDetailView>((Injector injector) => view);
+    } else if (view is SettingsDetailState) {
+      injector
+          .registerDependency<SettingsDetailView>((Injector injector) => view);
+    } else if (view is DetailPodcastState) {
+      injector
+          .registerDependency<DetailPodcastView>((Injector injector) => view);
     }
   }
 
@@ -74,7 +83,11 @@ class DependencyInjector {
   }
 
   loadPresentationModules() {
-    injector.registerSingleton<RadiocomColorsConract>((Injector injector){
+    injector.registerDependency<ConnectionContract>((_){
+      return Connection();
+    });
+
+    injector.registerSingleton<RadiocomColorsConract>((Injector injector) {
       return RadiocomColorsLight();
     });
     injector.registerSingleton<Invoker>((Injector injector) {
@@ -87,6 +100,14 @@ class DependencyInjector {
 
     injector.registerDependency<SettingsRouterContract>((Injector injector) {
       return SettingsRouter();
+    });
+
+    injector.registerDependency<AllPodcastRouterContract>((Injector injector) {
+      return AllPodcastRouter();
+    });
+
+    injector.registerDependency<DetailPodcastRouterContract>((Injector injector) {
+      return DetailPodcastRouter();
     });
 
     injector.registerDependency<HomePresenter>((Injector injector) {
@@ -105,18 +126,28 @@ class DependencyInjector {
     });
 
     injector.registerDependency<AllPodcastPresenter>((Injector injector) {
-      return new AllPodcastPresenter();
+      return new AllPodcastPresenter(injector.getDependency<AllPodcastView>(),
+          invoker: injector.getDependency<Invoker>(),
+          router: injector.getDependency<AllPodcastRouterContract>());
     });
     injector.registerDependency<NewDetailPresenter>((Injector injector) {
       return new NewDetailPresenter();
     });
     injector.registerDependency<SettingsPresenter>((Injector injector) {
       return new SettingsPresenter(injector.getDependency<SettingsView>(),
-        invoker: injector.getDependency<Invoker>(),
-        router: injector.getDependency<SettingsRouterContract>());
+          invoker: injector.getDependency<Invoker>(),
+          router: injector.getDependency<SettingsRouterContract>());
     });
     injector.registerDependency<SettingsDetailPresenter>((Injector injector) {
       return new SettingsDetailPresenter();
+    });
+
+    injector.registerDependency<DetailPodcastPresenter>((Injector injector) {
+      return new DetailPodcastPresenter(
+          injector.getDependency<DetailPodcastView>(),
+          invoker: injector.getDependency<Invoker>(),
+          router: injector.getDependency<DetailPodcastRouterContract>(),
+          getEpisodesUseCase: injector.getDependency<GetEpisodesUseCase>());
     });
   }
 
@@ -147,6 +178,11 @@ class DependencyInjector {
     injector.registerDependency<GetNewsUseCase>((Injector injector) {
       var radiocoRepository = injector.getDependency<CuacRepositoryContract>();
       return GetNewsUseCase(radiocoRepository: radiocoRepository);
+    });
+
+    injector.registerDependency<GetEpisodesUseCase>((Injector injector) {
+      var radiocoRepository = injector.getDependency<CuacRepositoryContract>();
+      return GetEpisodesUseCase(radiocoRepository: radiocoRepository);
     });
   }
 
