@@ -1,6 +1,6 @@
 # radiocom-flutter
 
-This is a flutter application for Community Media Stations.
+This is a flutter application for Community Media Stations based in radioco APIs.
 
 ## Getting Started
 

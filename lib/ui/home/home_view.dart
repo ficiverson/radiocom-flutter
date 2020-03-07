@@ -15,11 +15,12 @@ import 'package:cuacfm/utils/custom_image.dart';
 import 'package:cuacfm/utils/neumorfism.dart';
 import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
 import 'dart:io';
-
 import 'package:intl/intl.dart';
 import 'package:progress_indicators/progress_indicators.dart';
 
@@ -69,9 +70,13 @@ class MyHomePageState extends State<MyHomePage>
   bool isEmptyPodcast = false;
   bool isEmptyNews = false;
   bool isTimeTableEmpty = false;
+  bool isLoadingPlay = false;
   SnackBar snackBarConnection;
   var connectionSubscription;
   bool isContentUpdated = true;
+  EventChannel _notificationEvent =
+      EventChannel('cuacfm.flutter.io/updateNotificationMain');
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
   MyHomePageState() {
     DependencyInjector().injectByView(this);
@@ -82,6 +87,9 @@ class MyHomePageState extends State<MyHomePage>
     this.context = context;
     queryData = MediaQuery.of(context);
     _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    if (_presenter.currentPlayer.isPodcast) {
+      shouldShowPlayer = _presenter.currentPlayer.isPlaying();
+    }
     return Scaffold(
         key: scaffoldKey,
         backgroundColor: _colors.palidwhite,
@@ -116,30 +124,42 @@ class MyHomePageState extends State<MyHomePage>
         floatingActionButton: PlayerView(
             isMini: isMini,
             shouldShow: shouldShowPlayer,
-            currentSong: _nowProgram.name,
-            multimediaImage: _nowProgram.logo_url,
+            isPlayingAudio: _presenter.currentPlayer.isPlaying(),
             isExpanded: bottomBarOption != BottomBarOption.HOME,
             onDetailClicked: () {
               if (isMini) {
+                if (!mounted) return;
                 setState(() {
                   isMini = false;
                 });
               } else {
-                setState(() {
-                  isMini = true;
-                });
+                if (bottomBarOption == BottomBarOption.HOME) {
+                  if (!mounted) return;
+                  setState(() {
+                    isMini = true;
+                  });
+                }
+                _presenter
+                    .onPodcastControlsClicked(_presenter.currentPlayer.episode);
               }
             },
             onMultimediaClicked: (isPlaying) {
-              setState(() {
-                shouldShowPlayer = isPlaying;
-              });
+              if (isPlaying) {
+                _presenter.onPausePlayer();
+              } else {
+                if (_presenter.currentPlayer.isPodcast) {
+                  _presenter.onSelectedEpisode();
+                } else {
+                  _presenter.onLiveSelected(_nowProgram);
+                }
+              }
             }),
         bottomNavigationBar: BottomBar(
           onOptionSelected: (option, isMenu) {
             if (isMenu) {
               _presenter.onMenuClicked();
             } else {
+              if (!mounted) return;
               setState(() {
                 bottomBarOption = option;
               });
@@ -151,6 +171,10 @@ class MyHomePageState extends State<MyHomePage>
   @override
   void initState() {
     super.initState();
+    if (Platform.isAndroid) {
+      MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
+          'changeScreen', {"currentScreen": "main", "close": false});
+    }
     _presenter = Injector.appInstance.getDependency<HomePresenter>();
     _nowProgram = new Now.mock();
     _station = Injector.appInstance.getDependency<RadioStation>();
@@ -159,24 +183,59 @@ class MyHomePageState extends State<MyHomePage>
     categories.shuffle();
     setBrightness();
 
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print("onMessage: $message");
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print("onResume: $message");
+      },
+    );
+    _firebaseMessaging.requestNotificationPermissions(
+        IosNotificationSettings(sound: true, badge: true, alert: true));
+    _firebaseMessaging.onIosSettingsRegistered
+        .listen((IosNotificationSettings settings) {
+      print("Settings registered: $settings");
+    });
+    _firebaseMessaging.getToken().then((String token) {
+      assert(token != null);
+      print(token);
+    });
+
+    if (Platform.isAndroid) {
+      _notificationEvent.receiveBroadcastStream().listen((onData) {
+        if (_notificationEvent != null) {
+          setState(() {
+            _presenter.currentPlayer.release();
+            _presenter.currentPlayer.isPodcast = false;
+            _presenter.currentPlayer.episode = null;
+            shouldShowPlayer = false;
+          });
+        }
+      });
+    }
 
     connectionSubscription =
         Connectivity().onConnectivityChanged.listen((connection) {
-          if (connection == ConnectivityResult.none) {
-            new Timer(new Duration(milliseconds: 1200), () {
-              Connectivity().checkConnectivity().then((currentValue) {
-                if (currentValue == ConnectivityResult.none) {
-                 // _presenter.currentPlayer.restorePlayer(currentValue);
-                  setState(() {});
-                  onConnectionError();
-                }
-              });
-            });
-          } else {
-            //_presenter.currentPlayer.restorePlayer(connection);
-            onConnectionSuccess();
-          }
+      if (connection == ConnectivityResult.none) {
+        new Timer(new Duration(milliseconds: 1200), () {
+          Connectivity().checkConnectivity().then((currentValue) {
+            if (currentValue == ConnectivityResult.none) {
+              _presenter.currentPlayer.restorePlayer(currentValue);
+              if (!mounted) return;
+              setState(() {});
+              onConnectionError();
+            }
+          });
         });
+      } else {
+        _presenter.currentPlayer.restorePlayer(connection);
+        onConnectionSuccess();
+      }
+    });
 
     WidgetsBinding.instance.addObserver(this);
   }
@@ -185,10 +244,9 @@ class MyHomePageState extends State<MyHomePage>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        if(!isContentUpdated) {
+        if (!isContentUpdated) {
           isContentUpdated = true;
           setBrightness();
-          setState(() {});
           _presenter.onHomeResumed();
         }
         break;
@@ -202,6 +260,7 @@ class MyHomePageState extends State<MyHomePage>
 
   @override
   void dispose() {
+    _notificationEvent = null;
     connectionSubscription.cancel();
     Injector.appInstance.removeByKey<HomeView>();
     WidgetsBinding.instance.removeObserver(this);
@@ -220,6 +279,22 @@ class MyHomePageState extends State<MyHomePage>
           (_) => RadiocomColorsDark(),
           override: true);
     }
+  }
+
+  @override
+  void onNotifyUser(StatusPlayer status) {
+    if (!mounted) return;
+    setState(() {
+      isLoadingPlay = false;
+      if (status == StatusPlayer.PLAYING) {
+        shouldShowPlayer = true;
+      } else if (status == StatusPlayer.FAILED) {
+        shouldShowPlayer = false;
+      } else if (status == StatusPlayer.STOP &&
+          bottomBarOption == BottomBarOption.HOME) {
+        shouldShowPlayer = false;
+      }
+    });
   }
 
   @override
@@ -250,6 +325,7 @@ class MyHomePageState extends State<MyHomePage>
     isLoadingNews = false;
     isEmptyNews = news.isEmpty;
     if (bottomBarOption == BottomBarOption.NEWS) {
+      if (!mounted) return;
       setState(() {
         _lastNews = news;
       });
@@ -263,6 +339,7 @@ class MyHomePageState extends State<MyHomePage>
     isLoadingPodcast = false;
     isEmptyPodcast = podcasts.isEmpty;
     if (bottomBarOption == BottomBarOption.SEARCH) {
+      if (!mounted) return;
       setState(() {
         _podcast = podcasts;
         generatePodcast();
@@ -291,6 +368,7 @@ class MyHomePageState extends State<MyHomePage>
     isLoadingHome = false;
     isEmptyHome = programsTimeTable.isEmpty;
     if (bottomBarOption == BottomBarOption.HOME) {
+      if (!mounted) return;
       setState(() {
         _recentPodcast = programsTimeTable;
         _recentPodcast.removeWhere((element) => element.type == "S");
@@ -319,6 +397,7 @@ class MyHomePageState extends State<MyHomePage>
     isLoadingHome = false;
     isEmptyHome = true;
     if (bottomBarOption == BottomBarOption.HOME) {
+      if (!mounted) return;
       setState(() {});
     }
   }
@@ -333,6 +412,7 @@ class MyHomePageState extends State<MyHomePage>
     isLoadingNews = false;
     isEmptyNews = true;
     if (bottomBarOption == BottomBarOption.NEWS) {
+      if (!mounted) return;
       setState(() {});
     }
   }
@@ -342,13 +422,14 @@ class MyHomePageState extends State<MyHomePage>
     isLoadingPodcast = false;
     isEmptyPodcast = true;
     if (bottomBarOption == BottomBarOption.SEARCH) {
+      if (!mounted) return;
       setState(() {});
     }
   }
 
   @override
   void onRadioStationError(error) {
-    if(snackBarConnection == null){
+    if (snackBarConnection == null) {
       scaffoldKey.currentState..removeCurrentSnackBar();
       final snackBar = SnackBar(
         content: Text("No podemos conectar con el servidor en este momemto"),
@@ -369,7 +450,7 @@ class MyHomePageState extends State<MyHomePage>
   }
 
   showTimeTableEmptySnackbar() {
-    if(snackBarConnection == null){
+    if (snackBarConnection == null) {
       scaffoldKey.currentState..removeCurrentSnackBar();
       final snackBar = SnackBar(
         content: Text("No podemos conectar con el servidor en este momemto"),
@@ -433,30 +514,25 @@ class MyHomePageState extends State<MyHomePage>
                         fontSize: 30,
                         fontWeight: FontWeight.w900),
                   )),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
-                  child: Text(
-                    'Ahora suena',
-                    style: TextStyle(
-                        letterSpacing: 1.2,
-                        color: _colors.font,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500),
-                  )),
-              Padding(
-                  padding: const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
-                  child: NeumorphicCardHorizontal(
-                    onElementClicked: () {
-                      if (isTimeTableEmpty) {
-                        showTimeTableEmptySnackbar();
-                      } else {
-                        _presenter.nowPlayingClicked(_timeTable);
-                      }
-                    },
-                    active: false,
-                    image: _nowProgram.logo_url,
-                    label: _nowProgram.name,
-                  )),
+              shouldShowPlayer
+                  ? SizedBox(height: 10)
+                  : isLoadingPlay
+                      ? Container(height: 80.0, child: getLoadingState())
+                      : Padding(
+                          padding:
+                              const EdgeInsets.fromLTRB(25.0, 30.0, 25.0, 0.0),
+                          child: NeumorphicCardHorizontal(
+                              onElementClicked: () {
+                                if (!mounted) return;
+                                setState(() {
+                                  isLoadingPlay = true;
+                                  _presenter.onLiveSelected(_nowProgram);
+                                });
+                              },
+                              icon: Icons.play_arrow,
+                              active: true,
+                              label: "Escuchar en Directo",
+                              size: 80.0)),
               Padding(
                   padding: const EdgeInsets.fromLTRB(25.0, 30.0, 25.0, 0.0),
                   child: Text(
@@ -504,34 +580,47 @@ class MyHomePageState extends State<MyHomePage>
                                         )),
                                     SizedBox(width: 22.0)
                                   ]))),
+              Padding(
+                  padding: EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
+                  child: Text(
+                    'Ahora suena',
+                    style: TextStyle(
+                        letterSpacing: 1.2,
+                        color: _colors.font,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500),
+                  )),
+              Padding(
+                  padding: const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
+                  child: NeumorphicCardHorizontal(
+                    onElementClicked: () {
+                      if (isTimeTableEmpty) {
+                        showTimeTableEmptySnackbar();
+                      } else {
+                        _presenter.nowPlayingClicked(_timeTable);
+                      }
+                    },
+                    active: false,
+                    image: _nowProgram.logo_url,
+                    label: _nowProgram.name,
+                  )),
               shouldShowPlayer
                   ? Container(
                       width: queryData.size.width,
-                      padding: EdgeInsets.fromLTRB(80.0, 30.0, 80.0, 0.0),
-                      child: CustomImage(
-                          resPath: "assets/graphics/cuac-logo.png",
-                          radius: 0.0,
-                          background: false))
-                  : Padding(
-                      padding: const EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
-                      child: NeumorphicCardHorizontal(
-                          onElementClicked: () {
-                            setState(() {
-                              shouldShowPlayer = true;
-                            });
-                          },
-                          icon: Icons.play_arrow,
-                          active: true,
-                          label: "Escuchar en Directo",
-                          size: 80.0)),
-              shouldShowPlayer
-                  ? SizedBox(height: 80)
+                      padding: EdgeInsets.fromLTRB(80.0, 30.0, 80.0, 00.0),
+                      child: Column(children: <Widget>[
+                        CustomImage(
+                            resPath: "assets/graphics/cuac-logo.png",
+                            radius: 0.0,
+                            background: false),
+                        SizedBox(height: 60)
+                      ]))
                   : isLoadingHome
                       ? GlowingProgressIndicator(
                           child: Container(
                               width: queryData.size.width,
                               padding:
-                                  EdgeInsets.fromLTRB(80.0, 30.0, 80.0, 0.0),
+                                  EdgeInsets.fromLTRB(80.0, 40.0, 80.0, 0.0),
                               child: CustomImage(
                                   resPath: "assets/graphics/cuac-logo.png",
                                   radius: 0.0,
@@ -539,7 +628,7 @@ class MyHomePageState extends State<MyHomePage>
                         )
                       : Container(
                           width: queryData.size.width,
-                          padding: EdgeInsets.fromLTRB(80.0, 30.0, 80.0, 0.0),
+                          padding: EdgeInsets.fromLTRB(80.0, 40.0, 80.0, 0.0),
                           child: CustomImage(
                               resPath: "assets/graphics/cuac-logo.png",
                               radius: 0.0,

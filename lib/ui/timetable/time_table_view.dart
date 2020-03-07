@@ -1,4 +1,7 @@
 
+import 'dart:async';
+import 'dart:io';
+
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/time_table.dart';
 import 'package:cuacfm/ui/timetable/time_table_presenter.dart';
@@ -9,6 +12,7 @@ import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
 
 class Timetable extends StatefulWidget {
@@ -20,11 +24,17 @@ class Timetable extends StatefulWidget {
   TimetableState createState() => new TimetableState();
 }
 
-class TimetableState extends State<Timetable> implements TimeTableView {
+class TimetableState extends State<Timetable> with WidgetsBindingObserver implements TimeTableView {
   TimeTablePresenter _presenter;
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   MediaQueryData queryData;
   ScrollController _scrollController = ScrollController();
   RadiocomColorsConract _colors;
+  bool shouldShowPlayer = false;
+  bool isContentUpdated = true;
+  EventChannel _notificationEvent =
+  EventChannel('cuacfm.flutter.io/updateNotificationMain');
+  SnackBar snackBarConnection;
 
   TimetableState() {
     DependencyInjector().injectByView(this);
@@ -34,22 +44,32 @@ class TimetableState extends State<Timetable> implements TimeTableView {
   Widget build(BuildContext context) {
     queryData = MediaQuery.of(context);
     _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
-    return Scaffold(
+    return Scaffold(key : scaffoldKey,
       appBar:
-          TopBar(title: "Programas de hoy", topBarOption: TopBarOption.NORMAL),
+          TopBar("timetable",title: "Programas de hoy", topBarOption: TopBarOption.NORMAL),
       backgroundColor: _colors.palidwhite,
       body: _getBodyLayout(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: PlayerView(
           isMini: false,
           isAtBottom: true,
-          shouldShow: true,
-          currentSong: "what",
-          multimediaImage: "",
+          shouldShow: shouldShowPlayer,
+          isPlayingAudio: _presenter.currentPlayer.isPlaying(),
           isExpanded: true,
+          onDetailClicked: () {
+            _presenter.onPodcastControlsClicked(
+                _presenter.currentPlayer.episode);
+          },
           onMultimediaClicked: (isPlaying) {
-            setState(() {});
-          }),
+            if (!mounted) return;
+            setState(() {
+              if (isPlaying) {
+                _presenter.onPause();
+              } else {
+                _presenter.onResume();
+              }
+            });
+          })
     );
   }
 
@@ -64,7 +84,12 @@ class TimetableState extends State<Timetable> implements TimeTableView {
   @override
   void initState() {
     super.initState();
+    if (Platform.isAndroid) {
+      MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
+          'changeScreen', {"currentScreen": "timetable", "close": false});
+    }
     _presenter = Injector.appInstance.getDependency<TimeTablePresenter>();
+    shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     int currentIndex = 0;
     int jumpIndex = 0;
     widget.timeTables.forEach((element) {
@@ -81,13 +106,76 @@ class TimetableState extends State<Timetable> implements TimeTableView {
         _scrollController.jumpTo(50.0 * jumpIndex);
       });
     }
+
+    if (Platform.isAndroid) {
+      _notificationEvent.receiveBroadcastStream().listen((onData) {
+        if (_notificationEvent != null) {
+          setState(() {
+            _presenter.currentPlayer.release();
+            _presenter.currentPlayer.isPodcast = false;
+            _presenter.currentPlayer.episode = null;
+            shouldShowPlayer = false;
+          });
+        }
+      });
+    }
+
+    _presenter.currentPlayer.onConnection = (isError) {
+      if (mounted) {
+        new Timer(new Duration(milliseconds: 300), () {
+          setState(() {});
+        });
+        if(isError){
+          onConnectionError();
+        }
+      }
+    };
+
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (!isContentUpdated) {
+          isContentUpdated = true;
+          _presenter.onViewResumed();
+        }
+        break;
+      case AppLifecycleState.paused:
+        isContentUpdated = false;
+        break;
+      default:
+        break;
+    }
   }
 
   @override
   void dispose() {
+    _notificationEvent = null;
     _scrollController.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<TimeTableView>();
     super.dispose();
+  }
+
+  @override
+  void onConnectionError() {
+    if (snackBarConnection == null) {
+      scaffoldKey.currentState..removeCurrentSnackBar();
+      snackBarConnection = SnackBar(
+        duration: Duration(seconds: 3),
+        content: Text("No dispones de conexión a internet"),
+      );
+      scaffoldKey.currentState..showSnackBar(snackBarConnection);
+    }
+  }
+
+  @override
+  onNewData() {
+    if (!mounted) return;
+    setState(() {});
   }
 
   //build layout

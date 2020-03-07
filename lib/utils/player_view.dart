@@ -1,3 +1,4 @@
+import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,43 +10,41 @@ import 'neumorfism.dart';
 typedef PalyerCallback(bool isPlaying);
 
 class PlayerView extends StatefulWidget {
-  PlayerView({
-    this.multimediaImage,
-    this.currentSong,
-    this.isMini,
-    this.isExpanded,
-    this.onMultimediaClicked,
-    this.onDetailClicked,
-    this.shouldShow,
-    this.isAtBottom = false,
-  });
+  PlayerView(
+      {
+      this.isMini,
+      this.isExpanded,
+      this.onMultimediaClicked,
+      this.onDetailClicked,
+      this.shouldShow,
+      this.isAtBottom = false,
+      this.isPlayingAudio = false});
 
-  final String currentSong;
-  final String multimediaImage;
   final PalyerCallback onMultimediaClicked;
   final VoidCallback onDetailClicked;
   final bool isMini;
   final bool shouldShow;
   final bool isExpanded;
   final bool isAtBottom;
+  final bool isPlayingAudio;
 
   @override
   State<StatefulWidget> createState() => PlayerViewState();
 }
 
 class PlayerViewState extends State<PlayerView> {
-  bool isPlaying = true;
+  bool showPlayButton = true;
   RadiocomColorsConract _colors;
 
   _onMultimediaClicked() {
+    widget.onMultimediaClicked(showPlayButton);
     setState(() {
-      isPlaying = !isPlaying;
+      showPlayButton = !showPlayButton;
     });
-    widget.onMultimediaClicked(isPlaying);
   }
 
   _onDetailClicked() {
-    if(widget.onDetailClicked!=null) {
+    if (widget.onDetailClicked != null) {
       widget.onDetailClicked();
     }
   }
@@ -54,18 +53,38 @@ class PlayerViewState extends State<PlayerView> {
   Widget build(BuildContext context) {
     _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     var queryData = MediaQuery.of(context);
+    if (!widget.shouldShow) {
+      showPlayButton = true;
+    }
+    if (widget.isPlayingAudio && showPlayButton == false) {
+      showPlayButton = true;
+    } else if (!widget.isPlayingAudio && showPlayButton == true) {
+      showPlayButton = false;
+    }
     return widget.isExpanded
         ? Opacity(
             opacity: widget.shouldShow ? 1 : 0,
             child: Container(
+                decoration: BoxDecoration(
+                    color: _colors.palidwhiteverydark,
+                    boxShadow: [
+                      BoxShadow(
+                        color: widget.isAtBottom ?_colors.neuWhite :_colors.transparent,
+                        offset: Offset(-2, -2),
+                        blurRadius: 2,
+                      ),
+                      BoxShadow(
+                        color: widget.isAtBottom ?_colors.neuWhite :_colors.transparent,
+                        offset: Offset(2, 2),
+                        blurRadius: 2,
+                      ),
+                    ]),
               margin: EdgeInsets.fromLTRB(
                   0.0, 0.0, 0.0, widget.isAtBottom ? 0.0 : 60.0),
               width: queryData.size.width,
-              height: widget.isAtBottom ? 80.0 : 60.0,
-              child: _getContentView(true),
-              color: _colors.palidwhiteverydark,
-            ))
-        : Opacity(
+              height: widget.isAtBottom ? 70.0 : 60.0,
+              child: _getContentView(true)
+            )) : Opacity(
             opacity: widget.shouldShow ? 1 : 0,
             child: Container(
                 margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 90.0),
@@ -85,55 +104,60 @@ class PlayerViewState extends State<PlayerView> {
             child: getPlayerContent()));
   }
 
-  Widget getPlayerContent(){
-    return widget.isAtBottom? Center(child:ListTile(
-        leading: Container(
-            padding: EdgeInsets.symmetric(horizontal: 1),
-            width: 40.0,
-            height: 40.0,
-            child: CustomImage(
-                resPath: widget.multimediaImage,
-                fit: BoxFit.fitHeight,
-                radius: 20.0)),
-        title: Text(
-          widget.currentSong,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-              color: _colors.font,
-              fontWeight: FontWeight.w500,
-              fontSize: 13),
-        ),
-        trailing: new GestureDetector(
-          onTap: () {
-            _onMultimediaClicked();
-          },
-          child: Icon(isPlaying ? Icons.pause : Icons.play_arrow,
-              color: _colors.yellow, size: 40.0),
-        ))) : ListTile(
-        leading: Container(
-            padding: EdgeInsets.symmetric(horizontal: 1),
-            width: 40.0,
-            height: 40.0,
-            child: CustomImage(
-                resPath: widget.multimediaImage,
-                fit: BoxFit.fitHeight,
-                radius: 20.0)),
-        title: Text(
-          widget.currentSong,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-              color: _colors.font,
-              fontWeight: FontWeight.w500,
-              fontSize: 13),
-        ),
-        trailing: new GestureDetector(
-          onTap: () {
-            _onMultimediaClicked();
-          },
-          child: Icon(isPlaying ? Icons.pause : Icons.play_arrow,
-              color: _colors.yellow, size: 40.0),
-        ));
+  Widget getPlayerContent() {
+    return widget.isAtBottom
+        ? Center(
+                child: ListTile(
+                    leading: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 1),
+                        width: 40.0,
+                        height: 40.0,
+                        child: CustomImage(
+                            resPath: Injector.appInstance.getDependency<CurrentPlayerContract>().currentImage,
+                            fit: BoxFit.fitHeight,
+                            radius: 20.0)),
+                    title: Text(
+                      Injector.appInstance.getDependency<CurrentPlayerContract>().currentSong,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          color: _colors.font,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13),
+                    ),
+                    trailing: new GestureDetector(
+                      onTap: () {
+                        _onMultimediaClicked();
+                      },
+                      child: Icon(
+                          showPlayButton ? Icons.pause : Icons.play_arrow,
+                          color: _colors.yellow,
+                          size: 40.0),
+                    )))
+        : ListTile(
+            leading: Container(
+                padding: EdgeInsets.symmetric(horizontal: 1),
+                width: 40.0,
+                height: 40.0,
+                child: CustomImage(
+                    resPath: Injector.appInstance.getDependency<CurrentPlayerContract>().currentImage,
+                    fit: BoxFit.fitHeight,
+                    radius: 20.0)),
+            title: Text(
+              Injector.appInstance.getDependency<CurrentPlayerContract>().currentSong,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  color: _colors.font,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 13),
+            ),
+            trailing: new GestureDetector(
+              onTap: () {
+                _onMultimediaClicked();
+              },
+              child: Icon(showPlayButton ? Icons.pause : Icons.play_arrow,
+                  color: _colors.yellow, size: 40.0),
+            ));
   }
 }

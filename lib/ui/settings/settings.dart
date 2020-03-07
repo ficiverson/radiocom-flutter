@@ -1,12 +1,14 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:cuacfm/injector/dependency_injector.dart';
-import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/utils/custom_image.dart';
-import 'package:cuacfm/utils/neumorfism.dart';
+import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:injector/injector.dart';
 import 'settings_presenter.dart';
@@ -17,12 +19,17 @@ class Settings extends StatefulWidget {
   State createState() => new SettingsState();
 }
 
-class SettingsState extends State<Settings> implements SettingsView {
+class SettingsState extends State<Settings> with WidgetsBindingObserver implements SettingsView {
   MediaQueryData _queryData;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   SettingsPresenter _presenter;
   RadioStation _radioStation;
   RadiocomColorsConract _colors;
+  bool shouldShowPlayer = false;
+  bool isContentUpdated = true;
+  EventChannel _notificationEvent =
+  EventChannel('cuacfm.flutter.io/updateNotification');
+  SnackBar snackBarConnection;
 
   SettingsState() {
     DependencyInjector().injectByView(this);
@@ -34,9 +41,30 @@ class SettingsState extends State<Settings> implements SettingsView {
     _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     return Scaffold(
       key: scaffoldKey,
-      appBar: TopBar(title: "Menu", topBarOption: TopBarOption.NORMAL),
+      appBar: TopBar("settings",title: "Menu", topBarOption: TopBarOption.NORMAL),
       backgroundColor: _colors.palidwhite,
       body: _getBodyLayout(),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: PlayerView(
+            isMini: false,
+            isAtBottom: true,
+            shouldShow: shouldShowPlayer,
+            isPlayingAudio: _presenter.currentPlayer.isPlaying(),
+            isExpanded: true,
+            onDetailClicked: () {
+              _presenter.onPodcastControlsClicked(
+                  _presenter.currentPlayer.episode);
+            },
+            onMultimediaClicked: (isPlaying) {
+              if (!mounted) return;
+              setState(() {
+                if (isPlaying) {
+                  _presenter.onPause();
+                } else {
+                  _presenter.onResume();
+                }
+              });
+            })
     );
     ;
   }
@@ -44,14 +72,82 @@ class SettingsState extends State<Settings> implements SettingsView {
   @override
   void initState() {
     super.initState();
+    if (Platform.isAndroid) {
+      MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
+          'changeScreen', {"currentScreen": "settings", "close": false});
+    }
     _presenter = Injector.appInstance.getDependency<SettingsPresenter>();
+    shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     _radioStation = Injector.appInstance.getDependency<RadioStation>();
+
+    if (Platform.isAndroid) {
+      _notificationEvent.receiveBroadcastStream().listen((onData) {
+        if (_notificationEvent != null) {
+          setState(() {
+            _presenter.currentPlayer.release();
+            _presenter.currentPlayer.isPodcast = false;
+            _presenter.currentPlayer.episode = null;
+            shouldShowPlayer = false;
+          });
+        }
+      });
+    }
+
+    _presenter.currentPlayer.onConnection = (isError) {
+      if (mounted) {
+        new Timer(new Duration(milliseconds: 300), () {
+          setState(() {});
+        });
+        if(isError){
+          onConnectionError();
+        }
+      }
+    };
+
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (!isContentUpdated) {
+          isContentUpdated = true;
+          _presenter.onViewResumed();
+        }
+        break;
+      case AppLifecycleState.paused:
+        isContentUpdated = false;
+        break;
+      default:
+        break;
+    }
   }
 
   @override
   void dispose() {
+    _notificationEvent = null;
+    WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<SettingsView>();
     super.dispose();
+  }
+
+  @override
+  void onConnectionError() {
+    if (snackBarConnection == null) {
+      scaffoldKey.currentState..removeCurrentSnackBar();
+      snackBarConnection = SnackBar(
+        duration: Duration(seconds: 3),
+        content: Text("No dispones de conexión a internet"),
+      );
+      scaffoldKey.currentState..showSnackBar(snackBarConnection);
+    }
+  }
+
+  @override
+  onNewData() {
+    if (!mounted) return;
+    setState(() {});
   }
 
   //layout
@@ -350,8 +446,7 @@ class SettingsState extends State<Settings> implements SettingsView {
                           width: 50.0,
                           height: 50.0,
                           child: CustomImage(
-                              resPath:
-                              "https://pbs.twimg.com/profile_images/1058369132004028416/KVRpQGQU_400x400.jpg", // _radioStation.big_icon_url, TODO
+                              resPath: _radioStation.big_icon_url,
                               fit: BoxFit.fitHeight,
                               radius: 25.0)),
                       title: Text(
@@ -376,7 +471,7 @@ class SettingsState extends State<Settings> implements SettingsView {
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16),
                           ))),
-                  SizedBox(height: 40)
+                  SizedBox(height: 80)
                 ]))));
   }
 

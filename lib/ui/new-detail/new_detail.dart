@@ -1,8 +1,13 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/new.dart';
+import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:injector/injector.dart';
 import 'new_detail_presenter.dart';
@@ -14,11 +19,17 @@ class NewDetail extends StatefulWidget {
   State createState() => new NewDetailState();
 }
 
-class NewDetailState extends State<NewDetail> implements NewDetailView {
+class NewDetailState extends State<NewDetail> with WidgetsBindingObserver  implements NewDetailView {
   MediaQueryData _queryData;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   NewDetailPresenter _presenter;
   RadiocomColorsConract _colors;
+  bool shouldShowPlayer = false;
+  bool isContentUpdated = true;
+  EventChannel _notificationEvent =
+  EventChannel('cuacfm.flutter.io/updateNotificationNewDetail');
+  SnackBar snackBarConnection;
+
 
   NewDetailState() {
     DependencyInjector().injectByView(this);
@@ -30,7 +41,7 @@ class NewDetailState extends State<NewDetail> implements NewDetailView {
     _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     return Scaffold(
       key: scaffoldKey,
-      appBar: TopBar(
+      appBar: TopBar("new_detail",
           title: "",
           topBarOption: TopBarOption.NORMAL,
           rightIcon: Icons.share,
@@ -39,6 +50,27 @@ class NewDetailState extends State<NewDetail> implements NewDetailView {
           }),
       backgroundColor: _colors.palidwhite,
       body: _getBodyLayout(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: PlayerView(
+          isMini: false,
+          isAtBottom: true,
+          shouldShow: shouldShowPlayer,
+          isPlayingAudio: _presenter.currentPlayer.isPlaying(),
+          isExpanded: true,
+          onDetailClicked: () {
+              _presenter.onPodcastControlsClicked(
+                  _presenter.currentPlayer.episode);
+              },
+          onMultimediaClicked: (isPlaying) {
+            if (!mounted) return;
+            setState(() {
+              if (isPlaying) {
+                _presenter.onPause();
+              } else {
+                _presenter.onResume();
+              }
+            });
+          })
     );
     ;
   }
@@ -46,13 +78,81 @@ class NewDetailState extends State<NewDetail> implements NewDetailView {
   @override
   void initState() {
     super.initState();
+    if (Platform.isAndroid) {
+      MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
+          'changeScreen', {"currentScreen": "new_detail", "close": false});
+    }
     _presenter = Injector.appInstance.getDependency<NewDetailPresenter>();
+    shouldShowPlayer = _presenter.currentPlayer.isPlaying();
+
+    if (Platform.isAndroid) {
+      _notificationEvent.receiveBroadcastStream().listen((onData) {
+        if (_notificationEvent != null) {
+          setState(() {
+            _presenter.currentPlayer.release();
+            _presenter.currentPlayer.isPodcast = false;
+            _presenter.currentPlayer.episode = null;
+            shouldShowPlayer = false;
+          });
+        }
+      });
+    }
+
+    _presenter.currentPlayer.onConnection = (isError) {
+      if (mounted) {
+        new Timer(new Duration(milliseconds: 300), () {
+          setState(() {});
+        });
+        if(isError){
+          onConnectionError();
+        }
+      }
+    };
+
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (!isContentUpdated) {
+          isContentUpdated = true;
+          _presenter.onViewResumed();
+        }
+        break;
+      case AppLifecycleState.paused:
+        isContentUpdated = false;
+        break;
+      default:
+        break;
+    }
   }
 
   @override
   void dispose() {
+    _notificationEvent = null;
+    WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<NewDetailView>();
     super.dispose();
+  }
+
+  @override
+  void onConnectionError() {
+    if (snackBarConnection == null) {
+      scaffoldKey.currentState..removeCurrentSnackBar();
+      snackBarConnection = SnackBar(
+        duration: Duration(seconds: 3),
+        content: Text("No dispones de conexión a internet"),
+      );
+      scaffoldKey.currentState..showSnackBar(snackBarConnection);
+    }
+  }
+
+  @override
+  onNewData() {
+    if (!mounted) return;
+    setState(() {});
   }
 
   //layout
@@ -108,7 +208,7 @@ class NewDetailState extends State<NewDetail> implements NewDetailView {
                 onLinkTap: (url) {
                   _presenter.onLinkClicked(url);
                 },
-              ))),SizedBox(height: 20),
+              ))),SizedBox(height: 70),
             ]))));
   }
 }

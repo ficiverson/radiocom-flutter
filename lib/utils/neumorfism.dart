@@ -168,8 +168,8 @@ class NeumorphicCardVertical extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(15.0)),
             color: _colors.transparent),
         decoration: neumorphicBox(_colors),
-        width: imageOverLay ? 260.0 : 170.0,
-        height: imageOverLay ? 180.0 : 170.0,
+        width: imageOverLay ? 260.0 : 165.0,
+        height: imageOverLay ? 180.0 : 165.0,
         child: imageContent));
     if (!imageOverLay) {
       elements.add(SizedBox(width: 15, height: 10.0));
@@ -241,10 +241,11 @@ class NeumorphicCardHorizontal extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 11, vertical: 7),
           decoration: neumorphicBox(_colors),
           child: Row(
+            mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               iconCard,
               SizedBox(width: 15),
-              Text(label,
+              Text(label.length>25?label.substring(0, 25) + "...":label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.left,

@@ -1,6 +1,9 @@
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/ui/home/home_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/services.dart';
@@ -11,10 +14,16 @@ void main() {
   ErrorWidget.builder =
       (FlutterErrorDetails details) => errorScreen(details.exception);
   DependencyInjector().loadModules();
+  Crashlytics.instance.enableInDevMode = true;
+  FlutterError.onError = (FlutterErrorDetails details) {
+    Crashlytics.instance.recordFlutterError(details);
+  };
+
   runApp(new MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  FirebaseAnalytics analytics = FirebaseAnalytics();
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -23,6 +32,9 @@ class MyApp extends StatelessWidget {
       showSemanticsDebugger: false,
       checkerboardOffscreenLayers: false,
       title: 'CUAC FM',
+      navigatorObservers: [
+        FirebaseAnalyticsObserver(analytics: analytics),
+      ],
       theme: new ThemeData(
         canvasColor: Colors.white,
         primarySwatch: Colors.grey,
@@ -54,12 +66,3 @@ Widget errorScreen(dynamic detailsException) {
                     child: Text('Exeption Details:\n\n$detailsException')),
           )));
 }
-
-/*
-
-- TODO in backend updagte icon radiostation
-
-migration steps to be a HERO:
-
-- put player with - refresh foreground/background with now and player others??
-*/

@@ -1,10 +1,15 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/utils/neumorfism.dart';
+import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
 import 'package:intl/intl.dart';
 
@@ -20,7 +25,9 @@ class AllPodcast extends StatefulWidget {
   AllPodcastState createState() => new AllPodcastState();
 }
 
-class AllPodcastState extends State<AllPodcast> implements AllPodcastView {
+class AllPodcastState extends State<AllPodcast>
+    with WidgetsBindingObserver
+    implements AllPodcastView {
   AllPodcastPresenter _presenter;
   MediaQueryData queryData;
   bool _isSearching = false;
@@ -28,6 +35,11 @@ class AllPodcastState extends State<AllPodcast> implements AllPodcastView {
   List<Program> _podcasts = new List<Program>();
   List<Program> _podcastWithFilter = new List<Program>();
   RadiocomColorsConract _colors;
+  bool shouldShowPlayer = false;
+  bool isContentUpdated = true;
+  EventChannel _notificationEvent =
+      EventChannel('cuacfm.flutter.io/updateNotification');
+  SnackBar snackBarConnection;
 
   AllPodcastState() {
     DependencyInjector().injectByView(this);
@@ -37,75 +49,175 @@ class AllPodcastState extends State<AllPodcast> implements AllPodcastView {
   Widget build(BuildContext context) {
     queryData = MediaQuery.of(context);
     _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    if (_presenter.currentPlayer.isPodcast) {
+      shouldShowPlayer = _presenter.currentPlayer.isPlaying();
+    }
     return Scaffold(
-      key: scaffoldKey,
-      appBar: TopBar(
-          isSearch: _isSearching,
-          title:
-              widget.category != null ? widget.category : "Todos los podcasts",
-          topBarOption: TopBarOption.MODAL,
-          rightIcon: Icons.search,
-          onRightClicked: () {
-            ModalRoute.of(context).addLocalHistoryEntry(new LocalHistoryEntry(
-              onRemove: () {
-                setState(() {
-                  _isSearching = false;
-                });
-              },
-            ));
-            setState(() {
-              _isSearching = true;
-            });
-          },
-          onQueryCallback: (query) {
-            if (query != null && query.length > 2) {
-              setState(() {
-                _podcastWithFilter =
-                    _filterBySearchQuery(query, _podcasts).toList();
-              });
-            } else {
-              setState(() {
-                _podcastWithFilter = _podcasts;
-              });
-            }
-          },
-          onQuerySubmit: (query) {
-            if (query != null && query.length > 2) {
-              setState(() {
-                _podcastWithFilter =
-                    _filterBySearchQuery(query, _podcasts).toList();
-              });
-            } else {
+        key: scaffoldKey,
+        appBar: TopBar("all_podcast",
+            isSearch: _isSearching,
+            title: widget.category != null
+                ? widget.category
+                : "Todos los podcasts",
+            topBarOption: TopBarOption.MODAL,
+            rightIcon: Icons.search, onRightClicked: () {
+          if (Platform.isAndroid) {
+            MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
+                'changeScreen',
+                {"currentScreen": "all_podcast_search", "close": false});
+          }
+          ModalRoute.of(context).addLocalHistoryEntry(new LocalHistoryEntry(
+            onRemove: () {
+              if (!mounted) return;
               setState(() {
                 _isSearching = false;
-                _podcastWithFilter = _podcasts;
               });
-            }
-          }),
-      backgroundColor: _colors.palidwhite,
-      body: _getBodyLayout(),
-    );
+            },
+          ));
+          if (!mounted) return;
+          setState(() {
+            _isSearching = true;
+          });
+        }, onQueryCallback: (query) {
+          if (query != null && query.length > 2) {
+            if (!mounted) return;
+            setState(() {
+              _podcastWithFilter =
+                  _filterBySearchQuery(query, _podcasts).toList();
+            });
+          } else {
+            if (!mounted) return;
+            setState(() {
+              _podcastWithFilter = _podcasts;
+            });
+          }
+        }, onQuerySubmit: (query) {
+          if (query != null && query.length > 2) {
+            if (!mounted) return;
+            setState(() {
+              _podcastWithFilter =
+                  _filterBySearchQuery(query, _podcasts).toList();
+            });
+          } else {
+            if (!mounted) return;
+            setState(() {
+              _isSearching = false;
+              _podcastWithFilter = _podcasts;
+            });
+          }
+        }),
+        backgroundColor: _colors.palidwhite,
+        body: _getBodyLayout(),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: PlayerView(
+            isMini: false,
+            isAtBottom: true,
+            shouldShow: shouldShowPlayer,
+            isPlayingAudio: _presenter.currentPlayer.isPlaying(),
+            isExpanded: true,
+            onDetailClicked: () {
+              _presenter
+                  .onPodcastControlsClicked(_presenter.currentPlayer.episode);
+            },
+            onMultimediaClicked: (isPlaying) {
+              if (!mounted) return;
+              setState(() {
+                if (isPlaying) {
+                  _presenter.onPause();
+                } else {
+                  _presenter.onResume();
+                }
+              });
+            }));
   }
 
   @override
   void initState() {
     super.initState();
+    if (Platform.isAndroid) {
+      MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
+          'changeScreen', {"currentScreen": "all_podcast", "close": false});
+    }
     _presenter = Injector.appInstance.getDependency<AllPodcastPresenter>();
+    shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     _podcasts = widget.podcasts;
     _podcastWithFilter = widget.podcasts;
+
+    if (Platform.isAndroid) {
+      _notificationEvent.receiveBroadcastStream().listen((onData) {
+        if (_notificationEvent != null) {
+          setState(() {
+            _presenter.currentPlayer.release();
+            _presenter.currentPlayer.isPodcast = false;
+            _presenter.currentPlayer.episode = null;
+            shouldShowPlayer = false;
+          });
+        }
+      });
+    }
+
+    _presenter.currentPlayer.onConnection = (isError) {
+      if (mounted) {
+        new Timer(new Duration(milliseconds: 300), () {
+          setState(() {});
+        });
+        if (isError) {
+          onConnectionError();
+        }
+      }
+    };
+
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (!isContentUpdated) {
+          isContentUpdated = true;
+          _presenter.onViewResumed();
+        }
+        break;
+      case AppLifecycleState.paused:
+        isContentUpdated = false;
+        break;
+      default:
+        break;
+    }
   }
 
   @override
   void dispose() {
+    _notificationEvent = null;
+    WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<AllPodcastView>();
     super.dispose();
+  }
+
+  @override
+  void onConnectionError() {
+    if (snackBarConnection == null) {
+      scaffoldKey.currentState..removeCurrentSnackBar();
+      snackBarConnection = SnackBar(
+        duration: Duration(seconds: 3),
+        content: Text("No dispones de conexión a internet"),
+      );
+      scaffoldKey.currentState..showSnackBar(snackBarConnection);
+    }
+  }
+
+  @override
+  onNewData() {
+    if (!mounted) return;
+    setState(() {});
   }
 
   //build layout
 
   Widget _getBodyLayout() {
     return Container(
-        margin: EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+        padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, shouldShowPlayer?45.0:0.0),
         key: PageStorageKey<String>("allpodcastview"),
         color: _colors.transparent,
         width: queryData.size.width,
@@ -130,10 +242,11 @@ class AllPodcastState extends State<AllPodcast> implements AllPodcastView {
                         image: _podcastWithFilter[index].logo_url,
                         label: _podcastWithFilter[index].name,
                         subtitle: (DateFormat("hh:mm:ss")
-                            .parse(_podcastWithFilter[index].duration)
-                            .hour *
-                            60)
-                            .toString() +
+                                        .parse(
+                                            _podcastWithFilter[index].duration)
+                                        .hour *
+                                    60)
+                                .toString() +
                             " minutos.",
                       )));
             }));

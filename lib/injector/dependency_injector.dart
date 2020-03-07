@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cuacfm/data/datasource/radioco_remote_datasource.dart';
 import 'package:cuacfm/domain/usecase/get_all_podcast_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_episodes_use_case.dart';
@@ -16,18 +17,24 @@ import 'package:cuacfm/ui/home/home_router.dart';
 import 'package:cuacfm/ui/home/home_view.dart';
 import 'package:cuacfm/ui/new-detail/new_detail.dart';
 import 'package:cuacfm/ui/new-detail/new_detail_presenter.dart';
+import 'package:cuacfm/ui/new-detail/new_detail_router.dart';
+import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/podcast/all_podcast/all_podcast_presenter.dart';
 import 'package:cuacfm/ui/podcast/all_podcast/all_podcast_router.dart';
 import 'package:cuacfm/ui/podcast/all_podcast/all_podcast_view.dart';
+import 'package:cuacfm/ui/podcast/controls/podcast_controls.dart';
+import 'package:cuacfm/ui/podcast/controls/podcast_controls_presenter.dart';
 import 'package:cuacfm/ui/podcast/detail_podcast_presenter.dart';
 import 'package:cuacfm/ui/podcast/detail_podcast_router.dart';
 import 'package:cuacfm/ui/podcast/detail_podcast_view.dart';
 import 'package:cuacfm/ui/settings/settings-detail/settings_detail.dart';
+import 'package:cuacfm/ui/settings/settings-detail/settings_detail_router.dart';
 import 'package:cuacfm/ui/settings/settings-detail/settings_presenter_detail.dart';
 import 'package:cuacfm/ui/settings/settings.dart';
 import 'package:cuacfm/ui/settings/settings_presenter.dart';
 import 'package:cuacfm/ui/settings/settings_router.dart';
 import 'package:cuacfm/ui/timetable/time_table_presenter.dart';
+import 'package:cuacfm/ui/timetable/time_table_router.dart';
 import 'package:cuacfm/ui/timetable/time_table_view.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:cuacfm/utils/cuac_client.dart';
@@ -69,21 +76,24 @@ class DependencyInjector {
     } else if (view is DetailPodcastState) {
       injector
           .registerDependency<DetailPodcastView>((Injector injector) => view);
+    } else if (view is PodcastControlsState) {
+      injector
+          .registerDependency<PodcastControlsView>((Injector injector) => view);
     }
   }
 
   loadPlayerModules() {
-//    injector.registerSingleton<CurrentPlayerContract>((Injector injector) {
-//      return CurrentPlayer();
-//    });
-//    injector.registerSingleton<AudioPlayer>((Injector injector) {
-//      AudioPlayer.logEnabled = false;
-//      return AudioPlayer();
-//    });
+    injector.registerSingleton<CurrentPlayerContract>((Injector injector) {
+      return CurrentPlayer();
+    });
+    injector.registerSingleton<AudioPlayer>((Injector injector) {
+      AudioPlayer.logEnabled = false;
+      return AudioPlayer();
+    });
   }
 
   loadPresentationModules() {
-    injector.registerDependency<ConnectionContract>((_){
+    injector.registerDependency<ConnectionContract>((_) {
       return Connection();
     });
 
@@ -106,8 +116,22 @@ class DependencyInjector {
       return AllPodcastRouter();
     });
 
-    injector.registerDependency<DetailPodcastRouterContract>((Injector injector) {
+    injector
+        .registerDependency<DetailPodcastRouterContract>((Injector injector) {
       return DetailPodcastRouter();
+    });
+
+    injector.registerDependency<NewDetailRouterContract>((Injector injector) {
+      return NewDetailRouter();
+    });
+
+    injector
+        .registerDependency<SettingsDetailRouterContract>((Injector injector) {
+      return SettingsDetailRouter();
+    });
+
+    injector.registerDependency<TimeTableRouterContract>((Injector injector) {
+      return TimeTableRouter();
     });
 
     injector.registerDependency<HomePresenter>((Injector injector) {
@@ -122,24 +146,38 @@ class DependencyInjector {
     });
 
     injector.registerDependency<TimeTablePresenter>((Injector injector) {
-      return new TimeTablePresenter();
+      return new TimeTablePresenter(injector.getDependency<TimeTableView>(),
+          invoker: injector.getDependency<Invoker>(),
+          router: injector.getDependency<TimeTableRouterContract>(),
+          getLiveDataUseCase: injector.getDependency<GetLiveProgramUseCase>());
     });
 
     injector.registerDependency<AllPodcastPresenter>((Injector injector) {
       return new AllPodcastPresenter(injector.getDependency<AllPodcastView>(),
           invoker: injector.getDependency<Invoker>(),
-          router: injector.getDependency<AllPodcastRouterContract>());
+          router: injector.getDependency<AllPodcastRouterContract>(),
+          getLiveDataUseCase: injector.getDependency<GetLiveProgramUseCase>());
     });
     injector.registerDependency<NewDetailPresenter>((Injector injector) {
-      return new NewDetailPresenter();
+      return new NewDetailPresenter(
+        injector.getDependency<NewDetailView>(),
+        router: injector.getDependency<NewDetailRouterContract>(),
+        invoker: injector.getDependency<Invoker>(),
+        getLiveDataUseCase: injector.getDependency<GetLiveProgramUseCase>(),
+      );
     });
     injector.registerDependency<SettingsPresenter>((Injector injector) {
       return new SettingsPresenter(injector.getDependency<SettingsView>(),
           invoker: injector.getDependency<Invoker>(),
-          router: injector.getDependency<SettingsRouterContract>());
+          router: injector.getDependency<SettingsRouterContract>(),
+          getLiveDataUseCase: injector.getDependency<GetLiveProgramUseCase>());
     });
     injector.registerDependency<SettingsDetailPresenter>((Injector injector) {
-      return new SettingsDetailPresenter();
+      return new SettingsDetailPresenter(
+          injector.getDependency<SettingsDetailView>(),
+          invoker: injector.getDependency<Invoker>(),
+          router: injector.getDependency<SettingsDetailRouterContract>(),
+          getLiveDataUseCase: injector.getDependency<GetLiveProgramUseCase>());
     });
 
     injector.registerDependency<DetailPodcastPresenter>((Injector injector) {
@@ -147,7 +185,15 @@ class DependencyInjector {
           injector.getDependency<DetailPodcastView>(),
           invoker: injector.getDependency<Invoker>(),
           router: injector.getDependency<DetailPodcastRouterContract>(),
-          getEpisodesUseCase: injector.getDependency<GetEpisodesUseCase>());
+          getEpisodesUseCase: injector.getDependency<GetEpisodesUseCase>(),
+          getLiveDataUseCase: injector.getDependency<GetLiveProgramUseCase>());
+    });
+
+    injector.registerDependency<PodcastControlsPresenter>((Injector injector) {
+      return new PodcastControlsPresenter(
+          injector.getDependency<PodcastControlsView>(),
+          invoker: injector.getDependency<Invoker>(),
+          getLiveDataUseCase: injector.getDependency<GetLiveProgramUseCase>());
     });
   }
 

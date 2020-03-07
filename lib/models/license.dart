@@ -35,7 +35,21 @@ class License {
       License("progress_indicators",
           "https://pub.dev/packages/progress_indicators \n\nFree to use for all :)"),
       License("connectivity",
-          "https://pub.dev/packages/connectivity \n\nCopyright 2017 The Chromium Authors. All rights reserved.")
+          "https://pub.dev/packages/uuid \n\nCopyright 2017 The Chromium Authors. All rights reserved."),
+      License("connectivity",
+          "https://pub.dev/packages/uuid \n\nCopyright (c) 2012 Yulian Kuncheff Permission is hereby granted, free of charge"),
+      License("provider",
+          "https://pub.dev/packages/provider \n\nMIT License Copyright (c) 2019 Remi Rousselet"),
+      License("firebase_core",
+          "https://pub.dartlang.org/packages/firebase_core \n\nCopyright 2018 The Chromium Authors. All rights reserved."),
+      License("firebase_messaging",
+          "https://pub.dartlang.org/packages/firebase_messaging \n\nCopyright 2018 The Chromium Authors. All rights reserved."),
+      License("firebase_performance",
+          "https://pub.dartlang.org/packages/firebase_performance \n\nCopyright 2018 The Chromium Authors. All rights reserved."),
+      License("firebase_crashlytics",
+          "https://pub.dartlang.org/packages/firebase_crashlytics \n\nCopyright 2018 The Chromium Authors. All rights reserved."),
+      License("firebase_analytics",
+          "https://pub.dartlang.org/packages/firebase_analytics \n\nCopyright 2018 The Chromium Authors. All rights reserved."),
     ];
   }
 }

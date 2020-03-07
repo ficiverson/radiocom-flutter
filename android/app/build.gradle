@@ -28,26 +28,31 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 android {
     compileSdkVersion 28
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     lintOptions {
         disable 'InvalidPackage'
     }
 
     defaultConfig {
-        applicationId "com.app.cuacfm.radio.coruna.temp"
+        applicationId "com.app.cuacfm.radio.coruna"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        versionCode 12
+        versionName "3.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     //flutter build appbundle
     signingConfigs {
         release {
-            keyAlias "declare"
-            keyPassword "declare"
-            storeFile file("/storecerts")
-            storePassword "storedpass"
+            keyAlias "mriv"
+            keyPassword "1034"
+            storeFile file("pathto/keystore")
+            storePassword "1034"
         }
     }
     buildTypes {
@@ -72,4 +77,8 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'androidx.palette:palette:1.0.0'
 }
+
+apply plugin: 'io.fabric'
+apply plugin: "com.google.gms.google-services"

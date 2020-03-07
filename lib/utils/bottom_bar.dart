@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +55,7 @@ class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
           color: _colors.palidwhite,
         ),
         width: queryData.size.width,
-        height: queryData.size.height *0.13,
+        height: Platform.isAndroid ? 85: 100,
         child: Column(children: [
           SizedBox(height: 10.0),
           Container(

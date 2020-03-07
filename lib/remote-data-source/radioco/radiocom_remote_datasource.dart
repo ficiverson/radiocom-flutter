@@ -34,7 +34,7 @@ class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
     Uri url = Uri.parse(radiocoAPI.baseUrl + radiocoAPI.live);
     try {
       var res = await this.client.get(url);
-      return new Now.fromInstance(res);
+      return Now.fromInstance(res);
     } catch (Exception) {
       return null;
     }

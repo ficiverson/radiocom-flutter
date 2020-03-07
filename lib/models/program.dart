@@ -185,51 +185,51 @@ class Program {
     switch (category) {
       case ProgramCategories.TV:
         content =
-            "https://images.unsplash.com/photo-1485846234645-a62644f84728?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60";
+            "assets/graphics/categories/tv.jpeg";
         break;
       case ProgramCategories.NEWS:
         content =
-            "https://images.unsplash.com/photo-1502772066658-3006ff41449b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60";
+            "assets/graphics/categories/news.jpeg";
         break;
       case ProgramCategories.SPORTS:
         content =
-            "https://images.unsplash.com/photo-1547347298-4074fc3086f0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60";
+            "assets/graphics/categories/sports.jpeg";
         break;
       case ProgramCategories.SOCIETY:
         content =
-            "https://images.unsplash.com/photo-1516179257071-71a54dbb4853?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60";
+            "assets/graphics/categories/society.jpeg";
         break;
       case ProgramCategories.EDUCATION:
         content =
-            "https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60";
+            "assets/graphics/categories/education.jpeg";
         break;
       case ProgramCategories.COMEDY:
         content =
-            "https://images.unsplash.com/photo-1452195172560-8ebaf7f58235?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60";
+            "assets/graphics/categories/comedy.jpeg";
         break;
       case ProgramCategories.MUSIC:
         content =
-            "https://images.unsplash.com/photo-1506157786151-b8491531f063?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60";
+            "assets/graphics/categories/music.jpeg";
         break;
       case ProgramCategories.SCIENCE:
         content =
-            "https://images.unsplash.com/photo-1511174511562-5f7f18b874f8?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60";
+            "assets/graphics/categories/science.jpeg";
         break;
       case ProgramCategories.ARTS:
         content =
-            "https://images.unsplash.com/photo-1513364776144-60967b0f800f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60";
+            "assets/graphics/categories/arts.jpeg";
         break;
       case ProgramCategories.GOVERNMENT:
         content =
-            "https://images.unsplash.com/photo-1527168027773-0cc890c4f42e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60";
+            "assets/graphics/categories/goverment.jpeg";
         break;
       case ProgramCategories.HEALTH:
         content =
-            "https://images.unsplash.com/photo-1535914254981-b5012eebbd15?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60";
+            "assets/graphics/categories/health.jpeg";
         break;
       case ProgramCategories.TECH:
         content =
-            "https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60";
+            "assets/graphics/categories/tech.jpeg";
         break;
       default:
         break;

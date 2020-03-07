@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
 
 import 'neumorfism.dart';
@@ -12,7 +13,7 @@ typedef void QueryCallback(String query);
 enum TopBarOption { MODAL, NORMAL }
 
 class TopBar extends StatefulWidget implements PreferredSizeWidget {
-  TopBar(
+  TopBar(this.screenName,
       {this.topBarOption = TopBarOption.NORMAL,
       this.title,
       this.rightIcon,
@@ -28,6 +29,7 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
   bool isSearch;
   QueryCallback onQueryCallback;
   QueryCallback onQuerySubmit;
+  String screenName;
 
   @override
   State<StatefulWidget> createState() => TopBarState();
@@ -41,6 +43,7 @@ class TopBarState extends State<TopBar> {
   String currentQuery;
   RadiocomColorsConract _colors;
   final TextEditingController _searchQuery = new TextEditingController();
+  String screenName;
 
   _onRightClicked() {
     if (widget.onRightClicked != null) {
@@ -66,7 +69,7 @@ class TopBarState extends State<TopBar> {
     queryData = MediaQuery.of(context);
     return Container(
         width: MediaQuery.of(context).size.width,
-        height: Platform.isAndroid ? queryData.size.height *0.13: queryData.size.height *0.117,//100,90
+        height: 90,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.only(
                 bottomRight: Radius.circular(25.0),
@@ -114,6 +117,11 @@ class TopBarState extends State<TopBar> {
                             ? Platform.isIOS ? 28 : 27
                             : Platform.isIOS ? 35 : 27),
                     onPressed: () {
+                      if (Platform.isAndroid) {
+                        MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
+                            'changeScreen',
+                            {"currentScreen": screenName, "close": true});
+                      }
                       if (widget.isSearch) {
                         if (currentQuery == null || currentQuery.isEmpty) {
                           if (Navigator.of(context).canPop()) {
@@ -155,6 +163,7 @@ class TopBarState extends State<TopBar> {
   @override
   void initState() {
     super.initState();
+    screenName = widget.screenName;
   }
 
   Widget buildSearchBarPodcast() {

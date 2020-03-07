@@ -48,7 +48,7 @@ class New {
     } else if (document.body.getElementsByTagName("img").length > 0) {
       return document.body.getElementsByTagName("img")[0].attributes["src"];
     } else {
-      String baseImage = "https://cuacfm.org/radioco/media/photos/cuac.png";
+      String baseImage = "https://cuacfm.org/wp-content/uploads/2015/04/cousomicros1.jpg";
       switch (Random().nextInt(5)) {
         case 0:
           baseImage =
@@ -67,7 +67,7 @@ class New {
               "https://i1.wp.com/cuacfm.org/wp-content/uploads/2014/05/parrulo-naranja.jpg?ssl=1";
           break;
         case 4:
-          baseImage = "https://cuacfm.org/radioco/media/photos/cuac.png";
+          baseImage = "https://cuacfm.org/wp-content/uploads/2015/04/cousomicros1.jpg";
           break;
       }
       return baseImage;

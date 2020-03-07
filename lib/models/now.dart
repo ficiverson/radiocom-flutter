@@ -1,3 +1,6 @@
+import 'package:cuacfm/models/radiostation.dart';
+import 'package:injector/injector.dart';
+
 class Now {
   String name;
   String description;
@@ -8,7 +11,7 @@ class Now {
   Now.mock()
       :
         name = "Continuidad CUAC FM",
-        logo_url = "https://cuacfm.org/radioco/media/photos/cuac.png";
+        logo_url = "https://cuacfm.org/wp-content/uploads/2015/04/cousomicros1.jpg";
 
   Now.fromInstance(Map<String, dynamic> map)
       :
@@ -17,4 +20,8 @@ class Now {
         programme_url = map["programme_url"],
         logo_url = map["logo_url"],
         rss_url = map["rss_url"];
+
+  String streamUrl(){
+    return Injector.appInstance.getDependency<RadioStation>().stream_url;
+  }
 }
