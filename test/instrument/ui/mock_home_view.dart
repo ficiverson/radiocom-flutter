@@ -18,10 +18,27 @@ enum HomeState {
   onNewData,
   connectionSuccess,
   liveDataError,
-  liveDataLoaded
+  liveDataLoaded,
+  loadNews,
+  newsError,
+  loadPodcast,
+  podcastError,
+  loadStation,
+  stationError,
+  loadRecent,
+  recenterror,
+  loadTimetable,
+  timetableError,
+  notifyUser,
+  goToAllPodcast,
+  goToNewDetail,
+  goToEpisode,
+  goToPodcast,
+  goToSettings,
+  goToTimeTable
 }
 
-class MockHomelView implements HomeView {
+class MockHomeView implements HomeView {
   List<HomeState> viewState = List();
   List<dynamic> data = List();
 
@@ -48,62 +65,74 @@ class MockHomelView implements HomeView {
 
   @override
   void onLoadLiveData(Now now) {
-    // TODO: implement onLoadLiveData
+    viewState.add(HomeState.liveDataLoaded);
+    data.add(now);
   }
 
   @override
   void onLoadNews(List<New> news) {
-    // TODO: implement onLoadNews
+    viewState.add(HomeState.loadNews);
+    data.add(news);
   }
 
   @override
   void onLoadPodcasts(List<Program> podcasts) {
-    // TODO: implement onLoadPodcasts
+    viewState.add(HomeState.loadPodcast);
+    data.add(podcasts);
   }
 
   @override
   void onLoadRadioStation(RadioStation station) {
-    // TODO: implement onLoadRadioStation
+    viewState.add(HomeState.loadStation);
+    data.add(station);
   }
 
   @override
   void onLoadRecents(List<TimeTable> programsTimeTable) {
-    // TODO: implement onLoadRecents
+    viewState.add(HomeState.loadRecent);
+    data.add(programsTimeTable);
   }
 
   @override
   void onLoadRecentsError(error) {
-    // TODO: implement onLoadRecentsError
+    viewState.add(HomeState.recenterror);
+    data.add(error);
   }
 
   @override
   void onLoadTimetable(List<TimeTable> programsTimeTable) {
-    // TODO: implement onLoadTimetable
+    viewState.add(HomeState.loadTimetable);
+    data.add(programsTimeTable);
   }
 
   @override
   void onNewsError(error) {
-    // TODO: implement onNewsError
+    viewState.add(HomeState.newsError);
+    data.add(error);
   }
 
   @override
   void onNotifyUser(StatusPlayer status) {
-    // TODO: implement onNotifyUser
+    viewState.add(HomeState.notifyUser);
+    data.add(status);
   }
 
   @override
   void onPodcastError(error) {
-    // TODO: implement onPodcastError
+    viewState.add(HomeState.podcastError);
+    data.add(error);
   }
 
   @override
   void onRadioStationError(error) {
-    // TODO: implement onRadioStationError
+    viewState.add(HomeState.stationError);
+    data.add(error);
   }
 
   @override
   void onTimetableError(error) {
-    // TODO: implement onTimetableError
+    viewState.add(HomeState.timetableError);
+    data.add(error);
   }
 }
 
@@ -113,38 +142,36 @@ class MockHomeRouter implements HomeRouterContract {
 
   @override
   goToAllPodcast(List<Program> podcasts, {String category}) {
-    // TODO: implement goToAllPodcast
-    return null;
+    viewState.add(HomeState.goToAllPodcast);
+    data.add(category!=null?category:podcasts);
   }
 
   @override
   goToNewDetail(New itemNew) {
-    // TODO: implement goToNewDetail
-    return null;
+    viewState.add(HomeState.goToNewDetail);
+    data.add(itemNew);
   }
 
   @override
   goToPodcastControls(Episode episode) {
-    // TODO: implement goToPodcastControls
-    return null;
+    viewState.add(HomeState.goToEpisode);
+    data.add(episode);
   }
 
   @override
   goToPodcastDetail(Program podcast) {
-    // TODO: implement goToPodcastDetail
-    return null;
+    viewState.add(HomeState.goToPodcast);
+    data.add(podcast);
   }
 
   @override
   goToSettings() {
-    // TODO: implement goToSettings
-    return null;
+    viewState.add(HomeState.goToSettings);
   }
 
   @override
   goToTimeTable(List<TimeTable> timeTables) {
-    // TODO: implement goToTimeTable
-    return null;
+    viewState.add(HomeState.goToTimeTable);
+    data.add(timeTables);
   }
-
 }

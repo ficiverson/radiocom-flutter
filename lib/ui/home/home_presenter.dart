@@ -73,15 +73,14 @@ class HomePresenter {
       @required this.getNewsUseCase}) {
     connection = Injector.appInstance.getDependency<ConnectionContract>();
     currentPlayer = Injector.appInstance.getDependency<CurrentPlayerContract>();
-    init();
   }
 
   init() async {
     bool isConnectionAvailable = await connection.isConnectionAvailable();
     if (isConnectionAvailable) {
       _homeView.onConnectionSuccess();
-      getRadioStationData();
-      getLiveProgram(true);
+      _getRadioStationData();
+      _getLiveProgram(true);
     } else {
       _homeView.onConnectionError();
       _homeView.onLoadRecentsError("connectionerror");
@@ -93,107 +92,8 @@ class HomePresenter {
 
   onHomeResumed() async {
     if (await connection.isConnectionAvailable()) {
-      getLiveProgram(false);
+      _getLiveProgram(false);
     }
-  }
-
-  getNews() {
-    invoker.execute(getNewsUseCase).listen((result) {
-      if (result is Success) {
-        _homeView.onLoadNews(result.data);
-      } else {
-        _homeView.onNewsError((result as Error).status);
-      }
-    });
-  }
-
-  getRadioStationData() {
-    invoker.execute(getStationUseCase).listen((result) {
-      if (result is Success) {
-        _homeView.onLoadRadioStation(result.data);
-      } else {
-        _homeView.onRadioStationError((result as Error).status);
-      }
-    });
-  }
-
-  getLiveProgram(bool refreshAll) {
-    invoker.execute(getLiveDataUseCase).listen((result) {
-      if (result is Success) {
-        _liveData = result.data;
-        if (!currentPlayer.isPodcast) {
-          currentPlayer.now = result.data;
-          currentPlayer.currentSong = result.data.name;
-          currentPlayer.currentImage = result.data.logo_url;
-        }
-        _homeView.onLoadLiveData(result.data);
-      } else {
-        if (!currentPlayer.isPodcast) {
-          _liveData = Now.mock();
-          currentPlayer.now = Now.mock();
-          currentPlayer.currentSong = Now
-              .mock()
-              .name;
-          currentPlayer.currentImage = Now
-              .mock()
-              .logo_url;
-        }
-        _homeView.onLiveDataError((result as Error).status);
-      }
-      getRecentPodcast(refreshAll);
-    });
-  }
-
-  getTimetable() {
-    DateTime nowDate = new DateTime.now();
-    var formatter = new DateFormat('dd/MM/yyyy');
-    String now = formatter.format(nowDate);
-    invoker
-        .execute(
-            getTimetableUseCase.withParams(GetTimetableUseCaseParams(now, now)))
-        .listen((result) {
-      if (result is Success) {
-        _homeView.onLoadTimetable(result.data);
-      } else {
-        _homeView.onTimetableError((result as Error).status);
-      }
-      getAllPodcasts();
-    });
-  }
-
-  getRecentPodcast(bool refreshAll) {
-    DateTime nowDate = new DateTime.now();
-    var formatter = new DateFormat('dd/MM/yyyy');
-    String now = formatter.format(nowDate);
-    String yesterday =
-        formatter.format(nowDate.toUtc().subtract(new Duration(days: 1)));
-    invoker
-        .execute(getTimetableUseCase
-            .withParams(GetTimetableUseCaseParams(yesterday, now)))
-        .listen((result) {
-      if (result is Success) {
-        _homeView.onLoadRecents(result.data);
-      } else {
-        _homeView.onLoadRecentsError((result as Error).status);
-      }
-      if(refreshAll) {
-        getTimetable();
-      }
-    });
-  }
-
-  getAllPodcasts() {
-    invoker
-        .execute(getAllPodcastUseCase.withParams(DataPolicy.network))
-        .listen((onResult) {
-      if (onResult is Success) {
-        _homeView.onLoadPodcasts(onResult.data);
-      } else {
-        _homeView
-            .onPodcastError("Imposible recuperar los podcast en este momento");
-      }
-      getNews();
-    });
   }
 
   onSeeAllPodcast(List<Program> podcasts) {
@@ -235,7 +135,7 @@ class HomePresenter {
       _play();
     }
     if (await connection.isConnectionAvailable()) {
-      getLiveProgram(false);
+      _getLiveProgram(false);
     }
   }
 
@@ -243,8 +143,6 @@ class HomePresenter {
     await currentPlayer.resume();
     _homeView.onNotifyUser(StatusPlayer.PLAYING);
   }
-
-
 
   onPausePlayer() async {
     if (currentPlayer.isPodcast) {
@@ -321,5 +219,104 @@ class HomePresenter {
 
   _release() {
     currentPlayer.release();
+  }
+
+  _getNews() {
+    invoker.execute(getNewsUseCase).listen((result) {
+      if (result is Success) {
+        _homeView.onLoadNews(result.data);
+      } else {
+        _homeView.onNewsError((result as Error).status);
+      }
+    });
+  }
+
+  _getRadioStationData() {
+    invoker.execute(getStationUseCase).listen((result) {
+      if (result is Success) {
+        _homeView.onLoadRadioStation(result.data);
+      } else {
+        _homeView.onRadioStationError((result as Error).status);
+      }
+    });
+  }
+
+  _getLiveProgram(bool refreshAll) {
+    invoker.execute(getLiveDataUseCase).listen((result) {
+      if (result is Success) {
+        _liveData = result.data;
+        if (!currentPlayer.isPodcast) {
+          currentPlayer.now = result.data;
+          currentPlayer.currentSong = result.data.name;
+          currentPlayer.currentImage = result.data.logo_url;
+        }
+        _homeView.onLoadLiveData(result.data);
+      } else {
+        if (!currentPlayer.isPodcast) {
+          _liveData = Now.mock();
+          currentPlayer.now = Now.mock();
+          currentPlayer.currentSong = Now
+              .mock()
+              .name;
+          currentPlayer.currentImage = Now
+              .mock()
+              .logo_url;
+        }
+        _homeView.onLiveDataError((result as Error).status);
+      }
+      _getRecentPodcast(refreshAll);
+    });
+  }
+
+  _getTimetable() {
+    DateTime nowDate = new DateTime.now();
+    var formatter = new DateFormat('dd/MM/yyyy');
+    String now = formatter.format(nowDate);
+    invoker
+        .execute(
+        getTimetableUseCase.withParams(GetTimetableUseCaseParams(now, now)))
+        .listen((result) {
+      if (result is Success) {
+        _homeView.onLoadTimetable(result.data);
+      } else {
+        _homeView.onTimetableError((result as Error).status);
+      }
+      _getAllPodcasts();
+    });
+  }
+
+  _getRecentPodcast(bool refreshAll) {
+    DateTime nowDate = new DateTime.now();
+    var formatter = new DateFormat('dd/MM/yyyy');
+    String now = formatter.format(nowDate);
+    String yesterday =
+    formatter.format(nowDate.toUtc().subtract(new Duration(days: 1)));
+    invoker
+        .execute(getTimetableUseCase
+        .withParams(GetTimetableUseCaseParams(yesterday, now)))
+        .listen((result) {
+      if (result is Success) {
+        _homeView.onLoadRecents(result.data);
+      } else {
+        _homeView.onLoadRecentsError((result as Error).status);
+      }
+      if(refreshAll) {
+        _getTimetable();
+      }
+    });
+  }
+
+  _getAllPodcasts() {
+    invoker
+        .execute(getAllPodcastUseCase.withParams(DataPolicy.network))
+        .listen((onResult) {
+      if (onResult is Success) {
+        _homeView.onLoadPodcasts(onResult.data);
+      } else {
+        _homeView
+            .onPodcastError("Imposible recuperar los podcast en este momento");
+      }
+      _getNews();
+    });
   }
 }

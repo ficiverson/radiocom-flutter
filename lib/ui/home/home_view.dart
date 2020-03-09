@@ -176,6 +176,7 @@ class MyHomePageState extends State<MyHomePage>
           'changeScreen', {"currentScreen": "main", "close": false});
     }
     _presenter = Injector.appInstance.getDependency<HomePresenter>();
+    _presenter.init();
     _nowProgram = new Now.mock();
     _station = Injector.appInstance.getDependency<RadioStation>();
 
