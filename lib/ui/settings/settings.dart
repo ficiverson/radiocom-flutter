@@ -19,7 +19,9 @@ class Settings extends StatefulWidget {
   State createState() => new SettingsState();
 }
 
-class SettingsState extends State<Settings> with WidgetsBindingObserver implements SettingsView {
+class SettingsState extends State<Settings>
+    with WidgetsBindingObserver
+    implements SettingsView {
   MediaQueryData _queryData;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   SettingsPresenter _presenter;
@@ -28,8 +30,9 @@ class SettingsState extends State<Settings> with WidgetsBindingObserver implemen
   bool shouldShowPlayer = false;
   bool isContentUpdated = true;
   EventChannel _notificationEvent =
-  EventChannel('cuacfm.flutter.io/updateNotification');
+      EventChannel('cuacfm.flutter.io/updateNotification');
   SnackBar snackBarConnection;
+  bool isDarkModeEnabled = false;
 
   SettingsState() {
     DependencyInjector().injectByView(this);
@@ -40,10 +43,11 @@ class SettingsState extends State<Settings> with WidgetsBindingObserver implemen
     _queryData = MediaQuery.of(context);
     _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     return Scaffold(
-      key: scaffoldKey,
-      appBar: TopBar("settings",title: "Menu", topBarOption: TopBarOption.NORMAL),
-      backgroundColor: _colors.palidwhite,
-      body: _getBodyLayout(),
+        key: scaffoldKey,
+        appBar: TopBar("settings",
+            title: "Menu", topBarOption: TopBarOption.NORMAL),
+        backgroundColor: _colors.palidwhite,
+        body: _getBodyLayout(),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: PlayerView(
             isMini: false,
@@ -52,8 +56,8 @@ class SettingsState extends State<Settings> with WidgetsBindingObserver implemen
             isPlayingAudio: _presenter.currentPlayer.isPlaying(),
             isExpanded: true,
             onDetailClicked: () {
-              _presenter.onPodcastControlsClicked(
-                  _presenter.currentPlayer.episode);
+              _presenter
+                  .onPodcastControlsClicked(_presenter.currentPlayer.episode);
             },
             onMultimediaClicked: (isPlaying) {
               if (!mounted) return;
@@ -64,8 +68,7 @@ class SettingsState extends State<Settings> with WidgetsBindingObserver implemen
                   _presenter.onResume();
                 }
               });
-            })
-    );
+            }));
     ;
   }
 
@@ -77,6 +80,7 @@ class SettingsState extends State<Settings> with WidgetsBindingObserver implemen
           'changeScreen', {"currentScreen": "settings", "close": false});
     }
     _presenter = Injector.appInstance.getDependency<SettingsPresenter>();
+    _presenter.init();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     _radioStation = Injector.appInstance.getDependency<RadioStation>();
 
@@ -98,7 +102,7 @@ class SettingsState extends State<Settings> with WidgetsBindingObserver implemen
         new Timer(new Duration(milliseconds: 300), () {
           setState(() {});
         });
-        if(isError){
+        if (isError) {
           onConnectionError();
         }
       }
@@ -148,6 +152,27 @@ class SettingsState extends State<Settings> with WidgetsBindingObserver implemen
   onNewData() {
     if (!mounted) return;
     setState(() {});
+  }
+
+  @override
+  void onDarkModeStatus(bool status) {
+    setState(() {
+      isDarkModeEnabled = status;
+    });
+  }
+
+  void setBrightness() {
+    final Brightness brightness =
+        WidgetsBinding.instance.window.platformBrightness;
+    if (brightness == Brightness.light && !isDarkModeEnabled) {
+      Injector.appInstance.registerSingleton<RadiocomColorsConract>(
+          (_) => RadiocomColorsLight(),
+          override: true);
+    } else {
+      Injector.appInstance.registerSingleton<RadiocomColorsConract>(
+          (_) => RadiocomColorsDark(),
+          override: true);
+    }
   }
 
   //layout
@@ -222,6 +247,51 @@ class SettingsState extends State<Settings> with WidgetsBindingObserver implemen
                                   ),
                                   trailing: FaIcon(FontAwesomeIcons.images,
                                       color: _colors.grey, size: 25.0))))),
+                  getDivider(),
+                  SizedBox(height: 15),
+                  Container(
+                      margin: EdgeInsets.fromLTRB(25.0, 0.0, 0.0, 0.0),
+                      child: Text(
+                        "CONFIGURACIÓN",
+                        maxLines: 1,
+                        textAlign: TextAlign.left,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            letterSpacing: 1.2,
+                            color: _colors.font,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18),
+                      )),
+                  Material(
+                      color: _colors.transparent,
+                      child: Container(
+                          margin: EdgeInsets.fromLTRB(10.0, 0.0, 20.0, 0.0),
+                          child: ListTile(
+                              title: Text(
+                                "Forzar modo oscuro",
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    letterSpacing: 1.2,
+                                    color: _colors.font,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16),
+                              ),
+                              trailing: WidgetsBinding.instance.window
+                                  .platformBrightness ==
+                                  Brightness.light ? Switch(
+                                value: isDarkModeEnabled,
+                                onChanged:(value) {
+                                  _presenter.onDarkMode(value);
+                                  setState(() {
+                                    isDarkModeEnabled = value;
+                                    setBrightness();
+                                  });
+                                },
+                                activeTrackColor: _colors.yellow,
+                                activeColor: _colors.yellow,
+                              ):Icon(Icons.lock,
+                                  color: _colors.grey, size: 25.0)))),
                   getDivider(),
                   SizedBox(height: 15),
                   Container(

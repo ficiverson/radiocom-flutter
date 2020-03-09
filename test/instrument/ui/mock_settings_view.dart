@@ -7,6 +7,7 @@ import 'package:cuacfm/ui/settings/settings_router.dart';
 enum SettingsState {
   noConnection,
   onNewData,
+  onDarkMode,
   goToEpisode,
   goToHistory,
   goToLegal
@@ -24,6 +25,12 @@ class MockSettingsView implements SettingsView {
   @override
   onNewData() {
     viewState.add(SettingsState.onNewData);
+  }
+
+  @override
+  onDarkModeStatus(bool status) {
+    viewState.add(SettingsState.onDarkMode);
+    data.add(status);
   }
 }
 

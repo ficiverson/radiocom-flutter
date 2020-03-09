@@ -12,11 +12,13 @@ import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:flutter/material.dart';
 import 'package:injector/injector.dart';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 abstract class SettingsView {
   onNewData();
   onConnectionError();
+  onDarkModeStatus(bool status);
 }
 
 
@@ -32,6 +34,10 @@ class SettingsPresenter {
   }) {
     connection = Injector.appInstance.getDependency<ConnectionContract>();
     currentPlayer = Injector.appInstance.getDependency<CurrentPlayerContract>();
+  }
+
+  init() async {
+    _settingsView.onDarkModeStatus(await _getDarkModeStatus());
   }
 
   onViewResumed() async {
@@ -117,7 +123,18 @@ class SettingsPresenter {
     router.goToPodcastControls(episode);
   }
 
+  onDarkMode(bool setting) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('dark_mode_enabled', setting);
+  }
+
   //private methods
+
+  _getDarkModeStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var result =  prefs.getBool('dark_mode_enabled');
+    return result==null? false : result;
+  }
 
   _launchURL(String url, {bool universalLink = true}) async {
     if (await canLaunch(url)) {

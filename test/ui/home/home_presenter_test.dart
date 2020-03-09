@@ -13,6 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:injector/injector.dart';
 import 'package:mockito/mockito.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../instrument/data/repository_mock.dart';
 import '../../instrument/helper/helper-instrument.dart';
@@ -32,6 +33,7 @@ void main() {
 
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences.setMockInitialValues({});
     DependencyInjector().loadModules();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
         (_) => mockRepository,
@@ -81,13 +83,14 @@ void main() {
         presenter.init();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState[0], equals(HomeState.connectionSuccess));
-        expect(view.viewState[1], equals(HomeState.loadStation));
-        expect(view.viewState[2], equals(HomeState.liveDataLoaded));
-        expect(view.viewState[3], equals(HomeState.loadRecent));
-        expect(view.viewState[4], equals(HomeState.loadTimetable));
-        expect(view.viewState[5], equals(HomeState.loadPodcast));
-        expect(view.viewState[6], equals(HomeState.loadNews));
+        expect(view.viewState[0], equals(HomeState.onDarkMode));
+        expect(view.viewState[1], equals(HomeState.connectionSuccess));
+        expect(view.viewState[2], equals(HomeState.loadStation));
+        expect(view.viewState[3], equals(HomeState.liveDataLoaded));
+        expect(view.viewState[4], equals(HomeState.loadRecent));
+        expect(view.viewState[5], equals(HomeState.loadTimetable));
+        expect(view.viewState[6], equals(HomeState.loadPodcast));
+        expect(view.viewState[7], equals(HomeState.loadNews));
       });
 
   test('that can init the presenter without connection',
@@ -109,11 +112,12 @@ void main() {
         presenter.init();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState[0], equals(HomeState.noConnection));
-        expect(view.viewState[1], equals(HomeState.recenterror));
-        expect(view.viewState[2], equals(HomeState.newsError));
-        expect(view.viewState[3], equals(HomeState.podcastError));
-        expect(view.viewState[4], equals(HomeState.timetableError));
+        expect(view.viewState[0], equals(HomeState.onDarkMode));
+        expect(view.viewState[1], equals(HomeState.noConnection));
+        expect(view.viewState[2], equals(HomeState.recenterror));
+        expect(view.viewState[3], equals(HomeState.newsError));
+        expect(view.viewState[4], equals(HomeState.podcastError));
+        expect(view.viewState[5], equals(HomeState.timetableError));
       });
 
   test('that can init the presenter withhout service working',
@@ -135,13 +139,14 @@ void main() {
         presenter.init();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState[0], equals(HomeState.connectionSuccess));
-        expect(view.viewState[1], equals(HomeState.stationError));
-        expect(view.viewState[2], equals(HomeState.liveDataError));
-        expect(view.viewState[3], equals(HomeState.recenterror));
-        expect(view.viewState[4], equals(HomeState.timetableError));
-        expect(view.viewState[5], equals(HomeState.podcastError));
-        expect(view.viewState[6], equals(HomeState.newsError));
+        expect(view.viewState[0], equals(HomeState.onDarkMode));
+        expect(view.viewState[1], equals(HomeState.connectionSuccess));
+        expect(view.viewState[2], equals(HomeState.stationError));
+        expect(view.viewState[3], equals(HomeState.liveDataError));
+        expect(view.viewState[4], equals(HomeState.recenterror));
+        expect(view.viewState[5], equals(HomeState.timetableError));
+        expect(view.viewState[6], equals(HomeState.podcastError));
+        expect(view.viewState[7], equals(HomeState.newsError));
       });
 
   test('that can resume the view and realod the data',
@@ -159,10 +164,11 @@ void main() {
     presenter.onHomeResumed();
     await Future.delayed(Duration(milliseconds: 200));
 
-    expect(view.viewState[0], equals(HomeState.liveDataLoaded));
-    expect((view.data[0] as Now).name, equals(NowInstrument.givenANow().name));
-    expect(view.viewState[1], equals(HomeState.loadRecent));
-    expect((view.data[1] as List<TimeTable>).length, equals(1));
+    expect(view.viewState[0], equals(HomeState.onDarkMode));
+    expect(view.viewState[1], equals(HomeState.liveDataLoaded));
+    expect((view.data[1] as Now).name, equals(NowInstrument.givenANow().name));
+    expect(view.viewState[2], equals(HomeState.loadRecent));
+    expect((view.data[2] as List<TimeTable>).length, equals(1));
   });
 
   test('that can resume the view and realod the data with error response reload the view with base now',
@@ -180,8 +186,9 @@ void main() {
         presenter.onHomeResumed();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState[0], equals(HomeState.liveDataError));
-        expect(view.viewState[1], equals(HomeState.recenterror));
+        expect(view.viewState[0], equals(HomeState.onDarkMode));
+        expect(view.viewState[1], equals(HomeState.liveDataError));
+        expect(view.viewState[2], equals(HomeState.recenterror));
       });
 
   test(
@@ -199,7 +206,8 @@ void main() {
         presenter.onHomeResumed();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState.isEmpty, equals(true));
+        expect(view.viewState[0], equals(HomeState.onDarkMode));
+        expect(view.viewState.length, equals(1));
       });
 
   test(

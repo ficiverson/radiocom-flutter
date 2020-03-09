@@ -18,6 +18,7 @@ import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:injector/injector.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'home_router.dart';
 
@@ -44,6 +45,8 @@ abstract class HomeView {
   void onConnectionSuccess();
 
   void onNotifyUser(StatusPlayer status);
+
+  void onDarkModeStatus(bool status);
 }
 
 enum StatusPlayer { PLAYING, FAILED, STOP }
@@ -76,6 +79,7 @@ class HomePresenter {
   }
 
   init() async {
+    _homeView.onDarkModeStatus(await _getDarkModeStatus());
     bool isConnectionAvailable = await connection.isConnectionAvailable();
     if (isConnectionAvailable) {
       _homeView.onConnectionSuccess();
@@ -91,6 +95,7 @@ class HomePresenter {
   }
 
   onHomeResumed() async {
+    _homeView.onDarkModeStatus(await _getDarkModeStatus());
     if (await connection.isConnectionAvailable()) {
       _getLiveProgram(false);
     }
@@ -154,6 +159,13 @@ class HomePresenter {
   }
 
   //private methods
+
+  _getDarkModeStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var result =  prefs.getBool('dark_mode_enabled');
+    return result==null? false : result;
+  }
+
   _play() async {
     isLoading = true;
     var success = await currentPlayer.play();

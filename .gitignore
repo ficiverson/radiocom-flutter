@@ -11,3 +11,4 @@ pubspec.lock
 coverage/
 ios/Runner/GoogleService-Info.plist
 android/app/google-services.json
+.dart_tool/

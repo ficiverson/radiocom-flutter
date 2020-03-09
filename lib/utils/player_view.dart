@@ -99,7 +99,7 @@ class PlayerViewState extends State<PlayerView> {
         isFullScreen: isFullScreen,
         child: GestureDetector(
             onTap: () {
-              _onDetailClicked();
+              if(widget.shouldShow) {_onDetailClicked();}
             },
             child: getPlayerContent()));
   }
@@ -127,7 +127,7 @@ class PlayerViewState extends State<PlayerView> {
                     ),
                     trailing: new GestureDetector(
                       onTap: () {
-                        _onMultimediaClicked();
+                        if(widget.shouldShow) {_onMultimediaClicked();}
                       },
                       child: Icon(
                           showPlayButton ? Icons.pause : Icons.play_arrow,
@@ -154,7 +154,7 @@ class PlayerViewState extends State<PlayerView> {
             ),
             trailing: new GestureDetector(
               onTap: () {
-                _onMultimediaClicked();
+                if(widget.shouldShow) {_onMultimediaClicked();}
               },
               child: Icon(showPlayButton ? Icons.pause : Icons.play_arrow,
                   color: _colors.yellow, size: 40.0),

@@ -30,6 +30,7 @@ enum HomeState {
   loadTimetable,
   timetableError,
   notifyUser,
+  onDarkMode,
   goToAllPodcast,
   goToNewDetail,
   goToEpisode,
@@ -133,6 +134,12 @@ class MockHomeView implements HomeView {
   void onTimetableError(error) {
     viewState.add(HomeState.timetableError);
     data.add(error);
+  }
+
+  @override
+  void onDarkModeStatus(bool status) {
+    viewState.add(HomeState.onDarkMode);
+    data.add(status);
   }
 }
 

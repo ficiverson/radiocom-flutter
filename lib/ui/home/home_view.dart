@@ -77,6 +77,7 @@ class MyHomePageState extends State<MyHomePage>
   EventChannel _notificationEvent =
       EventChannel('cuacfm.flutter.io/updateNotificationMain');
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  bool isDarkModeEnabled = false;
 
   MyHomePageState() {
     DependencyInjector().injectByView(this);
@@ -182,7 +183,6 @@ class MyHomePageState extends State<MyHomePage>
 
     categories.addAll(ProgramCategories.values);
     categories.shuffle();
-    setBrightness();
 
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
@@ -248,7 +248,6 @@ class MyHomePageState extends State<MyHomePage>
       case AppLifecycleState.resumed:
         if (!isContentUpdated) {
           isContentUpdated = true;
-          setBrightness();
           _presenter.onHomeResumed();
         }
         break;
@@ -269,10 +268,18 @@ class MyHomePageState extends State<MyHomePage>
     super.dispose();
   }
 
+  @override
+  void onDarkModeStatus(bool status) {
+    setState(() {
+      isDarkModeEnabled = status;
+      setBrightness();
+    });
+  }
+
   void setBrightness() {
     final Brightness brightness =
         WidgetsBinding.instance.window.platformBrightness;
-    if (brightness == Brightness.light) {
+    if (brightness == Brightness.light && !isDarkModeEnabled) {
       Injector.appInstance.registerSingleton<RadiocomColorsConract>(
           (_) => RadiocomColorsLight(),
           override: true);
@@ -496,130 +503,145 @@ class MyHomePageState extends State<MyHomePage>
   }
 
   Widget _getHomeLayout() {
-    return SingleChildScrollView(
-        key: ValueKey<String>(BottomBarOption.HOME.toString()),
-        physics: BouncingScrollPhysics(),
-        child: Container(
-          color: _colors.palidwhite,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(height: 40.0),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(22.0, 10.0, 25.0, 0.0),
-                  child: Text(
-                    _getWelcomeText(),
-                    style: TextStyle(
-                        letterSpacing: 1.5,
-                        color: _colors.fontH1,
-                        fontSize: 30,
-                        fontWeight: FontWeight.w900),
-                  )),
-              shouldShowPlayer
-                  ? SizedBox(height: 10)
-                  : isLoadingPlay
-                      ? Container(height: 80.0, child: getLoadingState())
-                      : Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(25.0, 30.0, 25.0, 0.0),
-                          child: NeumorphicCardHorizontal(
-                              onElementClicked: () {
-                                if (!mounted) return;
-                                setState(() {
-                                  isLoadingPlay = true;
-                                  _presenter.onLiveSelected(_nowProgram);
-                                });
-                              },
-                              icon: Icons.play_arrow,
-                              active: true,
-                              label: "Escuchar en Directo",
-                              size: 80.0)),
-              Padding(
-                  padding: const EdgeInsets.fromLTRB(25.0, 30.0, 25.0, 0.0),
-                  child: Text(
-                    'Podcast recientes',
-                    style: TextStyle(
-                        letterSpacing: 1.5,
-                        color: _colors.font,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500),
-                  )),
-              isEmptyHome
-                  ? Padding(
-                      padding: EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 20.0),
-                      child: NeumorphicEmptyView(
-                        "No hay podcast recientes ahora mismo.",
-                        width: queryData.size.width,
-                        height: 280.0,
-                      ))
-                  : Container(
-                      color: _colors.transparent,
-                      width: queryData.size.width,
-                      height: 280.0,
-                      child: isLoadingHome
-                          ? Container(height: 280.0, child: getLoadingState())
-                          : ListView.builder(
-                              physics: BouncingScrollPhysics(),
-                              scrollDirection: Axis.horizontal,
-                              itemCount: _recentPodcast.length,
-                              itemBuilder: (_, int index) => Row(children: [
-                                    SizedBox(width: 15.0),
-                                    GestureDetector(
-                                        onTap: () {
-                                          _presenter.onPodcastClicked(
-                                              findPodcastByName(
-                                                  _recentPodcast[index]
-                                                      .rss_url));
-                                        },
-                                        child: NeumorphicCardVertical(
-                                          active: false,
-                                          image: _recentPodcast[index].logo_url,
-                                          label: _recentPodcast[index].name,
-                                          subtitle:
-                                              _recentPodcast[index].duration +
+    return Container(
+        key: PageStorageKey<String>(BottomBarOption.HOME.toString()),
+        color: _colors.palidwhitedark,
+        width: queryData.size.width,
+        height: queryData.size.height,
+        child: SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
+            child: Container(
+              color: _colors.palidwhite,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(height: 45.0),
+                  Padding(
+                      padding: EdgeInsets.fromLTRB(22.0, 10.0, 25.0, 0.0),
+                      child: Text(
+                        _getWelcomeText(),
+                        style: TextStyle(
+                            letterSpacing: 1.5,
+                            color: _colors.fontH1,
+                            fontSize: 30,
+                            fontWeight: FontWeight.w900),
+                      )),
+                  shouldShowPlayer
+                      ? SizedBox(height: 10)
+                      : isLoadingPlay
+                          ? Container(height: 80.0, child: getLoadingState())
+                          : Padding(
+                              padding: const EdgeInsets.fromLTRB(
+                                  25.0, 30.0, 25.0, 0.0),
+                              child: NeumorphicCardHorizontal(
+                                  onElementClicked: () {
+                                    if (!mounted) return;
+                                    setState(() {
+                                      isLoadingPlay = true;
+                                      _presenter.onLiveSelected(_nowProgram);
+                                    });
+                                  },
+                                  icon: Icons.play_arrow,
+                                  active: true,
+                                  label: "Escuchar en Directo",
+                                  size: 80.0)),
+                  Padding(
+                      padding: const EdgeInsets.fromLTRB(25.0, 30.0, 25.0, 0.0),
+                      child: Text(
+                        'Podcast recientes',
+                        style: TextStyle(
+                            letterSpacing: 1.5,
+                            color: _colors.font,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500),
+                      )),
+                  isEmptyHome
+                      ? Padding(
+                          padding: EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 20.0),
+                          child: NeumorphicEmptyView(
+                            "No hay podcast recientes ahora mismo.",
+                            width: queryData.size.width,
+                            height: 280.0,
+                          ))
+                      : Container(
+                          color: _colors.transparent,
+                          width: queryData.size.width,
+                          height: 280.0,
+                          child: isLoadingHome
+                              ? Container(
+                                  height: 280.0, child: getLoadingState())
+                              : ListView.builder(
+                                  physics: BouncingScrollPhysics(),
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: _recentPodcast.length,
+                                  itemBuilder: (_, int index) => Row(children: [
+                                        SizedBox(width: 15.0),
+                                        GestureDetector(
+                                            onTap: () {
+                                              _presenter.onPodcastClicked(
+                                                  findPodcastByName(
+                                                      _recentPodcast[index]
+                                                          .rss_url));
+                                            },
+                                            child: NeumorphicCardVertical(
+                                              active: false,
+                                              image: _recentPodcast[index]
+                                                  .logo_url,
+                                              label: _recentPodcast[index].name,
+                                              subtitle: _recentPodcast[index]
+                                                      .duration +
                                                   " minutos",
-                                        )),
-                                    SizedBox(width: 22.0)
-                                  ]))),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
-                  child: Text(
-                    'Ahora suena',
-                    style: TextStyle(
-                        letterSpacing: 1.5,
-                        color: _colors.font,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500),
-                  )),
-              Padding(
-                  padding: const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
-                  child: NeumorphicCardHorizontal(
-                    onElementClicked: () {
-                      if (isTimeTableEmpty) {
-                        showTimeTableEmptySnackbar();
-                      } else {
-                        _presenter.nowPlayingClicked(_timeTable);
-                      }
-                    },
-                    active: false,
-                    image: _nowProgram.logo_url,
-                    label: _nowProgram.name,
-                  )),
-              shouldShowPlayer
-                  ? Container(
-                      width: queryData.size.width,
-                      padding: EdgeInsets.fromLTRB(80.0, 30.0, 80.0, 00.0),
-                      child: Column(children: <Widget>[
-                        CustomImage(
-                            resPath: "assets/graphics/cuac-logo.png",
-                            radius: 0.0,
-                            background: false),
-                        SizedBox(height: 60)
-                      ]))
-                  : isLoadingHome
-                      ? GlowingProgressIndicator(
-                          child: Container(
+                                            )),
+                                        SizedBox(width: 22.0)
+                                      ]))),
+                  Padding(
+                      padding: EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
+                      child: Text(
+                        'Ahora suena',
+                        style: TextStyle(
+                            letterSpacing: 1.5,
+                            color: _colors.font,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500),
+                      )),
+                  Padding(
+                      padding: const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
+                      child: NeumorphicCardHorizontal(
+                        onElementClicked: () {
+                          if (isTimeTableEmpty) {
+                            showTimeTableEmptySnackbar();
+                          } else {
+                            _presenter.nowPlayingClicked(_timeTable);
+                          }
+                        },
+                        active: false,
+                        image: _nowProgram.logo_url,
+                        label: _nowProgram.name,
+                      )),
+                  shouldShowPlayer
+                      ? Container(
+                          width: queryData.size.width,
+                          padding: EdgeInsets.fromLTRB(80.0, 30.0, 80.0, 00.0),
+                          child: Column(children: <Widget>[
+                            CustomImage(
+                                resPath: "assets/graphics/cuac-logo.png",
+                                radius: 0.0,
+                                background: false),
+                            SizedBox(height: 60)
+                          ]))
+                      : isLoadingHome
+                          ? GlowingProgressIndicator(
+                              child: Container(
+                                  width: queryData.size.width,
+                                  padding: EdgeInsets.fromLTRB(
+                                      80.0, 40.0, 80.0, 0.0),
+                                  child: CustomImage(
+                                      resPath: "assets/graphics/cuac-logo.png",
+                                      radius: 0.0,
+                                      background: false)),
+                            )
+                          : Container(
                               width: queryData.size.width,
                               padding:
                                   EdgeInsets.fromLTRB(80.0, 40.0, 80.0, 0.0),
@@ -627,20 +649,12 @@ class MyHomePageState extends State<MyHomePage>
                                   resPath: "assets/graphics/cuac-logo.png",
                                   radius: 0.0,
                                   background: false)),
-                        )
-                      : Container(
-                          width: queryData.size.width,
-                          padding: EdgeInsets.fromLTRB(80.0, 40.0, 80.0, 0.0),
-                          child: CustomImage(
-                              resPath: "assets/graphics/cuac-logo.png",
-                              radius: 0.0,
-                              background: false)),
-              SizedBox(
-                height: 20.0,
-              )
-            ],
-          ),
-        ));
+                  SizedBox(
+                    height: 20.0,
+                  )
+                ],
+              ),
+            )));
   }
 
   Widget _getNewsLayout() {
@@ -657,7 +671,7 @@ class MyHomePageState extends State<MyHomePage>
               Widget element = Container();
               if (index == 0) {
                 element = Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.fromLTRB(20.0, 30.0, 0.0, 20.0),
                     child: Text(
                       'Noticias',
                       style: TextStyle(
@@ -754,7 +768,7 @@ class MyHomePageState extends State<MyHomePage>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                        SizedBox(height: 30.0),
+                        SizedBox(height: 35.0),
                         Padding(
                             padding: EdgeInsets.all(20.0),
                             child: Text(
