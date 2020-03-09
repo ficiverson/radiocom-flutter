@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>981411379872-jnj8ousl5lg6m2i5ibuqoj39dhs7i26q.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.981411379872-jnj8ousl5lg6m2i5ibuqoj39dhs7i26q</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCmykROwVIFTeYnLPaGSKOt0t4PP4IAn7w</string>
+	<key>GCM_SENDER_ID</key>
+	<string>981411379872</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>org.cuacfm.radio.coruna</string>
+	<key>PROJECT_ID</key>
+	<string>cuac-fm-f2bb8</string>
+	<key>STORAGE_BUCKET</key>
+	<string>cuac-fm-f2bb8.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:981411379872:ios:fad8e67b93ad06bb26e7c5</string>
+	<key>DATABASE_URL</key>
+	<string>https://cuac-fm-f2bb8.firebaseio.com</string>
+</dict>
+</plist>
