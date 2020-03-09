@@ -207,6 +207,7 @@ class MyHomePageState extends State<MyHomePage>
 
     if (Platform.isAndroid) {
       _notificationEvent.receiveBroadcastStream().listen((onData) {
+        print("pause/notification");
         if (_notificationEvent != null) {
           setState(() {
             _presenter.currentPlayer.release();
@@ -585,7 +586,7 @@ class MyHomePageState extends State<MyHomePage>
                   child: Text(
                     'Ahora suena',
                     style: TextStyle(
-                        letterSpacing: 1.2,
+                        letterSpacing: 1.5,
                         color: _colors.font,
                         fontSize: 20,
                         fontWeight: FontWeight.w500),

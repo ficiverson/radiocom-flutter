@@ -28,7 +28,7 @@ class RadioStation {
         longitude = -8.4090277,
         news_rss = "https://cuacfm.org/feed/",
         stream_url = "http://streaming.cuacfm.org/cuacfm.mp3",
-        facebook_url = "https://www.facebook.com/cadenaser/",
+        facebook_url = "https://www.facebook.com/cuacfm/",
         twitter_url = "https://twitter.com/cuacfm/";
 
   RadioStation.fromInstance(Map<String, dynamic> map)
