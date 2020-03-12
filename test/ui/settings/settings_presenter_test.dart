@@ -90,6 +90,7 @@ void main() {
     await Future.delayed(Duration(milliseconds: 200));
 
     expect(view.viewState[0], equals(SettingsState.onDarkMode));
+    expect(view.viewState[1], equals(SettingsState.onLiveNotification));
   });
 
   test(

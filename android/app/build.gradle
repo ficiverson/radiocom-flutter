@@ -41,18 +41,19 @@ android {
         applicationId "com.app.cuacfm.radio.coruna"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 12
-        versionName "3.0.0"
+        versionCode 15
+        versionName "3.0.3"
+        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     //flutter build appbundle
     signingConfigs {
         release {
-            keyAlias "mriv"
-            keyPassword "1034"
-            storeFile file("pathto/keystore")
-            storePassword "1034"
+            keyAlias "sorry"
+            keyPassword "sorry"
+            storeFile file("/sorry/sorry/sorry/sorry")
+            storePassword "sorry"
         }
     }
     buildTypes {

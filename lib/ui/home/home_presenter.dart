@@ -14,6 +14,7 @@ import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/models/time_table.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
+import 'package:cuacfm/ui/player/current_timer.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:injector/injector.dart';
@@ -63,6 +64,7 @@ class HomePresenter {
   HomeRouterContract router;
   ConnectionContract connection;
   CurrentPlayerContract currentPlayer;
+  CurrentTimerContract currentTimer;
   Timer _timer;
   bool isLoading = false;
 
@@ -74,6 +76,7 @@ class HomePresenter {
       @required this.getLiveDataUseCase,
       @required this.getTimetableUseCase,
       @required this.getNewsUseCase}) {
+    currentTimer = Injector.appInstance.getDependency<CurrentTimerContract>();
     connection = Injector.appInstance.getDependency<ConnectionContract>();
     currentPlayer = Injector.appInstance.getDependency<CurrentPlayerContract>();
   }
@@ -145,7 +148,11 @@ class HomePresenter {
   }
 
   onSelectedEpisode() async {
-    await currentPlayer.resume();
+    if(currentPlayer.playerState == PlayerState.stop){
+      await currentPlayer.play();
+    } else {
+      await currentPlayer.resume();
+    }
     _homeView.onNotifyUser(StatusPlayer.PLAYING);
   }
 

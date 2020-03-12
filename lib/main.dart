@@ -4,6 +4,7 @@ import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/services.dart';
@@ -18,12 +19,12 @@ void main() {
   FlutterError.onError = (FlutterErrorDetails details) {
     Crashlytics.instance.recordFlutterError(details);
   };
-
   runApp(new MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseInAppMessaging firebaseInAppMessaging = FirebaseInAppMessaging();
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
         FirebaseAnalyticsObserver(analytics: analytics),
       ],
       theme: new ThemeData(
-        canvasColor: Colors.white,
+        canvasColor: Colors.transparent,
         primarySwatch: Colors.grey,
         primaryColorBrightness: Brightness.light,
       ),
@@ -66,3 +67,5 @@ Widget errorScreen(dynamic detailsException) {
                     child: Text('Exeption Details:\n\n$detailsException')),
           )));
 }
+
+//redo test cases

@@ -106,7 +106,6 @@ class DetailPodcastState extends State<DetailPodcastPage>
           setState(() {
             _presenter.currentPlayer.release();
             _presenter.currentPlayer.isPodcast = false;
-            _presenter.currentPlayer.episode = null;
             shouldShowPlayer = false;
           });
         }

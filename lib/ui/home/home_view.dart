@@ -213,7 +213,6 @@ class MyHomePageState extends State<MyHomePage>
           setState(() {
             _presenter.currentPlayer.release();
             _presenter.currentPlayer.isPodcast = false;
-            _presenter.currentPlayer.episode = null;
             shouldShowPlayer = false;
           });
         }
@@ -238,6 +237,15 @@ class MyHomePageState extends State<MyHomePage>
         onConnectionSuccess();
       }
     });
+
+    _presenter.currentTimer.timerCallback = (finnish) {
+      _presenter.currentPlayer.stop();
+      if (mounted) {
+        if(finnish){
+          setState(() {});
+        }
+      }
+    };
 
     WidgetsBinding.instance.addObserver(this);
   }
@@ -505,7 +513,7 @@ class MyHomePageState extends State<MyHomePage>
   Widget _getHomeLayout() {
     return Container(
         key: PageStorageKey<String>(BottomBarOption.HOME.toString()),
-        color: _colors.palidwhitedark,
+        color: _colors.palidwhite,
         width: queryData.size.width,
         height: queryData.size.height,
         child: SingleChildScrollView(
@@ -532,7 +540,7 @@ class MyHomePageState extends State<MyHomePage>
                       : isLoadingPlay
                           ? Container(height: 80.0, child: getLoadingState())
                           : Padding(
-                              padding: const EdgeInsets.fromLTRB(
+                              padding: EdgeInsets.fromLTRB(
                                   25.0, 30.0, 25.0, 0.0),
                               child: NeumorphicCardHorizontal(
                                   onElementClicked: () {

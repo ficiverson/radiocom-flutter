@@ -93,7 +93,6 @@ class SettingsDetailState extends State<SettingsDetail> with WidgetsBindingObser
           setState(() {
             _presenter.currentPlayer.release();
             _presenter.currentPlayer.isPodcast = false;
-            _presenter.currentPlayer.episode = null;
             shouldShowPlayer = false;
           });
         }

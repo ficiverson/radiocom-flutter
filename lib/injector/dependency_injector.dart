@@ -19,6 +19,7 @@ import 'package:cuacfm/ui/new-detail/new_detail.dart';
 import 'package:cuacfm/ui/new-detail/new_detail_presenter.dart';
 import 'package:cuacfm/ui/new-detail/new_detail_router.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
+import 'package:cuacfm/ui/player/current_timer.dart';
 import 'package:cuacfm/ui/podcast/all_podcast/all_podcast_presenter.dart';
 import 'package:cuacfm/ui/podcast/all_podcast/all_podcast_router.dart';
 import 'package:cuacfm/ui/podcast/all_podcast/all_podcast_view.dart';
@@ -83,6 +84,9 @@ class DependencyInjector {
   }
 
   loadPlayerModules() {
+    injector.registerSingleton<CurrentTimerContract>((Injector injector) {
+      return CurrentTimer();
+    });
     injector.registerSingleton<CurrentPlayerContract>((Injector injector) {
       return CurrentPlayer();
     });

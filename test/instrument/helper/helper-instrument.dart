@@ -6,7 +6,6 @@ class MockConnection extends Mock implements ConnectionContract {}
 
 class MockPlayer extends Mock implements CurrentPlayerContract {}
 
-
 void printMessages(List list) {
   list.forEach((data) {
     print(data.toString());

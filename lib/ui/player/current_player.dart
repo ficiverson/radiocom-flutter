@@ -151,6 +151,8 @@ class CurrentPlayer implements CurrentPlayerContract {
         audioPlayer.onPlayerCompletion.listen((event) {
           stop();
           position = Duration(seconds: 0);
+          restoreDuration = Duration(seconds: 0);
+          restorePosition = Duration(seconds: 0);
           seek(position);
           if (onUpdate != null) {
             onUpdate();
@@ -158,6 +160,7 @@ class CurrentPlayer implements CurrentPlayerContract {
         });
 
         audioPlayer.onDurationChanged.listen((Duration d) {
+          print(d);
           duration = d;
           if (onUpdate != null) {
             onUpdate();
@@ -204,9 +207,7 @@ class CurrentPlayer implements CurrentPlayerContract {
       audioPlayer.onPlayerError.listen((onError) {
         print(onError);
       });
-
       setVolume(1.0);
-
       if ((isPodcast && episode.audio != null && episode.audio.isNotEmpty) ||
           (!isPodcast &&
               now.streamUrl() != null &&

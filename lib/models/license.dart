@@ -49,7 +49,11 @@ class License {
       License("firebase_crashlytics",
           "https://pub.dartlang.org/packages/firebase_crashlytics \n\nCopyright 2018 The Chromium Authors. All rights reserved."),
       License("firebase_analytics",
-          "https://pub.dartlang.org/packages/firebase_analytics \n\nCopyright 2018 The Chromium Authors. All rights reserved.")
+          "https://pub.dartlang.org/packages/firebase_analytics \n\nCopyright 2018 The Chromium Authors. All rights reserved."),
+      License("firebase_in_app_messaging",
+          "https://pub.dartlang.org/packages/firebase_in_app_messaging \n\nCopyright 2018 The Chromium Authors. All rights reserved."),
+      License("countdown",
+          "https://pub.dartlang.org/packages/countdown \n\nBSD 3-Clause \"New\" or \"Revised\" License Copyright (c) 2015, BenNG")
     ];
   }
 }

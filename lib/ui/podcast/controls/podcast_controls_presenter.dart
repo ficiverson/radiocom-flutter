@@ -3,6 +3,7 @@ import 'package:cuacfm/domain/result/result.dart';
 import 'package:cuacfm/domain/usecase/get_live_program_use_case.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
+import 'package:cuacfm/ui/player/current_timer.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:flutter/widgets.dart';
 import 'package:injector/injector.dart';
@@ -15,12 +16,14 @@ abstract class PodcastControlsView {
 class PodcastControlsPresenter {
   PodcastControlsView _view;
   Invoker invoker;
+  CurrentTimerContract currentTimer;
   CurrentPlayerContract currentPlayer;
   ConnectionContract connection;
   GetLiveProgramUseCase getLiveDataUseCase;
 
   PodcastControlsPresenter(this._view,
       {@required this.invoker, @required this.getLiveDataUseCase}) {
+    currentTimer = Injector.appInstance.getDependency<CurrentTimerContract>();
     connection = Injector.appInstance.getDependency<ConnectionContract>();
     currentPlayer = Injector.appInstance.getDependency<CurrentPlayerContract>();
   }
@@ -28,6 +31,16 @@ class PodcastControlsPresenter {
   onViewResumed() async {
     if (await connection.isConnectionAvailable()) {
       getLiveProgram();
+    }
+  }
+
+  onTimerStart(Duration minutes, int index) {
+    if (currentPlayer.isPlaying()) {
+      if (currentTimer.isTimerRunning()) {
+        currentTimer.stopTimer();
+      }
+      currentTimer.currentTime = index;
+      currentTimer.startTimer(minutes);
     }
   }
 
@@ -62,6 +75,8 @@ class PodcastControlsPresenter {
   onPlayPause() async {
     if (currentPlayer.isPlaying()) {
       await currentPlayer.pause();
+    } else if(currentPlayer.playerState == PlayerState.stop) {
+      await currentPlayer.play();
     } else {
       await currentPlayer.resume();
     }

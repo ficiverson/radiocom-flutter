@@ -91,7 +91,6 @@ class NewDetailState extends State<NewDetail> with WidgetsBindingObserver  imple
           setState(() {
             _presenter.currentPlayer.release();
             _presenter.currentPlayer.isPodcast = false;
-            _presenter.currentPlayer.episode = null;
             shouldShowPlayer = false;
           });
         }

@@ -149,7 +149,6 @@ class AllPodcastState extends State<AllPodcast>
           setState(() {
             _presenter.currentPlayer.release();
             _presenter.currentPlayer.isPodcast = false;
-            _presenter.currentPlayer.episode = null;
             shouldShowPlayer = false;
           });
         }

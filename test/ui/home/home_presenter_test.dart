@@ -329,6 +329,24 @@ void main() {
       });
 
   test(
+      'that can play podcast in stop state',
+          () async {
+        when(mockRepository.getLiveBroadcast()).thenAnswer(
+                (_) => MockRadiocoRepository.now());
+        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockConnection.isConnectionAvailable())
+            .thenAnswer((_) => Future.value(true));
+        when(mockPlayer.isPodcast).thenReturn(true);
+        when(mockPlayer.playerState).thenReturn(PlayerState.stop);
+
+        presenter.onSelectedEpisode();
+        await Future.delayed(Duration(milliseconds: 200));
+
+        expect(view.viewState[0], equals(HomeState.notifyUser));
+        expect((view.data[0] as StatusPlayer), equals(StatusPlayer.PLAYING));
+      });
+
+  test(
       'that can resume podcast',
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(

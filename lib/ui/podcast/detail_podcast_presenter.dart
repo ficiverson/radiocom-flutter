@@ -96,7 +96,11 @@ class DetailPodcastPresenter {
   }
 
   onResume() async {
-    await currentPlayer.resume();
+    if(currentPlayer.playerState == PlayerState.stop){
+      await currentPlayer.play();
+    } else {
+      await currentPlayer.resume();
+    }
   }
 
   onPause() async {

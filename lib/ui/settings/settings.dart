@@ -33,6 +33,7 @@ class SettingsState extends State<Settings>
       EventChannel('cuacfm.flutter.io/updateNotification');
   SnackBar snackBarConnection;
   bool isDarkModeEnabled = false;
+  bool isLiveNotificationEnabled = false;
 
   SettingsState() {
     DependencyInjector().injectByView(this);
@@ -90,7 +91,6 @@ class SettingsState extends State<Settings>
           setState(() {
             _presenter.currentPlayer.release();
             _presenter.currentPlayer.isPodcast = false;
-            _presenter.currentPlayer.episode = null;
             shouldShowPlayer = false;
           });
         }
@@ -158,6 +158,13 @@ class SettingsState extends State<Settings>
   void onDarkModeStatus(bool status) {
     setState(() {
       isDarkModeEnabled = status;
+    });
+  }
+
+  @override
+  onSettingsNotification(bool status) {
+    setState(() {
+      isLiveNotificationEnabled = status;
     });
   }
 
@@ -292,6 +299,33 @@ class SettingsState extends State<Settings>
                                 activeColor: _colors.yellow,
                               ):Icon(Icons.lock,
                                   color: _colors.grey, size: 25.0)))),
+                  getDivider(),
+                  Material(
+                      color: _colors.transparent,
+                      child: Container(
+                          margin: EdgeInsets.fromLTRB(10.0, 0.0, 20.0, 0.0),
+                          child: ListTile(
+                              title: Text(
+                                "Información de la parrilla",
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    letterSpacing: 1.2,
+                                    color: _colors.font,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16),
+                              ),
+                              trailing:  Switch(
+                                value: isLiveNotificationEnabled,
+                                onChanged:(value) {
+                                  _presenter.onLiveNotificationStatus(value);
+                                  setState(() {
+                                    isLiveNotificationEnabled = value;
+                                  });
+                                },
+                                activeTrackColor: _colors.yellow,
+                                activeColor: _colors.yellow,
+                              )))),
                   getDivider(),
                   SizedBox(height: 15),
                   Container(

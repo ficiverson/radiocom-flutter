@@ -13,7 +13,9 @@ import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:injector/injector.dart';
+import 'package:intl/intl.dart';
 import 'package:progress_indicators/progress_indicators.dart';
 
 class PodcastControls extends StatefulWidget {
@@ -36,7 +38,9 @@ class PodcastControlsState extends State<PodcastControls>
   EventChannel _notificationEvent =
       EventChannel('cuacfm.flutter.io/updateNotificationPodcastControl');
   SnackBar snackBarConnection;
-
+  int selectedIndex = 0;
+  Duration currentTimeCountdown = Duration.zero;
+  bool shouldShowTimer = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   PodcastControlsState() {
@@ -45,6 +49,7 @@ class PodcastControlsState extends State<PodcastControls>
 
   @override
   Widget build(BuildContext context) {
+    selectedIndex = _presenter.currentTimer.currentTime;
     mediaQuery = MediaQuery.of(context);
     _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     loadingView = loading ? getLoadingState() : Container();
@@ -70,6 +75,7 @@ class PodcastControlsState extends State<PodcastControls>
     }
     _presenter = Injector.appInstance.getDependency<PodcastControlsPresenter>();
     currentPlayer = Injector.appInstance.getDependency<CurrentPlayerContract>();
+    shouldShowTimer = _presenter.currentTimer.currentTime != 0;
     currentPlayer.onUpdate = () {
       if (currentPlayer.isPodcast) {
         setState(() {});
@@ -94,6 +100,23 @@ class PodcastControlsState extends State<PodcastControls>
         }
       }
     };
+
+    _presenter.currentTimer.timerControlsCallback = (finnish) {
+      _presenter.currentPlayer.stop();
+      if (mounted) {
+        if (finnish) {
+          setState(() {});
+        }
+      }
+    };
+
+    _presenter.currentTimer.timeControlsDurationCallback = (time) {
+      currentTimeCountdown = time;
+      if (mounted) {
+        setState(() {});
+      }
+    };
+
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -169,7 +192,12 @@ class PodcastControlsState extends State<PodcastControls>
                                     BorderRadius.all(Radius.circular(25.0)),
                                 color: _colors.palidwhitedark),
                             margin: EdgeInsets.fromLTRB(218.0, 15.0, 0.0, 0.0),
-                            child: CustomImage(height: 22, width: 22,radius: 25,fit: BoxFit.fill,resPath: "assets/graphics/empty-logo.png"))
+                            child: CustomImage(
+                                height: 22,
+                                width: 22,
+                                radius: 25,
+                                fit: BoxFit.fill,
+                                resPath: "assets/graphics/empty-logo.png"))
                       ])),
                   Container(
                       margin: EdgeInsets.fromLTRB(
@@ -245,14 +273,17 @@ class PodcastControlsState extends State<PodcastControls>
                                 Text(
                                     printDuration(!currentPlayer.isPodcast
                                         ? Duration.zero
-                                        : currentPlayer.duration),
+                                        : currentPlayer.duration ==
+                                                Duration.zero
+                                            ? null
+                                            : currentPlayer.duration),
                                     style: TextStyle(
                                         color: _colors.fontGrey,
                                         fontWeight: FontWeight.w700))
                               ]))
                       : Container(),
                   Container(
-                      height: mediaQuery.size.height * 0.10,
+                      height: mediaQuery.size.height * 0.03,
                       width: mediaQuery.size.width,
                       child: Center(child: loadingView)),
                   Container(
@@ -286,7 +317,83 @@ class PodcastControlsState extends State<PodcastControls>
                                       _presenter.onSeek(30);
                                     })
                                 : Container(width: 40)
-                          ]))
+                          ])),
+                  _presenter.currentPlayer.isPlaying()
+                      ? Padding(
+                          padding: EdgeInsets.fromLTRB(50.0, 10.0, 50.0, 0.0),
+                          child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  shouldShowTimer = !shouldShowTimer;
+                                });
+                              },
+                              child: Container(
+                                  child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                    Icon(
+                                        shouldShowTimer
+                                            ? Icons.keyboard_arrow_up
+                                            : Icons.keyboard_arrow_down,
+                                        color: _colors.font),
+                                    SizedBox(width: 10),
+                                    Text(getTextForCountDown(),
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 17.0,
+                                          letterSpacing: 2.0,
+                                          fontWeight: FontWeight.w700,
+                                          color: _colors.font,
+                                        ))
+                                  ]))))
+                      : Container(),
+                  _presenter.currentPlayer.isPlaying() && shouldShowTimer
+                      ? Padding(
+                          padding: EdgeInsets.fromLTRB(50.0, 20.0, 50.0, 0.0),
+                          child: Wrap(
+                            children: List<Widget>.generate(
+                              6,
+                              (int index) {
+                                return Padding(
+                                    padding:
+                                        EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
+                                    child: RawChip(
+                                      showCheckmark: true,
+                                      checkmarkColor: _colors.white,
+                                      labelStyle: TextStyle(
+                                        fontSize: 15.0,
+                                        letterSpacing: 1.1,
+                                        fontWeight: FontWeight.w400,
+                                        color: index == selectedIndex
+                                            ? _colors.white
+                                            : _colors.fontH1,
+                                      ),
+                                      label: Text(
+                                          index == 0
+                                              ? "Off      "
+                                              : '${index * 15} min',
+                                          textAlign: TextAlign.center),
+                                      selected: selectedIndex == index,
+                                      selectedColor: _colors.yellow,
+                                      backgroundColor: _colors.palidwhitedark,
+                                      onSelected: (bool selected) {
+                                        if (index == 0) {
+                                          currentTimeCountdown = Duration.zero;
+                                        }
+                                        _presenter.onTimerStart(
+                                            Duration(minutes: index * 15),
+                                            index);
+                                        setState(() {
+                                          selectedIndex = index;
+                                        });
+                                      },
+                                    ));
+                              },
+                            ).toList(),
+                          ))
+                      : Container()
                 ]))));
   }
 
@@ -299,14 +406,18 @@ class PodcastControlsState extends State<PodcastControls>
   }
 
   String printDuration(Duration duration) {
-    String twoDigits(int n) {
-      if (n >= 10) return "$n";
-      return "0$n";
-    }
+    if (duration == null) {
+      return "";
+    } else {
+      String twoDigits(int n) {
+        if (n >= 10) return "$n";
+        return "0$n";
+      }
 
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+      String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+      String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+      return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+    }
   }
 
   Widget getLoadingState() {
@@ -317,5 +428,32 @@ class PodcastControlsState extends State<PodcastControls>
       fontSize: 20.0,
       dotSpacing: 5.0,
     ));
+  }
+
+  String getTextForCountDown() {
+    DateTime date =
+        DateFormat("hh:mm:ss").parse(currentTimeCountdown.toString());
+    var hour = date.hour > 0 ? date.hour.toString() + ":" : "";
+    var minutes = date.minute > 0
+        ? date.minute > 9
+            ? date.minute.toString() + ":"
+            : "0" + date.minute.toString() + ":"
+        : "";
+    var seconds = date.second == 0
+        ? "00"
+        : date.second > 0
+            ? date.second > 9
+                ? date.second < 60 ? date.second.toString() : ""
+                : date.minute == 0
+                    ? date.second.toString()
+                    : "0" + date.second.toString()
+            : "";
+    if (date.minute == 0 && date.hour == 0 && date.second != 0) {
+      seconds = seconds + " segundos.";
+    }
+    var elapsedTime = hour + minutes + seconds;
+    return currentTimeCountdown != Duration.zero
+        ? "Autoapagado " + elapsedTime
+        : "Autoapagado";
   }
 }

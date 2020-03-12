@@ -19,10 +19,8 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -256,17 +254,13 @@ public class AudioService extends Service {
 
 			InputStream in;
 			try {
-
 				URL url = new URL(this.imageUrl);
 				HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 				connection.setDoInput(true);
 				connection.connect();
 				in = connection.getInputStream();
-				Bitmap myBitmap = BitmapFactory.decodeStream(in);
-				return myBitmap;
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
+				return BitmapFactory.decodeStream(in);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			return null;
@@ -278,7 +272,7 @@ public class AudioService extends Service {
 			super.onPostExecute(result);
 			if (result == null) {
 				Bitmap local = BitmapFactory.decodeResource(context.getResources(),
-						R.drawable.ic_launcher);
+						R.drawable.splash);
 				Palette.from(local).generate(new Palette.PaletteAsyncListener() {
 					public void onGenerated(Palette p) {
 						sendNotification(p.getDominantColor(ContextCompat.getColor(context, R.color.notification_background)), local);
@@ -312,7 +306,7 @@ public class AudioService extends Service {
 					.setContentTitle(title)
 					.setContentText(subtitle)
 					.setLargeIcon(result)
-					.setColor(color)//ContextCompat.getColor(context, R.color.notification_background))
+					.setColor(color)
 					.addAction(R.drawable.ic_pause, getString(R.string.close_notification), closeIntent)
 					.setPriority(NotificationCompat.PRIORITY_DEFAULT);
 

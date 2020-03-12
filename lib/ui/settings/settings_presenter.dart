@@ -9,6 +9,7 @@ import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/settings/settings-detail/settings_detail.dart';
 import 'package:cuacfm/ui/settings/settings_router.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:injector/injector.dart';
 import 'package:maps_launcher/maps_launcher.dart';
@@ -19,6 +20,7 @@ abstract class SettingsView {
   onNewData();
   onConnectionError();
   onDarkModeStatus(bool status);
+  onSettingsNotification(bool status);
 }
 
 
@@ -29,6 +31,7 @@ class SettingsPresenter {
   GetLiveProgramUseCase getLiveDataUseCase;
   ConnectionContract connection;
   CurrentPlayerContract currentPlayer;
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
   SettingsPresenter(this._settingsView, {@required this.invoker, @required this.router,@required this.getLiveDataUseCase,
   }) {
@@ -38,6 +41,7 @@ class SettingsPresenter {
 
   init() async {
     _settingsView.onDarkModeStatus(await _getDarkModeStatus());
+    _settingsView.onSettingsNotification(await _getLiveNotificationStatus());
   }
 
   onViewResumed() async {
@@ -71,7 +75,11 @@ class SettingsPresenter {
   }
 
   onResume() async {
-    await currentPlayer.resume();
+    if(currentPlayer.playerState == PlayerState.stop){
+      await currentPlayer.play();
+    } else {
+      await currentPlayer.resume();
+    }
   }
 
   onPause() async {
@@ -128,7 +136,23 @@ class SettingsPresenter {
     await prefs.setBool('dark_mode_enabled', setting);
   }
 
+  onLiveNotificationStatus(bool status) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('live_shows_info', status);
+    if(status) {
+      _firebaseMessaging.subscribeToTopic("live_shows_info");
+    } else {
+      _firebaseMessaging.unsubscribeFromTopic("live_shows_info");
+    }
+  }
+
   //private methods
+
+  _getLiveNotificationStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var result =  prefs.getBool('live_shows_info');
+    return result==null? true : result;
+  }
 
   _getDarkModeStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

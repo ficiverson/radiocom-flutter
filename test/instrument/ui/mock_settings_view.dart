@@ -8,6 +8,7 @@ enum SettingsState {
   noConnection,
   onNewData,
   onDarkMode,
+  onLiveNotification,
   goToEpisode,
   goToHistory,
   goToLegal
@@ -30,6 +31,12 @@ class MockSettingsView implements SettingsView {
   @override
   onDarkModeStatus(bool status) {
     viewState.add(SettingsState.onDarkMode);
+    data.add(status);
+  }
+
+  @override
+  onSettingsNotification(bool status) {
+    viewState.add(SettingsState.onLiveNotification);
     data.add(status);
   }
 }

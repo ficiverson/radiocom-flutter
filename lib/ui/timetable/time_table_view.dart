@@ -113,7 +113,6 @@ class TimetableState extends State<Timetable> with WidgetsBindingObserver implem
           setState(() {
             _presenter.currentPlayer.release();
             _presenter.currentPlayer.isPodcast = false;
-            _presenter.currentPlayer.episode = null;
             shouldShowPlayer = false;
           });
         }

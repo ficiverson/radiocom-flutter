@@ -1,6 +1,7 @@
 import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
+import 'package:cuacfm/ui/player/current_timer.dart';
 import 'package:cuacfm/ui/podcast/controls/podcast_controls_presenter.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:flutter/cupertino.dart';
@@ -149,6 +150,22 @@ void main() {
 
 
   test(
+      'that can resume if the audio is paused and update the view',
+          () async {
+        when(mockRepository.getLiveBroadcast()).thenAnswer(
+                (_) => MockRadiocoRepository.now());
+        when(mockConnection.isConnectionAvailable())
+            .thenAnswer((_) => Future.value(true));
+        when(mockPlayer.isPlaying()).thenReturn(false);
+        when(mockPlayer.playerState).thenReturn(PlayerState.stop);
+
+        presenter.onPlayPause();
+        await Future.delayed(Duration(milliseconds: 200));
+
+        expect(view.viewState[0], equals(PodcastControlState.onNewData));
+      });
+
+  test(
       'that can play if the audio is paused and update the view',
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
@@ -177,5 +194,52 @@ void main() {
 
         expect(view.viewState[0], equals(PodcastControlState.onNewData));
       });
+
+  test(
+      'that can set a timer when its not index to put to 0',
+          () async {
+        when(mockRepository.getLiveBroadcast()).thenAnswer(
+                (_) => MockRadiocoRepository.now());
+        when(mockConnection.isConnectionAvailable())
+            .thenAnswer((_) => Future.value(true));
+        when(mockPlayer.isPlaying()).thenReturn(true);
+
+        presenter.onTimerStart(Duration(milliseconds: 200),1);
+
+        CurrentTimerContract timer = Injector.appInstance.getDependency<CurrentTimerContract>();
+        expect(timer.isTimerRunning(), true);
+      });
+
+  test(
+      'that can set a timer when its index  0',
+          () async {
+        when(mockRepository.getLiveBroadcast()).thenAnswer(
+                (_) => MockRadiocoRepository.now());
+        when(mockConnection.isConnectionAvailable())
+            .thenAnswer((_) => Future.value(true));
+        when(mockPlayer.isPlaying()).thenReturn(true);
+
+        presenter.onTimerStart(Duration(milliseconds: 200),0);
+
+        CurrentTimerContract timer = Injector.appInstance.getDependency<CurrentTimerContract>();
+        expect(timer.isTimerRunning(), false);
+      });
+
+  test(
+      'that can set a timer when its not running',
+          () async {
+        when(mockRepository.getLiveBroadcast()).thenAnswer(
+                (_) => MockRadiocoRepository.now());
+        when(mockConnection.isConnectionAvailable())
+            .thenAnswer((_) => Future.value(true));
+        when(mockPlayer.isPlaying()).thenReturn(true);
+
+        presenter.onTimerStart(Duration.zero,1);
+        await Future.delayed(Duration(milliseconds: 200));
+
+        CurrentTimerContract timer = Injector.appInstance.getDependency<CurrentTimerContract>();
+        expect(timer.isTimerRunning(), false);
+      });
+
 
 }
