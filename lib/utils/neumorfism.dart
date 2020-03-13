@@ -73,22 +73,28 @@ class NeumorphicEmptyView extends StatelessWidget {
   Widget build(BuildContext context) {
     _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     return Container(
-      width: width,
-      height: height,
-      decoration: neumorphicInverseBox(_colors),
-      child: Column(children: <Widget>[Padding(padding: EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),child:Text(text,
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.left,
-          style: TextStyle(
-              wordSpacing: 3.0,
-              color: _colors.font,
-              fontWeight: FontWeight.w500,
-              fontSize: 20))),CustomImage(width: 200,height: 200,
-          resPath: "assets/graphics/empty-logo.png",
-          radius: 0.0,
-          background: false),])
-    );
+        width: width,
+        height: height,
+        decoration: neumorphicInverseBox(_colors),
+        child: Column(children: <Widget>[
+          Padding(
+              padding: EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
+              child: Text(text,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                      wordSpacing: 3.0,
+                      color: _colors.font,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 20))),
+          CustomImage(
+              width: 200,
+              height: 200,
+              resPath: "assets/graphics/empty-logo.png",
+              radius: 0.0,
+              background: false),
+        ]));
   }
 }
 
@@ -138,18 +144,19 @@ class NeumorphicCardVertical extends StatelessWidget {
         CustomImage(resPath: image, fit: BoxFit.cover, radius: 15.0);
     if (imageOverLay) {
       imageContent = Stack(fit: StackFit.passthrough, children: <Widget>[
-        removeShader? CustomImage(
-            resPath: image, fit: BoxFit.cover, radius: 15.0): ShaderMask(
-            shaderCallback: (Rect bounds) {
-              return RadialGradient(
-                center: Alignment.center,
-                radius: 1.0,
-                colors: <Color>[_colors.yellow, _colors.orange],
-                tileMode: TileMode.mirror,
-              ).createShader(bounds);
-            },
-            child: CustomImage(
-                resPath: image, fit: BoxFit.fitHeight, radius: 15.0)),
+        removeShader
+            ? CustomImage(resPath: image, fit: BoxFit.cover, radius: 15.0)
+            : ShaderMask(
+                shaderCallback: (Rect bounds) {
+                  return RadialGradient(
+                    center: Alignment.center,
+                    radius: 1.0,
+                    colors: <Color>[_colors.yellow, _colors.orange],
+                    tileMode: TileMode.mirror,
+                  ).createShader(bounds);
+                },
+                child: CustomImage(
+                    resPath: image, fit: BoxFit.fitHeight, radius: 15.0)),
         Center(
             child: Text(
           label,
@@ -209,13 +216,15 @@ class NeumorphicCardHorizontal extends StatelessWidget {
   final double size;
   final VoidCallback onElementClicked;
   RadiocomColorsConract _colors;
+  final int showUpDownRight;
   NeumorphicCardHorizontal(
       {this.active,
       this.icon,
       this.label,
       this.image,
       this.size,
-      this.onElementClicked});
+      this.onElementClicked,
+      this.showUpDownRight = 0});
 
   _onElementClicked() {
     if (onElementClicked != null) {
@@ -245,7 +254,7 @@ class NeumorphicCardHorizontal extends StatelessWidget {
             children: <Widget>[
               iconCard,
               SizedBox(width: 15),
-              Text(label.length>25?label.substring(0, 25) + "...":label,
+              Text(label.length > 25 ? label.substring(0, 25) + "..." : label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.left,
@@ -261,8 +270,14 @@ class NeumorphicCardHorizontal extends StatelessWidget {
                           fontSize: 20)),
               Spacer(),
               image != null
-                  ? Icon(Icons.keyboard_arrow_right,
-                      color: _colors.yellow, size: 40.0)
+                  ? Icon(
+                      showUpDownRight == 0
+                          ? Icons.keyboard_arrow_right
+                          : showUpDownRight == 1
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                      color: _colors.yellow,
+                      size: 40.0)
                   : Spacer(),
             ],
           ),

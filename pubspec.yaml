@@ -71,6 +71,7 @@ flutter:
       - assets/graphics/categories/goverment.jpeg
       - assets/graphics/categories/health.jpeg
       - assets/graphics/categories/tech.jpeg
+      - assets/graphics/watch.jpg
 
   fonts:
       - family: Montserrat

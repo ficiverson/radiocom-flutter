@@ -151,6 +151,9 @@ class SettingsPresenter {
   _getLiveNotificationStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var result =  prefs.getBool('live_shows_info');
+    if(result == null){
+      onLiveNotificationStatus(true);
+    }
     return result==null? true : result;
   }
 

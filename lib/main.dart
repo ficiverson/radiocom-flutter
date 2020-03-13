@@ -67,5 +67,3 @@ Widget errorScreen(dynamic detailsException) {
                     child: Text('Exeption Details:\n\n$detailsException')),
           )));
 }
-
-//redo test cases

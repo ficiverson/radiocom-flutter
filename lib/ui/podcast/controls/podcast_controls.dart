@@ -320,41 +320,28 @@ class PodcastControlsState extends State<PodcastControls>
                           ])),
                   _presenter.currentPlayer.isPlaying()
                       ? Padding(
-                          padding: EdgeInsets.fromLTRB(50.0, 10.0, 50.0, 0.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                setState(() {
+                          padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0.0),
+                          child: NeumorphicCardHorizontal(
+                              showUpDownRight : shouldShowTimer?1:2,
+                            onElementClicked: () {
+                              setState(() {
                                   shouldShowTimer = !shouldShowTimer;
                                 });
-                              },
-                              child: Container(
-                                  child: Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: <Widget>[
-                                    Icon(
-                                        shouldShowTimer
-                                            ? Icons.keyboard_arrow_up
-                                            : Icons.keyboard_arrow_down,
-                                        color: _colors.font),
-                                    SizedBox(width: 10),
-                                    Text(getTextForCountDown(),
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: 17.0,
-                                          letterSpacing: 2.0,
-                                          fontWeight: FontWeight.w700,
-                                          color: _colors.font,
-                                        ))
-                                  ]))))
+                            },
+                            active: shouldShowTimer,
+                            image: "assets/graphics/watch.jpg",
+                            label: getTextForCountDown()))
                       : Container(),
                   _presenter.currentPlayer.isPlaying() && shouldShowTimer
                       ? Padding(
-                          padding: EdgeInsets.fromLTRB(50.0, 20.0, 50.0, 0.0),
-                          child: Wrap(
+                          padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
+                          child: NeumorphicView(
+                              isFullScreen: false,
+                              child: Padding(
+                                  padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
+                                  child:Wrap(
                             children: List<Widget>.generate(
-                              6,
+                              8,
                               (int index) {
                                 return Padding(
                                     padding:
@@ -392,7 +379,7 @@ class PodcastControlsState extends State<PodcastControls>
                                     ));
                               },
                             ).toList(),
-                          ))
+                                  ))))
                       : Container()
                 ]))));
   }
@@ -453,7 +440,7 @@ class PodcastControlsState extends State<PodcastControls>
     }
     var elapsedTime = hour + minutes + seconds;
     return currentTimeCountdown != Duration.zero
-        ? "Autoapagado " + elapsedTime
+        ? "Autoapagado en: " + elapsedTime
         : "Autoapagado";
   }
 }
