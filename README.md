@@ -1,4 +1,4 @@
-# radiocom-flutter
+# radiocom-flutter [![Build Status](https://app.bitrise.io/app/a2d0176896f511a0/status.svg?token=k3AcmnfkVh_weNRR8_z5zQ&branch=master)](https://app.bitrise.io/app/a2d0176896f511a0)
 
 This is a flutter application for Community Media Stations based in radioco APIs.
 
