@@ -14,7 +14,7 @@ import 'new_detail_presenter.dart';
 
 class NewDetail extends StatefulWidget {
   NewDetail({Key key, this.newItem}) : super(key: key);
-  New newItem;
+  final New newItem;
   @override
   State createState() => new NewDetailState();
 }
@@ -72,7 +72,6 @@ class NewDetailState extends State<NewDetail> with WidgetsBindingObserver  imple
             });
           })
     );
-    ;
   }
 
   @override

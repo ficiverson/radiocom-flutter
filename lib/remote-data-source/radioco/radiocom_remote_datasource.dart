@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:cuacfm/data/datasource/radioco_remote_datasource.dart';
 import 'package:cuacfm/models/episode.dart';
@@ -77,7 +76,7 @@ class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
           Injector.appInstance.getDependency<RadioStation>();
 
       List<dynamic> res = await this.client.get(
-          Uri.parse(radioStation.news_rss),
+          Uri.parse(radioStation.newsRss),
           responseType: HTTPResponseType.XML);
       List<New> newsList = res.map((n) => new New.fromInstance(n)).toList();
       return newsList;

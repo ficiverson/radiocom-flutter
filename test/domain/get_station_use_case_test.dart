@@ -24,7 +24,7 @@ void main() {
 
     invoker.execute(useCase).listen(expectAsync1((result) {
       expect(result.status, equals(Status.ok));
-      expect((result.getData() as RadioStation).station_name, equals("CUAC FM INSTRUMENT"));
+      expect((result.getData() as RadioStation).stationName, equals("CUAC FM INSTRUMENT"));
       expect(result is Success, equals(true));
     }));
   });
@@ -34,7 +34,7 @@ void main() {
 
     invoker.execute(useCase).listen(expectAsync1((result) {
       expect(result.status, equals(Status.fail));
-      expect((result.getData() as RadioStation).station_name, equals("CUAC FM"));
+      expect((result.getData() as RadioStation).stationName, equals("CUAC FM"));
       expect(result is Error, equals(true));
     }));
   });

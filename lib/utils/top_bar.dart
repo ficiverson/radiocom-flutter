@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
 
-import 'neumorfism.dart';
-
 typedef void QueryCallback(String query);
 
 enum TopBarOption { MODAL, NORMAL }
@@ -22,14 +20,14 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
       this.onQueryCallback,
       this.onQuerySubmit});
 
-  String title;
-  TopBarOption topBarOption;
-  IconData rightIcon;
-  VoidCallback onRightClicked;
-  bool isSearch;
-  QueryCallback onQueryCallback;
-  QueryCallback onQuerySubmit;
-  String screenName;
+  final String title;
+  final TopBarOption topBarOption;
+  final IconData rightIcon;
+  final VoidCallback onRightClicked;
+  final bool isSearch;
+  final QueryCallback onQueryCallback;
+  final QueryCallback onQuerySubmit;
+  final String screenName;
 
   @override
   State<StatefulWidget> createState() => TopBarState();

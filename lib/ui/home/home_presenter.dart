@@ -53,7 +53,6 @@ abstract class HomeView {
 enum StatusPlayer { PLAYING, FAILED, STOP }
 
 class HomePresenter {
-  Now _liveData;
   HomeView _homeView;
   Invoker invoker;
   GetAllPodcastUseCase getAllPodcastUseCase;
@@ -135,7 +134,7 @@ class HomePresenter {
   onLiveSelected(Now now) async {
     currentPlayer.isPodcast = false;
     currentPlayer.now = now;
-    currentPlayer.currentImage = now.logo_url;
+    currentPlayer.currentImage = now.logoUrl;
     currentPlayer.currentSong = now.name;
     if (currentPlayer.isPlaying()) {
       _stopAndPlay();
@@ -236,10 +235,6 @@ class HomePresenter {
     _homeView.onNotifyUser(StatusPlayer.STOP);
   }
 
-  _release() {
-    currentPlayer.release();
-  }
-
   _getNews() {
     invoker.execute(getNewsUseCase).listen((result) {
       if (result is Success) {
@@ -263,23 +258,21 @@ class HomePresenter {
   _getLiveProgram(bool refreshAll) {
     invoker.execute(getLiveDataUseCase).listen((result) {
       if (result is Success) {
-        _liveData = result.data;
         if (!currentPlayer.isPodcast) {
           currentPlayer.now = result.data;
           currentPlayer.currentSong = result.data.name;
-          currentPlayer.currentImage = result.data.logo_url;
+          currentPlayer.currentImage = result.data.logoUrl;
         }
         _homeView.onLoadLiveData(result.data);
       } else {
         if (!currentPlayer.isPodcast) {
-          _liveData = Now.mock();
           currentPlayer.now = Now.mock();
           currentPlayer.currentSong = Now
               .mock()
               .name;
           currentPlayer.currentImage = Now
               .mock()
-              .logo_url;
+              .logoUrl;
         }
         _homeView.onLiveDataError((result as Error).status);
       }

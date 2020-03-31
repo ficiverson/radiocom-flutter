@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/episode.dart';
-import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/podcast/controls/podcast_controls_presenter.dart';
 import 'package:cuacfm/utils/custom_image.dart';
@@ -13,14 +12,13 @@ import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:injector/injector.dart';
 import 'package:intl/intl.dart';
 import 'package:progress_indicators/progress_indicators.dart';
 
 class PodcastControls extends StatefulWidget {
   PodcastControls({Key key, this.episode}) : super(key: key);
-  Episode episode;
+  final Episode episode;
   @override
   PodcastControlsState createState() => PodcastControlsState();
 }
@@ -153,7 +151,6 @@ class PodcastControlsState extends State<PodcastControls>
     setState(() {});
   }
 
-  @override
   void onConnectionError() {
     if (snackBarConnection == null) {
       _scaffoldKey.currentState..removeCurrentSnackBar();

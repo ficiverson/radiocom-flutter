@@ -16,8 +16,8 @@ enum ProgramCategories {
 class Program {
   String name;
   String description;
-  String logo_url;
-  String rss_url;
+  String logoUrl;
+  String rssUrl;
   String duration;
   String category;
   String language;
@@ -26,9 +26,9 @@ class Program {
   Program.fromInstance(Map<String, dynamic> map)
       : name = map["name"],
         description = map["synopsis"],
-        logo_url = map["photo_url"],
+        logoUrl = map["photo_url"],
         duration = map["runtime"],
-        rss_url = map["rss_url"],
+        rssUrl = map["rss_url"],
         language = getLanguage(map["language"]),
         categoryType = mapCategoryType(
             map["category"] != null ? map["category"] : "Otros"),

@@ -238,7 +238,7 @@ class AllPodcastState extends State<AllPodcast>
                       },
                       child: NeumorphicCardVertical(
                         active: false,
-                        image: _podcastWithFilter[index].logo_url,
+                        image: _podcastWithFilter[index].logoUrl,
                         label: _podcastWithFilter[index].name,
                         subtitle: (DateFormat("hh:mm:ss")
                                         .parse(

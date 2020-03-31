@@ -60,14 +60,14 @@ class DetailPodcastPresenter {
         if (!currentPlayer.isPodcast) {
           currentPlayer.now = result.data;
           currentPlayer.currentSong = result.data.name;
-          currentPlayer.currentImage = result.data.logo_url;
+          currentPlayer.currentImage = result.data.logoUrl;
           _view.onNewData();
         }
       } else {
         if (!currentPlayer.isPodcast) {
           currentPlayer.now = Now.mock();
           currentPlayer.currentSong = Now.mock().name;
-          currentPlayer.currentImage = Now.mock().logo_url;
+          currentPlayer.currentImage = Now.mock().logoUrl;
           _view.onNewData();
         }
       }
@@ -123,7 +123,7 @@ class DetailPodcastPresenter {
   }
 
   onShareClicked(Program podcast) {
-    Share.share(podcast.name + " en CUAC FM:  " + podcast.rss_url);
+    Share.share(podcast.name + " en CUAC FM:  " + podcast.rssUrl);
   }
 
   onDetailPodcast(String title, String subtitle, String content, String link) {
@@ -204,14 +204,5 @@ class DetailPodcastPresenter {
         }
       });
     }
-  }
-
-  _stop() {
-    currentPlayer.stop();
-    _view.onPlayerData(StatusPlayer.STOP);
-  }
-
-  _release() {
-    currentPlayer.release();
   }
 }

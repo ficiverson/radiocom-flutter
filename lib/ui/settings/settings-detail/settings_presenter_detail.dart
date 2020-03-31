@@ -44,14 +44,14 @@ class SettingsDetailPresenter {
         if (!currentPlayer.isPodcast) {
           currentPlayer.now = result.data;
           currentPlayer.currentSong = result.data.name;
-          currentPlayer.currentImage = result.data.logo_url;
+          currentPlayer.currentImage = result.data.logoUrl;
           view.onNewData();
         }
       } else {
         if (!currentPlayer.isPodcast) {
           currentPlayer.now = Now.mock();
           currentPlayer.currentSong = Now.mock().name;
-          currentPlayer.currentImage = Now.mock().logo_url;
+          currentPlayer.currentImage = Now.mock().logoUrl;
           view.onNewData();
         }
       }

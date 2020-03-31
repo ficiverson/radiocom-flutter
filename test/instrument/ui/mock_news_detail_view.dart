@@ -1,9 +1,6 @@
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/ui/new-detail/new_detail_presenter.dart';
 import 'package:cuacfm/ui/new-detail/new_detail_router.dart';
-import 'package:cuacfm/ui/settings/settings-detail/settings_detail_router.dart';
-import 'package:cuacfm/ui/settings/settings-detail/settings_presenter_detail.dart';
-
 enum NewsDetailState {
   noConnection,
   onNewData,

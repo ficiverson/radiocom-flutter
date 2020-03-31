@@ -1,8 +1,5 @@
 import 'package:cuacfm/models/episode.dart';
-import 'package:cuacfm/models/new.dart';
-import 'package:cuacfm/ui/new-detail/new_detail.dart';
 import 'package:cuacfm/ui/podcast/controls/podcast_controls.dart';
-import 'package:cuacfm/ui/settings/settings-detail/settings_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:injector/injector.dart';
 

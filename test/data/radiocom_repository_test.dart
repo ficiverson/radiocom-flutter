@@ -26,7 +26,7 @@ void main() {
     Result<RadioStation> result = await repository.getRadioStationData();
 
     expect(result.status, equals(Status.ok));
-    expect(result.getData().station_name, equals("CUAC FM INSTRUMENT"));
+    expect(result.getData().stationName, equals("CUAC FM INSTRUMENT"));
   });
 
   test('that can fetch base station date if network fails', () async {
@@ -35,7 +35,7 @@ void main() {
     Result<RadioStation> result = await repository.getRadioStationData();
 
     expect(result.status, equals(Status.ok));
-    expect(result.getData().station_name, equals("CUAC FM"));
+    expect(result.getData().stationName, equals("CUAC FM"));
   });
 
   test('that can fetch now data from network', () async {

@@ -2,11 +2,11 @@ class CurrentPodcast {
   String name;
   String episodeTitle;
   String image;
-  int podcast_index;
-  int audio_index;
+  int podcastIndex;
+  int audioIndex;
 
   CurrentPodcast({
-    this.name, this.image, this.podcast_index, this.audio_index, this.episodeTitle
+    this.name, this.image, this.podcastIndex, this.audioIndex, this.episodeTitle
   });
 
 }

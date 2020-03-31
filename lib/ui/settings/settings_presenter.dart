@@ -56,7 +56,7 @@ class SettingsPresenter {
         if (!currentPlayer.isPodcast) {
           currentPlayer.now = result.data;
           currentPlayer.currentSong = result.data.name;
-          currentPlayer.currentImage = result.data.logo_url;
+          currentPlayer.currentImage = result.data.logoUrl;
           _settingsView.onNewData();
         }
       }else {
@@ -67,7 +67,7 @@ class SettingsPresenter {
               .name;
           currentPlayer.currentImage = Now
               .mock()
-              .logo_url;
+              .logoUrl;
           _settingsView.onNewData();
         }
       }

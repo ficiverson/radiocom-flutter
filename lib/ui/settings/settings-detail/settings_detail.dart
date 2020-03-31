@@ -167,6 +167,8 @@ class SettingsDetailState extends State<SettingsDetail> with WidgetsBindingObser
       return _getTermsAndPrivacyLayout(legalType);
     } else if (legalType == LegalType.NONE) {
       return _getGallery();
+    } else {
+      return Container();
     }
   }
 
@@ -232,12 +234,12 @@ class SettingsDetailState extends State<SettingsDetail> with WidgetsBindingObser
           scrollPhysics: BouncingScrollPhysics(),
           builder: (BuildContext context, int index) {
             return PhotoViewGalleryPageOptions(
-              imageProvider: NetworkImage(_radioStation.station_photos[index]),
+              imageProvider: NetworkImage(_radioStation.stationPhotos[index]),
               initialScale: PhotoViewComputedScale.contained * 0.8,
              // heroAttributes:  HeroAttributes(tag: "tag1"),
             );
           },
-          itemCount: _radioStation.station_photos.length,
+          itemCount: _radioStation.stationPhotos.length,
           loadingBuilder: (context, event) => Center(
             child: Container(
               width: 20.0,

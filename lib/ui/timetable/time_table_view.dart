@@ -200,7 +200,7 @@ class TimetableState extends State<Timetable> with WidgetsBindingObserver implem
                               width: 50.0,
                               height: 50.0,
                               child: CustomImage(
-                                  resPath: widget.timeTables[index].logo_url,
+                                  resPath: widget.timeTables[index].logoUrl,
                                   fit: BoxFit.fitHeight,
                                   radius: 5.0)),
                           title: Text(

@@ -43,7 +43,6 @@ class MyHomePageState extends State<MyHomePage>
   BottomBarOption bottomBarOption = BottomBarOption.HOME;
   bool shouldShowPlayer = false;
   bool isMini = true;
-  RadioStation _station;
   Now _nowProgram = Now.mock();
   List<Program> _podcast = [];
   List<New> _lastNews = [];
@@ -179,7 +178,6 @@ class MyHomePageState extends State<MyHomePage>
     _presenter = Injector.appInstance.getDependency<HomePresenter>();
     _presenter.init();
     _nowProgram = new Now.mock();
-    _station = Injector.appInstance.getDependency<RadioStation>();
 
     categories.addAll(ProgramCategories.values);
     categories.shuffle();
@@ -371,7 +369,6 @@ class MyHomePageState extends State<MyHomePage>
   void onLoadRadioStation(RadioStation station) {
     Injector.appInstance
         .registerSingleton<RadioStation>((_) => station, override: true);
-    _station = station;
   }
 
   @override
@@ -590,12 +587,12 @@ class MyHomePageState extends State<MyHomePage>
                                               _presenter.onPodcastClicked(
                                                   findPodcastByName(
                                                       _recentPodcast[index]
-                                                          .rss_url));
+                                                          .rssUrl));
                                             },
                                             child: NeumorphicCardVertical(
                                               active: false,
                                               image: _recentPodcast[index]
-                                                  .logo_url,
+                                                  .logoUrl,
                                               label: _recentPodcast[index].name,
                                               subtitle: _recentPodcast[index]
                                                       .duration +
@@ -624,7 +621,7 @@ class MyHomePageState extends State<MyHomePage>
                           }
                         },
                         active: false,
-                        image: _nowProgram.logo_url,
+                        image: _nowProgram.logoUrl,
                         label: _nowProgram.name,
                       )),
                   shouldShowPlayer
@@ -897,7 +894,7 @@ class MyHomePageState extends State<MyHomePage>
                             },
                             child: NeumorphicCardVertical(
                               active: false,
-                              image: podcast[index].logo_url,
+                              image: podcast[index].logoUrl,
                               label: podcast[index].name,
                               subtitle: (DateFormat("hh:mm:ss")
                                               .parse(podcast[index].duration)
@@ -1005,10 +1002,12 @@ class MyHomePageState extends State<MyHomePage>
       return podcast10;
     } else if (index == 11) {
       return podcast11;
+    } else {
+      return podcast0;
     }
   }
 
   Program findPodcastByName(String url) {
-    return _podcast.where((element) => url == element.rss_url).first;
+    return _podcast.where((element) => url == element.rssUrl).first;
   }
 }

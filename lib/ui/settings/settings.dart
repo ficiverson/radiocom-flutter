@@ -70,7 +70,6 @@ class SettingsState extends State<Settings>
                 }
               });
             }));
-    ;
   }
 
   @override
@@ -346,7 +345,7 @@ class SettingsState extends State<Settings>
                       child: InkWell(
                           onTap: () {
                             _presenter
-                                .onFacebookClicked(_radioStation.facebook_url);
+                                .onFacebookClicked(_radioStation.facebookUrl);
                           },
                           child: Container(
                               margin: EdgeInsets.fromLTRB(10.0, 0.0, 20.0, 0.0),
@@ -369,7 +368,7 @@ class SettingsState extends State<Settings>
                       child: InkWell(
                           onTap: () {
                             _presenter
-                                .onTwitterClicked(_radioStation.twitter_url);
+                                .onTwitterClicked(_radioStation.twitterUrl);
                           },
                           child: Container(
                               margin: EdgeInsets.fromLTRB(10.0, 0.0, 20.0, 0.0),
@@ -550,11 +549,11 @@ class SettingsState extends State<Settings>
                           width: 50.0,
                           height: 50.0,
                           child: CustomImage(
-                              resPath: _radioStation.big_icon_url,
+                              resPath: _radioStation.bigIconUrl,
                               fit: BoxFit.fitHeight,
                               radius: 25.0)),
                       title: Text(
-                        _radioStation.station_name,
+                        _radioStation.stationName,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(

@@ -49,19 +49,19 @@ void main() {
   test('that can parse a response for station data', () async {
     server.enqueue(body: Helper.readFile("test_mocks/get_station.json"));
     RadioStation result = await remoteDataSource.getRadioStationData();
-    expect(result.station_name, equals("CUAC FM REMOTE"));
+    expect(result.stationName, equals("CUAC FM REMOTE"));
   });
 
   test('that can handle get station data internal server error', () async {
     server.enqueue(body: "", httpCode: 500);
     RadioStation result = await remoteDataSource.getRadioStationData();
-    expect(result.station_name, equals("CUAC FM"));
+    expect(result.stationName, equals("CUAC FM"));
   });
 
   test('that can handle get station data not found error', () async {
     server.enqueue(body: "", httpCode: 401);
     RadioStation result = await remoteDataSource.getRadioStationData();
-    expect(result.station_name, equals("CUAC FM"));
+    expect(result.stationName, equals("CUAC FM"));
   });
 
   test('that can parse a response for current program data', () async {

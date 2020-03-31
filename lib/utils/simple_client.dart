@@ -68,14 +68,14 @@ class SimpleClient {
 
 
   Future sendRequest(SimpleRequest request,  HTTPResponseType responseType) {
-    String reqBody = request.body != null
-        ? json.encoder.convert(request.body)
-        : null;
+//    String reqBody = request.body != null
+//        ? json.encoder.convert(request.body)
+//        : null;
 
     Map<String, String> headers = {
-      HttpHeaders.CONTENT_TYPE: 'application/json',
-      HttpHeaders.ACCEPT_ENCODING: 'utf-8',
-      HttpHeaders.ACCEPT_CHARSET : 'utf-8'
+      HttpHeaders.contentTypeHeader: 'application/json',
+      HttpHeaders.acceptEncodingHeader: 'utf-8',
+      HttpHeaders.acceptCharsetHeader : 'utf-8'
     };
 
     headers.addAll(request.headers);

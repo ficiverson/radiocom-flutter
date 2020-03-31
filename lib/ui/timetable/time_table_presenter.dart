@@ -44,7 +44,7 @@ class TimeTablePresenter {
         if (!currentPlayer.isPodcast) {
           currentPlayer.now = result.data;
           currentPlayer.currentSong = result.data.name;
-          currentPlayer.currentImage = result.data.logo_url;
+          currentPlayer.currentImage = result.data.logoUrl;
           view.onNewData();
         }
       } else {
@@ -55,7 +55,7 @@ class TimeTablePresenter {
               .name;
           currentPlayer.currentImage = Now
               .mock()
-              .logo_url;
+              .logoUrl;
           view.onNewData();
         }
       }

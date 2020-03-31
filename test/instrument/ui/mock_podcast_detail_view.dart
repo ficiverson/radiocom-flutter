@@ -1,12 +1,8 @@
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/ui/home/home_presenter.dart';
-import 'package:cuacfm/ui/new-detail/new_detail_presenter.dart';
-import 'package:cuacfm/ui/new-detail/new_detail_router.dart';
 import 'package:cuacfm/ui/podcast/detail_podcast_presenter.dart';
 import 'package:cuacfm/ui/podcast/detail_podcast_router.dart';
-import 'package:cuacfm/ui/settings/settings-detail/settings_detail_router.dart';
-import 'package:cuacfm/ui/settings/settings-detail/settings_presenter_detail.dart';
 
 enum PodcastDetailState {
   noConnection,

@@ -20,7 +20,7 @@ import 'package:progress_indicators/progress_indicators.dart';
 
 class DetailPodcastPage extends StatefulWidget {
   DetailPodcastPage({Key key, this.program}) : super(key: key);
-  Program program;
+  final Program program;
 
   @override
   State createState() => DetailPodcastState();
@@ -98,7 +98,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
     _program = widget.program;
     _presenter = Injector.appInstance.getDependency<DetailPodcastPresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
-    _presenter.loadEpisodes(_program.rss_url);
+    _presenter.loadEpisodes(_program.rssUrl);
 
     if (Platform.isAndroid) {
       _notificationEvent.receiveBroadcastStream().listen((onData) {
@@ -238,7 +238,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
                                   widget.program.description.isEmpty
                               ? "<p> No hay descripción todavía :(</p> <br/><br/><img src=\"https://cuacfm.org/wp-content/uploads/2015/04/cuacfm-banner-top.png\">"
                               : widget.program.description,
-                          widget.program.rss_url);
+                          widget.program.rssUrl);
                     },
                     child: Container(
                         margin: EdgeInsets.fromLTRB(5.0, 15.0, 0.0, 0.0),
@@ -247,7 +247,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
                               imageOverLay: true,
                               removeShader: true,
                               active: true,
-                              image: widget.program.logo_url,
+                              image: widget.program.logoUrl,
                               label: "",
                               subtitle: ""),
                           Container(
@@ -308,7 +308,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
                                         isLoadingEpisode = true;
                                         _presenter.onSelectedEpisode(
                                             _episodes[index - 1],
-                                            widget.program.logo_url);
+                                            widget.program.logoUrl);
                                         shouldShowPlayer = false;
                                       }
                                       if (!mounted) return;
