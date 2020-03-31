@@ -39,6 +39,7 @@ import 'package:cuacfm/ui/timetable/time_table_router.dart';
 import 'package:cuacfm/ui/timetable/time_table_view.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:cuacfm/utils/cuac_client.dart';
+import 'package:cuacfm/utils/notification_subscription_contract.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:flutter/widgets.dart';
 import 'package:injector/injector.dart';
@@ -99,6 +100,10 @@ class DependencyInjector {
   loadPresentationModules() {
     injector.registerDependency<ConnectionContract>((_) {
       return Connection();
+    });
+
+    injector.registerDependency<NotificationSubscriptionContract>((_) {
+      return NotificationSubscription();
     });
 
     injector.registerSingleton<RadiocomColorsConract>((Injector injector) {

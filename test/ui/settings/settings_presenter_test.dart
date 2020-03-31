@@ -7,6 +7,7 @@ import 'package:cuacfm/ui/settings/settings-detail/settings_detail.dart';
 import 'package:cuacfm/ui/settings/settings_presenter.dart';
 import 'package:cuacfm/ui/settings/settings_router.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
+import 'package:cuacfm/utils/notification_subscription_contract.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:injector/injector.dart';
@@ -23,6 +24,7 @@ void main() {
   MockSettingsView view = MockSettingsView();
   MockSettingsRouter router = MockSettingsRouter();
   MockConnection mockConnection = MockConnection();
+  MockNotifcationSubscription notifcationSubscription = MockNotifcationSubscription();
   MockPlayer mockPlayer = MockPlayer();
   SettingsPresenter presenter;
 
@@ -40,6 +42,9 @@ void main() {
         override: true);
     Injector.appInstance.registerDependency<ConnectionContract>(
         (_) => mockConnection,
+        override: true);
+    Injector.appInstance.registerDependency<NotificationSubscriptionContract>(
+            (_) => notifcationSubscription,
         override: true);
     Injector.appInstance.registerDependency<CurrentPlayerContract>(
         (_) => mockPlayer,
@@ -85,6 +90,8 @@ void main() {
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
     when(mockPlayer.isPodcast).thenReturn(false);
+    when(notifcationSubscription.subscribeToTopic(any)).thenAnswer((_) => Future.value(true));
+    when(notifcationSubscription.unsubscribeFromTopic(any)).thenAnswer((_) => Future.value(true));
 
     presenter.init();
     await Future.delayed(Duration(milliseconds: 200));

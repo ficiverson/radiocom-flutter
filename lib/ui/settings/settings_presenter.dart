@@ -9,6 +9,7 @@ import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/settings/settings-detail/settings_detail.dart';
 import 'package:cuacfm/ui/settings/settings_router.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
+import 'package:cuacfm/utils/notification_subscription_contract.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:injector/injector.dart';
@@ -31,10 +32,11 @@ class SettingsPresenter {
   GetLiveProgramUseCase getLiveDataUseCase;
   ConnectionContract connection;
   CurrentPlayerContract currentPlayer;
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  NotificationSubscriptionContract notificationSubscription;
 
   SettingsPresenter(this._settingsView, {@required this.invoker, @required this.router,@required this.getLiveDataUseCase,
   }) {
+    notificationSubscription = Injector.appInstance.getDependency<NotificationSubscriptionContract>();
     connection = Injector.appInstance.getDependency<ConnectionContract>();
     currentPlayer = Injector.appInstance.getDependency<CurrentPlayerContract>();
   }
@@ -140,9 +142,9 @@ class SettingsPresenter {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('live_shows_info', status);
     if(status) {
-      _firebaseMessaging.subscribeToTopic("live_shows_info");
+      notificationSubscription.subscribeToTopic("live_shows_info");
     } else {
-      _firebaseMessaging.unsubscribeFromTopic("live_shows_info");
+      notificationSubscription.unsubscribeFromTopic("live_shows_info");
     }
   }
 
