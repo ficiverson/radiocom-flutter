@@ -239,7 +239,7 @@ class MyHomePageState extends State<MyHomePage>
     _presenter.currentTimer.timerCallback = (finnish) {
       _presenter.currentPlayer.stop();
       if (mounted) {
-        if(finnish){
+        if (finnish) {
           setState(() {});
         }
       }
@@ -384,25 +384,10 @@ class MyHomePageState extends State<MyHomePage>
     if (bottomBarOption == BottomBarOption.HOME) {
       if (!mounted) return;
       setState(() {
-        _recentPodcast = programsTimeTable;
-        _recentPodcast.removeWhere((element) => element.type == "S");
-        _recentPodcast = _recentPodcast
-            .where((element) =>
-                element.start
-                    .isBefore(DateTime.now().subtract(Duration(hours: 1))) &&
-                element.start
-                    .isAfter(DateTime.now().subtract(Duration(hours: 12))))
-            .toList();
+        _updateRecentPodcasts(programsTimeTable);
       });
     } else {
-      _recentPodcast = programsTimeTable;
-      _recentPodcast.removeWhere((element) => element.type == "S");
-      _recentPodcast = _recentPodcast
-          .where((element) =>
-              element.start.isBefore(DateTime.now()) &&
-              element.start
-                  .isAfter(DateTime.now().subtract(Duration(hours: 12))))
-          .toList();
+      _updateRecentPodcasts(programsTimeTable);
     }
   }
 
@@ -537,8 +522,8 @@ class MyHomePageState extends State<MyHomePage>
                       : isLoadingPlay
                           ? Container(height: 80.0, child: getLoadingState())
                           : Padding(
-                              padding: EdgeInsets.fromLTRB(
-                                  25.0, 30.0, 25.0, 0.0),
+                              padding:
+                                  EdgeInsets.fromLTRB(25.0, 30.0, 25.0, 0.0),
                               child: NeumorphicCardHorizontal(
                                   onElementClicked: () {
                                     if (!mounted) return;
@@ -591,8 +576,8 @@ class MyHomePageState extends State<MyHomePage>
                                             },
                                             child: NeumorphicCardVertical(
                                               active: false,
-                                              image: _recentPodcast[index]
-                                                  .logoUrl,
+                                              image:
+                                                  _recentPodcast[index].logoUrl,
                                               label: _recentPodcast[index].name,
                                               subtitle: _recentPodcast[index]
                                                       .duration +
@@ -1010,4 +995,17 @@ class MyHomePageState extends State<MyHomePage>
   Program findPodcastByName(String url) {
     return _podcast.where((element) => url == element.rssUrl).first;
   }
+
+  _updateRecentPodcasts(List<TimeTable> programsTimeTable){
+    _recentPodcast = programsTimeTable;
+    _recentPodcast.removeWhere((element) => element.type == "S");
+    _recentPodcast = _recentPodcast
+        .where((element) =>
+    element.start
+        .isBefore(DateTime.now().subtract(Duration(hours: 1))) &&
+        element.start
+            .isAfter(DateTime.now().subtract(Duration(hours: 12))))
+        .toList();
+  }
+
 }

@@ -12,8 +12,8 @@ class TimeTable {
       :
         name = map["name"],
         description = map["description"],
-        start = DateTime.parse(map["start"]).add(Duration(minutes: 60)),
-        end = DateTime.parse(map["end"]).add(Duration(minutes: 60)),
+        start = DateTime.parse(map["start"]).toLocal(),
+        end = DateTime.parse(map["end"]).toLocal(),
         type = map["type"],
         logoUrl = map["logo_url"],
         duration = getDuration(DateTime.parse(map["start"]),DateTime.parse(map["end"])),
