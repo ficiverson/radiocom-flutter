@@ -1,0 +1,7 @@
+{
+  "home" : {
+    "welcome_msg_1" : "Good morning",
+    "welcome_msg_2" : "Good afternoon",
+    "welcome_msg_3" : "Good night"
+  }
+}

@@ -1,4 +1,5 @@
 import 'package:cuacfm/injector/dependency_injector.dart';
+import 'package:cuacfm/translations/localizations_delegate.dart';
 import 'package:cuacfm/ui/home/home_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -9,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +35,29 @@ class MyApp extends StatelessWidget {
       showPerformanceOverlay: false,
       showSemanticsDebugger: false,
       checkerboardOffscreenLayers: false,
+      supportedLocales: [
+        const Locale('en', 'US'),
+        const Locale('es', 'ES'),
+        const Locale('gl', 'ES'),
+      ],
+      localizationsDelegates: [
+        LocalizationDelegate(),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate
+      ],
+      localeResolutionCallback: (Locale locale, Iterable<Locale> supportedLocales) {
+        if(locale!=null) {
+          for (Locale supportedLocale in supportedLocales) {
+            if (supportedLocale.languageCode == locale.languageCode ||
+                supportedLocale.countryCode == locale.countryCode) {
+              return supportedLocale;
+            }
+          }
+        }
+
+        return supportedLocales.first;
+      },
       title: 'CUAC FM',
       navigatorObservers: [
         FirebaseAnalyticsObserver(analytics: analytics),

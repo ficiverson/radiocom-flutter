@@ -9,12 +9,14 @@ import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/models/time_table.dart';
+import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/ui/home/home_presenter.dart';
 import 'package:cuacfm/utils/bottom_bar.dart';
 import 'package:cuacfm/utils/custom_image.dart';
 import 'package:cuacfm/utils/neumorfism.dart';
 import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
+import 'package:cuacfm/utils/safe_map.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -77,6 +79,7 @@ class MyHomePageState extends State<MyHomePage>
       EventChannel('cuacfm.flutter.io/updateNotificationMain');
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   bool isDarkModeEnabled = false;
+  CuacLocalization _localization;
 
   MyHomePageState() {
     DependencyInjector().injectByView(this);
@@ -175,6 +178,7 @@ class MyHomePageState extends State<MyHomePage>
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "main", "close": false});
     }
+    _localization = Injector.appInstance.getDependency<CuacLocalization>();
     _presenter = Injector.appInstance.getDependency<HomePresenter>();
     _presenter.init();
     _nowProgram = new Now.mock();
@@ -894,14 +898,18 @@ class MyHomePageState extends State<MyHomePage>
   }
 
   String _getWelcomeText() {
-    String welcomeText = "Buenos días";
+    String welcomeText = SafeMap.safe(_localization.translateMap('home'),
+        ["welcome_msg_1"]);
     TimeOfDay now = TimeOfDay.now();
     if (now.hour >= 7 && DateTime.now().hour <= 12) {
-      welcomeText = "Buenos días";
+      welcomeText = SafeMap.safe(_localization.translateMap('home'),
+          ["welcome_msg_1"]);
     } else if (now.hour > 12 && DateTime.now().hour <= 20) {
-      welcomeText = "Buenas tardes";
+      welcomeText = SafeMap.safe(_localization.translateMap('home'),
+          ["welcome_msg_2"]);
     } else {
-      welcomeText = "Buenas noches";
+      welcomeText = SafeMap.safe(_localization.translateMap('home'),
+          ["welcome_msg_3"]);
     }
     return welcomeText;
   }

@@ -12,10 +12,12 @@ dependency_overrides:
 dependencies:
   flutter:
       sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   verbal_expressions: "^0.4.0"
   audioplayers: "^0.13.6"
-  intl: "^0.16.1"
+  intl: "^0.16.0"
   xml2json: "^4.1.1"
   cupertino_icons: "^0.1.3"
   device_info: "^0.4.1+5"
