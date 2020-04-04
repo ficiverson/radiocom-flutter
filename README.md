@@ -1,4 +1,4 @@
-# radiocom-flutter [![Build Status](https://app.bitrise.io/app/a2d0176896f511a0/status.svg?token=k3AcmnfkVh_weNRR8_z5zQ&branch=master)](https://app.bitrise.io/app/a2d0176896f511a0)
+# radiocom-flutter [![Codemagic build status](https://api.codemagic.io/apps/5e886482bccbec3072de65d9/5e886482bccbec3072de65d8/status_badge.svg)](https://codemagic.io/apps/5e886482bccbec3072de65d9/5e886482bccbec3072de65d8/latest_build)
 
 This is a flutter application for Community Media Stations based in radioco APIs.
 
