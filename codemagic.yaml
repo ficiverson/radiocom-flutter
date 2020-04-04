@@ -22,6 +22,8 @@ workflows:
       home_view.dart,home_router.dart,new_detail.dart,new_detail_router.dart,current_player.dart,detail_podcast_view.dart,detail_podcast_router.dart,all_podcast_view.dart,detail_podcast_router.dart,all_podcast_view.dart,all_podcast_router.dart,
       podcast_controls.dart,settings.dart,settings_router.dart,settings_detail.dart,settings_detail_router.dart,time_table_view.dart,time_table_router.dart,
       bottom_bar.dart,connection_contract.dart,custom_image.dart,neumorfism.dart,notification_subscription_contract.dart,player_view.dart,top_bar.dart$'
+    - genhtml coverage/lcov.info --output=coverage
     artifacts:
     - coverage/lcov.info
-    - coverage
+      paths:
+      - coverage/
