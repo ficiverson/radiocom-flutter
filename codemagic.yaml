@@ -25,5 +25,4 @@ workflows:
     - genhtml coverage/lcov.info --output=coverage
     artifacts:
     - coverage/lcov.info
-      paths:
-      - coverage/
+    - coverage/
