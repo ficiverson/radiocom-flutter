@@ -1,29 +1,39 @@
+import 'package:cuacfm/translations/localizations.dart';
+import 'package:cuacfm/utils/safe_map.dart';
+import 'package:injector/injector.dart';
 import 'package:intl/intl.dart';
 
 String getDayOfWeek(DateTime date){
-
+  var localization = Injector.appInstance.getDependency<CuacLocalization>();
   String day = "";
   switch(date.weekday){
     case 1:
-      day = "Lunes";
+      day = SafeMap.safe(
+          localization.translateMap("days"), ["mon"]);
       break;
     case 2:
-      day = "Martes";
+      day = SafeMap.safe(
+          localization.translateMap("days"), ["tue"]);
       break;
     case 3:
-      day = "Miércoles";
+      day = SafeMap.safe(
+          localization.translateMap("days"), ["wed"]);
       break;
     case 4:
-      day = "Jueves";
+      day = SafeMap.safe(
+          localization.translateMap("days"), ["thu"]);
       break;
     case 5:
-      day = "Viernes";
+      day = SafeMap.safe(
+          localization.translateMap("days"), ["fri"]);
       break;
     case 6:
-      day = "Sábado";
+      day = SafeMap.safe(
+          localization.translateMap("days"), ["sat"]);
       break;
     case 7:
-      day = "Domingo";
+      day = SafeMap.safe(
+          localization.translateMap("days"), ["sun"]);
       break;
     default:
       day = "";
@@ -33,44 +43,56 @@ String getDayOfWeek(DateTime date){
 }
 
 String getMonthOfYear(DateTime date){
-
+  var localization = Injector.appInstance.getDependency<CuacLocalization>();
   String day = "";
   switch(date.month){
     case 1:
-      day = "ene";
+      day = SafeMap.safe(
+          localization.translateMap("months"), ["jan"]);
       break;
     case 2:
-      day = "feb";
+      day = SafeMap.safe(
+          localization.translateMap("months"), ["feb"]);
       break;
     case 3:
-      day = "mar";
+      day = SafeMap.safe(
+          localization.translateMap("months"), ["mar"]);
       break;
     case 4:
-      day = "abr";
+      day = SafeMap.safe(
+          localization.translateMap("months"), ["apr"]);
       break;
     case 5:
-      day = "may";
+      day = SafeMap.safe(
+          localization.translateMap("months"), ["may"]);
       break;
     case 6:
-      day = "jun";
+      day = SafeMap.safe(
+          localization.translateMap("months"), ["jun"]);
       break;
     case 7:
-      day = "jul";
+      day = SafeMap.safe(
+          localization.translateMap("months"), ["jul"]);
       break;
     case 8:
-      day = "ago";
+      day = SafeMap.safe(
+          localization.translateMap("months"), ["ago"]);
       break;
     case 9:
-      day = "sep";
+      day = SafeMap.safe(
+          localization.translateMap("months"), ["sep"]);
       break;
     case 10:
-      day = "oct";
+      day = SafeMap.safe(
+          localization.translateMap("months"), ["oct"]);
       break;
     case 11:
-      day = "nov";
+      day = SafeMap.safe(
+          localization.translateMap("months"), ["nov"]);
       break;
     case 12:
-      day = "dic";
+      day = SafeMap.safe(
+          localization.translateMap("months"), ["dec"]);
       break;
     default:
       day = "";

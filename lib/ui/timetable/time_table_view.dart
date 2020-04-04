@@ -4,10 +4,12 @@ import 'dart:io';
 
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/time_table.dart';
+import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/ui/timetable/time_table_presenter.dart';
 import 'package:cuacfm/utils/custom_image.dart';
 import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
+import 'package:cuacfm/utils/safe_map.dart';
 import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +37,7 @@ class TimetableState extends State<Timetable> with WidgetsBindingObserver implem
   EventChannel _notificationEvent =
   EventChannel('cuacfm.flutter.io/updateNotificationMain');
   SnackBar snackBarConnection;
+  CuacLocalization _localization;
 
   TimetableState() {
     DependencyInjector().injectByView(this);
@@ -46,7 +49,8 @@ class TimetableState extends State<Timetable> with WidgetsBindingObserver implem
     _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     return Scaffold(key : scaffoldKey,
       appBar:
-          TopBar("timetable",title: "Programas de hoy", topBarOption: TopBarOption.NORMAL),
+          TopBar("timetable",title: SafeMap.safe(
+              _localization.translateMap("timetable"), ["title"]), topBarOption: TopBarOption.NORMAL),
       backgroundColor: _colors.palidwhite,
       body: _getBodyLayout(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -74,7 +78,9 @@ class TimetableState extends State<Timetable> with WidgetsBindingObserver implem
   }
 
   getTime(DateTime start, DateTime end) {
-    return "De " + start.hour.toString() + " a " + end.hour.toString();
+    return SafeMap.safe(
+        _localization.translateMap("general"), ["from"]) + start.hour.toString() + SafeMap.safe(
+        _localization.translateMap("general"), ["to"]) + end.hour.toString();
   }
 
   getCurrentTime() {
@@ -88,6 +94,7 @@ class TimetableState extends State<Timetable> with WidgetsBindingObserver implem
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "timetable", "close": false});
     }
+    _localization = Injector.appInstance.getDependency<CuacLocalization>();
     _presenter = Injector.appInstance.getDependency<TimeTablePresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     int currentIndex = 0;
@@ -165,7 +172,8 @@ class TimetableState extends State<Timetable> with WidgetsBindingObserver implem
       scaffoldKey.currentState..removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         duration: Duration(seconds: 3),
-        content: Text("No dispones de conexión a internet"),
+        content: Text(SafeMap.safe(
+            _localization.translateMap("error"), ["internet_error"])),
       );
       scaffoldKey.currentState..showSnackBar(snackBarConnection);
     }

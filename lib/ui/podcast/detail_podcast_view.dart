@@ -4,11 +4,13 @@ import 'dart:io';
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/program.dart';
+import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/ui/home/home_presenter.dart';
 import 'package:cuacfm/ui/podcast/detail_podcast_presenter.dart';
 import 'package:cuacfm/utils/neumorfism.dart';
 import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
+import 'package:cuacfm/utils/safe_map.dart';
 import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +46,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
   EventChannel _notificationEvent =
       EventChannel('cuacfm.flutter.io/updateNotificationPodcastDetail');
   SnackBar snackBarConnection;
+  CuacLocalization _localization;
 
   DetailPodcastState() {
     DependencyInjector().injectByView(this);
@@ -95,6 +98,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "podcast_detail", "close": false});
     }
+    _localization = Injector.appInstance.getDependency<CuacLocalization>();
     _program = widget.program;
     _presenter = Injector.appInstance.getDependency<DetailPodcastPresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
@@ -157,7 +161,8 @@ class DetailPodcastState extends State<DetailPodcastPage>
       _scaffoldKey.currentState..removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         duration: Duration(seconds: 3),
-        content: Text("No dispones de conexión a internet"),
+        content: Text(SafeMap.safe(
+            _localization.translateMap("error"), ["internet_error"])),
       );
       _scaffoldKey.currentState..showSnackBar(snackBarConnection);
     }
@@ -233,10 +238,12 @@ class DetailPodcastState extends State<DetailPodcastPage>
                                           .hour *
                                       60)
                                   .toString() +
-                              " minutos.",
+                              SafeMap.safe(
+                                  _localization.translateMap("general"), ["minutes"]),
                           widget.program.description == null ||
                                   widget.program.description.isEmpty
-                              ? "<p> No hay descripción todavía :(</p> <br/><br/><img src=\"https://cuacfm.org/wp-content/uploads/2015/04/cuacfm-banner-top.png\">"
+                              ? SafeMap.safe(
+                              _localization.translateMap("podcast_detail"), ["empty_msg"])
                               : widget.program.description,
                           widget.program.rssUrl);
                     },
@@ -336,7 +343,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
                             getFormattedDate(_episodes[index - 1].pubDate),
                             _episodes[index - 1].description == null ||
                                     _episodes[index - 1].description.isEmpty
-                                ? "<p> No hay descripción todavía :(</p> <br/><br/><img src=\"https://cuacfm.org/wp-content/uploads/2015/04/cuacfm-banner-top.png\">"
+                                ? SafeMap.safe(_localization.translateMap("podcast_detail"), ["empty_msg"])
                                 : _episodes[index - 1].description,
                             _episodes[index - 1].link);
                       },
@@ -347,8 +354,9 @@ class DetailPodcastState extends State<DetailPodcastPage>
                     : emptyState
                         ? Padding(
                             padding: EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 0.0),
-                            child: NeumorphicEmptyView(
-                                "No hay episodios en este momento :("))
+                            child: NeumorphicEmptyView(SafeMap.safe(
+                                _localization.translateMap("podcast_detail"), ["empty_episodes_msg"])
+                               ))
                         : SizedBox(height: 30.0);
               }
               return element;

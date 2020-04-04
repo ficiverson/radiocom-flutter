@@ -328,7 +328,8 @@ class MyHomePageState extends State<MyHomePage>
       scaffoldKey.currentState..removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         duration: Duration(seconds: 3),
-        content: Text("No dispones de conexión a internet"),
+        content: Text(SafeMap.safe(
+            _localization.translateMap("error"), ["internet_error"])),
       );
       scaffoldKey.currentState..showSnackBar(snackBarConnection);
     }
@@ -435,9 +436,11 @@ class MyHomePageState extends State<MyHomePage>
     if (snackBarConnection == null) {
       scaffoldKey.currentState..removeCurrentSnackBar();
       final snackBar = SnackBar(
-        content: Text("No podemos conectar con el servidor en este momemto"),
+        content: Text(SafeMap.safe(
+        _localization.translateMap("error"), ["connection_error"])),
         action: SnackBarAction(
-          label: "Cerrar",
+          label: SafeMap.safe(
+            _localization.translateMap("actions"), ["close"]),
           onPressed: () {
             scaffoldKey.currentState.hideCurrentSnackBar();
           },
@@ -456,9 +459,11 @@ class MyHomePageState extends State<MyHomePage>
     if (snackBarConnection == null) {
       scaffoldKey.currentState..removeCurrentSnackBar();
       final snackBar = SnackBar(
-        content: Text("No podemos conectar con el servidor en este momemto"),
+        content: Text(SafeMap.safe(
+            _localization.translateMap("error"), ["connection_error"])),
         action: SnackBarAction(
-          label: "Cerrar",
+          label: SafeMap.safe(
+              _localization.translateMap("actions"), ["close"]),
           onPressed: () {
             scaffoldKey.currentState.hideCurrentSnackBar();
           },
@@ -538,12 +543,14 @@ class MyHomePageState extends State<MyHomePage>
                                   },
                                   icon: Icons.play_arrow,
                                   active: true,
-                                  label: "Escuchar en Directo",
+                                  label: SafeMap.safe(
+                                      _localization.translateMap("home"), ["live_msg"]),
                                   size: 80.0)),
                   Padding(
                       padding: const EdgeInsets.fromLTRB(25.0, 30.0, 25.0, 0.0),
                       child: Text(
-                        'Podcast recientes',
+                        SafeMap.safe(
+                      _localization.translateMap("home"), ["recent_msg"]),
                         style: TextStyle(
                             letterSpacing: 1.5,
                             color: _colors.font,
@@ -554,7 +561,8 @@ class MyHomePageState extends State<MyHomePage>
                       ? Padding(
                           padding: EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 20.0),
                           child: NeumorphicEmptyView(
-                            "No hay podcast recientes ahora mismo.",
+                           SafeMap.safe(
+                          _localization.translateMap("home"), ["empty_podcast"]),
                             width: queryData.size.width,
                             height: 280.0,
                           ))
@@ -584,15 +592,16 @@ class MyHomePageState extends State<MyHomePage>
                                                   _recentPodcast[index].logoUrl,
                                               label: _recentPodcast[index].name,
                                               subtitle: _recentPodcast[index]
-                                                      .duration +
-                                                  " minutos",
+                                                      .duration + SafeMap.safe(
+                                            _localization.translateMap("general"), ["minutes"]),
                                             )),
                                         SizedBox(width: 22.0)
                                       ]))),
                   Padding(
                       padding: EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
                       child: Text(
-                        'Ahora suena',
+                       SafeMap.safe(
+                      _localization.translateMap("home"), ["now_msg"]),
                         style: TextStyle(
                             letterSpacing: 1.5,
                             color: _colors.font,
@@ -667,7 +676,8 @@ class MyHomePageState extends State<MyHomePage>
                 element = Padding(
                     padding: const EdgeInsets.fromLTRB(20.0, 30.0, 0.0, 20.0),
                     child: Text(
-                      'Noticias',
+                     SafeMap.safe(
+                    _localization.translateMap("home"), ["news"]),
                       style: TextStyle(
                           letterSpacing: 1.5,
                           color: _colors.font,
@@ -719,7 +729,8 @@ class MyHomePageState extends State<MyHomePage>
                     ? Padding(
                         padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 0.0),
                         child: NeumorphicEmptyView(
-                          "No podemos cargar las noticias ahora mismo.",
+                          SafeMap.safe(
+                        _localization.translateMap("home"), ["news_error"]),
                         ))
                     : SizedBox(height: shouldShowPlayer ? 60.0 : 10.0);
               }
@@ -744,7 +755,8 @@ class MyHomePageState extends State<MyHomePage>
                         Padding(
                             padding: EdgeInsets.all(20.0),
                             child: Text(
-                              'Podcast',
+                              SafeMap.safe(
+                            _localization.translateMap("home"), ["podcast"]),
                               style: TextStyle(
                                   letterSpacing: 1.5,
                                   color: _colors.font,
@@ -754,7 +766,8 @@ class MyHomePageState extends State<MyHomePage>
                         Padding(
                             padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 0.0),
                             child: NeumorphicEmptyView(
-                              "No podemos cargar los podcast en este momento",
+                              SafeMap.safe(
+                            _localization.translateMap("home"), ["podcast_error"]),
                               width: queryData.size.width,
                             ))
                       ])
@@ -766,7 +779,8 @@ class MyHomePageState extends State<MyHomePage>
                         Padding(
                             padding: EdgeInsets.all(20.0),
                             child: Text(
-                              'Podcast',
+                              SafeMap.safe(
+                                  _localization.translateMap("home"), ["podcast"]),
                               style: TextStyle(
                                   letterSpacing: 1.5,
                                   color: _colors.font,
@@ -803,7 +817,8 @@ class MyHomePageState extends State<MyHomePage>
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         Text(
-                          "Categorías",
+                           SafeMap.safe(
+                  _localization.translateMap("home"), ["categories"]),
                           textAlign: TextAlign.left,
                           style: TextStyle(
                               letterSpacing: 1.2,
@@ -814,7 +829,8 @@ class MyHomePageState extends State<MyHomePage>
                         Spacer(),
                         GestureDetector(
                           child: Text(
-                            "Ver todos",
+                            SafeMap.safe(
+    _localization.translateMap("home"), ["see_all"]),
                             style: TextStyle(
                                 color: _colors.fontGrey,
                                 fontSize: 19,
@@ -890,7 +906,8 @@ class MyHomePageState extends State<MyHomePage>
                                               .hour *
                                           60)
                                       .toString() +
-                                  " minutos.",
+                                  SafeMap.safe(
+                            _localization.translateMap("general"), ["minutes"]),
                             )),
                         SizedBox(width: 22.0)
                       ]))),
@@ -898,18 +915,18 @@ class MyHomePageState extends State<MyHomePage>
   }
 
   String _getWelcomeText() {
-    String welcomeText = SafeMap.safe(_localization.translateMap('home'),
-        ["welcome_msg_1"]);
+    String welcomeText =
+        SafeMap.safe(_localization.translateMap('home'), ["welcome_msg_1"]);
     TimeOfDay now = TimeOfDay.now();
     if (now.hour >= 7 && DateTime.now().hour <= 12) {
-      welcomeText = SafeMap.safe(_localization.translateMap('home'),
-          ["welcome_msg_1"]);
+      welcomeText =
+          SafeMap.safe(_localization.translateMap('home'), ["welcome_msg_1"]);
     } else if (now.hour > 12 && DateTime.now().hour <= 20) {
-      welcomeText = SafeMap.safe(_localization.translateMap('home'),
-          ["welcome_msg_2"]);
+      welcomeText =
+          SafeMap.safe(_localization.translateMap('home'), ["welcome_msg_2"]);
     } else {
-      welcomeText = SafeMap.safe(_localization.translateMap('home'),
-          ["welcome_msg_3"]);
+      welcomeText =
+          SafeMap.safe(_localization.translateMap('home'), ["welcome_msg_3"]);
     }
     return welcomeText;
   }
@@ -1004,16 +1021,14 @@ class MyHomePageState extends State<MyHomePage>
     return _podcast.where((element) => url == element.rssUrl).first;
   }
 
-  _updateRecentPodcasts(List<TimeTable> programsTimeTable){
+  _updateRecentPodcasts(List<TimeTable> programsTimeTable) {
     _recentPodcast = programsTimeTable;
     _recentPodcast.removeWhere((element) => element.type == "S");
     _recentPodcast = _recentPodcast
         .where((element) =>
-    element.start
-        .isBefore(DateTime.now().subtract(Duration(hours: 1))) &&
-        element.start
-            .isAfter(DateTime.now().subtract(Duration(hours: 12))))
+            element.start
+                .isBefore(DateTime.now().subtract(Duration(hours: 1))) &&
+            element.start.isAfter(DateTime.now().subtract(Duration(hours: 12))))
         .toList();
   }
-
 }

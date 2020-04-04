@@ -41,6 +41,12 @@
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		1506AFE22031ED9100364270 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
+		151FBFDA2438FFFE00DC94C2 /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "pt-PT.lproj/Main.strings"; sourceTree = "<group>"; };
+		151FBFDB2438FFFF00DC94C2 /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "pt-PT.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
+		151FBFDC2439000D00DC94C2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
+		151FBFDD2439000E00DC94C2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		151FBFDE2439007B00DC94C2 /* gl-ES */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "gl-ES"; path = "gl-ES.lproj/Main.strings"; sourceTree = "<group>"; };
+		151FBFDF2439007C00DC94C2 /* gl-ES */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "gl-ES"; path = "gl-ES.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		153D83A7206404DB00C4ED48 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Main.strings; sourceTree = "<group>"; };
 		153D83A8206404DB00C4ED48 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		158543CA2412B05100E4804A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -207,6 +213,9 @@
 				English,
 				Base,
 				es,
+				"pt-PT",
+				en,
+				"gl-ES",
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
@@ -334,6 +343,9 @@
 			children = (
 				97C146FB1CF9000F007C117D /* Base */,
 				153D83A7206404DB00C4ED48 /* es */,
+				151FBFDA2438FFFE00DC94C2 /* pt-PT */,
+				151FBFDC2439000D00DC94C2 /* en */,
+				151FBFDE2439007B00DC94C2 /* gl-ES */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -343,6 +355,9 @@
 			children = (
 				97C147001CF9000F007C117D /* Base */,
 				153D83A8206404DB00C4ED48 /* es */,
+				151FBFDB2438FFFF00DC94C2 /* pt-PT */,
+				151FBFDD2439000E00DC94C2 /* en */,
+				151FBFDF2439007C00DC94C2 /* gl-ES */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";

@@ -1,3 +1,7 @@
+import 'package:cuacfm/translations/localizations.dart';
+import 'package:cuacfm/utils/safe_map.dart';
+import 'package:injector/injector.dart';
+
 enum ProgramCategories {
   TV,
   NEWS,
@@ -91,43 +95,57 @@ class Program {
   }
 
   static String mapCategory(String content) {
-    String category = "Otros";
+    CuacLocalization _localization = Injector.appInstance.getDependency<CuacLocalization>();
+    String category = SafeMap.safe(
+        _localization.translateMap("categories"), ["others"]);
     switch (content) {
       case "TV & Film":
-        category = "Cine y series";
+        category = SafeMap.safe(
+            _localization.translateMap("categories"), ["tv"]);
         break;
       case "News & Politics":
-        category = "Noticias y política";
+        category = SafeMap.safe(
+            _localization.translateMap("categories"), ["news"]);
         break;
       case "Sports & Recreation":
-        category = "Deportes";
+        category = SafeMap.safe(
+            _localization.translateMap("categories"), ["sport"]);
         break;
       case "Society & Culture":
-        category = "Magazine";
+        category = SafeMap.safe(
+            _localization.translateMap("categories"), ["magazine"]);
         break;
       case "Education":
-        category = "Educativo";
+        category = SafeMap.safe(
+            _localization.translateMap("categories"), ["edu"]);
         break;
       case "Comedy":
-        category = "Humor";
+        category = SafeMap.safe(
+            _localization.translateMap("categories"), ["comedy"]);
         break;
       case "Music":
-        category = "Musical";
+        category = SafeMap.safe(
+            _localization.translateMap("categories"), ["music"]);
         break;
       case "Science & Medicine":
-        category = "Ciencia";
+        category = SafeMap.safe(
+            _localization.translateMap("categories"), ["science"]);
         break;
       case "Arts":
-        category = "Arte";
+        category = SafeMap.safe(
+            _localization.translateMap("categories"), ["art"]);
         break;
       case "Government & Organizations":
-        category = "Elecciones";
+        category = SafeMap.safe(
+            _localization.translateMap("categories"), ["goverment"]);
         break;
       case "Health":
-        category = "Salud";
+        category = SafeMap.safe(
+            _localization.translateMap("categories"), ["goverment"]);
         break;
       case "Technology":
-        category = "Tecnología";
+        category = SafeMap.safe(
+            _localization.translateMap("categories"), ["tech"]);
         break;
       default:
         break;
@@ -136,43 +154,57 @@ class Program {
   }
 
   static String getCategory(ProgramCategories category) {
-    String content = "Otros";
+    CuacLocalization _localization = Injector.appInstance.getDependency<CuacLocalization>();
+    String content =  SafeMap.safe(
+        _localization.translateMap("categories"), ["others"]);
     switch (category) {
       case ProgramCategories.TV:
-        content = "Cine y series";
+        content =SafeMap.safe(
+            _localization.translateMap("categories"), ["tv"]);
         break;
       case ProgramCategories.NEWS:
-        content = "Noticias y política";
+        content = SafeMap.safe(
+        _localization.translateMap("categories"), ["news"]);
         break;
       case ProgramCategories.SPORTS:
-        content = "Deportes";
+        content =  SafeMap.safe(
+            _localization.translateMap("categories"), ["sport "]);
         break;
       case ProgramCategories.SOCIETY:
-        content = "Magazine";
+        content =  SafeMap.safe(
+            _localization.translateMap("categories"), ["magazine"]);
         break;
       case ProgramCategories.EDUCATION:
-        content = "Educativo";
+        content =  SafeMap.safe(
+            _localization.translateMap("categories"), ["edu"]);
         break;
       case ProgramCategories.COMEDY:
-        content = "Humor";
+        content =  SafeMap.safe(
+            _localization.translateMap("categories"), ["comedy"]);
         break;
       case ProgramCategories.MUSIC:
-        content = "Musical";
+        content =  SafeMap.safe(
+            _localization.translateMap("categories"), ["music"]);
         break;
       case ProgramCategories.SCIENCE:
-        content = "Ciencia";
+        content =  SafeMap.safe(
+            _localization.translateMap("categories"), ["science"]);
         break;
       case ProgramCategories.ARTS:
-        content = "Arte";
+        content =  SafeMap.safe(
+            _localization.translateMap("categories"), ["art"]);
         break;
       case ProgramCategories.GOVERNMENT:
-        content = "Elecciones";
+        content =  SafeMap.safe(
+            _localization.translateMap("categories"), ["goverment"]);
         break;
       case ProgramCategories.HEALTH:
-        content = "Salud";
+        content =  SafeMap.safe(
+            _localization.translateMap("categories"), ["health"]);
         break;
       case ProgramCategories.TECH:
-        content = "Tecnología";
+        content =  SafeMap.safe(
+            _localization.translateMap("categories"), ["tech"]);
         break;
       default:
         break;

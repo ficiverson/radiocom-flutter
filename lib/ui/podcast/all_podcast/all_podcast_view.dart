@@ -3,9 +3,11 @@ import 'dart:io';
 
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/program.dart';
+import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/utils/neumorfism.dart';
 import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
+import 'package:cuacfm/utils/safe_map.dart';
 import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +42,7 @@ class AllPodcastState extends State<AllPodcast>
   EventChannel _notificationEvent =
       EventChannel('cuacfm.flutter.io/updateNotification');
   SnackBar snackBarConnection;
+  CuacLocalization _localization;
 
   AllPodcastState() {
     DependencyInjector().injectByView(this);
@@ -58,7 +61,8 @@ class AllPodcastState extends State<AllPodcast>
             isSearch: _isSearching,
             title: widget.category != null
                 ? widget.category
-                : "Todos los podcasts",
+                : SafeMap.safe(
+            _localization.translateMap("all_podcast"), ["title"]),
             topBarOption: TopBarOption.MODAL,
             rightIcon: Icons.search, onRightClicked: () {
           if (Platform.isAndroid) {
@@ -138,6 +142,7 @@ class AllPodcastState extends State<AllPodcast>
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "all_podcast", "close": false});
     }
+    _localization = Injector.appInstance.getDependency<CuacLocalization>();
     _presenter = Injector.appInstance.getDependency<AllPodcastPresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     _podcasts = widget.podcasts;
@@ -200,7 +205,8 @@ class AllPodcastState extends State<AllPodcast>
       scaffoldKey.currentState..removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         duration: Duration(seconds: 3),
-        content: Text("No dispones de conexión a internet"),
+        content: Text(SafeMap.safe(
+            _localization.translateMap("error"), ["internet_error"])),
       );
       scaffoldKey.currentState..showSnackBar(snackBarConnection);
     }
@@ -246,7 +252,8 @@ class AllPodcastState extends State<AllPodcast>
                                         .hour *
                                     60)
                                 .toString() +
-                            " minutos.",
+                            SafeMap.safe(
+                                _localization.translateMap("general"), ["minutes"]),
                       )));
             }));
   }

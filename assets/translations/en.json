@@ -2,6 +2,113 @@
   "home" : {
     "welcome_msg_1" : "Good morning",
     "welcome_msg_2" : "Good afternoon",
-    "welcome_msg_3" : "Good night"
+    "welcome_msg_3" : "Good evening",
+    "live_msg" : "Live broadcast",
+    "recent_msg" : "Recent Podcasts",
+    "now_msg" : "Now",
+    "empty_podcast" : "There is no podcast at this moment.",
+    "news" : "News",
+    "news_error" : "There is no news at this moment.",
+    "podcast" : "Podcast",
+    "podcast_error" : "There is no podcast at this moment.",
+    "categories" : "Categories",
+    "see_all" : "See all"
+  },
+  "podcast_controls" : {
+    "msg" : "Live streming of the stations. 103.4 FM. For more info visit: www.cuacfm.org",
+    "auto_off_active" : "Auto off in: ",
+    "auto_off_inactive" : "Auto off"
+  },
+  "timetable" : {
+    "title" : "Todays's schedule"
+  },
+  "all_podcast" : {
+    "title" :  "All podcasts",
+    "search" : "Search podcast"
+  },
+  "podcast_detail" : {
+    "empty_msg" : "<p> There is not description yet :(</p> <br/><br/><img src=\"https://cuacfm.org/wp-content/uploads/2015/04/cuacfm-banner-top.png\">",
+    "empty_episodes_msg" : "There is no episodes at this moment :("
+  },
+  "settings" : {
+    "station_section" : {
+      "name" : "STATION",
+      "item1" : "History",
+      "item2" : "Gallery"
+    },
+    "config_section" : {
+      "name" : "CONFIGURATION",
+      "item1" : "Force dark mode",
+      "item2" : "Schedule info"
+    },
+    "social_section" : {
+      "name" : "SOCIAL NETWORK",
+      "item1" : "Facebook",
+      "item2" : "Twitter"
+    },
+    "more_info_section" : {
+      "name" : "MORE INFO",
+      "item1" : "Web page",
+      "item2" : "Localization"
+    },
+    "legal_info_section" : {
+      "name" : "LEGAL",
+      "item1" : "Privacy policy",
+      "item2" : "Terms and conditions",
+      "item3" : "Software license"
+    }
+  },
+  "error" : {
+    "title" : "Error",
+    "message" : "Whooops something failed :(",
+    "internet_error" : "There is no internet connection",
+    "connection_error" : "We cannot contact our servers"
+  },
+  "actions" : {
+    "close" : "Close"
+  },
+  "general" : {
+    "minutes" : " minutes.",
+    "seconds" : " seconds.",
+    "from" : "From ",
+    "to" : " to "
+  },
+  "categories" : {
+    "others" : "Others",
+    "tv" : "TV & Film",
+    "news" : "News & Politics",
+    "sport" : "Sports ",
+    "magazine" : "Society & Culture",
+    "edu" : "Education",
+    "comedy" : "Comedy",
+    "music" : "Music",
+    "science" : "Science",
+    "art" : "Arts",
+    "goverment" : "Elections",
+    "health" : "Health",
+    "tech" : "Technology"
+  },
+  "days" : {
+    "mon": "Monday",
+    "tue": "Tuesday",
+    "wed": "Wednesday",
+    "thu": "Thrusday",
+    "fri": "Friday",
+    "sat": "Saturday",
+    "sun": "Sunday"
+  },
+  "months" : {
+    "jan" : "jan",
+    "feb" : "feb",
+    "mar" : "mar",
+    "apr" : "apr",
+    "may" : "may",
+    "jun" : "jun",
+    "jul" : "jul",
+    "ago" : "aug",
+    "sep" : "sep",
+    "oct" : "oct",
+    "nov" : "nov",
+    "dec" : "dec"
   }
 }

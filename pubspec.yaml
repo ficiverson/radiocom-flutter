@@ -74,6 +74,10 @@ flutter:
       - assets/graphics/categories/health.jpeg
       - assets/graphics/categories/tech.jpeg
       - assets/graphics/watch.jpg
+      - assets/translations/en.json
+      - assets/translations/es.json
+      - assets/translations/gl.json
+      - assets/translations/pt.json
 
   fonts:
       - family: Montserrat

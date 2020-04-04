@@ -3,11 +3,13 @@ import 'dart:io';
 
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/episode.dart';
+import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/podcast/controls/podcast_controls_presenter.dart';
 import 'package:cuacfm/utils/custom_image.dart';
 import 'package:cuacfm/utils/neumorfism.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
+import 'package:cuacfm/utils/safe_map.dart';
 import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +42,7 @@ class PodcastControlsState extends State<PodcastControls>
   Duration currentTimeCountdown = Duration.zero;
   bool shouldShowTimer = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  CuacLocalization _localization;
 
   PodcastControlsState() {
     DependencyInjector().injectByView(this);
@@ -71,6 +74,7 @@ class PodcastControlsState extends State<PodcastControls>
           'changeScreen',
           {"currentScreen": "podcast-controls", "close": false});
     }
+    _localization = Injector.appInstance.getDependency<CuacLocalization>();
     _presenter = Injector.appInstance.getDependency<PodcastControlsPresenter>();
     currentPlayer = Injector.appInstance.getDependency<CurrentPlayerContract>();
     shouldShowTimer = _presenter.currentTimer.currentTime != 0;
@@ -156,7 +160,8 @@ class PodcastControlsState extends State<PodcastControls>
       _scaffoldKey.currentState..removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         duration: Duration(seconds: 3),
-        content: Text("No dispones de conexión a internet"),
+        content: Text(SafeMap.safe(
+            _localization.translateMap("error"), ["internet_error"])),
       );
       _scaffoldKey.currentState..showSnackBar(snackBarConnection);
     }
@@ -244,7 +249,10 @@ class PodcastControlsState extends State<PodcastControls>
                           padding: EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
                           child: Container(
                               child: Text(
-                                  "Streming en directo de la radio comunitaria de A Coruña. 103.4 FM. Para más información visita: www.cuacfm.org",
+                                  SafeMap.safe(
+                                      _localization
+                                          .translateMap("podcast_controls"),
+                                      ["msg"]),
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 17.0,
@@ -319,15 +327,15 @@ class PodcastControlsState extends State<PodcastControls>
                       ? Padding(
                           padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0.0),
                           child: NeumorphicCardHorizontal(
-                              showUpDownRight : shouldShowTimer?1:2,
-                            onElementClicked: () {
-                              setState(() {
+                              showUpDownRight: shouldShowTimer ? 1 : 2,
+                              onElementClicked: () {
+                                setState(() {
                                   shouldShowTimer = !shouldShowTimer;
                                 });
-                            },
-                            active: shouldShowTimer,
-                            image: "assets/graphics/watch.jpg",
-                            label: getTextForCountDown()))
+                              },
+                              active: shouldShowTimer,
+                              image: "assets/graphics/watch.jpg",
+                              label: getTextForCountDown()))
                       : Container(),
                   _presenter.currentPlayer.isPlaying() && shouldShowTimer
                       ? Padding(
@@ -335,47 +343,51 @@ class PodcastControlsState extends State<PodcastControls>
                           child: NeumorphicView(
                               isFullScreen: false,
                               child: Padding(
-                                  padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
-                                  child:Wrap(
-                            children: List<Widget>.generate(
-                              8,
-                              (int index) {
-                                return Padding(
-                                    padding:
-                                        EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
-                                    child: RawChip(
-                                      showCheckmark: true,
-                                      checkmarkColor: _colors.white,
-                                      labelStyle: TextStyle(
-                                        fontSize: 15.0,
-                                        letterSpacing: 1.1,
-                                        fontWeight: FontWeight.w400,
-                                        color: index == selectedIndex
-                                            ? _colors.white
-                                            : _colors.fontH1,
-                                      ),
-                                      label: Text(
-                                          index == 0
-                                              ? "Off      "
-                                              : '${index * 15} min',
-                                          textAlign: TextAlign.center),
-                                      selected: selectedIndex == index,
-                                      selectedColor: _colors.yellow,
-                                      backgroundColor: _colors.palidwhitedark,
-                                      onSelected: (bool selected) {
-                                        if (index == 0) {
-                                          currentTimeCountdown = Duration.zero;
-                                        }
-                                        _presenter.onTimerStart(
-                                            Duration(minutes: index * 15),
-                                            index);
-                                        setState(() {
-                                          selectedIndex = index;
-                                        });
+                                  padding: EdgeInsets.fromLTRB(
+                                      10.0, 20.0, 10.0, 20.0),
+                                  child: Wrap(
+                                    children: List<Widget>.generate(
+                                      8,
+                                      (int index) {
+                                        return Padding(
+                                            padding: EdgeInsets.fromLTRB(
+                                                2.0, 0.0, 2.0, 0.0),
+                                            child: RawChip(
+                                              showCheckmark: true,
+                                              checkmarkColor: _colors.white,
+                                              labelStyle: TextStyle(
+                                                fontSize: 15.0,
+                                                letterSpacing: 1.1,
+                                                fontWeight: FontWeight.w400,
+                                                color: index == selectedIndex
+                                                    ? _colors.white
+                                                    : _colors.fontH1,
+                                              ),
+                                              label: Text(
+                                                  index == 0
+                                                      ? "Off      "
+                                                      : '${index * 15} min',
+                                                  textAlign: TextAlign.center),
+                                              selected: selectedIndex == index,
+                                              selectedColor: _colors.yellow,
+                                              backgroundColor:
+                                                  _colors.palidwhitedark,
+                                              onSelected: (bool selected) {
+                                                if (index == 0) {
+                                                  currentTimeCountdown =
+                                                      Duration.zero;
+                                                }
+                                                _presenter.onTimerStart(
+                                                    Duration(
+                                                        minutes: index * 15),
+                                                    index);
+                                                setState(() {
+                                                  selectedIndex = index;
+                                                });
+                                              },
+                                            ));
                                       },
-                                    ));
-                              },
-                            ).toList(),
+                                    ).toList(),
                                   ))))
                       : Container()
                 ]))));
@@ -433,11 +445,15 @@ class PodcastControlsState extends State<PodcastControls>
                     : "0" + date.second.toString()
             : "";
     if (date.minute == 0 && date.hour == 0 && date.second != 0) {
-      seconds = seconds + " segundos.";
+      seconds = seconds +
+          SafeMap.safe(_localization.translateMap("general"), ["seconds"]);
     }
     var elapsedTime = hour + minutes + seconds;
     return currentTimeCountdown != Duration.zero
-        ? "Autoapagado en: " + elapsedTime
-        : "Autoapagado";
+        ? SafeMap.safe(_localization.translateMap("podcast_controls"),
+                ["auto_off_active"]) +
+            elapsedTime
+        : SafeMap.safe(_localization.translateMap("podcast_controls"),
+            ["auto_off_inactive"]);
   }
 }

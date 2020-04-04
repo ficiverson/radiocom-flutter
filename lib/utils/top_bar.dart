@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
+import 'package:cuacfm/utils/safe_map.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -185,8 +187,9 @@ class TopBarState extends State<TopBar> {
           controller: _searchQuery,
           autofocus: true,
           autocorrect: false,
-          decoration: const InputDecoration(
-            hintText: 'Buscar podcast',
+          decoration: InputDecoration(
+            hintText:  SafeMap.safe(
+                Injector.appInstance.getDependency<CuacLocalization>().translateMap("all_podcast"), ["search"]),
           ),
         ));
   }

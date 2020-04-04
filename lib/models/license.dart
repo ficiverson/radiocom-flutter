@@ -53,7 +53,9 @@ class License {
       License("firebase_in_app_messaging",
           "https://pub.dartlang.org/packages/firebase_in_app_messaging \n\nCopyright 2018 The Chromium Authors. All rights reserved."),
       License("countdown",
-          "https://pub.dartlang.org/packages/countdown \n\nBSD 3-Clause \"New\" or \"Revised\" License Copyright (c) 2015, BenNG")
+          "https://pub.dartlang.org/packages/countdown \n\nBSD 3-Clause \"New\" or \"Revised\" License Copyright (c) 2015, BenNG"),
+      License("devicelocale",
+          "https://pub.dartlang.org/packages/devicelocale \n\nApache License Version 2.0, January 2004")
     ];
   }
 }

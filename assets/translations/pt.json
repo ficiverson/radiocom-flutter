@@ -1,0 +1,114 @@
+{
+  "home" : {
+    "welcome_msg_1" : "Buenos días",
+    "welcome_msg_2" : "Buenas tardes",
+    "welcome_msg_3" : "Buenas noches",
+    "live_msg" : "Escuchar en Directo",
+    "recent_msg" : "Podcast recientes",
+    "now_msg" : "Ahora suena",
+    "empty_podcast" : "No hay podcast recientes ahora mismo.",
+    "news" : "Noticias",
+    "news_error" : "No podemos cargar las noticias ahora mismo.",
+    "podcast" : "Podcast",
+    "podcast_error" : "No podemos cargar los podcast en este momento",
+    "categories" : "Categorías",
+    "see_all" : "Ver todos"
+  },
+  "podcast_controls" : {
+    "msg" : "Streming en directo de la radio comunitaria de A Coruña. 103.4 FM. Para más información visita: www.cuacfm.org",
+    "auto_off_active" : "Autoapagado en: ",
+    "auto_off_inactive" : "Autoapagado"
+  },
+  "timetable" : {
+    "title" : "Programas de hoy"
+  },
+  "all_podcast" : {
+    "title" :  "Todos los podcasts",
+    "search" : "Buscar podcast"
+  },
+  "podcast_detail" : {
+    "empty_msg" : "<p> No hay descripción todavía :(</p> <br/><br/><img src=\"https://cuacfm.org/wp-content/uploads/2015/04/cuacfm-banner-top.png\">",
+    "empty_episodes_msg" : "No hay episodios en este momento :("
+  },
+  "settings" : {
+    "station_section" : {
+      "name" : "EMISORA",
+      "item1" : "Historia",
+      "item2" : "Galería"
+    },
+    "config_section" : {
+      "name" : "CONFIGURACIÓN",
+      "item1" : "Forzar modo oscuro",
+      "item2" : "Información de parrilla"
+    },
+    "social_section" : {
+      "name" : "REDES SOCIALES",
+      "item1" : "Facebook",
+      "item2" : "Twitter"
+    },
+    "more_info_section" : {
+      "name" : "MÁS INFORMACIÓN",
+      "item1" : "Página web",
+      "item2" : "Localización"
+    },
+    "legal_info_section" : {
+      "name" : "LEGAL",
+      "item1" : "Política de privacidad",
+      "item2" : "Términos de uso",
+      "item3" : "Licencias de software"
+    }
+  },
+  "error" : {
+    "title" : "Error",
+    "message" : "Whooops hubo un problema no esperado :(",
+    "internet_error" : "No dispones de conexión a internet",
+    "connection_error" : "No podemos conectar con el servidor en este momento"
+  },
+  "actions" : {
+    "close" : "Cerrar"
+  },
+  "general" : {
+    "minutes" : " minutos.",
+    "seconds" : " segundos.",
+    "from" : "De ",
+    "to" : " a "
+  },
+  "categories" : {
+    "others" : "Otros",
+    "tv" : "Cine y series",
+    "news" : "Noticias y política",
+    "sport" : "Deportes",
+    "magazine" : "Magazine",
+    "edu" : "Educativo",
+    "comedy" : "Humor",
+    "music" : "Música",
+    "science" : "Ciencia",
+    "art" : "Arte",
+    "goverment" : "Elecciones",
+    "health" : "Salud",
+    "tech" : "Tecnología"
+  },
+  "days" : {
+    "mon": "Lunes",
+    "tue": "Martes",
+    "wed": "Miércoles",
+    "thu": "Jueves",
+    "fri": "Viernes",
+    "sat": "Sábado",
+    "sun": "Domingo"
+  },
+  "months" : {
+    "jan" : "ene",
+    "feb" : "feb",
+    "mar" : "mar",
+    "apr" : "abr",
+    "may" : "may",
+    "jun" : "jun",
+    "jul" : "jul",
+    "ago" : "ago",
+    "sep" : "sep",
+    "oct" : "oct",
+    "nov" : "nov",
+    "dec" : "dec"
+  }
+}

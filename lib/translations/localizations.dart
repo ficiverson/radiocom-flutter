@@ -21,7 +21,6 @@ class CuacLocalization implements CuacLocalizationContract {
   Map<String, dynamic> _sentencesLocal;
 
   Future<bool> load() async {
-    print(locale);
     if (_sentencesLocal != null && _sentencesLocal.isNotEmpty) {
       return true;
     } else {

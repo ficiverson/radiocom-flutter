@@ -5,8 +5,10 @@ import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/legal.dart';
 import 'package:cuacfm/models/license.dart';
 import 'package:cuacfm/models/radiostation.dart';
+import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
+import 'package:cuacfm/utils/safe_map.dart';
 import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,6 +39,7 @@ class SettingsDetailState extends State<SettingsDetail> with WidgetsBindingObser
   EventChannel _notificationEvent =
   EventChannel('cuacfm.flutter.io/updateNotification');
   SnackBar snackBarConnection;
+  CuacLocalization _localization;
 
   SettingsDetailState() {
     DependencyInjector().injectByView(this);
@@ -83,6 +86,7 @@ class SettingsDetailState extends State<SettingsDetail> with WidgetsBindingObser
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "settings_detail", "close": false});
     }
+    _localization = Injector.appInstance.getDependency<CuacLocalization>();
     _presenter = Injector.appInstance.getDependency<SettingsDetailPresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     _radioStation = Injector.appInstance.getDependency<RadioStation>();
@@ -144,7 +148,8 @@ class SettingsDetailState extends State<SettingsDetail> with WidgetsBindingObser
       scaffoldKey.currentState..removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         duration: Duration(seconds: 3),
-        content: Text("No dispones de conexión a internet"),
+        content: Text(SafeMap.safe(
+            _localization.translateMap("error"), ["internet_error"])),
       );
       scaffoldKey.currentState..showSnackBar(snackBarConnection);
     }
@@ -257,11 +262,14 @@ class SettingsDetailState extends State<SettingsDetail> with WidgetsBindingObser
 
   String getTitle(LegalType legalType) {
     if (legalType == LegalType.LICENSE) {
-      return "Licencias de software";
+      return SafeMap.safe(
+          _localization.translateMap("settings"), ["legal_info_section","item3"]);
     } else if (legalType == LegalType.TERMS) {
-      return "Términos y condiciones";
+      return SafeMap.safe(
+          _localization.translateMap("settings"), ["legal_info_section","item2"]);
     } else if (legalType == LegalType.PRIVACY) {
-      return "Política de privacidad";
+      return SafeMap.safe(
+          _localization.translateMap("settings"), ["legal_info_section","item1"]);
     } else {
       return "";
     }

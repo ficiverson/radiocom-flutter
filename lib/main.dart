@@ -1,7 +1,9 @@
 import 'package:cuacfm/injector/dependency_injector.dart';
+import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/translations/localizations_delegate.dart';
 import 'package:cuacfm/ui/home/home_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
+import 'package:cuacfm/utils/safe_map.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -39,6 +41,7 @@ class MyApp extends StatelessWidget {
         const Locale('en', 'US'),
         const Locale('es', 'ES'),
         const Locale('gl', 'ES'),
+        const Locale('pt','PT')
       ],
       localizationsDelegates: [
         LocalizationDelegate(),
@@ -55,7 +58,6 @@ class MyApp extends StatelessWidget {
             }
           }
         }
-
         return supportedLocales.first;
       },
       title: 'CUAC FM',
@@ -76,10 +78,12 @@ class MyApp extends StatelessWidget {
 }
 
 Widget errorScreen(dynamic detailsException) {
+  var _localization = Injector.appInstance.getDependency<CuacLocalization>();
   return Scaffold(
       appBar: AppBar(
         backgroundColor: Injector.appInstance.getDependency<RadiocomColorsConract>().white,
-        title: Text('Error'),
+        title: Text(SafeMap.safe(_localization.translateMap('error'),
+            ["title"])),
       ),
       body: Container(
           color: Injector.appInstance.getDependency<RadiocomColorsConract>().white,
@@ -87,7 +91,8 @@ Widget errorScreen(dynamic detailsException) {
             padding: EdgeInsets.all(20.0),
             child: Foundation.kReleaseMode
                 ? Center(
-                    child: Text('Whooops hubo un problema no esperado :(',
+                    child: Text(SafeMap.safe(_localization.translateMap('error'),
+                        ["message"]),
                         style: TextStyle(fontSize: 24.0)))
                 : SingleChildScrollView(
                     child: Text('Exeption Details:\n\n$detailsException')),
