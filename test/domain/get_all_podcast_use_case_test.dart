@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
 import '../instrument/data/repository_mock.dart';
+import '../instrument/helper/helper-instrument.dart';
 
 void main() {
   GetAllPodcastUseCase useCase;
@@ -13,8 +14,8 @@ void main() {
   Invoker invoker = Invoker();
 
   setUpAll(() async {
+    getTranslations();
     useCase = GetAllPodcastUseCase(radiocoRepository: mockRepository);
-
   });
 
   tearDownAll(() async {});

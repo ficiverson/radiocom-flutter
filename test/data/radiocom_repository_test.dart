@@ -8,12 +8,14 @@ import 'package:cuacfm/models/time_table.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
+import '../instrument/helper/helper-instrument.dart';
 import '../instrument/remote-data-source/remote-data-source-mock.dart';
 
 void main() {
   CuacRepository repository;
   MockRemoteDataSource mockRemoteDataSource = MockRemoteDataSource();
   setUpAll(() async {
+    getTranslations();
     repository = CuacRepository(
         remoteDataSource: mockRemoteDataSource);
   });

@@ -12,6 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:injector/injector.dart';
 import 'package:mock_web_server/mock_web_server.dart';
 
+import '../instrument/helper/helper-instrument.dart';
 import '../instrument/helper/helper.dart';
 import '../instrument/model/radio_station_instrument.dart';
 import '../instrument/remote-data-source/radioco_api_mock.dart';
@@ -25,6 +26,7 @@ void main() {
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
     DependencyInjector().loadModules();
+    getTranslations();
     server = new MockWebServer();
     await server.start();
     mockRaiodocApi.baseUrl = server.url;

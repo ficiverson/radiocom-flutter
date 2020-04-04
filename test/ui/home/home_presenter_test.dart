@@ -35,6 +35,7 @@ void main() {
     WidgetsFlutterBinding.ensureInitialized();
     SharedPreferences.setMockInitialValues({});
     DependencyInjector().loadModules();
+    getTranslations();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
         (_) => mockRepository,
         override: true);

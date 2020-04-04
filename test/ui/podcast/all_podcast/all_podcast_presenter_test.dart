@@ -28,6 +28,7 @@ void main() {
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
     DependencyInjector().loadModules();
+    getTranslations();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
         (_) => mockRepository,
         override: true);
