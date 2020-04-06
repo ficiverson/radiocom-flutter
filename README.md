@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a2e79f35bb5c4b2a83157af7c3114037)](https://app.codacy.com/manual/ficiverson/radiocom-flutter?utm_source=github.com&utm_medium=referral&utm_content=ficiverson/radiocom-flutter&utm_campaign=Badge_Grade_Dashboard)
 # radiocom-flutter [![Codemagic build status](https://api.codemagic.io/apps/5e886482bccbec3072de65d9/5e886482bccbec3072de65d8/status_badge.svg)](https://codemagic.io/apps/5e886482bccbec3072de65d9/5e886482bccbec3072de65d8/latest_build)
 
 This is a flutter application for Community Media Stations based in radioco APIs.
