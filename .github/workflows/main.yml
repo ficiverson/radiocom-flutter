@@ -26,7 +26,7 @@ jobs:
       - run: flutter test --coverage
       # run flutter command to fix coverage report
       - run: flutter pub global activate remove_from_coverage
-      - run: flutter pub global run remove_from_coverage:remove_from_coverage -f coverage/lcov.info -r '.g.dart,license.dart,home_view.dart,home_router.dart,new_detail.dart,new_detail_router.dart,current_player.dart,detail_podcast_view.dart,detail_podcast_router.dart,all_podcast_view.dart,detail_podcast_router.dart,all_podcast_view.dart,all_podcast_router.dart,podcast_controls.dart,settings.dart,settings_router.dart,settings_detail.dart,settings_detail_router.dart,time_table_view.dart,time_table_router.dart,bottom_bar.dart,connection_contract.dart,custom_image.dart,neumorfism.dart,notification_subscription_contract.dart,player_view.dart,top_bar.dart$'
+      - run: flutter pub global run remove_from_coverage:remove_from_coverage -f coverage/lcov.info -r '.g.dart,license.dart,_router.dart,current_player.dart,bottom_bar.dart,connection_contract.dart,custom_image.dart,neumorfism.dart,notification_subscription_contract.dart,player_view.dart,top_bar.dart$'
       # Upload coverage reports to Codecov
       # https://github.com/marketplace/actions/codecov
       - name: Upload coverage to Codecov

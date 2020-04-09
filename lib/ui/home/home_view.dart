@@ -517,6 +517,7 @@ class MyHomePageState extends State<MyHomePage>
                 children: <Widget>[
                   SizedBox(height: 45.0),
                   Padding(
+                      key: Key("welcome_message_home"),
                       padding: EdgeInsets.fromLTRB(22.0, 10.0, 25.0, 0.0),
                       child: Text(
                         _getWelcomeText(),

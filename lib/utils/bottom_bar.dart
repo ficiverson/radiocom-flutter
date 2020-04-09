@@ -40,6 +40,7 @@ class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
       _resizableController.forward(from: 0.0);
     }
     return Container(
+        key: Key("bottom_bar"),
         decoration: BoxDecoration(
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.only(
@@ -55,7 +56,7 @@ class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
           color: _colors.palidwhite,
         ),
         width: queryData.size.width,
-        height: Platform.isAndroid ? 85: 100,
+        height: Platform.isAndroid ? 85 : 100,
         child: Column(children: [
           SizedBox(height: 10.0),
           Container(
@@ -64,6 +65,7 @@ class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
                   GestureDetector(
+                      key: Key("bottom_bar_item1"),
                       onTap: () {
                         setState(() {
                           bottomBarOption = BottomBarOption.HOME;
@@ -77,6 +79,7 @@ class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
                         icon: Icons.home,
                       )),
                   GestureDetector(
+                      key: Key("bottom_bar_item2"),
                       onTap: () {
                         setState(() {
                           bottomBarOption = BottomBarOption.SEARCH;
@@ -90,6 +93,7 @@ class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
                         icon: Icons.headset,
                       )),
                   GestureDetector(
+                      key: Key("bottom_bar_item3"),
                       onTap: () {
                         setState(() {
                           bottomBarOption = BottomBarOption.NEWS;
@@ -103,6 +107,7 @@ class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
                         icon: FontAwesomeIcons.newspaper,
                       )),
                   GestureDetector(
+                      key: Key("bottom_bar_item4"),
                       onTap: () {
                         setState(() {
                           _onOptionSelected(true);

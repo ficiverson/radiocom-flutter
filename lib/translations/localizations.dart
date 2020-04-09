@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 
 abstract class CuacLocalizationContract {
   Map<String, dynamic> translateMap(String key);
+  String getTranslations(String key);
+  String translate(String key);
 }
 
 class CuacLocalization implements CuacLocalizationContract {
@@ -49,6 +51,7 @@ class CuacLocalization implements CuacLocalizationContract {
 //    }
 //  }
 
+  @override
   String getTranslations(String key) {
     if (_sentencesRemote != null && this._sentencesRemote.containsKey(key)) {
       return this._sentencesRemote[key];
@@ -60,6 +63,7 @@ class CuacLocalization implements CuacLocalizationContract {
     }
   }
 
+  @override
   String translate(String key) {
     if (_sentencesRemote != null && this._sentencesRemote.containsKey(key)) {
       return this._sentencesRemote[key].toString();
@@ -71,7 +75,8 @@ class CuacLocalization implements CuacLocalizationContract {
     }
   }
 
-  @override Map<String, dynamic> translateMap(String key) {
+  @override
+  Map<String, dynamic> translateMap(String key) {
     if (_sentencesRemote != null && this._sentencesRemote.containsKey(key)) {
       return this._sentencesRemote[key];
     } else if (_sentencesLocal != null &&
