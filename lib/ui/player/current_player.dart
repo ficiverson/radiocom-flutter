@@ -18,7 +18,8 @@ abstract class CurrentPlayerContract {
   PlayerState playerState = PlayerState.stop;
   AudioPlayer audioPlayer = Injector.appInstance.getDependency<AudioPlayer>();
   String currentSong = ":";
-  String currentImage = "https://cuacfm.org/wp-content/uploads/2015/04/cousomicros1.jpg";
+  String currentImage =
+      "https://cuacfm.org/wp-content/uploads/2015/04/cousomicros1.jpg";
   bool isPodcast = false;
   Duration duration = Duration(seconds: 0);
   Duration position = Duration(seconds: 0);
@@ -58,7 +59,8 @@ class CurrentPlayer implements CurrentPlayerContract {
   @override
   String currentSong = ":";
   @override
-  String currentImage = "https://cuacfm.org/wp-content/uploads/2015/04/cousomicros1.jpg";
+  String currentImage =
+      "https://cuacfm.org/wp-content/uploads/2015/04/cousomicros1.jpg";
   @override
   bool isPodcast = false;
   @override
@@ -166,41 +168,51 @@ class CurrentPlayer implements CurrentPlayerContract {
             onUpdate();
           }
         });
-
+      }
         audioPlayer.onAudioPositionChanged.listen((Duration p) {
-          if (p.inSeconds.ceilToDouble() >= 0.0 &&
-              p.inSeconds.ceilToDouble() <= duration.inSeconds.ceilToDouble()) {
+          if(isPodcast) {
+            if (p.inSeconds.ceilToDouble() >= 0.0 &&
+                p.inSeconds.ceilToDouble() <=
+                    duration.inSeconds.ceilToDouble()) {
+              position = p;
+              if (onUpdate != null) {
+                onUpdate();
+              }
+              if (Platform.isIOS) {
+                audioPlayer.setNotification(
+                    title: currentSong,
+                    imageUrl: currentImage,
+                    artist: "CUAC FM",
+                    albumTitle: "Podcast",
+                    forwardSkipInterval: const Duration(seconds: 30),
+                    backwardSkipInterval: const Duration(seconds: 30),
+                    duration: duration,
+                    elapsedTime: position);
+              }
+            }
+          } else {
             position = p;
-            if (onUpdate != null) {
-              onUpdate();
+            if (Platform.isIOS) {
+              audioPlayer.setNotification(
+                  title: currentSong,
+                  imageUrl: currentImage,
+                  albumTitle: "Live",
+                  artist: "CUAC FM");
             }
           }
         });
 
-//          if (Platform.isIOS) {
-//            audioPlayer.setNotification(
-//                title: currentSong,
-//                imageUrl: currentImage,
-//                artist: "CUAC FM",
-//                forwardSkipInterval: const Duration(seconds: 30),
-//                backwardSkipInterval: const Duration(seconds: 30),
-//                duration: d,
-//                elapsedTime: position);
-//          }
 
-//        if (Platform.isIOS) {
-//          audioPlayer.onNotificationPlayerStateChanged.listen((state) {
-//            if (state == AudioPlayerState.PLAYING) {
-//              playerState = PlayerState.play;
-//            } else {
-//              playerState = PlayerState.pause;
-//            }
-//          });
-//        }
-
-      } else {
-        audioPlayer.onAudioPositionChanged.listen((Duration p) {
-          position = p;
+      if (Platform.isIOS) {
+        audioPlayer.onNotificationPlayerStateChanged.listen((state) {
+          if (state == AudioPlayerState.PLAYING) {
+            playerState = PlayerState.play;
+          } else {
+            playerState = PlayerState.pause;
+          }
+          if (onUpdate != null) {
+            onUpdate();
+          }
         });
       }
 
@@ -221,7 +233,7 @@ class CurrentPlayer implements CurrentPlayerContract {
           MethodChannel('cuacfm.flutter.io/notificationInfo')
               .invokeMethod('notificationInfo', {
             "notificationTitle": isPodcast ? "Podcast" : "Directo",
-            "notificationImage" : currentImage,
+            "notificationImage": currentImage,
             "notificationSubtitle": currentSong
           });
         }
@@ -264,7 +276,7 @@ class CurrentPlayer implements CurrentPlayerContract {
         MethodChannel('cuacfm.flutter.io/notificationInfo')
             .invokeMethod('notificationInfo', {
           "notificationTitle": isPodcast ? "Podcast" : "Directo",
-          "notificationImage" : currentImage,
+          "notificationImage": currentImage,
           "notificationSubtitle": currentSong
         });
       }
@@ -297,7 +309,7 @@ class CurrentPlayer implements CurrentPlayerContract {
         MethodChannel('cuacfm.flutter.io/notificationInfo')
             .invokeMethod('notificationInfo', {
           "notificationTitle": isPodcast ? "Podcast" : "Directo",
-          "notificationImage" : currentImage,
+          "notificationImage": currentImage,
           "notificationSubtitle": currentSong
         });
       }

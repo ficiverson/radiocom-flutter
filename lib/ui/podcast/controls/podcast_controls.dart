@@ -176,7 +176,7 @@ class PodcastControlsState extends State<PodcastControls>
             physics: BouncingScrollPhysics(),
             child: new Container(
                 width: mediaQuery.size.width,
-                height: mediaQuery.size.height,
+                height: mediaQuery.size.height + 150.0,
                 child: Column(children: <Widget>[
                   Container(
                       margin: EdgeInsets.fromLTRB(5.0, 15.0, 0.0, 0.0),

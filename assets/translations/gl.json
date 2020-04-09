@@ -1,34 +1,34 @@
 {
   "home" : {
-    "welcome_msg_1" : "Buenos días",
-    "welcome_msg_2" : "Buenas tardes",
-    "welcome_msg_3" : "Buenas noches",
-    "live_msg" : "Escuchar en Directo",
-    "recent_msg" : "Podcast recientes",
-    "now_msg" : "Ahora suena",
-    "empty_podcast" : "No hay podcast recientes ahora mismo.",
-    "news" : "Noticias",
-    "news_error" : "No podemos cargar las noticias ahora mismo.",
+    "welcome_msg_1" : "Bo día",
+    "welcome_msg_2" : "Boa tarde",
+    "welcome_msg_3" : "Boa noite",
+    "live_msg" : "Escoitar en directo",
+    "recent_msg" : "Podcasts recentes",
+    "now_msg" : "Agora soa",
+    "empty_podcast" : "Non hai podcasts recentes agora mesmo.",
+    "news" : "Novas",
+    "news_error" : "Non podemos cargar a novas agora mesmo.",
     "podcast" : "Podcast",
-    "podcast_error" : "No podemos cargar los podcast en este momento",
+    "podcast_error" : "Non podemos cargar os podcasts neste momento.",
     "categories" : "Categorías",
     "see_all" : "Ver todos"
   },
   "podcast_controls" : {
-    "msg" : "Streming en directo de la radio comunitaria de A Coruña. 103.4 FM. Para más información visita: www.cuacfm.org",
+    "msg" : "Streming en directo da radio comunitaria da Coruña. 103.4 FM. Para máis información visita: www.cuacfm.org",
     "auto_off_active" : "Autoapagado en: ",
     "auto_off_inactive" : "Autoapagado"
   },
   "timetable" : {
-    "title" : "Programas de hoy"
+    "title" : "Programas de hoxe"
   },
   "all_podcast" : {
-    "title" :  "Todos los podcasts",
-    "search" : "Buscar podcast"
+    "title" :  "Todos os podcasts",
+    "search" : "Procurar podcast"
   },
   "podcast_detail" : {
-    "empty_msg" : "<p> No hay descripción todavía :(</p> <br/><br/><img src=\"https://cuacfm.org/wp-content/uploads/2015/04/cuacfm-banner-top.png\">",
-    "empty_episodes_msg" : "No hay episodios en este momento :("
+    "empty_msg" : "<p> Ainda non hai descripción :(</p> <br/><br/><img src=\"https://cuacfm.org/wp-content/uploads/2015/04/cuacfm-banner-top.png\">",
+    "empty_episodes_msg" : "Non hai episodios neste momento :("
   },
   "settings" : {
     "station_section" : {
@@ -39,33 +39,33 @@
     "config_section" : {
       "name" : "CONFIGURACIÓN",
       "item1" : "Forzar modo oscuro",
-      "item2" : "Información de parrilla"
+      "item2" : "Información de grella"
     },
     "social_section" : {
-      "name" : "REDES SOCIALES",
+      "name" : "REDES SOCIAIS",
       "item1" : "Facebook",
       "item2" : "Twitter"
     },
     "more_info_section" : {
-      "name" : "MÁS INFORMACIÓN",
-      "item1" : "Página web",
+      "name" : "MÁIS INFORMACIÓN",
+      "item1" : "Páxina web",
       "item2" : "Localización"
     },
     "legal_info_section" : {
       "name" : "LEGAL",
-      "item1" : "Política de privacidad",
-      "item2" : "Términos de uso",
-      "item3" : "Licencias de software"
+      "item1" : "Política de privacidade",
+      "item2" : "Termos de uso",
+      "item3" : "Licenzas de software"
     }
   },
   "error" : {
-    "title" : "Error",
-    "message" : "Whooops hubo un problema no esperado :(",
-    "internet_error" : "No dispones de conexión a internet",
-    "connection_error" : "No podemos conectar con el servidor en este momento"
+    "title" : "Erro",
+    "message" : "Ups houbo un problema inesperado :(",
+    "internet_error" : "Non dispós de conexión a internet",
+    "connection_error" : "Non podemos conectar co servidor neste momento"
   },
   "actions" : {
-    "close" : "Cerrar"
+    "close" : "Fechar"
   },
   "general" : {
     "minutes" : " minutos.",
@@ -74,9 +74,9 @@
     "to" : " a "
   },
   "categories" : {
-    "others" : "Otros",
-    "tv" : "Cine y series",
-    "news" : "Noticias y política",
+    "others" : "Outros",
+    "tv" : "Cine e series",
+    "news" : "Novas e política",
     "sport" : "Deportes",
     "magazine" : "Magazine",
     "edu" : "Educativo",
@@ -84,30 +84,30 @@
     "music" : "Música",
     "science" : "Ciencia",
     "art" : "Arte",
-    "goverment" : "Elecciones",
-    "health" : "Salud",
-    "tech" : "Tecnología"
+    "goverment" : "Eleccións",
+    "health" : "Saúde",
+    "tech" : "Tecnoloxía"
   },
   "days" : {
-    "mon": "Lunes",
+    "mon": "Luns",
     "tue": "Martes",
-    "wed": "Miércoles",
-    "thu": "Jueves",
-    "fri": "Viernes",
+    "wed": "Mércores",
+    "thu": "Xoves",
+    "fri": "Venres",
     "sat": "Sábado",
     "sun": "Domingo"
   },
   "months" : {
-    "jan" : "ene",
+    "jan" : "xan",
     "feb" : "feb",
     "mar" : "mar",
     "apr" : "abr",
-    "may" : "may",
-    "jun" : "jun",
-    "jul" : "jul",
+    "may" : "mai",
+    "jun" : "xuñ",
+    "jul" : "xul",
     "ago" : "ago",
-    "sep" : "sep",
-    "oct" : "oct",
+    "sep" : "set",
+    "oct" : "out",
     "nov" : "nov",
     "dec" : "dec"
   }

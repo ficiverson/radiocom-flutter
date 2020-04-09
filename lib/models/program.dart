@@ -168,7 +168,7 @@ class Program {
         break;
       case ProgramCategories.SPORTS:
         content =  SafeMap.safe(
-            _localization.translateMap("categories"), ["sport "]);
+            _localization.translateMap("categories"), ["sport"]);
         break;
       case ProgramCategories.SOCIETY:
         content =  SafeMap.safe(

@@ -7,7 +7,7 @@ class LocalizationDelegate extends LocalizationsDelegate<CuacLocalization> {
   const LocalizationDelegate();
 
   @override
-  bool isSupported(Locale locale) => ['en', 'es', 'gl'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => ['en', 'es', 'gl','pt'].contains(locale.languageCode);
 
   @override
   Future<CuacLocalization> load(Locale locale) async {

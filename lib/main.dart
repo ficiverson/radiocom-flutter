@@ -14,7 +14,6 @@ import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   ErrorWidget.builder =
@@ -29,7 +28,8 @@ void main() {
 
 class MyApp extends StatelessWidget {
   static FirebaseAnalytics analytics = FirebaseAnalytics();
-  static FirebaseInAppMessaging firebaseInAppMessaging = FirebaseInAppMessaging();
+  static FirebaseInAppMessaging firebaseInAppMessaging =
+      FirebaseInAppMessaging();
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
         const Locale('en', 'US'),
         const Locale('es', 'ES'),
         const Locale('gl', 'ES'),
-        const Locale('pt','PT')
+        const Locale('pt', 'PT')
       ],
       localizationsDelegates: [
         LocalizationDelegate(),
@@ -49,10 +49,11 @@ class MyApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate
       ],
-      localeResolutionCallback: (Locale locale, Iterable<Locale> supportedLocales) {
-        if(locale!=null) {
+      localeResolutionCallback:
+          (Locale locale, Iterable<Locale> supportedLocales) {
+        if (locale != null) {
           for (Locale supportedLocale in supportedLocales) {
-            if (supportedLocale.languageCode == locale.languageCode ||
+            if (supportedLocale.languageCode == locale.languageCode &&
                 supportedLocale.countryCode == locale.countryCode) {
               return supportedLocale;
             }
@@ -69,8 +70,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.grey,
         primaryColorBrightness: Brightness.light,
       ),
-      darkTheme: ThemeData(primaryColorBrightness: Brightness.dark,
-        canvasColor: Colors.black,primarySwatch: Colors.blue,
+      darkTheme: ThemeData(
+        primaryColorBrightness: Brightness.dark,
+        canvasColor: Colors.black,
+        primarySwatch: Colors.blue,
       ),
       home: new MyHomePage(title: 'Benvida a CUAC FM'),
     );
@@ -81,18 +84,21 @@ Widget errorScreen(dynamic detailsException) {
   var _localization = Injector.appInstance.getDependency<CuacLocalization>();
   return Scaffold(
       appBar: AppBar(
-        backgroundColor: Injector.appInstance.getDependency<RadiocomColorsConract>().white,
-        title: Text(SafeMap.safe(_localization.translateMap('error'),
-            ["title"])),
+        backgroundColor:
+            Injector.appInstance.getDependency<RadiocomColorsConract>().white,
+        title:
+            Text(SafeMap.safe(_localization.translateMap('error'), ["title"])),
       ),
       body: Container(
-          color: Injector.appInstance.getDependency<RadiocomColorsConract>().white,
+          color:
+              Injector.appInstance.getDependency<RadiocomColorsConract>().white,
           child: Padding(
             padding: EdgeInsets.all(20.0),
             child: Foundation.kReleaseMode
                 ? Center(
-                    child: Text(SafeMap.safe(_localization.translateMap('error'),
-                        ["message"]),
+                    child: Text(
+                        SafeMap.safe(
+                            _localization.translateMap('error'), ["message"]),
                         style: TextStyle(fontSize: 24.0)))
                 : SingleChildScrollView(
                     child: Text('Exeption Details:\n\n$detailsException')),
