@@ -62,7 +62,7 @@ class AllPodcastState extends State<AllPodcast>
             title: widget.category != null
                 ? widget.category
                 : SafeMap.safe(
-            _localization.translateMap("all_podcast"), ["title"]),
+                    _localization.translateMap("all_podcast"), ["title"]),
             topBarOption: TopBarOption.MODAL,
             rightIcon: Icons.search, onRightClicked: () {
           if (Platform.isAndroid) {
@@ -204,6 +204,7 @@ class AllPodcastState extends State<AllPodcast>
     if (snackBarConnection == null) {
       scaffoldKey.currentState..removeCurrentSnackBar();
       snackBarConnection = SnackBar(
+        key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
@@ -222,7 +223,8 @@ class AllPodcastState extends State<AllPodcast>
 
   Widget _getBodyLayout() {
     return Container(
-        padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, shouldShowPlayer?45.0:0.0),
+        padding:
+            EdgeInsets.fromLTRB(0.0, 0.0, 0.0, shouldShowPlayer ? 45.0 : 0.0),
         key: PageStorageKey<String>("allpodcastview"),
         color: _colors.transparent,
         width: queryData.size.width,
@@ -252,8 +254,8 @@ class AllPodcastState extends State<AllPodcast>
                                         .hour *
                                     60)
                                 .toString() +
-                            SafeMap.safe(
-                                _localization.translateMap("general"), ["minutes"]),
+                            SafeMap.safe(_localization.translateMap("general"),
+                                ["minutes"]),
                       )));
             }));
   }

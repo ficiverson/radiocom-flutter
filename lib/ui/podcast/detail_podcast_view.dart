@@ -160,6 +160,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
     if (snackBarConnection == null) {
       _scaffoldKey.currentState..removeCurrentSnackBar();
       snackBarConnection = SnackBar(
+        key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
@@ -239,11 +240,13 @@ class DetailPodcastState extends State<DetailPodcastPage>
                                       60)
                                   .toString() +
                               SafeMap.safe(
-                                  _localization.translateMap("general"), ["minutes"]),
+                                  _localization.translateMap("general"),
+                                  ["minutes"]),
                           widget.program.description == null ||
                                   widget.program.description.isEmpty
                               ? SafeMap.safe(
-                              _localization.translateMap("podcast_detail"), ["empty_msg"])
+                                  _localization.translateMap("podcast_detail"),
+                                  ["empty_msg"])
                               : widget.program.description,
                           widget.program.rssUrl);
                     },
@@ -343,7 +346,10 @@ class DetailPodcastState extends State<DetailPodcastPage>
                             getFormattedDate(_episodes[index - 1].pubDate),
                             _episodes[index - 1].description == null ||
                                     _episodes[index - 1].description.isEmpty
-                                ? SafeMap.safe(_localization.translateMap("podcast_detail"), ["empty_msg"])
+                                ? SafeMap.safe(
+                                    _localization
+                                        .translateMap("podcast_detail"),
+                                    ["empty_msg"])
                                 : _episodes[index - 1].description,
                             _episodes[index - 1].link);
                       },
@@ -353,10 +359,11 @@ class DetailPodcastState extends State<DetailPodcastPage>
                     ? getLoadingState()
                     : emptyState
                         ? Padding(
+                            key: PageStorageKey<String>("emptyState"),
                             padding: EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 0.0),
                             child: NeumorphicEmptyView(SafeMap.safe(
-                                _localization.translateMap("podcast_detail"), ["empty_episodes_msg"])
-                               ))
+                                _localization.translateMap("podcast_detail"),
+                                ["empty_episodes_msg"])))
                         : SizedBox(height: 30.0);
               }
               return element;

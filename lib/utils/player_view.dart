@@ -63,6 +63,7 @@ class PlayerViewState extends State<PlayerView> {
     }
     return widget.isExpanded
         ? Opacity(
+            key: Key("player_view_container"),
             opacity: widget.shouldShow ? 1 : 0,
             child: Container(
                 decoration: BoxDecoration(

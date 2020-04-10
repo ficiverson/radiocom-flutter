@@ -69,7 +69,7 @@ void main() {
     presenter.onViewResumed();
     await Future.delayed(Duration(milliseconds: 200));
 
-    expect(view.viewState[0], equals(SettingsDetailState.onNewData));
+    expect(view.viewState[0], equals(SettingsDetailViewState.onNewData));
   });
 
   test('that can init the presenter, then resume the view and realod the data with error response reload the view with base now',
@@ -86,7 +86,7 @@ void main() {
         presenter.onViewResumed();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState[0], equals(SettingsDetailState.onNewData));
+        expect(view.viewState[0], equals(SettingsDetailViewState.onNewData));
       });
 
   test(
@@ -135,7 +135,7 @@ void main() {
         presenter.onPodcastControlsClicked(EpisodeInstrument.givenAnEpisode());
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(router.viewState[0], equals(SettingsDetailState.goToEpisode));
+        expect(router.viewState[0], equals(SettingsDetailViewState.goToEpisode));
         expect((router.data[0] as Episode).title, equals(EpisodeInstrument.givenAnEpisode().title));
       });
 }

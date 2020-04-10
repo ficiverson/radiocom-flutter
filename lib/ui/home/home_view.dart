@@ -327,6 +327,7 @@ class MyHomePageState extends State<MyHomePage>
     if (snackBarConnection == null) {
       scaffoldKey.currentState..removeCurrentSnackBar();
       snackBarConnection = SnackBar(
+        key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),

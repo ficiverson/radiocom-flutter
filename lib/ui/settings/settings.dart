@@ -144,6 +144,7 @@ class SettingsState extends State<Settings>
     if (snackBarConnection == null) {
       scaffoldKey.currentState..removeCurrentSnackBar();
       snackBarConnection = SnackBar(
+        key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
@@ -190,6 +191,7 @@ class SettingsState extends State<Settings>
 
   Widget _getBodyLayout() {
     return new Container(
+        key: PageStorageKey<String>("settings_container"),
         color: _colors.palidwhitedark,
         height: _queryData.size.height,
         child: SingleChildScrollView(

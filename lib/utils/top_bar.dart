@@ -147,7 +147,7 @@ class TopBarState extends State<TopBar> {
                               fontWeight: FontWeight.w600),
                         )),
                   widget.rightIcon != null && !widget.isSearch
-                      ? IconButton(
+                      ? IconButton(key: Key("top_bar_search"),
                           icon: Icon(widget.rightIcon,
                               color: _colors.font, size: 30),
                           onPressed: () {
@@ -171,6 +171,7 @@ class TopBarState extends State<TopBar> {
         height: 40,
         width: queryData.size.width * 0.78,
         child: TextField(
+          key: Key("top_bar_search_input"),
           maxLines: 1,
           style: TextStyle(
               fontWeight: FontWeight.w700,

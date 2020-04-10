@@ -159,6 +159,7 @@ class PodcastControlsState extends State<PodcastControls>
     if (snackBarConnection == null) {
       _scaffoldKey.currentState..removeCurrentSnackBar();
       snackBarConnection = SnackBar(
+        key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
@@ -171,6 +172,7 @@ class PodcastControlsState extends State<PodcastControls>
 
   Widget getBodyLayout() {
     return new Container(
+        key: Key("podcast_controls_container"),
         child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             physics: BouncingScrollPhysics(),
@@ -353,6 +355,9 @@ class PodcastControlsState extends State<PodcastControls>
                                             padding: EdgeInsets.fromLTRB(
                                                 2.0, 0.0, 2.0, 0.0),
                                             child: RawChip(
+                                              key: Key("timer_chip_" +
+                                                  (index * 15).toString() +
+                                                  "_min"),
                                               showCheckmark: true,
                                               checkmarkColor: _colors.white,
                                               labelStyle: TextStyle(

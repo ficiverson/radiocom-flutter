@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
+import 'package:cuacfm/ui/player/current_timer.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:cuacfm/utils/notification_subscription_contract.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,6 +18,8 @@ class MockNotifcationSubscription extends Mock
 class MockConnection extends Mock implements ConnectionContract {}
 
 class MockPlayer extends Mock implements CurrentPlayerContract {}
+
+class MockCurrentTimerContract extends Mock implements CurrentTimerContract{}
 
 void mockTranslationsWithLocale() {
   Injector.appInstance.registerSingleton<CuacLocalization>(

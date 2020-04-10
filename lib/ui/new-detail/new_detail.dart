@@ -140,6 +140,7 @@ class NewDetailState extends State<NewDetail> with WidgetsBindingObserver  imple
     if (snackBarConnection == null) {
       scaffoldKey.currentState..removeCurrentSnackBar();
       snackBarConnection = SnackBar(
+        key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text("No dispones de conexión a internet"),
       );
@@ -160,6 +161,7 @@ class NewDetailState extends State<NewDetail> with WidgetsBindingObserver  imple
         color: _colors.palidwhitedark,
         height: _queryData.size.height,
         child: SingleChildScrollView(
+            key: PageStorageKey<String>("news_detail_container"),
             scrollDirection: Axis.vertical,
             physics: BouncingScrollPhysics(),
             child: Container(

@@ -27,7 +27,8 @@ class SettingsDetail extends StatefulWidget {
   State createState() => new SettingsDetailState();
 }
 
-class SettingsDetailState extends State<SettingsDetail> with WidgetsBindingObserver
+class SettingsDetailState extends State<SettingsDetail>
+    with WidgetsBindingObserver
     implements SettingsDetailView {
   MediaQueryData _queryData;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -37,7 +38,7 @@ class SettingsDetailState extends State<SettingsDetail> with WidgetsBindingObser
   bool shouldShowPlayer = false;
   bool isContentUpdated = true;
   EventChannel _notificationEvent =
-  EventChannel('cuacfm.flutter.io/updateNotification');
+      EventChannel('cuacfm.flutter.io/updateNotification');
   SnackBar snackBarConnection;
   CuacLocalization _localization;
 
@@ -50,11 +51,14 @@ class SettingsDetailState extends State<SettingsDetail> with WidgetsBindingObser
     _queryData = MediaQuery.of(context);
     _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
     return Scaffold(
-      key: scaffoldKey,
-      appBar: TopBar("settings_detail",
-          title: getTitle(widget.legalType), topBarOption: TopBarOption.MODAL),
-      backgroundColor: widget.legalType == LegalType.NONE ? _colors.transparent:_colors.palidwhite,
-      body: _getBodyLayout(widget.legalType),
+        key: scaffoldKey,
+        appBar: TopBar("settings_detail",
+            title: getTitle(widget.legalType),
+            topBarOption: TopBarOption.MODAL),
+        backgroundColor: widget.legalType == LegalType.NONE
+            ? _colors.transparent
+            : _colors.palidwhite,
+        body: _getBodyLayout(widget.legalType),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: PlayerView(
             isMini: false,
@@ -63,8 +67,8 @@ class SettingsDetailState extends State<SettingsDetail> with WidgetsBindingObser
             isPlayingAudio: _presenter.currentPlayer.isPlaying(),
             isExpanded: true,
             onDetailClicked: () {
-              _presenter.onPodcastControlsClicked(
-                  _presenter.currentPlayer.episode);
+              _presenter
+                  .onPodcastControlsClicked(_presenter.currentPlayer.episode);
             },
             onMultimediaClicked: (isPlaying) {
               if (!mounted) return;
@@ -75,8 +79,7 @@ class SettingsDetailState extends State<SettingsDetail> with WidgetsBindingObser
                   _presenter.onResume();
                 }
               });
-            })
-    );
+            }));
   }
 
   @override
@@ -108,7 +111,7 @@ class SettingsDetailState extends State<SettingsDetail> with WidgetsBindingObser
         new Timer(new Duration(milliseconds: 300), () {
           setState(() {});
         });
-        if(isError){
+        if (isError) {
           onConnectionError();
         }
       }
@@ -147,6 +150,7 @@ class SettingsDetailState extends State<SettingsDetail> with WidgetsBindingObser
     if (snackBarConnection == null) {
       scaffoldKey.currentState..removeCurrentSnackBar();
       snackBarConnection = SnackBar(
+        key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
@@ -233,43 +237,43 @@ class SettingsDetailState extends State<SettingsDetail> with WidgetsBindingObser
             ])));
   }
 
-  Widget _getGallery(){
-     return Container(
+  Widget _getGallery() {
+    return Container(
+        key: ValueKey<String>("gallery_cotainer"),
         child: PhotoViewGallery.builder(
-          scrollPhysics: BouncingScrollPhysics(),
-          builder: (BuildContext context, int index) {
-            return PhotoViewGalleryPageOptions(
-              imageProvider: NetworkImage(_radioStation.stationPhotos[index]),
-              initialScale: PhotoViewComputedScale.contained * 0.8,
-             // heroAttributes:  HeroAttributes(tag: "tag1"),
-            );
-          },
-          itemCount: _radioStation.stationPhotos.length,
-          loadingBuilder: (context, event) => Center(
-            child: Container(
-              width: 20.0,
-              height: 20.0,
-              child: CircularProgressIndicator(
-                value: event == null
-                    ? 0
-                    : event.cumulativeBytesLoaded / event.expectedTotalBytes,
-              ),
-            ),
-          )
-        )
-    );
+            scrollPhysics: BouncingScrollPhysics(),
+            builder: (BuildContext context, int index) {
+              return PhotoViewGalleryPageOptions(
+                imageProvider: NetworkImage(_radioStation.stationPhotos[index]),
+                initialScale: PhotoViewComputedScale.contained * 0.8,
+                // heroAttributes:  HeroAttributes(tag: "tag1"),
+              );
+            },
+            itemCount: _radioStation.stationPhotos.length,
+            loadingBuilder: (context, event) => Center(
+                  child: Container(
+                    width: 20.0,
+                    height: 20.0,
+                    child: CircularProgressIndicator(
+                      value: event == null
+                          ? 0
+                          : event.cumulativeBytesLoaded /
+                              event.expectedTotalBytes,
+                    ),
+                  ),
+                )));
   }
 
   String getTitle(LegalType legalType) {
     if (legalType == LegalType.LICENSE) {
-      return SafeMap.safe(
-          _localization.translateMap("settings"), ["legal_info_section","item3"]);
+      return SafeMap.safe(_localization.translateMap("settings"),
+          ["legal_info_section", "item3"]);
     } else if (legalType == LegalType.TERMS) {
-      return SafeMap.safe(
-          _localization.translateMap("settings"), ["legal_info_section","item2"]);
+      return SafeMap.safe(_localization.translateMap("settings"),
+          ["legal_info_section", "item2"]);
     } else if (legalType == LegalType.PRIVACY) {
-      return SafeMap.safe(
-          _localization.translateMap("settings"), ["legal_info_section","item1"]);
+      return SafeMap.safe(_localization.translateMap("settings"),
+          ["legal_info_section", "item1"]);
     } else {
       return "";
     }

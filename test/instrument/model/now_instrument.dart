@@ -7,7 +7,7 @@ class NowInstrument {
       "name": "Spoiler",
       "description":"Best program now",
       "programme_url": "https://url/program",
-      "logo_url": "http://image",
+      "logo_url": "assets/graphics/cuac-logo.png",
       "rss_url": "http://image"
     });
   }
