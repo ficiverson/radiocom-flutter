@@ -1,12 +1,6 @@
 import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
-import 'package:cuacfm/models/episode.dart';
-import 'package:cuacfm/models/new.dart';
-import 'package:cuacfm/models/now.dart';
-import 'package:cuacfm/models/program.dart';
-import 'package:cuacfm/models/time_table.dart';
 import 'package:cuacfm/ui/home/home_presenter.dart';
-import 'package:cuacfm/ui/home/home_router.dart';
 import 'package:cuacfm/ui/home/home_view.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/utils/bottom_bar.dart';
@@ -19,11 +13,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../instrument/data/repository_mock.dart';
 import '../../instrument/helper/helper-instrument.dart';
-import '../../instrument/model/episode_instrument.dart';
-import '../../instrument/model/news_instrument.dart';
-import '../../instrument/model/now_instrument.dart';
-import '../../instrument/model/program_instrument.dart';
-import '../../instrument/ui/mock_home_view.dart';
 
 void main() {
   MockRadiocoRepository mockRepository = MockRadiocoRepository();
