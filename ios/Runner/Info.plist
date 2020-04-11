@@ -30,6 +30,8 @@
 	<string>NO</string>
 	<key>FirebaseScreenReportingEnabled</key>
 	<true/>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>

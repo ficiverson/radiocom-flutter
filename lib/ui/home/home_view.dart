@@ -17,6 +17,7 @@ import 'package:cuacfm/utils/neumorfism.dart';
 import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -174,6 +175,7 @@ class MyHomePageState extends State<MyHomePage>
   @override
   void initState() {
     super.initState();
+    FirebaseAnalytics().setCurrentScreen(screenName: "home_screen");
     if (Platform.isAndroid) {
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "main", "close": false});
