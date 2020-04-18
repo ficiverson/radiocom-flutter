@@ -9,8 +9,10 @@ packages
 pubspec.lock
 .flutter-plugins
 coverage/
+ozzie/
 ios/Runner/GoogleService-Info.plist
 ios/.symlinks/plugins/
 android/app/google-services.json
 .dart_tool/
 android/app/src/main/gen/
+ios/Flutter/flutter_export_environment.sh

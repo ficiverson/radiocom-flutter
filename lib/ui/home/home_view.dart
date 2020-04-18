@@ -506,11 +506,12 @@ class MyHomePageState extends State<MyHomePage>
 
   Widget _getHomeLayout() {
     return Container(
-        key: PageStorageKey<String>(BottomBarOption.HOME.toString()),
+        key: Key("welcome_container"),
         color: _colors.palidwhite,
         width: queryData.size.width,
         height: queryData.size.height,
         child: SingleChildScrollView(
+            key: PageStorageKey<String>(BottomBarOption.HOME.toString()),
             physics: BouncingScrollPhysics(),
             child: Container(
               color: _colors.palidwhite,
@@ -666,11 +667,12 @@ class MyHomePageState extends State<MyHomePage>
 
   Widget _getNewsLayout() {
     return Container(
-        key: PageStorageKey<String>(BottomBarOption.NEWS.toString()),
+        key : Key("news_container"),
         color: _colors.palidwhitedark,
         width: queryData.size.width,
         height: queryData.size.height,
         child: ListView.builder(
+            key: PageStorageKey<String>(BottomBarOption.NEWS.toString()),
             physics: BouncingScrollPhysics(),
             scrollDirection: Axis.vertical,
             itemCount: _lastNews.length + 2,
@@ -744,11 +746,12 @@ class MyHomePageState extends State<MyHomePage>
 
   Widget _getSearchLayout() {
     return Container(
-        key: PageStorageKey<String>(BottomBarOption.SEARCH.toString()),
+        key : Key("search_container"),
         color: _colors.palidwhitedark,
         width: queryData.size.width,
         height: queryData.size.height,
         child: SingleChildScrollView(
+            key: PageStorageKey<String>(BottomBarOption.SEARCH.toString()),
             physics: BouncingScrollPhysics(),
             child: isEmptyPodcast
                 ? Column(

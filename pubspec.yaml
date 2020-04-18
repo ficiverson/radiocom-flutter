@@ -46,9 +46,12 @@ dependencies:
   mock_web_server: ^4.1.1
   mockito: ^4.1.1
   countdown: ^0.1.0
+  ozzie: ^2.2.3
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  flutter_driver:
     sdk: flutter
 
 

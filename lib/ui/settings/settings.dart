@@ -191,10 +191,11 @@ class SettingsState extends State<Settings>
 
   Widget _getBodyLayout() {
     return new Container(
-        key: PageStorageKey<String>("settings_container"),
+        key: Key("settings_container"),
         color: _colors.palidwhitedark,
         height: _queryData.size.height,
         child: SingleChildScrollView(
+            key: PageStorageKey<String>("settings_container"),
             scrollDirection: Axis.vertical,
             physics: BouncingScrollPhysics(),
             child: Container(
