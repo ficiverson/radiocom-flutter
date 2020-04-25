@@ -1,6 +1,5 @@
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
-import 'package:cuacfm/utils/wave.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:injector/injector.dart';

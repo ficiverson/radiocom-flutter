@@ -579,6 +579,7 @@ class MyHomePageState extends State<MyHomePage>
                               ? Container(
                                   height: 280.0, child: getLoadingState())
                               : ListView.builder(
+                                   key : PageStorageKey<String>("home_last_episodes"),
                                   physics: BouncingScrollPhysics(),
                                   scrollDirection: Axis.horizontal,
                                   itemCount: _recentPodcast.length,
@@ -852,6 +853,7 @@ class MyHomePageState extends State<MyHomePage>
                   width: queryData.size.width,
                   height: 230.0,
                   child: ListView.builder(
+                      key : PageStorageKey<String>("search_categories_all"),
                       physics: BouncingScrollPhysics(),
                       scrollDirection: Axis.horizontal,
                       itemCount: categories.length,
@@ -895,6 +897,7 @@ class MyHomePageState extends State<MyHomePage>
               width: queryData.size.width,
               height: 230.0,
               child: ListView.builder(
+                  key : PageStorageKey<String>("search_podcast_category" + Program.getCategory(category)),
                   physics: BouncingScrollPhysics(),
                   scrollDirection: Axis.horizontal,
                   itemCount: podcast.length,

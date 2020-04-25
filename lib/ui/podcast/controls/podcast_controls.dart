@@ -6,7 +6,6 @@ import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/podcast/controls/podcast_controls_presenter.dart';
-import 'package:cuacfm/utils/custom_image.dart';
 import 'package:cuacfm/utils/neumorfism.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
