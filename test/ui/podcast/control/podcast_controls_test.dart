@@ -127,7 +127,7 @@ void main() {
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPlaying()).thenReturn(true);
+    when(mockPlayer.isPlaying()).thenReturn(false);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
     when(mockPlayer.isPodcast).thenReturn(false);

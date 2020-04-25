@@ -11,8 +11,7 @@ typedef PalyerCallback(bool isPlaying);
 
 class PlayerView extends StatefulWidget {
   PlayerView(
-      {
-      this.isMini,
+      {this.isMini,
       this.isExpanded,
       this.onMultimediaClicked,
       this.onDetailClicked,
@@ -70,22 +69,26 @@ class PlayerViewState extends State<PlayerView> {
                     color: _colors.palidwhiteverydark,
                     boxShadow: [
                       BoxShadow(
-                        color: widget.isAtBottom ?_colors.neuWhite :_colors.transparent,
+                        color: widget.isAtBottom
+                            ? _colors.neuWhite
+                            : _colors.transparent,
                         offset: Offset(-2, -2),
                         blurRadius: 2,
                       ),
                       BoxShadow(
-                        color: widget.isAtBottom ?_colors.neuWhite :_colors.transparent,
+                        color: widget.isAtBottom
+                            ? _colors.neuWhite
+                            : _colors.transparent,
                         offset: Offset(2, 2),
                         blurRadius: 2,
                       ),
                     ]),
-              margin: EdgeInsets.fromLTRB(
-                  0.0, 0.0, 0.0, widget.isAtBottom ? 0.0 : 60.0),
-              width: queryData.size.width,
-              height: widget.isAtBottom ? 70.0 : 60.0,
-              child: _getContentView(true)
-            )) : Opacity(
+                margin: EdgeInsets.fromLTRB(
+                    0.0, 0.0, 0.0, widget.isAtBottom ? 0.0 : 60.0),
+                width: queryData.size.width,
+                height: widget.isAtBottom ? 70.0 : 60.0,
+                child: _getContentView(true)))
+        : Opacity(
             opacity: widget.shouldShow ? 1 : 0,
             child: Container(
                 margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 90.0),
@@ -100,7 +103,9 @@ class PlayerViewState extends State<PlayerView> {
         isFullScreen: isFullScreen,
         child: GestureDetector(
             onTap: () {
-              if(widget.shouldShow) {_onDetailClicked();}
+              if (widget.shouldShow) {
+                _onDetailClicked();
+              }
             },
             child: getPlayerContent()));
   }
@@ -108,44 +113,53 @@ class PlayerViewState extends State<PlayerView> {
   Widget getPlayerContent() {
     return widget.isAtBottom
         ? Center(
-                child: ListTile(
-                    leading: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 1),
-                        width: 40.0,
-                        height: 40.0,
-                        child: CustomImage(
-                            resPath: Injector.appInstance.getDependency<CurrentPlayerContract>().currentImage,
-                            fit: BoxFit.fitHeight,
-                            radius: 20.0)),
-                    title: Text(
-                      Injector.appInstance.getDependency<CurrentPlayerContract>().currentSong,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          color: _colors.font,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13),
-                    ),
-                    trailing: new GestureDetector(
-                      onTap: () {
-                        if(widget.shouldShow) {_onMultimediaClicked();}
-                      },
-                      child: Icon(
-                          showPlayButton ? Icons.pause : Icons.play_arrow,
-                          color: _colors.yellow,
-                          size: 40.0),
-                    )))
+            child: ListTile(
+                leading: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 1),
+                    width: 40.0,
+                    height: 40.0,
+                    child: CustomImage(
+                        resPath: Injector.appInstance
+                            .getDependency<CurrentPlayerContract>()
+                            .currentImage,
+                        fit: BoxFit.fitHeight,
+                        radius: 20.0)),
+                title: Text(
+                  Injector.appInstance
+                      .getDependency<CurrentPlayerContract>()
+                      .currentSong,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      color: _colors.font,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 13),
+                ),
+                trailing: new GestureDetector(
+                  onTap: () {
+                    if (widget.shouldShow) {
+                      _onMultimediaClicked();
+                    }
+                  },
+                  child: showPlayButton ?
+                        Icon(Icons.pause, color: _colors.yellow, size: 40.0)
+                      : Icon(Icons.play_arrow, color: _colors.yellow, size: 40.0),
+                )))
         : ListTile(
             leading: Container(
                 padding: EdgeInsets.symmetric(horizontal: 1),
                 width: 40.0,
                 height: 40.0,
                 child: CustomImage(
-                    resPath: Injector.appInstance.getDependency<CurrentPlayerContract>().currentImage,
+                    resPath: Injector.appInstance
+                        .getDependency<CurrentPlayerContract>()
+                        .currentImage,
                     fit: BoxFit.fitHeight,
                     radius: 20.0)),
             title: Text(
-              Injector.appInstance.getDependency<CurrentPlayerContract>().currentSong,
+              Injector.appInstance
+                  .getDependency<CurrentPlayerContract>()
+                  .currentSong,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -154,11 +168,13 @@ class PlayerViewState extends State<PlayerView> {
                   fontSize: 13),
             ),
             trailing: new GestureDetector(
-              onTap: () {
-                if(widget.shouldShow) {_onMultimediaClicked();}
-              },
-              child: Icon(showPlayButton ? Icons.pause : Icons.play_arrow,
-                  color: _colors.yellow, size: 40.0),
-            ));
+                onTap: () {
+                  if (widget.shouldShow) {
+                    _onMultimediaClicked();
+                  }
+                },
+                child: showPlayButton
+                    ?  Icon(Icons.pause, color: _colors.yellow, size: 40.0)
+                    : Icon(Icons.play_arrow, color: _colors.yellow, size: 40.0)));
   }
 }

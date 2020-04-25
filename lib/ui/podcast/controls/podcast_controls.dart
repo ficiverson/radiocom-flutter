@@ -6,11 +6,11 @@ import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/podcast/controls/podcast_controls_presenter.dart';
-import 'package:cuacfm/utils/custom_image.dart';
 import 'package:cuacfm/utils/neumorfism.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
 import 'package:cuacfm/utils/top_bar.dart';
+import 'package:cuacfm/utils/wave.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -191,17 +191,13 @@ class PodcastControlsState extends State<PodcastControls>
                             label: "",
                             subtitle: ""),
                         Container(
-                            decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(25.0)),
-                                color: _colors.palidwhitedark),
-                            margin: EdgeInsets.fromLTRB(218.0, 15.0, 0.0, 0.0),
-                            child: CustomImage(
-                                height: 22,
-                                width: 22,
-                                radius: 25,
-                                fit: BoxFit.fill,
-                                resPath: "assets/graphics/empty-logo.png"))
+                            margin: EdgeInsets.fromLTRB(210.0, 160.0, 0.0, 0.0),
+                            child: AnimatedOpacity(
+                                opacity: currentPlayer.isPlaying() ? 1.0 : 0.0,
+                                duration: Duration(seconds: 1),
+                                child: Wave(
+                                    size:
+                                    Size(30.0, 20.0), shouldAnimate: currentPlayer.isPlaying())))
                       ])),
                   Container(
                       margin: EdgeInsets.fromLTRB(
@@ -289,10 +285,6 @@ class PodcastControlsState extends State<PodcastControls>
                                         fontWeight: FontWeight.w700))
                               ]))
                       : Container(),
-                  Container(
-                      height: mediaQuery.size.height * 0.03,
-                      width: mediaQuery.size.width,
-                      child: Center(child: loadingView)),
                   Container(
                       width: mediaQuery.size.width - mediaQuery.size.width / 3,
                       child: Row(
