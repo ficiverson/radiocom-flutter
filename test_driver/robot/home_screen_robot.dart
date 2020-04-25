@@ -11,18 +11,15 @@ class HomeScreenRobot extends Robot {
     return this;
   }
 
-
   HomeScreenRobot seePodcasts() {
     work = work.then((_) async => await seesKey("search_container"));
     return this;
   }
 
-
   HomeScreenRobot seeNews() {
     work = work.then((_) async => await seesKey("news_container"));
     return this;
   }
-
 
   HomeScreenRobot seeSettings() {
     work = work.then((_) async => await seesKey("settings_container"));
