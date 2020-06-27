@@ -2,6 +2,7 @@ package xyz.luan.audioplayers;
 
 import android.app.Service;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Handler;
@@ -13,6 +14,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import androidx.annotation.NonNull;
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -21,19 +24,26 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 /**
  * Fork for audioplayers to update please take into account the service
  */
-public class AudioplayersPlugin implements MethodCallHandler {
+public class AudioplayersPlugin implements MethodCallHandler, FlutterPlugin  {
 
-	private static final Logger LOGGER = Logger.getLogger((AudioplayersPlugin.class.getCanonicalName()));
-	private static AudioService audioService;
-	private final MethodChannel channel;
-	private final MethodChannel notificationChannel;
+
+	private static final Logger LOGGER = Logger.getLogger(AudioplayersPlugin.class.getCanonicalName());
+
+	private MethodChannel channel;
+	private final Map<String, Player> mediaPlayers = new HashMap<>();
 	private final Handler handler = new Handler();
 	private Runnable positionUpdates;
+	private Context context;
+	private boolean seekFinish;
+
+	private static AudioService audioService;
+	private MethodChannel notificationChannel;
+
 
 	public static void registerWith(final Registrar registrar) {
 		final MethodChannel channel = new MethodChannel(registrar.messenger(), "xyz.luan/audioplayers");
 		final MethodChannel notificationChannel = new MethodChannel(registrar.messenger(), "cuacfm.flutter.io/notificationInfo");
-		channel.setMethodCallHandler(new AudioplayersPlugin(channel, notificationChannel));
+		channel.setMethodCallHandler(new AudioplayersPlugin(channel, notificationChannel,registrar.activeContext()));
 
 		registrar.context().bindService(new Intent(registrar.activeContext().getApplicationContext(), AudioService.class), new ServiceConnection() {
 			@Override
@@ -48,12 +58,27 @@ public class AudioplayersPlugin implements MethodCallHandler {
 		}, Service.BIND_ABOVE_CLIENT);
 	}
 
-	private AudioplayersPlugin(final MethodChannel channel, final MethodChannel notificationChannel) {
+	private AudioplayersPlugin(final MethodChannel channel, final MethodChannel notificationChannel, Context context) {
 		this.channel = channel;
 		this.notificationChannel = notificationChannel;
 		this.channel.setMethodCallHandler(this);
 		this.notificationChannel.setMethodCallHandler(this);
+		this.context = context;
 	}
+
+	public AudioplayersPlugin() {}
+
+	@Override
+	public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+		final MethodChannel channel = new MethodChannel(binding.getBinaryMessenger(), "xyz.luan/audioplayers");
+		this.channel = channel;
+		this.context = binding.getApplicationContext();
+		this.seekFinish = false;
+		channel.setMethodCallHandler(this);
+	}
+
+	@Override
+	public void onDetachedFromEngine(@NonNull FlutterPlugin.FlutterPluginBinding binding) {}
 
 	@Override
 	public void onMethodCall(final MethodCall call, final MethodChannel.Result response) {
@@ -64,6 +89,7 @@ public class AudioplayersPlugin implements MethodCallHandler {
 			response.error("Unexpected error!", e.getMessage(), e);
 		}
 	}
+
 
 	private void handleMethodCall(final MethodCall call, final MethodChannel.Result response) {
 		final String playerId = call.argument("playerId");
@@ -79,19 +105,20 @@ public class AudioplayersPlugin implements MethodCallHandler {
 				final Integer position = call.argument("position");
 				final boolean respectSilence = call.argument("respectSilence");
 				final boolean isLocal = call.argument("isLocal");
-				player.configAttributes(respectSilence);
+				final boolean stayAwake = call.argument("stayAwake");
+				player.configAttributes(respectSilence, stayAwake, context.getApplicationContext());
 				player.setVolume(volume);
-				player.setUrl(url, isLocal);
+				player.setUrl(url, isLocal, context.getApplicationContext());
 				if (position != null && !mode.equals("PlayerMode.LOW_LATENCY")) {
 					player.seek(position);
 				}
 				audioService.startForeground();
-				player.play();
+				player.play(context.getApplicationContext());
 				break;
 			}
 			case "resume": {
 				audioService.startForeground();
-				player.play();
+				player.play(context.getApplicationContext());
 				break;
 			}
 			case "pause": {
@@ -125,13 +152,31 @@ public class AudioplayersPlugin implements MethodCallHandler {
 			case "setUrl": {
 				final String url = call.argument("url");
 				final boolean isLocal = call.argument("isLocal");
-				player.setUrl(url, isLocal);
+				player.setUrl(url, isLocal, context.getApplicationContext());
 				break;
+			}
+			case "setPlaybackRate": {
+				final double rate = call.argument("playbackRate");
+				response.success(player.setRate(rate));
+				return;
+			}
+			case "getDuration": {
+				response.success(player.getDuration());
+				return;
+			}
+			case "getCurrentPosition": {
+				response.success(player.getCurrentPosition());
+				return;
 			}
 			case "setReleaseMode": {
 				final String releaseModeName = call.argument("releaseMode");
 				final ReleaseMode releaseMode = ReleaseMode.valueOf(releaseModeName.substring("ReleaseMode.".length()));
 				player.setReleaseMode(releaseMode);
+				break;
+			}
+			case "earpieceOrSpeakersToggle": {
+				final String playingRoute = call.argument("playingRoute");
+				player.setPlayingRoute(playingRoute, context.getApplicationContext());
 				break;
 			}
 			case "notificationInfo": {
@@ -167,8 +212,20 @@ public class AudioplayersPlugin implements MethodCallHandler {
 		startPositionUpdates();
 	}
 
+	public void handleDuration(Player player) {
+		channel.invokeMethod("audio.onDuration", buildArguments(player.getPlayerId(), player.getDuration()));
+	}
+
 	public void handleCompletion(Player player) {
 		channel.invokeMethod("audio.onComplete", buildArguments(player.getPlayerId(), true));
+	}
+
+	public void handleError(Player player, String message) {
+		channel.invokeMethod("audio.onError", buildArguments(player.getPlayerId(), message));
+	}
+
+	public void handleSeekComplete(Player player) {
+		this.seekFinish = true;
 	}
 
 	private void startPositionUpdates() {
@@ -234,6 +291,10 @@ public class AudioplayersPlugin implements MethodCallHandler {
 					final int time = player.getCurrentPosition();
 					channel.invokeMethod("audio.onDuration", buildArguments(key, duration));
 					channel.invokeMethod("audio.onCurrentPosition", buildArguments(key, time));
+					if (audioplayersPlugin.seekFinish) {
+						channel.invokeMethod("audio.onSeekComplete", buildArguments(player.getPlayerId(), true));
+						audioplayersPlugin.seekFinish = false;
+					}
 				} catch (UnsupportedOperationException e) {
 
 				}

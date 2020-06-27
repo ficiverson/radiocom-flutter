@@ -15,7 +15,7 @@ abstract class HomeRouterContract {
   goToTimeTable(List<TimeTable> timeTables);
   goToAllPodcast(List<Program> podcasts, {String category});
   goToNewDetail(New itemNew);
-  goToSettings();
+  goToSettings(VoidCallback invokeResult);
   goToPodcastDetail(Program podcast);
   goToPodcastControls(Episode episode);
 }
@@ -29,8 +29,6 @@ class HomeRouter implements HomeRouterContract {
             builder: (BuildContext context) =>
                 Timetable(timeTables: timeTables),
             fullscreenDialog: false));
-//    Navigator.of(Injector.appInstance.getDependency<BuildContext>())
-//        .push(ScaleRoute(page: Timetable(timeTables: timeTables)));
   }
 
   @override
@@ -53,12 +51,14 @@ class HomeRouter implements HomeRouterContract {
   }
 
   @override
-  goToSettings() {
+  goToSettings(VoidCallback invokeResult) {
     Navigator.of(Injector.appInstance.getDependency<BuildContext>()).push(
         MaterialPageRoute(
             settings: RouteSettings(name: "settings"),
             builder: (BuildContext context) => Settings(),
-            fullscreenDialog: false));
+            fullscreenDialog: false)).then((value) {
+            invokeResult.call();
+    });
   }
 
   @override

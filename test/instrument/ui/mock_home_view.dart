@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/now.dart';
@@ -165,7 +167,7 @@ class MockHomeRouter implements HomeRouterContract {
   }
 
   @override
-  goToSettings() {
+  goToSettings(VoidCallback invokeResult) {
     viewState.add(HomeState.goToSettings);
   }
 

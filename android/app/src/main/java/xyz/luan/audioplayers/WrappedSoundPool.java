@@ -4,6 +4,9 @@ import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Build;
+import android.os.PowerManager;
+import android.content.Context;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -12,12 +15,51 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Collections;
 
 import static java.io.File.createTempFile;
 
-public class WrappedSoundPool extends Player implements SoundPool.OnLoadCompleteListener {
+public class WrappedSoundPool extends Player {
 
 	private static SoundPool soundPool = createSoundPool();
+	static {
+		soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+			public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
+				Log.d("WSP", "Loaded " + sampleId);
+				WrappedSoundPool loadingPlayer = soundIdToPlayer.get(sampleId);
+				if (loadingPlayer != null) {
+					soundIdToPlayer.remove(loadingPlayer.soundId);
+					// Now mark all players using this sound as not loading and start them if necessary
+					synchronized (urlToPlayers) {
+						List<WrappedSoundPool> urlPlayers = urlToPlayers.get(loadingPlayer.url);
+						for (WrappedSoundPool player : urlPlayers) {
+							Log.d("WSP", "Marking " + player + " as loaded");
+							player.loading = false;
+							if (player.playing) {
+								Log.d("WSP", "Delayed start of " + player);
+								player.start();
+							}
+						}
+					}
+				}
+			}
+		});
+	}
+
+	/** For the onLoadComplete listener, track which sound id is associated with which player. An entry only exists until
+	 * it has been loaded.
+	 */
+	private static Map<Integer, WrappedSoundPool> soundIdToPlayer = Collections.synchronizedMap(new HashMap<Integer, WrappedSoundPool>());
+	/** This is to keep track of the players which share the same sound id, referenced by url. When a player release()s, it
+	 * is removed from the associated player list. The last player to be removed actually unloads() the sound id and then
+	 * the url is removed from this map.
+	 */
+	private static Map<String, List<WrappedSoundPool>> urlToPlayers = Collections.synchronizedMap(new HashMap<String, List<WrappedSoundPool>>());
+
 
 	private final AudioplayersPlugin ref;
 
@@ -26,6 +68,8 @@ public class WrappedSoundPool extends Player implements SoundPool.OnLoadComplete
 	private String url;
 
 	private float volume = 1.0f;
+
+	private float rate = 1.0f;
 
 	private Integer soundId;
 
@@ -39,6 +83,8 @@ public class WrappedSoundPool extends Player implements SoundPool.OnLoadComplete
 
 	private boolean loading = false;
 
+	private String playingRoute = "speakers";
+
 	WrappedSoundPool(AudioplayersPlugin ref, String playerId) {
 		this.ref = ref;
 		this.playerId = playerId;
@@ -50,7 +96,7 @@ public class WrappedSoundPool extends Player implements SoundPool.OnLoadComplete
 	}
 
 	@Override
-	void play() {
+	void play(Context context) {
 		if (!this.loading) {
 			start();
 		}
@@ -69,7 +115,23 @@ public class WrappedSoundPool extends Player implements SoundPool.OnLoadComplete
 	@Override
 	void release() {
 		this.stop();
-		soundPool.unload(this.soundId);
+		if (this.soundId != null && this.url != null) {
+			synchronized (this.urlToPlayers) {
+				List<WrappedSoundPool> playersForSoundId = this.urlToPlayers.get(this.url);
+				if (playersForSoundId != null) {
+					if (playersForSoundId.size() == 1 && playersForSoundId.get(0) == this) {
+						this.urlToPlayers.remove(this.url);
+						soundPool.unload(this.soundId);
+						soundIdToPlayer.remove(this.soundId);
+						this.soundId = null;
+						Log.d("WSP", "Unloaded soundId " + this.soundId);
+					} else {
+						// This is not the last player using the soundId, just remove it from the list.
+						playersForSoundId.remove(this);
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -82,26 +144,39 @@ public class WrappedSoundPool extends Player implements SoundPool.OnLoadComplete
 	}
 
 	@Override
-	void setUrl(final String url, final boolean isLocal) {
+	void setUrl(final String url, final boolean isLocal, Context context) {
 		if (this.url != null && this.url.equals(url)) {
 			return;
 		}
+
 		if (this.soundId != null) {
-			soundPool.unload(this.soundId);
-		} else {
-			soundPool.setOnLoadCompleteListener(this);
+			release();
 		}
-		this.url = url;
-		this.loading = true;
 
-		final WrappedSoundPool self = this;
-
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				self.soundId = soundPool.load(getAudioPath(url, isLocal), 1);
+		synchronized (urlToPlayers) {
+			this.url = url;
+			List<WrappedSoundPool> urlPlayers = urlToPlayers.get(url);
+			if (urlPlayers != null) {
+				// Sound has already been loaded - reuse the soundId.
+				WrappedSoundPool originalPlayer = urlPlayers.get(0);
+				this.soundId = originalPlayer.soundId;
+				this.loading = originalPlayer.loading;
+				urlPlayers.add(this);
+				Log.d("WSP", "Reusing soundId" + this.soundId + " for " + url + " is loading=" + this.loading + " " + this);
+				return;
 			}
-		}).start();
+
+			// First one for this URL - load it.
+			this.loading = true;
+
+			long start = System.currentTimeMillis();
+			this.soundId = soundPool.load(getAudioPath(url, isLocal), 1);
+			Log.d("WSP", "time to call load() for " + url + ": " + (System.currentTimeMillis() - start) + " player=" + this);
+			soundIdToPlayer.put(this.soundId, this);
+			urlPlayers = new ArrayList<>();
+			urlPlayers.add(this);
+			urlToPlayers.put(url, urlPlayers);
+		}
 	}
 
 	@Override
@@ -113,7 +188,17 @@ public class WrappedSoundPool extends Player implements SoundPool.OnLoadComplete
 	}
 
 	@Override
-	void configAttributes(boolean respectSilence) {
+	int setRate(double rate) {
+		this.rate = (float) rate;
+		if (this.streamId != null) {
+			soundPool.setRate(this.streamId, this.rate);
+			return 1;
+		}
+		return 0;
+	}
+
+	@Override
+	void configAttributes(boolean respectSilence, boolean setWakeMode, Context context) {
 	}
 
 	@Override
@@ -140,13 +225,19 @@ public class WrappedSoundPool extends Player implements SoundPool.OnLoadComplete
 	}
 
 	@Override
+	void setPlayingRoute(String playingRoute, Context context) {
+		throw unsupportedOperation("setPlayingRoute");
+	}
+
+	@Override
 	void seek(int position) {
 		throw unsupportedOperation("seek");
 	}
 
 	private static SoundPool createSoundPool() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			AudioAttributes attrs = new AudioAttributes.Builder().setLegacyStreamType(AudioManager.USE_DEFAULT_STREAM_TYPE)
+			AudioAttributes attrs = new AudioAttributes
+					.Builder().setLegacyStreamType(AudioManager.USE_DEFAULT_STREAM_TYPE)
 					.setUsage(AudioAttributes.USAGE_GAME)
 					.build();
 			return new SoundPool.Builder()
@@ -163,6 +254,7 @@ public class WrappedSoundPool extends Player implements SoundPool.OnLoadComplete
 	}
 
 	private void start() {
+		setRate(this.rate);
 		if (this.paused) {
 			soundPool.resume(this.streamId);
 			this.paused = false;
@@ -174,16 +266,6 @@ public class WrappedSoundPool extends Player implements SoundPool.OnLoadComplete
 					0,
 					this.looping ? -1 : 0,
 					1.0f);
-		}
-	}
-
-	@Override
-	public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
-		if (soundId == sampleId) {
-			this.loading = false;
-			if (this.playing) {
-				start();
-			}
 		}
 	}
 

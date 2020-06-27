@@ -120,7 +120,7 @@ class HomePresenter {
   }
 
   onMenuClicked() {
-    router.goToSettings();
+    router.goToSettings((){onHomeResumed();});
   }
 
   onPodcastClicked(Program podcast) {
