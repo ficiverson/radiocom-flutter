@@ -9,6 +9,11 @@ class AppDelegate: FlutterAppDelegate {
     override func application(_ application: UIApplication,
                               didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         GeneratedPluginRegistrant.register(with: self)
+
+        if #available(iOS 10.0, *) {
+            UNUserNotificationCenter.current().delegate = self
+        }
+
        //set audio session to be on background always
         application.beginReceivingRemoteControlEvents()
         do {

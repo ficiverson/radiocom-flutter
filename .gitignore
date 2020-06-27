@@ -16,3 +16,4 @@ android/app/google-services.json
 .dart_tool/
 android/app/src/main/gen/
 ios/Flutter/flutter_export_environment.sh
+ios/.symlinks/
