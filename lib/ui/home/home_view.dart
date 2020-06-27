@@ -174,7 +174,6 @@ class MyHomePageState extends State<MyHomePage>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    print(state);
     switch (state) {
       case AppLifecycleState.resumed:
         if (!isContentUpdated) {
