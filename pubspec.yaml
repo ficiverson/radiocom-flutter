@@ -28,7 +28,7 @@ dependencies:
   flutter_html: ^1.0.2
   url_launcher: ^5.5.0
   font_awesome_flutter: ^8.8.1
-  maps_launcher: ^1.2.1
+  maps_launcher: ^1.2.2+1
   photo_view: ^0.10.0
   progress_indicators: ^0.1.5
   connectivity: ^0.4.9
