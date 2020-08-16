@@ -241,5 +241,24 @@ void main() {
         expect(timer.isTimerRunning(), false);
       });
 
+  test(
+      'that can set speed in the player',
+          () async {
+        when(mockRepository.getLiveBroadcast()).thenAnswer(
+                (_) => MockRadiocoRepository.now());
+        when(mockConnection.isConnectionAvailable())
+            .thenAnswer((_) => Future.value(true));
+        when(mockPlayer.isPlaying()).thenReturn(true);
+        when(mockPlayer.getPlaybackRate()).thenReturn(2.5);
+        when(mockPlayer.setPlaybackRate(any)).thenReturn({
+          mockPlayer.playbackRate = any
+        });
+
+        presenter.onSpeedSelected(2.5);
+
+        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
+        expect( mockPlayer.playbackRate, equals(2.5));
+      });
+
 
 }

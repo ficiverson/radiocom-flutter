@@ -149,4 +149,32 @@ void main() {
         find.byKey(Key("connection_snackbar"),skipOffstage: true),
         findsOneWidget);
   });
+
+  testWidgets('that in podcast controls can put playback rate for faster', (WidgetTester tester) async{
+    when(mockRepository.getLiveBroadcast())
+        .thenAnswer((_) => MockRadiocoRepository.now());
+    when(mockConnection.isConnectionAvailable())
+        .thenAnswer((_) => Future.value(true));
+    when(mockPlayer.isPlaying()).thenReturn(true);
+    when(mockPlayer.stop()).thenReturn(true);
+    when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
+    when(mockPlayer.isPodcast).thenReturn(true);
+    when(mockPlayer.currentSong).thenReturn("mocklive");
+    when(mockPlayer.duration).thenReturn(Duration(seconds: 220));
+    when(mockPlayer.position).thenReturn(Duration(seconds: 110));
+    when(mockPlayer.currentSong).thenReturn("mocklive");
+    when(mockPlayer.playbackRate).thenReturn(1.5);
+    when(mockCurrentTimerContract.currentTime).thenReturn(110);
+
+    await tester.pumpWidget(startWidget(PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
+    final gesture = await tester.startGesture(Offset(0, 600));
+    await gesture.moveBy(Offset(0, -600));
+    await tester.pump();
+    await tester.tap(find.byKey(Key("faster_chip_3_speed")));
+    await tester.pump(Duration(milliseconds: 300));
+
+    expect(
+        find.byType(NeumorphicView, skipOffstage: false),
+        findsOneWidget);
+  });
 }

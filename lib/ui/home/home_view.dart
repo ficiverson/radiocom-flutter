@@ -1066,5 +1066,6 @@ class MyHomePageState extends State<MyHomePage>
                 .isBefore(DateTime.now().subtract(Duration(hours: 1))) &&
             element.start.isAfter(DateTime.now().subtract(Duration(hours: 12))))
         .toList();
+    isEmptyHome = _recentPodcast.isEmpty;
   }
 }

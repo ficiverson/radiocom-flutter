@@ -26,6 +26,7 @@ abstract class CurrentPlayerContract {
   Duration restoreDuration = Duration(seconds: 0);
   Duration restorePosition = Duration(seconds: 0);
   double volume = 1.0;
+  double playbackRate = 1.0;
   VoidCallback onUpdate;
   ConnectionCallback onConnection;
   ConnectionCallback podcastConnectivityResult;
@@ -43,6 +44,8 @@ abstract class CurrentPlayerContract {
   bool isStreamingAudio();
   bool isPaused();
   void release();
+  double getPlaybackRate();
+  void setPlaybackRate(double playbackRate);
 }
 
 class CurrentPlayer implements CurrentPlayerContract {
@@ -73,6 +76,8 @@ class CurrentPlayer implements CurrentPlayerContract {
   Duration restorePosition = Duration(seconds: 0);
   @override
   double volume = 1.0;
+  @override
+  double playbackRate = 1.0;
   @override
   VoidCallback onUpdate;
   @override
@@ -224,6 +229,10 @@ class CurrentPlayer implements CurrentPlayerContract {
           (!isPodcast &&
               now.streamUrl() != null &&
               now.streamUrl().isNotEmpty)) {
+        if(!isPodcast){
+          playbackRate =1.0;
+          audioPlayer.setPlaybackRate(playbackRate: playbackRate);
+        }
         final result = await audioPlayer.play(
             isPodcast ? episode.audio : now.streamUrl(),
             isLocal: false,
@@ -260,6 +269,10 @@ class CurrentPlayer implements CurrentPlayerContract {
   @override
   Future<bool> stopAndPlay() async {
     if (playerState == PlayerState.play || playerState == PlayerState.pause) {
+      if(!isPodcast){
+        playbackRate =1.0;
+        audioPlayer.setPlaybackRate(playbackRate: playbackRate);
+      }
       final result = await audioPlayer.pause();
       if (result == 1) playerState = PlayerState.pause;
       duration = Duration(seconds: 0);
@@ -346,5 +359,16 @@ class CurrentPlayer implements CurrentPlayerContract {
     duration = Duration(seconds: 0);
     audioPlayer.setReleaseMode(ReleaseMode.RELEASE);
     await audioPlayer.release();
+  }
+
+  @override
+  double getPlaybackRate() {
+    return playbackRate;
+  }
+
+  @override
+  void setPlaybackRate(double playbackRate) {
+    this.playbackRate = playbackRate;
+    audioPlayer.setPlaybackRate(playbackRate: playbackRate);
   }
 }

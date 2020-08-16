@@ -12,6 +12,7 @@ import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
 import 'package:cuacfm/utils/top_bar.dart';
+import 'package:cuacfm/utils/wave.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -308,10 +309,8 @@ class DetailPodcastState extends State<DetailPodcastPage>
                                     onTap: () {
                                       if (_presenter.isSamePodcast(
                                           _episodes[index - 1])) {
-                                        if (_presenter.currentPlayer
+                                        if (!_presenter.currentPlayer
                                             .isPlaying()) {
-                                          _presenter.onPause();
-                                        } else {
                                           _presenter.onResume();
                                         }
                                       } else {
@@ -330,13 +329,16 @@ class DetailPodcastState extends State<DetailPodcastPage>
                                         ? Container(
                                             child: getLoadingStatePlayer(),
                                             width: 40.0)
-                                        : Icon(
-                                            _presenter.currentPlayer
-                                                        .isPlaying() &&
-                                                    _presenter.isSamePodcast(
-                                                        _episodes[index - 1])
-                                                ? Icons.pause_circle_outline
-                                                : Icons.play_circle_outline,
+                                        :  _presenter.currentPlayer
+                                        .isPlaying() &&
+                                        _presenter.isSamePodcast(
+                                            _episodes[index - 1])
+                                        ? AnimatedOpacity(
+                                        opacity: _presenter.currentPlayer.isPlaying() ? 1.0 : 0.0,
+                                        duration: Duration(seconds: 1),
+                                        child: Wave(
+                                            size:
+                                            Size(30.0, 20.0), shouldAnimate: _presenter.currentPlayer.isPlaying())) : Icon(Icons.play_circle_outline,
                                             color: _colors.yellow,
                                             size: 38.0)),
                               ))),
