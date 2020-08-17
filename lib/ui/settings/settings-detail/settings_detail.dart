@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/legal.dart';
 import 'package:cuacfm/models/license.dart';
@@ -244,9 +245,8 @@ class SettingsDetailState extends State<SettingsDetail>
             scrollPhysics: BouncingScrollPhysics(),
             builder: (BuildContext context, int index) {
               return PhotoViewGalleryPageOptions(
-                imageProvider: NetworkImage(_radioStation.stationPhotos[index]),
-                initialScale: PhotoViewComputedScale.contained * 0.8,
-                // heroAttributes:  HeroAttributes(tag: "tag1"),
+                imageProvider: CachedNetworkImageProvider(_radioStation.stationPhotos[index]),
+                initialScale: PhotoViewComputedScale.contained * 0.8
               );
             },
             itemCount: _radioStation.stationPhotos.length,

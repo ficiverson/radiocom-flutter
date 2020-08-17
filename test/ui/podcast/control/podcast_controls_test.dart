@@ -21,7 +21,8 @@ import '../../../instrument/model/radio_station_instrument.dart';
 void main() {
   MockRadiocoRepository mockRepository = MockRadiocoRepository();
   MockConnection mockConnection = MockConnection();
-  MockCurrentTimerContract mockCurrentTimerContract = MockCurrentTimerContract();
+  MockCurrentTimerContract mockCurrentTimerContract =
+      MockCurrentTimerContract();
   MockPlayer mockPlayer = MockPlayer();
 
   setUpAll(() async {
@@ -30,19 +31,19 @@ void main() {
     DependencyInjector().loadModules();
     mockTranslationsWithLocale();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
-            (_) => mockRepository,
+        (_) => mockRepository,
         override: true);
     Injector.appInstance.registerDependency<CurrentTimerContract>(
-            (_) => mockCurrentTimerContract,
+        (_) => mockCurrentTimerContract,
         override: true);
     Injector.appInstance.registerDependency<ConnectionContract>(
-            (_) => mockConnection,
+        (_) => mockConnection,
         override: true);
     Injector.appInstance.registerDependency<CurrentPlayerContract>(
-            (_) => mockPlayer,
+        (_) => mockPlayer,
         override: true);
     Injector.appInstance.registerDependency<RadioStation>(
-            (_) => RadioStationInstrument.givenARadioStation(),
+        (_) => RadioStationInstrument.givenARadioStation(),
         override: true);
   });
 
@@ -54,7 +55,8 @@ void main() {
     Injector.appInstance.removeByKey<PodcastControlsView>();
   });
 
-  testWidgets('that in podcast controls can show info while playing live audio', (WidgetTester tester) async{
+  testWidgets('that in podcast controls can show info while playing live audio',
+      (WidgetTester tester) async {
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -66,14 +68,16 @@ void main() {
     when(mockPlayer.currentSong).thenReturn("mocklive");
     when(mockCurrentTimerContract.currentTime).thenReturn(0);
 
-    await tester.pumpWidget(startWidget(PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
+    await tester.pumpWidget(startWidget(
+        PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
 
-    expect(
-        find.byKey(Key("podcast_controls_container"),skipOffstage: true),
+    expect(find.byKey(Key("podcast_controls_container"), skipOffstage: true),
         findsOneWidget);
   });
 
-  testWidgets('that in podcast controls can show info while playing podcast audio', (WidgetTester tester) async{
+  testWidgets(
+      'that in podcast controls can show info while playing podcast audio',
+      (WidgetTester tester) async {
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -88,14 +92,15 @@ void main() {
     when(mockPlayer.currentSong).thenReturn("mocklive");
     when(mockCurrentTimerContract.currentTime).thenReturn(0);
 
-    await tester.pumpWidget(startWidget(PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
+    await tester.pumpWidget(startWidget(
+        PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
 
-    expect(
-        find.byKey(Key("podcast_controls_container"),skipOffstage: true),
+    expect(find.byKey(Key("podcast_controls_container"), skipOffstage: true),
         findsOneWidget);
   });
 
-  testWidgets('that in podcast controls can put a timer properly', (WidgetTester tester) async{
+  testWidgets('that in podcast controls can put a timer properly',
+      (WidgetTester tester) async {
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -110,19 +115,20 @@ void main() {
     when(mockPlayer.currentSong).thenReturn("mocklive");
     when(mockCurrentTimerContract.currentTime).thenReturn(110);
 
-    await tester.pumpWidget(startWidget(PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
+    await tester.pumpWidget(startWidget(
+        PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
     final gesture = await tester.startGesture(Offset(0, 600));
     await gesture.moveBy(Offset(0, -600));
     await tester.pump();
     await tester.tap(find.byKey(Key("timer_chip_15_min")));
     await tester.pump(Duration(milliseconds: 300));
 
-    expect(
-        find.byType(NeumorphicView, skipOffstage: false),
-        findsOneWidget);
+    expect(find.byType(NeumorphicView, skipOffstage: false), findsNWidgets(2));
   });
 
-  testWidgets('that in podcast controls can handle error on connection while playing', (WidgetTester tester) async{
+  testWidgets(
+      'that in podcast controls can handle error on connection while playing',
+      (WidgetTester tester) async {
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -133,24 +139,25 @@ void main() {
     when(mockPlayer.isPodcast).thenReturn(false);
     when(mockPlayer.currentSong).thenReturn("mocklive");
     when(mockCurrentTimerContract.currentTime).thenReturn(0);
-    when(mockPlayer.onConnection).thenReturn((isError){
-      tester.allStates.forEach((state){
-        if( state is PodcastControlsState){
+    when(mockPlayer.onConnection).thenReturn((isError) {
+      tester.allStates.forEach((state) {
+        if (state is PodcastControlsState) {
           state.onConnectionError();
         }
       });
     });
 
-    await tester.pumpWidget(startWidget(PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
+    await tester.pumpWidget(startWidget(
+        PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
     mockPlayer.onConnection(true);
     await tester.pumpAndSettle();
 
-    expect(
-        find.byKey(Key("connection_snackbar"),skipOffstage: true),
+    expect(find.byKey(Key("connection_snackbar"), skipOffstage: true),
         findsOneWidget);
   });
 
-  testWidgets('that in podcast controls can put playback rate for faster', (WidgetTester tester) async{
+  testWidgets('that in podcast controls can put playback rate for faster',
+      (WidgetTester tester) async {
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -166,15 +173,14 @@ void main() {
     when(mockPlayer.playbackRate).thenReturn(1.5);
     when(mockCurrentTimerContract.currentTime).thenReturn(110);
 
-    await tester.pumpWidget(startWidget(PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
+    await tester.pumpWidget(startWidget(
+        PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
     final gesture = await tester.startGesture(Offset(0, 600));
     await gesture.moveBy(Offset(0, -600));
     await tester.pump();
     await tester.tap(find.byKey(Key("faster_chip_3_speed")));
     await tester.pump(Duration(milliseconds: 300));
 
-    expect(
-        find.byType(NeumorphicView, skipOffstage: false),
-        findsOneWidget);
+    expect(find.byType(NeumorphicView, skipOffstage: false), findsNWidgets(2));
   });
 }

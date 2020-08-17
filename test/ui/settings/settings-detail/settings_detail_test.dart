@@ -26,16 +26,16 @@ void main() {
     DependencyInjector().loadModules();
     mockTranslationsWithLocale();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
-            (_) => mockRepository,
+        (_) => mockRepository,
         override: true);
     Injector.appInstance.registerDependency<ConnectionContract>(
-            (_) => mockConnection,
+        (_) => mockConnection,
         override: true);
     Injector.appInstance.registerDependency<CurrentPlayerContract>(
-            (_) => mockPlayer,
+        (_) => mockPlayer,
         override: true);
     Injector.appInstance.registerDependency<RadioStation>(
-            (_) => RadioStationInstrument.givenARadioStation(),
+        (_) => RadioStationInstrument.givenARadioStation(),
         override: true);
   });
 
@@ -47,7 +47,9 @@ void main() {
     Injector.appInstance.removeByKey<SettingsDetailView>();
   });
 
-  testWidgets('that can init the setting detail screen screen with player playing in terms and conditions', (WidgetTester tester) async{
+  testWidgets(
+      'that can init the setting detail screen screen with player playing in terms and conditions',
+      (WidgetTester tester) async {
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -58,14 +60,20 @@ void main() {
     when(mockPlayer.isPodcast).thenReturn(false);
     when(mockPlayer.currentSong).thenReturn("mocklive");
 
-    await tester.pumpWidget(startWidget(SettingsDetail(legalType: LegalType.TERMS)));
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 1.0);
+    await tester
+        .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.TERMS)));
     expect(
-        find.byKey(ValueKey<String>("termsprivacynote"),skipOffstage: true),
+        tester
+            .widget<Opacity>(find.byKey(Key("player_view_container")))
+            .opacity,
+        1.0);
+    expect(find.byKey(ValueKey<String>("termsprivacynote"), skipOffstage: true),
         findsOneWidget);
   });
 
-  testWidgets('that can init the setting detail screen screen with player no playing in terms and conditions', (WidgetTester tester) async{
+  testWidgets(
+      'that can init the setting detail screen screen with player no playing in terms and conditions',
+      (WidgetTester tester) async {
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -76,14 +84,20 @@ void main() {
     when(mockPlayer.isPodcast).thenReturn(false);
     when(mockPlayer.currentSong).thenReturn("mocklive");
 
-    await tester.pumpWidget(startWidget(SettingsDetail(legalType: LegalType.TERMS)));
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 0.0);
+    await tester
+        .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.TERMS)));
     expect(
-        find.byKey(ValueKey<String>("termsprivacynote"),skipOffstage: true),
+        tester
+            .widget<Opacity>(find.byKey(Key("player_view_container")))
+            .opacity,
+        0.0);
+    expect(find.byKey(ValueKey<String>("termsprivacynote"), skipOffstage: true),
         findsOneWidget);
   });
 
-  testWidgets('that can init the setting detail screen screen with player playing in privacy', (WidgetTester tester) async{
+  testWidgets(
+      'that can init the setting detail screen screen with player playing in privacy',
+      (WidgetTester tester) async {
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -94,14 +108,20 @@ void main() {
     when(mockPlayer.isPodcast).thenReturn(false);
     when(mockPlayer.currentSong).thenReturn("mocklive");
 
-    await tester.pumpWidget(startWidget(SettingsDetail(legalType: LegalType.PRIVACY)));
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 1.0);
+    await tester
+        .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.PRIVACY)));
     expect(
-        find.byKey(ValueKey<String>("termsprivacynote"),skipOffstage: true),
+        tester
+            .widget<Opacity>(find.byKey(Key("player_view_container")))
+            .opacity,
+        1.0);
+    expect(find.byKey(ValueKey<String>("termsprivacynote"), skipOffstage: true),
         findsOneWidget);
   });
 
-  testWidgets('that can init the setting detail screen screen with player no playing in privacy', (WidgetTester tester) async{
+  testWidgets(
+      'that can init the setting detail screen screen with player no playing in privacy',
+      (WidgetTester tester) async {
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -112,14 +132,20 @@ void main() {
     when(mockPlayer.isPodcast).thenReturn(false);
     when(mockPlayer.currentSong).thenReturn("mocklive");
 
-    await tester.pumpWidget(startWidget(SettingsDetail(legalType: LegalType.PRIVACY)));
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 0.0);
+    await tester
+        .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.PRIVACY)));
     expect(
-        find.byKey(ValueKey<String>("termsprivacynote"),skipOffstage: true),
+        tester
+            .widget<Opacity>(find.byKey(Key("player_view_container")))
+            .opacity,
+        0.0);
+    expect(find.byKey(ValueKey<String>("termsprivacynote"), skipOffstage: true),
         findsOneWidget);
   });
 
-  testWidgets('that can init the setting detail screen screen with player playing in license', (WidgetTester tester) async{
+  testWidgets(
+      'that can init the setting detail screen screen with player playing in license',
+      (WidgetTester tester) async {
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -130,14 +156,20 @@ void main() {
     when(mockPlayer.isPodcast).thenReturn(false);
     when(mockPlayer.currentSong).thenReturn("mocklive");
 
-    await tester.pumpWidget(startWidget(SettingsDetail(legalType: LegalType.LICENSE)));
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 1.0);
+    await tester
+        .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.LICENSE)));
     expect(
-        find.byKey(ValueKey<String>("licenseNote"),skipOffstage: true),
+        tester
+            .widget<Opacity>(find.byKey(Key("player_view_container")))
+            .opacity,
+        1.0);
+    expect(find.byKey(ValueKey<String>("licenseNote"), skipOffstage: true),
         findsOneWidget);
   });
 
-  testWidgets('that can init the setting detail screen screen with player no playing in license', (WidgetTester tester) async{
+  testWidgets(
+      'that can init the setting detail screen screen with player no playing in license',
+      (WidgetTester tester) async {
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -148,14 +180,21 @@ void main() {
     when(mockPlayer.isPodcast).thenReturn(false);
     when(mockPlayer.currentSong).thenReturn("mocklive");
 
-    await tester.pumpWidget(startWidget(SettingsDetail(legalType: LegalType.LICENSE)));
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 0.0);
+    await tester
+        .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.LICENSE)));
     expect(
-        find.byKey(ValueKey<String>("licenseNote"),skipOffstage: true),
+        tester
+            .widget<Opacity>(find.byKey(Key("player_view_container")))
+            .opacity,
+        0.0);
+    expect(find.byKey(ValueKey<String>("licenseNote"), skipOffstage: true),
         findsOneWidget);
   });
 
-  testWidgets('that can init the setting detail screen screen with player playing in gallery', (WidgetTester tester) async{
+  testWidgets(
+      'that can init the setting detail screen screen with player playing in gallery',
+      (WidgetTester tester) async {
+    //TODO
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -166,14 +205,21 @@ void main() {
     when(mockPlayer.isPodcast).thenReturn(false);
     when(mockPlayer.currentSong).thenReturn("mocklive");
 
-    await tester.pumpWidget(startWidget(SettingsDetail(legalType: LegalType.NONE)));
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 1.0);
+    await tester
+        .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.NONE)));
     expect(
-        find.byKey(ValueKey<String>("gallery_cotainer"),skipOffstage: true),
+        tester
+            .widget<Opacity>(find.byKey(Key("player_view_container")))
+            .opacity,
+        1.0);
+    expect(find.byKey(ValueKey<String>("gallery_cotainer"), skipOffstage: true),
         findsOneWidget);
   });
 
-  testWidgets('that can init the setting detail screen screen with player no playing in gallery', (WidgetTester tester) async{
+  testWidgets(
+      'that can init the setting detail screen screen with player no playing in gallery',
+      (WidgetTester tester) async {
+    //TODO
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -184,14 +230,21 @@ void main() {
     when(mockPlayer.isPodcast).thenReturn(false);
     when(mockPlayer.currentSong).thenReturn("mocklive");
 
-    await tester.pumpWidget(startWidget(SettingsDetail(legalType: LegalType.NONE)));
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 0.0);
+    await tester
+        .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.NONE)));
     expect(
-        find.byKey(ValueKey<String>("gallery_cotainer"),skipOffstage: true),
+        tester
+            .widget<Opacity>(find.byKey(Key("player_view_container")))
+            .opacity,
+        0.0);
+    expect(find.byKey(ValueKey<String>("gallery_cotainer"), skipOffstage: true),
         findsOneWidget);
   });
 
-  testWidgets('that in setting detail screen can handle error on connection while playing', (WidgetTester tester) async{
+  testWidgets(
+      'that in setting detail screen can handle error on connection while playing',
+      (WidgetTester tester) async {
+    //tODO
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -201,22 +254,25 @@ void main() {
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
     when(mockPlayer.isPodcast).thenReturn(false);
     when(mockPlayer.currentSong).thenReturn("mocklive");
-    when(mockPlayer.onConnection).thenReturn((isError){
-      tester.allStates.forEach((state){
-        if(state is SettingsDetailState){
+    when(mockPlayer.onConnection).thenReturn((isError) {
+      tester.allStates.forEach((state) {
+        if (state is SettingsDetailState) {
           state.onConnectionError();
         }
       });
     });
 
-    await tester.pumpWidget(startWidget(SettingsDetail(legalType: LegalType.NONE)));
+    await tester
+        .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.NONE)));
     mockPlayer.onConnection(true);
     await tester.pumpAndSettle();
 
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 1.0);
     expect(
-        find.byKey(Key("connection_snackbar"),skipOffstage: true),
+        tester
+            .widget<Opacity>(find.byKey(Key("player_view_container")))
+            .opacity,
+        1.0);
+    expect(find.byKey(Key("connection_snackbar"), skipOffstage: true),
         findsOneWidget);
   });
-
 }
