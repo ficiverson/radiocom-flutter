@@ -62,7 +62,7 @@ void main() {
     presenter.onViewResumed();
     await Future.delayed(Duration(milliseconds: 200));
 
-    expect(view.viewState[0], equals(PodcastControlState.onNewData));
+    expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
   });
 
   test('that can init the presenter, then resume the view and realod the data with error response reload the view with base now',
@@ -79,7 +79,7 @@ void main() {
         presenter.onViewResumed();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState[0], equals(PodcastControlState.onNewData));
+        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
       });
 
   test(
@@ -97,7 +97,8 @@ void main() {
         presenter.onViewResumed();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState.isEmpty, equals(true));
+        expect(view.viewState.isEmpty, equals(false));
+        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
       });
 
   test(
@@ -112,7 +113,8 @@ void main() {
         presenter.onViewResumed();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState.isEmpty, equals(true));
+        expect(view.viewState.isEmpty, equals(false));
+        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
 
       });
 
@@ -129,7 +131,8 @@ void main() {
         presenter.onSeek(200);
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState[0], equals(PodcastControlState.onNewData));
+        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
+        expect(view.viewState[1], equals(PodcastControlState.onNewData));
       });
 
   test(
@@ -145,7 +148,8 @@ void main() {
         presenter.onSeek(200);
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState.isEmpty, equals(true));
+        expect(view.viewState.isEmpty, equals(false));
+        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
       });
 
 
@@ -162,7 +166,8 @@ void main() {
         presenter.onPlayPause();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState[0], equals(PodcastControlState.onNewData));
+        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
+        expect(view.viewState[1], equals(PodcastControlState.onNewData));
       });
 
   test(
@@ -177,7 +182,8 @@ void main() {
         presenter.onPlayPause();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState[0], equals(PodcastControlState.onNewData));
+        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
+        expect(view.viewState[1], equals(PodcastControlState.onNewData));
       });
 
   test(
@@ -192,7 +198,8 @@ void main() {
         presenter.onPlayPause();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState[0], equals(PodcastControlState.onNewData));
+        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
+        expect(view.viewState[1], equals(PodcastControlState.onNewData));
       });
 
   test(
@@ -251,13 +258,12 @@ void main() {
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.getPlaybackRate()).thenReturn(2.5);
         when(mockPlayer.setPlaybackRate(any)).thenReturn({
-          mockPlayer.playbackRate = any
+          2.5
         });
 
         presenter.onSpeedSelected(2.5);
 
         expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
-        expect( mockPlayer.playbackRate, equals(2.5));
       });
 
 
