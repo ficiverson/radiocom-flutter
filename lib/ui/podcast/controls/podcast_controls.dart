@@ -336,7 +336,7 @@ class PodcastControlsState extends State<PodcastControls>
                             });
                           },
                           active: shouldShowFaster,
-                          image: "assets/graphics/watch.jpg",
+                          image: "assets/graphics/faster.jpg",
                           label: getTextForFasters())) : Container(),
                   shouldShowFaster && _presenter.currentPlayer.isPlaying() && _presenter.currentPlayer.isPodcast
                       ? Padding(
@@ -393,7 +393,7 @@ class PodcastControlsState extends State<PodcastControls>
                                 });
                               },
                               active: shouldShowTimer,
-                              image: "assets/graphics/watch.jpg",
+                              image: "assets/graphics/sleep.jpg",
                               label: getTextForCountDown()))
                       : Container(),
                   _presenter.currentPlayer.isPlaying() && shouldShowTimer

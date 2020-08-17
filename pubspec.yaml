@@ -73,7 +73,8 @@ flutter:
       - assets/graphics/categories/goverment.jpeg
       - assets/graphics/categories/health.jpeg
       - assets/graphics/categories/tech.jpeg
-      - assets/graphics/watch.jpg
+      - assets/graphics/faster.jpg
+      - assets/graphics/sleep.jpg
       - assets/translations/en.json
       - assets/translations/es.json
       - assets/translations/gl.json

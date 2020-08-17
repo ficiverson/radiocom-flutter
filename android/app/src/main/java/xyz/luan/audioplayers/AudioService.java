@@ -29,6 +29,7 @@ import androidx.annotation.ColorInt;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.palette.graphics.Palette;
+import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.EventChannel;
 
 public class AudioService extends Service {
@@ -53,8 +54,8 @@ public class AudioService extends Service {
 	static EventChannel.EventSink updateEventPodcastControl;
 	static EventChannel.EventSink updateEventNewDetail;
 
-	public static void registerActivity(MainActivity activity) {
-		new EventChannel(activity.getFlutterView(), EVENT_ID_NEW_DETAIL).setStreamHandler(
+	public static void registerActivity(FlutterEngine flutterEngine) {
+		new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), EVENT_ID_NEW_DETAIL).setStreamHandler(
 				new EventChannel.StreamHandler() {
 					@Override
 					public void onListen(Object args, final EventChannel.EventSink events) {
@@ -67,7 +68,7 @@ public class AudioService extends Service {
 					}
 				}
 		);
-		new EventChannel(activity.getFlutterView(), EVENT_ID_CONTROL_PODCAST).setStreamHandler(
+		new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), EVENT_ID_CONTROL_PODCAST).setStreamHandler(
 				new EventChannel.StreamHandler() {
 					@Override
 					public void onListen(Object args, final EventChannel.EventSink events) {
@@ -80,7 +81,7 @@ public class AudioService extends Service {
 					}
 				}
 		);
-		new EventChannel(activity.getFlutterView(), EVENT_ID_PODCAST).setStreamHandler(
+		new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), EVENT_ID_PODCAST).setStreamHandler(
 				new EventChannel.StreamHandler() {
 					@Override
 					public void onListen(Object args, final EventChannel.EventSink events) {
@@ -93,7 +94,7 @@ public class AudioService extends Service {
 					}
 				}
 		);
-		new EventChannel(activity.getFlutterView(), EVENT_ID_MAIN).setStreamHandler(
+		new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), EVENT_ID_MAIN).setStreamHandler(
 				new EventChannel.StreamHandler() {
 					@Override
 					public void onListen(Object args, final EventChannel.EventSink events) {
@@ -107,7 +108,7 @@ public class AudioService extends Service {
 				}
 		);
 
-		new EventChannel(activity.getFlutterView(), EVENT_ID).setStreamHandler(
+		new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), EVENT_ID).setStreamHandler(
 				new EventChannel.StreamHandler() {
 					@Override
 					public void onListen(Object args, final EventChannel.EventSink events) {

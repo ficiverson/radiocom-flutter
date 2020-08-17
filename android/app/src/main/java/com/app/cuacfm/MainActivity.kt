@@ -7,7 +7,8 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.StrictMode
-import io.flutter.app.FlutterActivity
+import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
 import xyz.luan.audioplayers.AudioService
@@ -23,16 +24,18 @@ class MainActivity : FlutterActivity() {
     private var currentScreen: String = ""
     private var tempCurrentScreen: String = ""
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        AudioService.registerActivity(this@MainActivity)
 
         if (Build.VERSION.SDK_INT > 16) {
             val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
             StrictMode.setThreadPolicy(policy)
         }
+
+    }
+
+    override fun configureFlutterEngine(flutterEngine : FlutterEngine) {
+        AudioService.registerActivity(flutterEngine)
 
         val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val runningAppProcesses = activityManager.runningAppProcesses
@@ -45,9 +48,10 @@ class MainActivity : FlutterActivity() {
                 }, 200)
             }
         }
-        GeneratedPluginRegistrant.registerWith(this)
 
-        MethodChannel(flutterView, CHANGE_LOCALE).setMethodCallHandler { call, result ->
+        GeneratedPluginRegistrant.registerWith(flutterEngine)
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANGE_LOCALE).setMethodCallHandler { call, result ->
             if (call.method == "changeScreen") {
                 changeScreen = result
                 currentScreen = call.argument<String>("currentScreen") as String

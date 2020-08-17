@@ -13,12 +13,6 @@ class CuacApplication : MultiDexApplication() {
     private var mCurrentActivity: Activity? = null
 
     @CallSuper
-    override fun onCreate() {
-        super.onCreate()
-        FlutterMain.startInitialization(this)
-    }
-
-    @CallSuper
     override fun attachBaseContext(context: Context) {
         super.attachBaseContext(context)
         MultiDex.install(this)
