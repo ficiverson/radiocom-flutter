@@ -17,7 +17,9 @@
   "podcast_controls" : {
     "msg" : "Streming en directo da radio comunitaria da Coruña. 103.4 FM. Para máis información visita: www.cuacfm.org",
     "auto_off_active" : "Autoapagado en: ",
-    "auto_off_inactive" : "Autoapagado"
+    "auto_off_inactive" : "Autoapagado",
+    "faster_inactive" : "Velocidade de reproducción",
+    "faster_active" : "Velocidade faster a: "
   },
   "timetable" : {
     "title" : "Programas de hoxe"

@@ -11,6 +11,7 @@ import 'package:share/share.dart';
 
 abstract class PodcastControlsView {
   onNewData();
+  setupInitialRate(int index);
 }
 
 class PodcastControlsPresenter {
@@ -26,6 +27,7 @@ class PodcastControlsPresenter {
     currentTimer = Injector.appInstance.getDependency<CurrentTimerContract>();
     connection = Injector.appInstance.getDependency<ConnectionContract>();
     currentPlayer = Injector.appInstance.getDependency<CurrentPlayerContract>();
+    _view.setupInitialRate(_getRateIndex(currentPlayer.getPlaybackRate()));
   }
 
   onViewResumed() async {
@@ -41,6 +43,12 @@ class PodcastControlsPresenter {
       }
       currentTimer.currentTime = index;
       currentTimer.startTimer(minutes);
+    }
+  }
+
+  onSpeedSelected(double speed) {
+    if (currentPlayer.isPlaying()) {
+      currentPlayer.setPlaybackRate(speed);
     }
   }
 
@@ -89,5 +97,21 @@ class PodcastControlsPresenter {
           .seek(Duration(seconds: currentPlayer.position.inSeconds + timeSeek));
       _view.onNewData();
     }
+  }
+
+  int _getRateIndex(double speed){
+    int index = 1;
+    if(speed == 0.8){
+      index = 0;
+    } else if(speed ==1.0) {
+      index = 1;
+    } else if(speed == 1.2){
+      index = 2;
+    } else if(speed ==1.5){
+      index = 3;
+    } else if(speed ==2.0){
+      index = 4;
+    }
+    return index;
   }
 }
