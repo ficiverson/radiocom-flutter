@@ -62,199 +62,199 @@ class DependencyInjector {
   injectByView(dynamic view) {
     if (view is MyHomePageState) {
       Injector.appInstance
-          .registerSingleton<BuildContext>((_) => view.context, override: true);
-      injector.registerDependency<HomeView>((Injector injector) => view);
+          .registerSingleton<BuildContext>(() => view.context, override: true);
+      injector.registerDependency<HomeView>(() => view);
     } else if (view is TimetableState) {
-      injector.registerDependency<TimeTableView>((Injector injector) => view);
+      injector.registerDependency<TimeTableView>(() => view);
     } else if (view is AllPodcastState) {
-      injector.registerDependency<AllPodcastView>((Injector injector) => view);
+      injector.registerDependency<AllPodcastView>(() => view);
     } else if (view is NewDetailState) {
-      injector.registerDependency<NewDetailView>((Injector injector) => view);
+      injector.registerDependency<NewDetailView>(() => view);
     } else if (view is SettingsState) {
-      injector.registerDependency<SettingsView>((Injector injector) => view);
+      injector.registerDependency<SettingsView>(() => view);
     } else if (view is SettingsDetailState) {
       injector
-          .registerDependency<SettingsDetailView>((Injector injector) => view);
+          .registerDependency<SettingsDetailView>(() => view);
     } else if (view is DetailPodcastState) {
       injector
-          .registerDependency<DetailPodcastView>((Injector injector) => view);
+          .registerDependency<DetailPodcastView>(() => view);
     } else if (view is PodcastControlsState) {
       injector
-          .registerDependency<PodcastControlsView>((Injector injector) => view);
+          .registerDependency<PodcastControlsView>(() => view);
     }
   }
 
   loadPlayerModules() {
-    injector.registerSingleton<CurrentTimerContract>((Injector injector) {
+    injector.registerSingleton<CurrentTimerContract>(() {
       return CurrentTimer();
     });
-    injector.registerSingleton<CurrentPlayerContract>((Injector injector) {
+    injector.registerSingleton<CurrentPlayerContract>(() {
       return CurrentPlayer();
     });
-    injector.registerSingleton<AudioPlayer>((Injector injector) {
+    injector.registerSingleton<AudioPlayer>(() {
       AudioPlayer.logEnabled = false;
       return AudioPlayer();
     });
   }
 
   loadPresentationModules() {
-    injector.registerDependency<ConnectionContract>((_) {
+    injector.registerDependency<ConnectionContract>(() {
       return Connection();
     });
 
-    injector.registerDependency<NotificationSubscriptionContract>((_) {
+    injector.registerDependency<NotificationSubscriptionContract>(() {
       return NotificationSubscription();
     });
 
-    injector.registerSingleton<RadiocomColorsConract>((Injector injector) {
+    injector.registerSingleton<RadiocomColorsConract>(() {
       return RadiocomColorsLight();
     });
-    injector.registerSingleton<Invoker>((Injector injector) {
+    injector.registerSingleton<Invoker>(() {
       return Invoker();
     });
 
-    injector.registerDependency<HomeRouterContract>((Injector injector) {
+    injector.registerDependency<HomeRouterContract>(() {
       return HomeRouter();
     });
 
-    injector.registerDependency<SettingsRouterContract>((Injector injector) {
+    injector.registerDependency<SettingsRouterContract>(() {
       return SettingsRouter();
     });
 
-    injector.registerDependency<AllPodcastRouterContract>((Injector injector) {
+    injector.registerDependency<AllPodcastRouterContract>(() {
       return AllPodcastRouter();
     });
 
     injector
-        .registerDependency<DetailPodcastRouterContract>((Injector injector) {
+        .registerDependency<DetailPodcastRouterContract>(() {
       return DetailPodcastRouter();
     });
 
-    injector.registerDependency<NewDetailRouterContract>((Injector injector) {
+    injector.registerDependency<NewDetailRouterContract>(() {
       return NewDetailRouter();
     });
 
     injector
-        .registerDependency<SettingsDetailRouterContract>((Injector injector) {
+        .registerDependency<SettingsDetailRouterContract>(() {
       return SettingsDetailRouter();
     });
 
-    injector.registerDependency<TimeTableRouterContract>((Injector injector) {
+    injector.registerDependency<TimeTableRouterContract>(() {
       return TimeTableRouter();
     });
 
-    injector.registerDependency<HomePresenter>((Injector injector) {
-      return new HomePresenter(injector.getDependency<HomeView>(),
-          invoker: injector.getDependency<Invoker>(),
-          router: injector.getDependency<HomeRouterContract>(),
-          getAllPodcastUseCase: injector.getDependency<GetAllPodcastUseCase>(),
-          getStationUseCase: injector.getDependency<GetStationUseCase>(),
-          getLiveDataUseCase: injector.getDependency<GetLiveProgramUseCase>(),
-          getTimetableUseCase: injector.getDependency<GetTimetableUseCase>(),
-          getNewsUseCase: injector.getDependency<GetNewsUseCase>());
+    injector.registerDependency<HomePresenter>(() {
+      return new HomePresenter(injector.get<HomeView>(),
+          invoker: injector.get<Invoker>(),
+          router: injector.get<HomeRouterContract>(),
+          getAllPodcastUseCase: injector.get<GetAllPodcastUseCase>(),
+          getStationUseCase: injector.get<GetStationUseCase>(),
+          getLiveDataUseCase: injector.get<GetLiveProgramUseCase>(),
+          getTimetableUseCase: injector.get<GetTimetableUseCase>(),
+          getNewsUseCase: injector.get<GetNewsUseCase>());
     });
 
-    injector.registerDependency<TimeTablePresenter>((Injector injector) {
-      return new TimeTablePresenter(injector.getDependency<TimeTableView>(),
-          invoker: injector.getDependency<Invoker>(),
-          router: injector.getDependency<TimeTableRouterContract>(),
-          getLiveDataUseCase: injector.getDependency<GetLiveProgramUseCase>());
+    injector.registerDependency<TimeTablePresenter>(() {
+      return new TimeTablePresenter(injector.get<TimeTableView>(),
+          invoker: injector.get<Invoker>(),
+          router: injector.get<TimeTableRouterContract>(),
+          getLiveDataUseCase: injector.get<GetLiveProgramUseCase>());
     });
 
-    injector.registerDependency<AllPodcastPresenter>((Injector injector) {
-      return new AllPodcastPresenter(injector.getDependency<AllPodcastView>(),
-          invoker: injector.getDependency<Invoker>(),
-          router: injector.getDependency<AllPodcastRouterContract>(),
-          getLiveDataUseCase: injector.getDependency<GetLiveProgramUseCase>());
+    injector.registerDependency<AllPodcastPresenter>(() {
+      return new AllPodcastPresenter(injector.get<AllPodcastView>(),
+          invoker: injector.get<Invoker>(),
+          router: injector.get<AllPodcastRouterContract>(),
+          getLiveDataUseCase: injector.get<GetLiveProgramUseCase>());
     });
-    injector.registerDependency<NewDetailPresenter>((Injector injector) {
+    injector.registerDependency<NewDetailPresenter>(() {
       return new NewDetailPresenter(
-        injector.getDependency<NewDetailView>(),
-        router: injector.getDependency<NewDetailRouterContract>(),
-        invoker: injector.getDependency<Invoker>(),
-        getLiveDataUseCase: injector.getDependency<GetLiveProgramUseCase>(),
+        injector.get<NewDetailView>(),
+        router: injector.get<NewDetailRouterContract>(),
+        invoker: injector.get<Invoker>(),
+        getLiveDataUseCase: injector.get<GetLiveProgramUseCase>(),
       );
     });
-    injector.registerDependency<SettingsPresenter>((Injector injector) {
-      return new SettingsPresenter(injector.getDependency<SettingsView>(),
-          invoker: injector.getDependency<Invoker>(),
-          router: injector.getDependency<SettingsRouterContract>(),
-          getLiveDataUseCase: injector.getDependency<GetLiveProgramUseCase>());
+    injector.registerDependency<SettingsPresenter>(() {
+      return new SettingsPresenter(injector.get<SettingsView>(),
+          invoker: injector.get<Invoker>(),
+          router: injector.get<SettingsRouterContract>(),
+          getLiveDataUseCase: injector.get<GetLiveProgramUseCase>());
     });
-    injector.registerDependency<SettingsDetailPresenter>((Injector injector) {
+    injector.registerDependency<SettingsDetailPresenter>(() {
       return new SettingsDetailPresenter(
-          injector.getDependency<SettingsDetailView>(),
-          invoker: injector.getDependency<Invoker>(),
-          router: injector.getDependency<SettingsDetailRouterContract>(),
-          getLiveDataUseCase: injector.getDependency<GetLiveProgramUseCase>());
+          injector.get<SettingsDetailView>(),
+          invoker: injector.get<Invoker>(),
+          router: injector.get<SettingsDetailRouterContract>(),
+          getLiveDataUseCase: injector.get<GetLiveProgramUseCase>());
     });
 
-    injector.registerDependency<DetailPodcastPresenter>((Injector injector) {
+    injector.registerDependency<DetailPodcastPresenter>(() {
       return new DetailPodcastPresenter(
-          injector.getDependency<DetailPodcastView>(),
-          invoker: injector.getDependency<Invoker>(),
-          router: injector.getDependency<DetailPodcastRouterContract>(),
-          getEpisodesUseCase: injector.getDependency<GetEpisodesUseCase>(),
-          getLiveDataUseCase: injector.getDependency<GetLiveProgramUseCase>());
+          injector.get<DetailPodcastView>(),
+          invoker: injector.get<Invoker>(),
+          router: injector.get<DetailPodcastRouterContract>(),
+          getEpisodesUseCase: injector.get<GetEpisodesUseCase>(),
+          getLiveDataUseCase: injector.get<GetLiveProgramUseCase>());
     });
 
-    injector.registerDependency<PodcastControlsPresenter>((Injector injector) {
+    injector.registerDependency<PodcastControlsPresenter>(() {
       return new PodcastControlsPresenter(
-          injector.getDependency<PodcastControlsView>(),
-          invoker: injector.getDependency<Invoker>(),
-          getLiveDataUseCase: injector.getDependency<GetLiveProgramUseCase>());
+          injector.get<PodcastControlsView>(),
+          invoker: injector.get<Invoker>(),
+          getLiveDataUseCase: injector.get<GetLiveProgramUseCase>());
     });
   }
 
   loadDomainModules() {
-    injector.registerSingleton<RadioStation>((Injector injector) {
+    injector.registerSingleton<RadioStation>(() {
       return RadioStation.base();
     });
-    injector.registerDependency<GetAllPodcastUseCase>((Injector injector) {
-      var radiocoRepository = injector.getDependency<CuacRepositoryContract>();
+    injector.registerDependency<GetAllPodcastUseCase>(() {
+      var radiocoRepository = injector.get<CuacRepositoryContract>();
       return GetAllPodcastUseCase(radiocoRepository: radiocoRepository);
     });
 
-    injector.registerDependency<GetStationUseCase>((Injector injector) {
-      var radiocoRepository = injector.getDependency<CuacRepositoryContract>();
+    injector.registerDependency<GetStationUseCase>(() {
+      var radiocoRepository = injector.get<CuacRepositoryContract>();
       return GetStationUseCase(radiocoRepository: radiocoRepository);
     });
 
-    injector.registerDependency<GetLiveProgramUseCase>((Injector injector) {
-      var radiocoRepository = injector.getDependency<CuacRepositoryContract>();
+    injector.registerDependency<GetLiveProgramUseCase>(() {
+      var radiocoRepository = injector.get<CuacRepositoryContract>();
       return GetLiveProgramUseCase(radiocoRepository: radiocoRepository);
     });
 
-    injector.registerDependency<GetTimetableUseCase>((Injector injector) {
-      var radiocoRepository = injector.getDependency<CuacRepositoryContract>();
+    injector.registerDependency<GetTimetableUseCase>(() {
+      var radiocoRepository = injector.get<CuacRepositoryContract>();
       return GetTimetableUseCase(radiocoRepository: radiocoRepository);
     });
 
-    injector.registerDependency<GetNewsUseCase>((Injector injector) {
-      var radiocoRepository = injector.getDependency<CuacRepositoryContract>();
+    injector.registerDependency<GetNewsUseCase>(() {
+      var radiocoRepository = injector.get<CuacRepositoryContract>();
       return GetNewsUseCase(radiocoRepository: radiocoRepository);
     });
 
-    injector.registerDependency<GetEpisodesUseCase>((Injector injector) {
-      var radiocoRepository = injector.getDependency<CuacRepositoryContract>();
+    injector.registerDependency<GetEpisodesUseCase>(() {
+      var radiocoRepository = injector.get<CuacRepositoryContract>();
       return GetEpisodesUseCase(radiocoRepository: radiocoRepository);
     });
   }
 
   loadDataModules() {
-    injector.registerDependency<CuacRepositoryContract>((Injector injector) {
+    injector.registerDependency<CuacRepositoryContract>(() {
       var remoteDataSource =
-          injector.getDependency<RadiocoRemoteDataSourceContract>();
+          injector.get<RadiocoRemoteDataSourceContract>();
       return CuacRepository(remoteDataSource: remoteDataSource);
     });
   }
 
   loadRemoteDatasourceModules() {
-    injector.registerDependency<CUACClient>((_) => CUACClient(),
+    injector.registerDependency<CUACClient>(() => CUACClient(),
         override: true);
-    injector.registerDependency<RadiocoAPIContract>((_) => RadiocoAPI());
+    injector.registerDependency<RadiocoAPIContract>(() => RadiocoAPI());
     injector.registerDependency<RadiocoRemoteDataSourceContract>(
-        (Injector injector) {
+        () {
       return new RadiocoRemoteDataSource();
     });
   }

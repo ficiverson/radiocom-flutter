@@ -11,7 +11,7 @@ class NewDetailRouter implements NewDetailRouterContract {
 
   @override
   goToPodcastControls(Episode episode) {
-    Navigator.of(Injector.appInstance.getDependency<BuildContext>()).push(
+    Navigator.of(Injector.appInstance.get<BuildContext>()).push(
         MaterialPageRoute(
             settings: RouteSettings(name: "podcastcontrolsnews"),
             builder: (BuildContext context) =>

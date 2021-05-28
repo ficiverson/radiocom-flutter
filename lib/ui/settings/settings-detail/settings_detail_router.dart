@@ -11,7 +11,7 @@ class SettingsDetailRouter extends SettingsDetailRouterContract {
 
   @override
   goToPodcastControls(Episode episode) {
-    Navigator.of(Injector.appInstance.getDependency<BuildContext>()).push(
+    Navigator.of(Injector.appInstance.get<BuildContext>()).push(
         MaterialPageRoute(
             settings: RouteSettings(name: "podcastcontrolshomne"),
             builder: (BuildContext context) =>

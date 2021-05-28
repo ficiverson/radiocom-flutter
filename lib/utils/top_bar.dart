@@ -65,11 +65,11 @@ class TopBarState extends State<TopBar> {
 
   @override
   Widget build(BuildContext context) {
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     queryData = MediaQuery.of(context);
     return Container(
         width: MediaQuery.of(context).size.width,
-        height: 90,
+        height: MediaQuery.of(context).padding.top + 60,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.only(
                 bottomRight: Radius.circular(25.0),
@@ -190,7 +190,7 @@ class TopBarState extends State<TopBar> {
           autocorrect: false,
           decoration: InputDecoration(
             hintText:  SafeMap.safe(
-                Injector.appInstance.getDependency<CuacLocalization>().translateMap("all_podcast"), ["search"]),
+                Injector.appInstance.get<CuacLocalization>().translateMap("all_podcast"), ["search"]),
           ),
         ));
   }

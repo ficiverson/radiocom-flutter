@@ -51,7 +51,7 @@ class AllPodcastState extends State<AllPodcast>
   @override
   Widget build(BuildContext context) {
     queryData = MediaQuery.of(context);
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     if (_presenter.currentPlayer.isPodcast) {
       shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     }
@@ -142,8 +142,8 @@ class AllPodcastState extends State<AllPodcast>
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "all_podcast", "close": false});
     }
-    _localization = Injector.appInstance.getDependency<CuacLocalization>();
-    _presenter = Injector.appInstance.getDependency<AllPodcastPresenter>();
+    _localization = Injector.appInstance.get<CuacLocalization>();
+    _presenter = Injector.appInstance.get<AllPodcastPresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     _podcasts = widget.podcasts;
     _podcastWithFilter = widget.podcasts;

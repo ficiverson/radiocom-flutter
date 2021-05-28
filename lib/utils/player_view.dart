@@ -50,7 +50,7 @@ class PlayerViewState extends State<PlayerView> {
 
   @override
   Widget build(BuildContext context) {
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     var queryData = MediaQuery.of(context);
     if (!widget.shouldShow) {
       showPlayButton = true;
@@ -120,13 +120,13 @@ class PlayerViewState extends State<PlayerView> {
                     height: 40.0,
                     child: CustomImage(
                         resPath: Injector.appInstance
-                            .getDependency<CurrentPlayerContract>()
+                            .get<CurrentPlayerContract>()
                             .currentImage,
                         fit: BoxFit.fitHeight,
                         radius: 20.0)),
                 title: Text(
                   Injector.appInstance
-                      .getDependency<CurrentPlayerContract>()
+                      .get<CurrentPlayerContract>()
                       .currentSong,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -152,13 +152,13 @@ class PlayerViewState extends State<PlayerView> {
                 height: 40.0,
                 child: CustomImage(
                     resPath: Injector.appInstance
-                        .getDependency<CurrentPlayerContract>()
+                        .get<CurrentPlayerContract>()
                         .currentImage,
                     fit: BoxFit.fitHeight,
                     radius: 20.0)),
             title: Text(
               Injector.appInstance
-                  .getDependency<CurrentPlayerContract>()
+                  .get<CurrentPlayerContract>()
                   .currentSong,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

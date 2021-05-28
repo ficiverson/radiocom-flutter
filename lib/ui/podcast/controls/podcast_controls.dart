@@ -54,7 +54,7 @@ class PodcastControlsState extends State<PodcastControls>
   Widget build(BuildContext context) {
     sleepSelectedIndex = _presenter.currentTimer.currentTime;
     mediaQuery = MediaQuery.of(context);
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     loadingView = loading ? getLoadingState() : Container();
     return new Scaffold(
         key: _scaffoldKey,
@@ -76,9 +76,9 @@ class PodcastControlsState extends State<PodcastControls>
           'changeScreen',
           {"currentScreen": "podcast-controls", "close": false});
     }
-    _localization = Injector.appInstance.getDependency<CuacLocalization>();
-    _presenter = Injector.appInstance.getDependency<PodcastControlsPresenter>();
-    currentPlayer = Injector.appInstance.getDependency<CurrentPlayerContract>();
+    _localization = Injector.appInstance.get<CuacLocalization>();
+    _presenter = Injector.appInstance.get<PodcastControlsPresenter>();
+    currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
     shouldShowTimer = _presenter.currentTimer.currentTime != 0;
     shouldShowFaster = _presenter.currentTimer.currentTime != 0;
     currentPlayer.onUpdate = () {

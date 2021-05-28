@@ -30,24 +30,24 @@ void main() {
     WidgetsFlutterBinding.ensureInitialized();
     DependencyInjector().loadModules();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
-        (_) => mockRepository,
+        () => mockRepository,
         override: true);
     Injector.appInstance
-        .registerDependency<DetailPodcastView>((_) => view, override: true);
+        .registerDependency<DetailPodcastView>(() => view, override: true);
     Injector.appInstance
-        .registerDependency<DetailPodcastRouterContract>((_) => router, override: true);
+        .registerDependency<DetailPodcastRouterContract>(() => router, override: true);
     Injector.appInstance.registerDependency<ConnectionContract>(
-        (_) => mockConnection,
+        () => mockConnection,
         override: true);
     Injector.appInstance.registerDependency<CurrentPlayerContract>(
-        (_) => mockPlayer,
+        () => mockPlayer,
         override: true);
-    presenter = Injector.appInstance.getDependency<DetailPodcastPresenter>();
+    presenter = Injector.appInstance.get<DetailPodcastPresenter>();
   });
 
   setUp(() async {
     mockPlayer = MockPlayer();
-    presenter = Injector.appInstance.getDependency<DetailPodcastPresenter>();
+    presenter = Injector.appInstance.get<DetailPodcastPresenter>();
   });
 
   tearDown(() async {

@@ -45,7 +45,7 @@ class SettingsState extends State<Settings>
   @override
   Widget build(BuildContext context) {
     _queryData = MediaQuery.of(context);
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     return Scaffold(
         key: scaffoldKey,
         appBar: TopBar("settings",
@@ -82,11 +82,11 @@ class SettingsState extends State<Settings>
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "settings", "close": false});
     }
-    _localization = Injector.appInstance.getDependency<CuacLocalization>();
-    _presenter = Injector.appInstance.getDependency<SettingsPresenter>();
+    _localization = Injector.appInstance.get<CuacLocalization>();
+    _presenter = Injector.appInstance.get<SettingsPresenter>();
     _presenter.init();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
-    _radioStation = Injector.appInstance.getDependency<RadioStation>();
+    _radioStation = Injector.appInstance.get<RadioStation>();
 
     if (Platform.isAndroid) {
       _notificationEvent.receiveBroadcastStream().listen((onData) {
@@ -178,11 +178,11 @@ class SettingsState extends State<Settings>
         WidgetsBinding.instance.window.platformBrightness;
     if (brightness == Brightness.light && !isDarkModeEnabled) {
       Injector.appInstance.registerSingleton<RadiocomColorsConract>(
-          (_) => RadiocomColorsLight(),
+          () => RadiocomColorsLight(),
           override: true);
     } else {
       Injector.appInstance.registerSingleton<RadiocomColorsConract>(
-          (_) => RadiocomColorsDark(),
+          () => RadiocomColorsDark(),
           override: true);
     }
   }

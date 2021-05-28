@@ -75,9 +75,9 @@ class HomePresenter {
       @required this.getLiveDataUseCase,
       @required this.getTimetableUseCase,
       @required this.getNewsUseCase}) {
-    currentTimer = Injector.appInstance.getDependency<CurrentTimerContract>();
-    connection = Injector.appInstance.getDependency<ConnectionContract>();
-    currentPlayer = Injector.appInstance.getDependency<CurrentPlayerContract>();
+    currentTimer = Injector.appInstance.get<CurrentTimerContract>();
+    connection = Injector.appInstance.get<ConnectionContract>();
+    currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
   }
 
   init() async {
@@ -147,7 +147,7 @@ class HomePresenter {
   }
 
   onSelectedEpisode() async {
-    if(currentPlayer.playerState == PlayerState.stop){
+    if(currentPlayer.playerState == AudioPlayerState.stop){
       await currentPlayer.play();
     } else {
       await currentPlayer.resume();

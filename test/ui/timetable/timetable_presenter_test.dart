@@ -27,24 +27,24 @@ void main() {
     WidgetsFlutterBinding.ensureInitialized();
     DependencyInjector().loadModules();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
-        (_) => mockRepository,
+        () => mockRepository,
         override: true);
     Injector.appInstance
-        .registerDependency<TimeTableView>((_) => view, override: true);
+        .registerDependency<TimeTableView>(() => view, override: true);
     Injector.appInstance
-        .registerDependency<TimeTableRouterContract>((_) => router, override: true);
+        .registerDependency<TimeTableRouterContract>(() => router, override: true);
     Injector.appInstance.registerDependency<ConnectionContract>(
-        (_) => mockConnection,
+        () => mockConnection,
         override: true);
     Injector.appInstance.registerDependency<CurrentPlayerContract>(
-        (_) => mockPlayer,
+        () => mockPlayer,
         override: true);
-    presenter = Injector.appInstance.getDependency<TimeTablePresenter>();
+    presenter = Injector.appInstance.get<TimeTablePresenter>();
   });
 
   setUp(() async {
     mockPlayer = MockPlayer();
-    presenter = Injector.appInstance.getDependency<TimeTablePresenter>();
+    presenter = Injector.appInstance.get<TimeTablePresenter>();
   });
 
   tearDown(() async {

@@ -50,7 +50,7 @@ class SettingsDetailState extends State<SettingsDetail>
   @override
   Widget build(BuildContext context) {
     _queryData = MediaQuery.of(context);
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     return Scaffold(
         key: scaffoldKey,
         appBar: TopBar("settings_detail",
@@ -90,10 +90,10 @@ class SettingsDetailState extends State<SettingsDetail>
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "settings_detail", "close": false});
     }
-    _localization = Injector.appInstance.getDependency<CuacLocalization>();
-    _presenter = Injector.appInstance.getDependency<SettingsDetailPresenter>();
+    _localization = Injector.appInstance.get<CuacLocalization>();
+    _presenter = Injector.appInstance.get<SettingsDetailPresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
-    _radioStation = Injector.appInstance.getDependency<RadioStation>();
+    _radioStation = Injector.appInstance.get<RadioStation>();
 
     if (Platform.isAndroid) {
       _notificationEvent.receiveBroadcastStream().listen((onData) {

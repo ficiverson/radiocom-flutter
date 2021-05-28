@@ -55,7 +55,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
 
   Widget build(BuildContext context) {
     queryData = MediaQuery.of(context);
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     _scaffold = new Scaffold(
         key: _scaffoldKey,
         appBar: TopBar("podcast_detail",
@@ -99,9 +99,9 @@ class DetailPodcastState extends State<DetailPodcastPage>
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "podcast_detail", "close": false});
     }
-    _localization = Injector.appInstance.getDependency<CuacLocalization>();
+    _localization = Injector.appInstance.get<CuacLocalization>();
     _program = widget.program;
-    _presenter = Injector.appInstance.getDependency<DetailPodcastPresenter>();
+    _presenter = Injector.appInstance.get<DetailPodcastPresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     _presenter.loadEpisodes(_program.rssUrl);
 

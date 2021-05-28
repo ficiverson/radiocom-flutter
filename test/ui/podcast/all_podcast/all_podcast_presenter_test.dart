@@ -30,24 +30,24 @@ void main() {
     DependencyInjector().loadModules();
     getTranslations();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
-        (_) => mockRepository,
+        () => mockRepository,
         override: true);
     Injector.appInstance
-        .registerDependency<AllPodcastView>((_) => view, override: true);
+        .registerDependency<AllPodcastView>(() => view, override: true);
     Injector.appInstance
-        .registerDependency<AllPodcastRouterContract>((_) => router, override: true);
+        .registerDependency<AllPodcastRouterContract>(() => router, override: true);
     Injector.appInstance.registerDependency<ConnectionContract>(
-        (_) => mockConnection,
+        () => mockConnection,
         override: true);
     Injector.appInstance.registerDependency<CurrentPlayerContract>(
-        (_) => mockPlayer,
+        () => mockPlayer,
         override: true);
-    presenter = Injector.appInstance.getDependency<AllPodcastPresenter>();
+    presenter = Injector.appInstance.get<AllPodcastPresenter>();
   });
 
   setUp(() async {
     mockPlayer = MockPlayer();
-    presenter = Injector.appInstance.getDependency<AllPodcastPresenter>();
+    presenter = Injector.appInstance.get<AllPodcastPresenter>();
   });
 
   tearDown(() async {

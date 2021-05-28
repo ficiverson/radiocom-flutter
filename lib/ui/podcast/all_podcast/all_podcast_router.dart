@@ -14,7 +14,7 @@ abstract class AllPodcastRouterContract {
 class AllPodcastRouter implements AllPodcastRouterContract {
   @override
   goToPodcastDetail(Program podcast) {
-    Navigator.of(Injector.appInstance.getDependency<BuildContext>()).push(
+    Navigator.of(Injector.appInstance.get<BuildContext>()).push(
         MaterialPageRoute(
             settings: RouteSettings(name: "podcastdetail"),
             builder: (BuildContext context) =>
@@ -23,7 +23,7 @@ class AllPodcastRouter implements AllPodcastRouterContract {
   }
 
   goToPodcastControls(Episode episode) {
-    Navigator.of(Injector.appInstance.getDependency<BuildContext>()).push(
+    Navigator.of(Injector.appInstance.get<BuildContext>()).push(
         MaterialPageRoute(
             settings: RouteSettings(name: "podcastcontrolspodcastdetail"),
             builder: (BuildContext context) =>

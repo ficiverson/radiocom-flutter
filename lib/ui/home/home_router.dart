@@ -23,7 +23,7 @@ abstract class HomeRouterContract {
 class HomeRouter implements HomeRouterContract {
   @override
   goToTimeTable(List<TimeTable> timeTables) {
-    Navigator.of(Injector.appInstance.getDependency<BuildContext>()).push(
+    Navigator.of(Injector.appInstance.get<BuildContext>()).push(
         MaterialPageRoute(
             settings: RouteSettings(name: "schedules"),
             builder: (BuildContext context) =>
@@ -33,7 +33,7 @@ class HomeRouter implements HomeRouterContract {
 
   @override
   goToAllPodcast(List<Program> podcasts, {String category}) {
-    Navigator.of(Injector.appInstance.getDependency<BuildContext>()).push(
+    Navigator.of(Injector.appInstance.get<BuildContext>()).push(
         MaterialPageRoute(
             settings: RouteSettings(name: "allpodcast"),
             builder: (BuildContext context) =>
@@ -43,7 +43,7 @@ class HomeRouter implements HomeRouterContract {
 
   @override
   goToNewDetail(New itemNew) {
-    Navigator.of(Injector.appInstance.getDependency<BuildContext>()).push(
+    Navigator.of(Injector.appInstance.get<BuildContext>()).push(
         MaterialPageRoute(
             settings: RouteSettings(name: "newdetail"),
             builder: (BuildContext context) => NewDetail(newItem: itemNew),
@@ -52,7 +52,7 @@ class HomeRouter implements HomeRouterContract {
 
   @override
   goToSettings(VoidCallback invokeResult) {
-    Navigator.of(Injector.appInstance.getDependency<BuildContext>()).push(
+    Navigator.of(Injector.appInstance.get<BuildContext>()).push(
         MaterialPageRoute(
             settings: RouteSettings(name: "settings"),
             builder: (BuildContext context) => Settings(),
@@ -63,7 +63,7 @@ class HomeRouter implements HomeRouterContract {
 
   @override
   goToPodcastDetail(Program podcast) {
-    Navigator.of(Injector.appInstance.getDependency<BuildContext>()).push(
+    Navigator.of(Injector.appInstance.get<BuildContext>()).push(
         MaterialPageRoute(
             settings: RouteSettings(name: "podcastdetail"),
             builder: (BuildContext context) =>
@@ -73,7 +73,7 @@ class HomeRouter implements HomeRouterContract {
 
   @override
   goToPodcastControls(Episode episode) {
-    Navigator.of(Injector.appInstance.getDependency<BuildContext>()).push(
+    Navigator.of(Injector.appInstance.get<BuildContext>()).push(
         MaterialPageRoute(
             settings: RouteSettings(name: "podcastcontrolshomne"),
             builder: (BuildContext context) =>

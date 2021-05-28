@@ -46,7 +46,7 @@ class TimetableState extends State<Timetable> with WidgetsBindingObserver implem
   @override
   Widget build(BuildContext context) {
     queryData = MediaQuery.of(context);
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     return Scaffold(key : scaffoldKey,
       appBar:
           TopBar("timetable",title: SafeMap.safe(
@@ -94,8 +94,8 @@ class TimetableState extends State<Timetable> with WidgetsBindingObserver implem
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "timetable", "close": false});
     }
-    _localization = Injector.appInstance.getDependency<CuacLocalization>();
-    _presenter = Injector.appInstance.getDependency<TimeTablePresenter>();
+    _localization = Injector.appInstance.get<CuacLocalization>();
+    _presenter = Injector.appInstance.get<TimeTablePresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     int currentIndex = 0;
     int jumpIndex = 0;

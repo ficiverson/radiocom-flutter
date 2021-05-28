@@ -25,13 +25,13 @@ void main() {
     DependencyInjector().loadModules();
     mockTranslationsWithLocale();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
-        (_) => mockRepository,
+        () => mockRepository,
         override: true);
     Injector.appInstance.registerDependency<ConnectionContract>(
-        (_) => mockConnection,
+        () => mockConnection,
         override: true);
     Injector.appInstance.registerDependency<CurrentPlayerContract>(
-        (_) => mockPlayer,
+        () => mockPlayer,
         override: true);
   });
 
