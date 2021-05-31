@@ -42,7 +42,7 @@ class NeumorphicView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     RadiocomColorsConract _colors =
-        Injector.appInstance.getDependency<RadiocomColorsConract>();
+        Injector.appInstance.get<RadiocomColorsConract>();
     return Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(isFullScreen ? 0 : 25),
@@ -71,7 +71,7 @@ class NeumorphicEmptyView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     RadiocomColorsConract _colors =
-        Injector.appInstance.getDependency<RadiocomColorsConract>();
+        Injector.appInstance.get<RadiocomColorsConract>();
     return Container(
         width: width,
         height: height,
@@ -107,7 +107,7 @@ class NeumorphicButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     RadiocomColorsConract _colors =
-        Injector.appInstance.getDependency<RadiocomColorsConract>();
+        Injector.appInstance.get<RadiocomColorsConract>();
     return Container(
       width: 55,
       height: 55,
@@ -140,7 +140,7 @@ class NeumorphicCardVertical extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     RadiocomColorsConract _colors =
-        Injector.appInstance.getDependency<RadiocomColorsConract>();
+        Injector.appInstance.get<RadiocomColorsConract>();
     var queryData = MediaQuery.of(context);
     List<Widget> elements = [];
     Widget imageContent =
@@ -237,7 +237,7 @@ class NeumorphicCardHorizontal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     RadiocomColorsConract _colors =
-        Injector.appInstance.getDependency<RadiocomColorsConract>();
+        Injector.appInstance.get<RadiocomColorsConract>();
 
     Widget iconCard = Icon(icon, color: _colors.yellow, size: 40.0);
     if (image != null) {

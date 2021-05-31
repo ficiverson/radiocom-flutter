@@ -33,28 +33,28 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     DependencyInjector().loadModules();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
-        (_) => mockRepository,
+        () => mockRepository,
         override: true);
     Injector.appInstance
-        .registerDependency<SettingsView>((_) => view, override: true);
+        .registerDependency<SettingsView>(() => view, override: true);
     Injector.appInstance.registerDependency<SettingsRouterContract>(
-        (_) => router,
+        () => router,
         override: true);
     Injector.appInstance.registerDependency<ConnectionContract>(
-        (_) => mockConnection,
+        () => mockConnection,
         override: true);
     Injector.appInstance.registerDependency<NotificationSubscriptionContract>(
-            (_) => notifcationSubscription,
+            () => notifcationSubscription,
         override: true);
     Injector.appInstance.registerDependency<CurrentPlayerContract>(
-        (_) => mockPlayer,
+        () => mockPlayer,
         override: true);
-    presenter = Injector.appInstance.getDependency<SettingsPresenter>();
+    presenter = Injector.appInstance.get<SettingsPresenter>();
   });
 
   setUp(() async {
     mockPlayer = MockPlayer();
-    presenter = Injector.appInstance.getDependency<SettingsPresenter>();
+    presenter = Injector.appInstance.get<SettingsPresenter>();
   });
 
   tearDown(() async {

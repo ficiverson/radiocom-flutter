@@ -78,7 +78,7 @@ class MyHomePageState extends State<MyHomePage>
   bool isContentUpdated = true;
   EventChannel _notificationEvent =
       EventChannel('cuacfm.flutter.io/updateNotificationMain');
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   bool isDarkModeEnabled = false;
   CuacLocalization _localization;
 
@@ -90,7 +90,7 @@ class MyHomePageState extends State<MyHomePage>
   Widget build(BuildContext context) {
     this.context = context;
     queryData = MediaQuery.of(context);
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     if (_presenter.currentPlayer.isPodcast) {
       shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     }
@@ -276,31 +276,16 @@ class MyHomePageState extends State<MyHomePage>
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "main", "close": false});
     }
-    _localization = Injector.appInstance.getDependency<CuacLocalization>();
-    _presenter = Injector.appInstance.getDependency<HomePresenter>();
+    _localization = Injector.appInstance.get<CuacLocalization>();
+    _presenter = Injector.appInstance.get<HomePresenter>();
     _presenter.init();
     _nowProgram = new Now.mock();
 
     categories.addAll(ProgramCategories.values);
     categories.shuffle();
 
-    _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        print("onMessage: $message");
-      },
-      onLaunch: (Map<String, dynamic> message) async {
-        print("onLaunch: $message");
-      },
-      onResume: (Map<String, dynamic> message) async {
-        print("onResume: $message");
-      },
-    );
-    _firebaseMessaging.requestNotificationPermissions(
-        IosNotificationSettings(sound: true, badge: true, alert: true));
-    _firebaseMessaging.onIosSettingsRegistered
-        .listen((IosNotificationSettings settings) {
-      print("Settings registered: $settings");
-    });
+
+    _firebaseMessaging.requestPermission(sound: true, badge: true, alert: true);
     _firebaseMessaging.getToken().then((String token) {
       assert(token != null);
       print(token);
@@ -353,20 +338,20 @@ class MyHomePageState extends State<MyHomePage>
   @override
   void onConnectionError() {
     if (snackBarConnection == null) {
-      scaffoldKey.currentState..removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
       );
-      scaffoldKey.currentState..showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
     }
   }
 
   @override
   void onConnectionSuccess() {
-    scaffoldKey.currentState..removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
     snackBarConnection = null;
   }
 
@@ -421,7 +406,7 @@ class MyHomePageState extends State<MyHomePage>
   @override
   void onLoadRadioStation(RadioStation station) {
     Injector.appInstance
-        .registerSingleton<RadioStation>((_) => station, override: true);
+        .registerSingleton<RadioStation>(() => station, override: true);
   }
 
   @override
@@ -493,18 +478,18 @@ class MyHomePageState extends State<MyHomePage>
   @override
   void onRadioStationError(error) {
     if (snackBarConnection == null) {
-      scaffoldKey.currentState..removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       final snackBar = SnackBar(
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["connection_error"])),
         action: SnackBarAction(
           label: SafeMap.safe(_localization.translateMap("actions"), ["close"]),
           onPressed: () {
-            scaffoldKey.currentState.hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
           },
         ),
       );
-      scaffoldKey.currentState..showSnackBar(snackBar);
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 
@@ -550,29 +535,29 @@ class MyHomePageState extends State<MyHomePage>
         WidgetsBinding.instance.window.platformBrightness;
     if (brightness == Brightness.light && !isDarkModeEnabled) {
       Injector.appInstance.registerSingleton<RadiocomColorsConract>(
-          (_) => RadiocomColorsLight(),
+          () => RadiocomColorsLight(),
           override: true);
     } else {
       Injector.appInstance.registerSingleton<RadiocomColorsConract>(
-          (_) => RadiocomColorsDark(),
+          () => RadiocomColorsDark(),
           override: true);
     }
   }
 
   showTimeTableEmptySnackbar() {
     if (snackBarConnection == null) {
-      scaffoldKey.currentState..removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       final snackBar = SnackBar(
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["connection_error"])),
         action: SnackBarAction(
           label: SafeMap.safe(_localization.translateMap("actions"), ["close"]),
           onPressed: () {
-            scaffoldKey.currentState.hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
           },
         ),
       );
-      scaffoldKey.currentState..showSnackBar(snackBar);
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 

@@ -13,10 +13,10 @@ import 'package:cuacfm/utils/simple_client.dart';
 import 'package:injector/injector.dart';
 
 class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
-  final CUACClient client = Injector.appInstance.getDependency<CUACClient>();
+  final CUACClient client = Injector.appInstance.get<CUACClient>();
   RadiocoAPIContract radiocoAPI;
   RadiocoRemoteDataSource() {
-    radiocoAPI = Injector.appInstance.getDependency<RadiocoAPIContract>();
+    radiocoAPI = Injector.appInstance.get<RadiocoAPIContract>();
   }
 
   Future<RadioStation> getRadioStationData() async {
@@ -73,7 +73,7 @@ class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
   Future<List<New>> getNews() async {
     try {
       RadioStation radioStation =
-          Injector.appInstance.getDependency<RadioStation>();
+          Injector.appInstance.get<RadioStation>();
 
       List<dynamic> res = await this.client.get(
           Uri.parse(radioStation.newsRss),

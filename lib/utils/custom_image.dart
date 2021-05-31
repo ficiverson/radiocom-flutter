@@ -30,14 +30,12 @@ class CustomImageState extends State<CustomImage> {
   RadiocomColorsConract _colors;
   @override
   Widget build(BuildContext context) {
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     var customImage;
     if (widget.resPath == null) {
       customImage = new Icon(Icons.warning);
     } else if (widget.resPath.contains("http")) {
       customImage = new CachedNetworkImage(
-          httpHeaders: new Map.fromIterables(
-              ["Cache-control"], ["max-stale=31536000,public"]),
           fit: widget.fit,
           width: widget.width,
           height: widget.height,

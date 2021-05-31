@@ -15,7 +15,7 @@ abstract class SettingsRouterContract{
 class SettingsRouter extends SettingsRouterContract {
   @override
   goToLegal(LegalType legalType) {
-    Navigator.of(Injector.appInstance.getDependency<BuildContext>())
+    Navigator.of(Injector.appInstance.get<BuildContext>())
         .push(MaterialPageRoute(
         settings: RouteSettings(name: "settingsDetail"),
         builder: (BuildContext context) => SettingsDetail(legalType:legalType),
@@ -24,7 +24,7 @@ class SettingsRouter extends SettingsRouterContract {
 
   @override
   goToHistory(New newItem) {
-    Navigator.of(Injector.appInstance.getDependency<BuildContext>())
+    Navigator.of(Injector.appInstance.get<BuildContext>())
         .push(MaterialPageRoute(
         settings: RouteSettings(name: "historyDetail"),
         builder: (BuildContext context) => NewDetail(newItem:newItem),
@@ -33,7 +33,7 @@ class SettingsRouter extends SettingsRouterContract {
 
   @override
   goToPodcastControls(Episode episode) {
-    Navigator.of(Injector.appInstance.getDependency<BuildContext>()).push(
+    Navigator.of(Injector.appInstance.get<BuildContext>()).push(
         MaterialPageRoute(
             settings: RouteSettings(name: "podcastcontrolshomne"),
             builder: (BuildContext context) =>

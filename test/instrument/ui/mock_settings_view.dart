@@ -15,8 +15,8 @@ enum SettingsState {
 }
 
 class MockSettingsView implements SettingsView {
-  List<SettingsState> viewState = List();
-  List<dynamic> data = List();
+  List<SettingsState> viewState = [];
+  List<dynamic> data = [];
 
   @override
   onConnectionError() {
@@ -42,8 +42,8 @@ class MockSettingsView implements SettingsView {
 }
 
 class MockSettingsRouter implements SettingsRouterContract {
-  List<SettingsState> viewState = List();
-  List<dynamic> data = List();
+  List<SettingsState> viewState = [];
+  List<dynamic> data = [];
   @override
   goToPodcastControls(Episode episode) {
     viewState.add(SettingsState.goToEpisode);

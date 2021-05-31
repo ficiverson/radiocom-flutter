@@ -8,8 +8,8 @@ enum NewsDetailState {
 }
 
 class MockNewsDetailView implements NewDetailView {
-  List<NewsDetailState> viewState = List();
-  List<dynamic> data = List();
+  List<NewsDetailState> viewState = [];
+  List<dynamic> data = [];
 
   @override
   onConnectionError() {
@@ -23,8 +23,8 @@ class MockNewsDetailView implements NewDetailView {
 }
 
 class MockNewsRouter implements NewDetailRouterContract {
-  List<NewsDetailState> viewState = List();
-  List<dynamic> data = List();
+  List<NewsDetailState> viewState = [];
+  List<dynamic> data = [];
   @override
   goToPodcastControls(Episode episode) {
     viewState.add(NewsDetailState.goToEpisode);

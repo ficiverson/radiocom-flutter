@@ -4,7 +4,7 @@ import 'package:injector/injector.dart';
 import 'package:intl/intl.dart';
 
 String getDayOfWeek(DateTime date){
-  var localization = Injector.appInstance.getDependency<CuacLocalization>();
+  var localization = Injector.appInstance.get<CuacLocalization>();
   String day = "";
   switch(date.weekday){
     case 1:
@@ -43,7 +43,7 @@ String getDayOfWeek(DateTime date){
 }
 
 String getMonthOfYear(DateTime date){
-  var localization = Injector.appInstance.getDependency<CuacLocalization>();
+  var localization = Injector.appInstance.get<CuacLocalization>();
   String day = "";
   switch(date.month){
     case 1:

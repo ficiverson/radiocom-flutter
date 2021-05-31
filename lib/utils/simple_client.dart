@@ -118,7 +118,7 @@ class SimpleClient {
           if(resultDecode["rss"]["channel"]["item"] is List){
             respBody = resultDecode["rss"]["channel"]["item"];
           } else {
-            List tempList = new List<dynamic>();
+            List tempList = [];
             tempList.add(resultDecode["rss"]["channel"]["item"]);
             respBody = tempList;
           }

@@ -24,9 +24,9 @@ class PodcastControlsPresenter {
 
   PodcastControlsPresenter(this._view,
       {@required this.invoker, @required this.getLiveDataUseCase}) {
-    currentTimer = Injector.appInstance.getDependency<CurrentTimerContract>();
-    connection = Injector.appInstance.getDependency<ConnectionContract>();
-    currentPlayer = Injector.appInstance.getDependency<CurrentPlayerContract>();
+    currentTimer = Injector.appInstance.get<CurrentTimerContract>();
+    connection = Injector.appInstance.get<ConnectionContract>();
+    currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
     _view.setupInitialRate(_getRateIndex(currentPlayer.getPlaybackRate()));
   }
 
@@ -83,7 +83,7 @@ class PodcastControlsPresenter {
   onPlayPause() async {
     if (currentPlayer.isPlaying()) {
       await currentPlayer.pause();
-    } else if(currentPlayer.playerState == PlayerState.stop) {
+    } else if(currentPlayer.playerState == AudioPlayerState.stop) {
       await currentPlayer.play();
     } else {
       await currentPlayer.resume();

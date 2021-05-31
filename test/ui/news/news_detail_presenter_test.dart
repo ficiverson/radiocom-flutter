@@ -27,24 +27,24 @@ void main() {
     WidgetsFlutterBinding.ensureInitialized();
     DependencyInjector().loadModules();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
-        (_) => mockRepository,
+        () => mockRepository,
         override: true);
     Injector.appInstance
-        .registerDependency<NewDetailView>((_) => view, override: true);
+        .registerDependency<NewDetailView>(() => view, override: true);
     Injector.appInstance
-        .registerDependency<NewDetailRouterContract>((_) => router, override: true);
+        .registerDependency<NewDetailRouterContract>(() => router, override: true);
     Injector.appInstance.registerDependency<ConnectionContract>(
-        (_) => mockConnection,
+        () => mockConnection,
         override: true);
     Injector.appInstance.registerDependency<CurrentPlayerContract>(
-        (_) => mockPlayer,
+        () => mockPlayer,
         override: true);
-    presenter = Injector.appInstance.getDependency<NewDetailPresenter>();
+    presenter = Injector.appInstance.get<NewDetailPresenter>();
   });
 
   setUp(() async {
     mockPlayer = MockPlayer();
-    presenter = Injector.appInstance.getDependency<NewDetailPresenter>();
+    presenter = Injector.appInstance.get<NewDetailPresenter>();
   });
 
   tearDown(() async {

@@ -33,10 +33,10 @@ void main() {
     mockRaiodocApi.feedUrl = server.url;
     mockUrl = server.url;
     Injector.appInstance.registerDependency<RadioStation>(
-            (_) => RadioStationInstrument.givenARadioStation(feed: mockUrl),
+            () => RadioStationInstrument.givenARadioStation(feed: mockUrl),
         override: true);
     Injector.appInstance.registerDependency<RadiocoAPIContract>(
-        (_) => mockRaiodocApi,
+        () => mockRaiodocApi,
         override: true);
     remoteDataSource = RadiocoRemoteDataSource();
   });

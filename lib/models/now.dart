@@ -22,6 +22,6 @@ class Now {
         rssUrl = map["rss_url"];
 
   String streamUrl(){
-    return Injector.appInstance.getDependency<RadioStation>().streamUrl;
+    return Injector.appInstance.get<RadioStation>().streamUrl;
   }
 }

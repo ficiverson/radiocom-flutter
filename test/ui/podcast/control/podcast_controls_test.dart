@@ -31,19 +31,19 @@ void main() {
     DependencyInjector().loadModules();
     mockTranslationsWithLocale();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
-        (_) => mockRepository,
+        () => mockRepository,
         override: true);
     Injector.appInstance.registerDependency<CurrentTimerContract>(
-        (_) => mockCurrentTimerContract,
+        () => mockCurrentTimerContract,
         override: true);
     Injector.appInstance.registerDependency<ConnectionContract>(
-        (_) => mockConnection,
+        () => mockConnection,
         override: true);
     Injector.appInstance.registerDependency<CurrentPlayerContract>(
-        (_) => mockPlayer,
+        () => mockPlayer,
         override: true);
     Injector.appInstance.registerDependency<RadioStation>(
-        (_) => RadioStationInstrument.givenARadioStation(),
+        () => RadioStationInstrument.givenARadioStation(),
         override: true);
   });
 
@@ -118,12 +118,14 @@ void main() {
     await tester.pumpWidget(startWidget(
         PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
     final gesture = await tester.startGesture(Offset(0, 600));
+    await tester.tap(find.byKey(Key("timer_chip")));
+    await tester.pump();
     await gesture.moveBy(Offset(0, -600));
     await tester.pump();
     await tester.tap(find.byKey(Key("timer_chip_15_min")));
     await tester.pump(Duration(milliseconds: 300));
 
-    expect(find.byType(NeumorphicView, skipOffstage: false), findsNWidgets(2));
+    expect(find.byType(NeumorphicView, skipOffstage: false), findsNWidgets(1));
   });
 
   testWidgets(
@@ -176,11 +178,13 @@ void main() {
     await tester.pumpWidget(startWidget(
         PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
     final gesture = await tester.startGesture(Offset(0, 600));
+    await tester.tap(find.byKey(Key("faster_chip")));
+    await tester.pump();
     await gesture.moveBy(Offset(0, -600));
     await tester.pump();
     await tester.tap(find.byKey(Key("faster_chip_3_speed")));
     await tester.pump(Duration(milliseconds: 300));
 
-    expect(find.byType(NeumorphicView, skipOffstage: false), findsNWidgets(2));
+    expect(find.byType(NeumorphicView, skipOffstage: false), findsNWidgets(1));
   });
 }

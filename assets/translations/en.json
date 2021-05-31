@@ -16,10 +16,10 @@
   },
   "podcast_controls" : {
     "msg" : "Live streming of the stations. 103.4 FM. For more info visit: www.cuacfm.org",
-    "auto_off_active" : "Auto off in: ",
+    "auto_off_active" : "Auto off: ",
     "auto_off_inactive" : "Auto off",
     "faster_inactive" : "Speed rate",
-    "faster_active" : "Faster rate at: "
+    "faster_active" : "Faster: "
   },
   "timetable" : {
     "title" : "Todays's schedule"

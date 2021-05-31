@@ -50,7 +50,7 @@ class SettingsDetailState extends State<SettingsDetail>
   @override
   Widget build(BuildContext context) {
     _queryData = MediaQuery.of(context);
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     return Scaffold(
         key: scaffoldKey,
         appBar: TopBar("settings_detail",
@@ -60,6 +60,7 @@ class SettingsDetailState extends State<SettingsDetail>
             ? _colors.transparent
             : _colors.palidwhite,
         body: _getBodyLayout(widget.legalType),
+        bottomNavigationBar: Container(height: Platform.isAndroid? 0 : shouldShowPlayer? 60 : 0,color: _colors.palidwhite),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: PlayerView(
             isMini: false,
@@ -90,10 +91,10 @@ class SettingsDetailState extends State<SettingsDetail>
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "settings_detail", "close": false});
     }
-    _localization = Injector.appInstance.getDependency<CuacLocalization>();
-    _presenter = Injector.appInstance.getDependency<SettingsDetailPresenter>();
+    _localization = Injector.appInstance.get<CuacLocalization>();
+    _presenter = Injector.appInstance.get<SettingsDetailPresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
-    _radioStation = Injector.appInstance.getDependency<RadioStation>();
+    _radioStation = Injector.appInstance.get<RadioStation>();
 
     if (Platform.isAndroid) {
       _notificationEvent.receiveBroadcastStream().listen((onData) {
@@ -149,14 +150,14 @@ class SettingsDetailState extends State<SettingsDetail>
   @override
   void onConnectionError() {
     if (snackBarConnection == null) {
-      scaffoldKey.currentState..removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
       );
-      scaffoldKey.currentState..showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
     }
   }
 
@@ -184,7 +185,7 @@ class SettingsDetailState extends State<SettingsDetail>
 
   Widget _getLicense() {
     var licenses = License.getAll();
-    var licenseList = List<Widget>();
+    List<Widget> licenseList = [];
     licenseList.add(SizedBox(height: 10));
     licenses.forEach((license) {
       licenseList.add(Container(

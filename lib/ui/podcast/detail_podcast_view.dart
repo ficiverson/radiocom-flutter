@@ -37,7 +37,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
   Scaffold _scaffold;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   MediaQueryData queryData;
-  List<Episode> _episodes = List<Episode>();
+  List<Episode> _episodes = [];
   RadiocomColorsConract _colors;
   bool isLoadingEpisodes = true;
   bool isLoadingEpisode = false;
@@ -55,7 +55,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
 
   Widget build(BuildContext context) {
     queryData = MediaQuery.of(context);
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     _scaffold = new Scaffold(
         key: _scaffoldKey,
         appBar: TopBar("podcast_detail",
@@ -68,6 +68,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
         }),
         backgroundColor: _colors.palidwhite,
         body: _getBodyLayout(),
+        bottomNavigationBar: Container(height: Platform.isAndroid? 0 : shouldShowPlayer? 60 : 0,color: _colors.palidwhite),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: PlayerView(
             isMini: false,
@@ -99,9 +100,9 @@ class DetailPodcastState extends State<DetailPodcastPage>
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "podcast_detail", "close": false});
     }
-    _localization = Injector.appInstance.getDependency<CuacLocalization>();
+    _localization = Injector.appInstance.get<CuacLocalization>();
     _program = widget.program;
-    _presenter = Injector.appInstance.getDependency<DetailPodcastPresenter>();
+    _presenter = Injector.appInstance.get<DetailPodcastPresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     _presenter.loadEpisodes(_program.rssUrl);
 
@@ -159,14 +160,14 @@ class DetailPodcastState extends State<DetailPodcastPage>
   @override
   void onConnectionError() {
     if (snackBarConnection == null) {
-      _scaffoldKey.currentState..removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
       );
-      _scaffoldKey.currentState..showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
     }
   }
 

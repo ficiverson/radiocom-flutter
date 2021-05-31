@@ -71,10 +71,24 @@ public class AudioplayersPlugin implements MethodCallHandler, FlutterPlugin  {
 	@Override
 	public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
 		final MethodChannel channel = new MethodChannel(binding.getBinaryMessenger(), "xyz.luan/audioplayers");
+		final MethodChannel notificationChannel = new MethodChannel(binding.getBinaryMessenger(), "cuacfm.flutter.io/notificationInfo");
+		channel.setMethodCallHandler(new AudioplayersPlugin(channel, notificationChannel,binding.getApplicationContext()));
 		this.channel = channel;
 		this.context = binding.getApplicationContext();
 		this.seekFinish = false;
 		channel.setMethodCallHandler(this);
+
+		binding.getApplicationContext().bindService(new Intent(binding.getApplicationContext(), AudioService.class), new ServiceConnection() {
+			@Override
+			public void onServiceConnected(ComponentName name, IBinder service) {
+				audioService = ((AudioService.AudioBinder) service).getService();
+			}
+
+			@Override
+			public void onServiceDisconnected(ComponentName name) {
+
+			}
+		}, Service.BIND_ABOVE_CLIENT);
 	}
 
 	@Override

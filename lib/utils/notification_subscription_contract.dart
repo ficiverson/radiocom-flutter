@@ -6,7 +6,7 @@ abstract class NotificationSubscriptionContract {
 }
 
 class NotificationSubscription implements NotificationSubscriptionContract {
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   @override
   Future<void> subscribeToTopic(String channelName) async {

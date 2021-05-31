@@ -24,22 +24,22 @@ void main() {
     WidgetsFlutterBinding.ensureInitialized();
     DependencyInjector().loadModules();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
-        (_) => mockRepository,
+        () => mockRepository,
         override: true);
     Injector.appInstance
-        .registerDependency<PodcastControlsView>((_) => view, override: true);
+        .registerDependency<PodcastControlsView>(() => view, override: true);
     Injector.appInstance.registerDependency<ConnectionContract>(
-        (_) => mockConnection,
+        () => mockConnection,
         override: true);
     Injector.appInstance.registerDependency<CurrentPlayerContract>(
-        (_) => mockPlayer,
+        () => mockPlayer,
         override: true);
-    presenter = Injector.appInstance.getDependency<PodcastControlsPresenter>();
+    presenter = Injector.appInstance.get<PodcastControlsPresenter>();
   });
 
   setUp(() async {
     mockPlayer = MockPlayer();
-    presenter = Injector.appInstance.getDependency<PodcastControlsPresenter>();
+    presenter = Injector.appInstance.get<PodcastControlsPresenter>();
   });
 
   tearDown(() async {
@@ -161,7 +161,7 @@ void main() {
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.isPlaying()).thenReturn(false);
-        when(mockPlayer.playerState).thenReturn(PlayerState.stop);
+        when(mockPlayer.playerState).thenReturn(AudioPlayerState.stop);
 
         presenter.onPlayPause();
         await Future.delayed(Duration(milliseconds: 200));
@@ -213,7 +213,7 @@ void main() {
 
         presenter.onTimerStart(Duration(milliseconds: 200),1);
 
-        CurrentTimerContract timer = Injector.appInstance.getDependency<CurrentTimerContract>();
+        CurrentTimerContract timer = Injector.appInstance.get<CurrentTimerContract>();
         expect(timer.isTimerRunning(), true);
       });
 
@@ -228,7 +228,7 @@ void main() {
 
         presenter.onTimerStart(Duration(milliseconds: 200),0);
 
-        CurrentTimerContract timer = Injector.appInstance.getDependency<CurrentTimerContract>();
+        CurrentTimerContract timer = Injector.appInstance.get<CurrentTimerContract>();
         expect(timer.isTimerRunning(), false);
       });
 
@@ -244,7 +244,7 @@ void main() {
         presenter.onTimerStart(Duration.zero,1);
         await Future.delayed(Duration(milliseconds: 200));
 
-        CurrentTimerContract timer = Injector.appInstance.getDependency<CurrentTimerContract>();
+        CurrentTimerContract timer = Injector.appInstance.get<CurrentTimerContract>();
         expect(timer.isTimerRunning(), false);
       });
 

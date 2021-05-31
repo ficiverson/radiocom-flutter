@@ -12,7 +12,7 @@ class LocalizationDelegate extends LocalizationsDelegate<CuacLocalization> {
   @override
   Future<CuacLocalization> load(Locale locale) async {
     CuacLocalization localizations = new CuacLocalization(locale);
-    Injector.appInstance.registerSingleton<CuacLocalization>((_) => localizations, override : true);
+    Injector.appInstance.registerSingleton<CuacLocalization>(() => localizations, override : true);
     await localizations.load();
    // localizations.loadRemote();
     return localizations;

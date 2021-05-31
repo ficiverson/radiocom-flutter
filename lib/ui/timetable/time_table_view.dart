@@ -46,13 +46,14 @@ class TimetableState extends State<Timetable> with WidgetsBindingObserver implem
   @override
   Widget build(BuildContext context) {
     queryData = MediaQuery.of(context);
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     return Scaffold(key : scaffoldKey,
       appBar:
           TopBar("timetable",title: SafeMap.safe(
               _localization.translateMap("timetable"), ["title"]), topBarOption: TopBarOption.NORMAL),
       backgroundColor: _colors.palidwhite,
       body: _getBodyLayout(),
+        bottomNavigationBar: Container(height: Platform.isAndroid? 0 : shouldShowPlayer? 60 : 0,color: _colors.palidwhite),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: PlayerView(
           isMini: false,
@@ -94,8 +95,8 @@ class TimetableState extends State<Timetable> with WidgetsBindingObserver implem
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "timetable", "close": false});
     }
-    _localization = Injector.appInstance.getDependency<CuacLocalization>();
-    _presenter = Injector.appInstance.getDependency<TimeTablePresenter>();
+    _localization = Injector.appInstance.get<CuacLocalization>();
+    _presenter = Injector.appInstance.get<TimeTablePresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     int currentIndex = 0;
     int jumpIndex = 0;
@@ -169,14 +170,14 @@ class TimetableState extends State<Timetable> with WidgetsBindingObserver implem
   @override
   void onConnectionError() {
     if (snackBarConnection == null) {
-      scaffoldKey.currentState..removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
       );
-      scaffoldKey.currentState..showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
     }
   }
 

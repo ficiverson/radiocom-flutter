@@ -95,7 +95,7 @@ class Program {
   }
 
   static String mapCategory(String content) {
-    CuacLocalization _localization = Injector.appInstance.getDependency<CuacLocalization>();
+    CuacLocalization _localization = Injector.appInstance.get<CuacLocalization>();
     String category = SafeMap.safe(
         _localization.translateMap("categories"), ["others"]);
     switch (content) {
@@ -154,7 +154,7 @@ class Program {
   }
 
   static String getCategory(ProgramCategories category) {
-    CuacLocalization _localization = Injector.appInstance.getDependency<CuacLocalization>();
+    CuacLocalization _localization = Injector.appInstance.get<CuacLocalization>();
     String content =  SafeMap.safe(
         _localization.translateMap("categories"), ["others"]);
     switch (category) {

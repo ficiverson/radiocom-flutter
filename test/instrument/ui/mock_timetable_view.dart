@@ -9,8 +9,8 @@ enum TimeTableState {
 }
 
 class MockTimetableView implements TimeTableView{
-  List<TimeTableState> viewState = List();
-  List<dynamic> data = List();
+  List<TimeTableState> viewState = [];
+  List<dynamic> data = [];
 
   @override
   onConnectionError() {
@@ -24,8 +24,8 @@ class MockTimetableView implements TimeTableView{
 }
 
 class MockTimeTableRouter implements TimeTableRouterContract {
-  List<TimeTableState> viewState = List();
-  List<dynamic> data = List();
+  List<TimeTableState> viewState = [];
+  List<dynamic> data = [];
   @override
   goToPodcastControls(Episode episode) {
     viewState.add(TimeTableState.goToEpisode);

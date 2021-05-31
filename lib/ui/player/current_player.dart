@@ -9,14 +9,14 @@ import 'package:injector/injector.dart';
 
 typedef void ConnectionCallback(bool isError);
 
-enum PlayerState { play, stop, pause }
+enum AudioPlayerState { play, stop, pause }
 
 abstract class CurrentPlayerContract {
   Now now;
   Episode episode;
   Episode tempEpisode;
-  PlayerState playerState = PlayerState.stop;
-  AudioPlayer audioPlayer = Injector.appInstance.getDependency<AudioPlayer>();
+  AudioPlayerState playerState = AudioPlayerState.stop;
+  AudioPlayer audioPlayer = Injector.appInstance.get<AudioPlayer>();
   String currentSong = ":";
   String currentImage =
       "https://cuacfm.org/wp-content/uploads/2015/04/cousomicros1.jpg";
@@ -56,9 +56,9 @@ class CurrentPlayer implements CurrentPlayerContract {
   @override
   Episode tempEpisode;
   @override
-  PlayerState playerState = PlayerState.stop;
+  AudioPlayerState playerState = AudioPlayerState.stop;
   @override
-  AudioPlayer audioPlayer = Injector.appInstance.getDependency<AudioPlayer>();
+  AudioPlayer audioPlayer = Injector.appInstance.get<AudioPlayer>();
   @override
   String currentSong = ":";
   @override
@@ -92,7 +92,7 @@ class CurrentPlayer implements CurrentPlayerContract {
     if (!isPodcast && isPlaying()) {
       if (connection != ConnectivityResult.none &&
           connection != connectivityResult &&
-          playerState == PlayerState.play) {
+          playerState == AudioPlayerState.play) {
         restorePosition = position;
         restorePosition = duration;
         tempEpisode = episode;
@@ -124,7 +124,7 @@ class CurrentPlayer implements CurrentPlayerContract {
 
   @override
   Future<bool> seek(Duration position) async {
-    if (playerState == PlayerState.play) {
+    if (playerState == AudioPlayerState.play) {
       if (position <= duration) {
         final result = await audioPlayer.seek(position);
         return result == 1;
@@ -139,7 +139,7 @@ class CurrentPlayer implements CurrentPlayerContract {
 
   @override
   Future<bool> setVolume(double volume) async {
-    if (playerState == PlayerState.play) {
+    if (playerState == AudioPlayerState.play) {
       this.volume = volume;
       final result = await audioPlayer.setVolume(volume);
       return result == 1;
@@ -150,9 +150,9 @@ class CurrentPlayer implements CurrentPlayerContract {
 
   @override
   Future<bool> play() async {
-    if (playerState != PlayerState.play) {
+    if (playerState != AudioPlayerState.play) {
       if (Platform.isIOS) {
-        audioPlayer.startHeadlessService();
+        audioPlayer.notificationService.startHeadlessService();
       }
       if (isPodcast) {
         audioPlayer.onPlayerCompletion.listen((event) {
@@ -184,7 +184,7 @@ class CurrentPlayer implements CurrentPlayerContract {
                 onUpdate();
               }
               if (Platform.isIOS) {
-                audioPlayer.setNotification(
+                audioPlayer.notificationService.setNotification(
                     title: currentSong,
                     imageUrl: currentImage,
                     artist: "CUAC FM",
@@ -198,7 +198,7 @@ class CurrentPlayer implements CurrentPlayerContract {
           } else {
             position = p;
             if (Platform.isIOS) {
-              audioPlayer.setNotification(
+              audioPlayer.notificationService.setNotification(
                   title: currentSong,
                   imageUrl: currentImage,
                   albumTitle: "Live",
@@ -210,10 +210,10 @@ class CurrentPlayer implements CurrentPlayerContract {
 
       if (Platform.isIOS) {
         audioPlayer.onNotificationPlayerStateChanged.listen((state) {
-          if (state == AudioPlayerState.PLAYING) {
-            playerState = PlayerState.play;
+          if (state == PlayerState.PLAYING) {
+            playerState = AudioPlayerState.play;
           } else {
-            playerState = PlayerState.pause;
+            playerState = AudioPlayerState.pause;
           }
           if (onUpdate != null) {
             onUpdate();
@@ -237,7 +237,7 @@ class CurrentPlayer implements CurrentPlayerContract {
             isPodcast ? episode.audio : now.streamUrl(),
             isLocal: false,
             respectSilence: false);
-        if (result == 1) playerState = PlayerState.play;
+        if (result == 1) playerState = AudioPlayerState.play;
         if (Platform.isAndroid) {
           MethodChannel('cuacfm.flutter.io/notificationInfo')
               .invokeMethod('notificationInfo', {
@@ -268,13 +268,13 @@ class CurrentPlayer implements CurrentPlayerContract {
 
   @override
   Future<bool> stopAndPlay() async {
-    if (playerState == PlayerState.play || playerState == PlayerState.pause) {
+    if (playerState == AudioPlayerState.play || playerState == AudioPlayerState.pause) {
       if(!isPodcast){
         playbackRate =1.0;
         audioPlayer.setPlaybackRate(playbackRate: playbackRate);
       }
       final result = await audioPlayer.pause();
-      if (result == 1) playerState = PlayerState.pause;
+      if (result == 1) playerState = AudioPlayerState.pause;
       duration = Duration(seconds: 0);
       position = Duration(seconds: 0);
       if (!isPodcast) {
@@ -284,7 +284,7 @@ class CurrentPlayer implements CurrentPlayerContract {
           isPodcast ? episode.audio : now.streamUrl(),
           isLocal: false,
           respectSilence: false);
-      if (playResult == 1) playerState = PlayerState.play;
+      if (playResult == 1) playerState = AudioPlayerState.play;
       if (Platform.isAndroid) {
         MethodChannel('cuacfm.flutter.io/notificationInfo')
             .invokeMethod('notificationInfo', {
@@ -301,8 +301,8 @@ class CurrentPlayer implements CurrentPlayerContract {
 
   @override
   void stop() async {
-    if (playerState == PlayerState.play || playerState == PlayerState.pause) {
-      playerState = PlayerState.stop;
+    if (playerState == AudioPlayerState.play || playerState == AudioPlayerState.pause) {
+      playerState = AudioPlayerState.stop;
       if (isPodcast) {
         tempEpisode = episode;
         restoreDuration = duration;
@@ -315,8 +315,8 @@ class CurrentPlayer implements CurrentPlayerContract {
 
   @override
   Future resume() async {
-    if (playerState == PlayerState.pause) {
-      playerState = PlayerState.play;
+    if (playerState == AudioPlayerState.pause) {
+      playerState = AudioPlayerState.play;
       await audioPlayer.resume();
       if (Platform.isAndroid) {
         MethodChannel('cuacfm.flutter.io/notificationInfo')
@@ -331,15 +331,15 @@ class CurrentPlayer implements CurrentPlayerContract {
 
   @override
   Future pause() async {
-    if (playerState == PlayerState.play) {
+    if (playerState == AudioPlayerState.play) {
       final result = await audioPlayer.pause();
-      if (result == 1) playerState = PlayerState.pause;
+      if (result == 1) playerState = AudioPlayerState.pause;
     }
   }
 
   @override
   bool isPlaying() {
-    return playerState == PlayerState.play;
+    return playerState == AudioPlayerState.play;
   }
 
   @override
@@ -349,12 +349,12 @@ class CurrentPlayer implements CurrentPlayerContract {
 
   @override
   bool isPaused() {
-    return playerState == PlayerState.pause;
+    return playerState == AudioPlayerState.pause;
   }
 
   @override
   void release() async {
-    playerState = PlayerState.stop;
+    playerState = AudioPlayerState.stop;
     position = Duration(seconds: 0);
     duration = Duration(seconds: 0);
     audioPlayer.setReleaseMode(ReleaseMode.RELEASE);

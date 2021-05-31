@@ -33,7 +33,7 @@ class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     var queryData = MediaQuery.of(context);
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     if (bottomBarOption != BottomBarOption.HOME) {
       _resizableController.reverse(from: 25.0);
     } else {

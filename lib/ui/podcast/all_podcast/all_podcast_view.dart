@@ -34,8 +34,8 @@ class AllPodcastState extends State<AllPodcast>
   MediaQueryData queryData;
   bool _isSearching = false;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
-  List<Program> _podcasts = new List<Program>();
-  List<Program> _podcastWithFilter = new List<Program>();
+  List<Program> _podcasts = [];
+  List<Program> _podcastWithFilter = [];
   RadiocomColorsConract _colors;
   bool shouldShowPlayer = false;
   bool isContentUpdated = true;
@@ -51,7 +51,7 @@ class AllPodcastState extends State<AllPodcast>
   @override
   Widget build(BuildContext context) {
     queryData = MediaQuery.of(context);
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     if (_presenter.currentPlayer.isPodcast) {
       shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     }
@@ -112,6 +112,7 @@ class AllPodcastState extends State<AllPodcast>
         }),
         backgroundColor: _colors.palidwhite,
         body: _getBodyLayout(),
+        bottomNavigationBar: Container(height: Platform.isAndroid? 0 : shouldShowPlayer? 60 : 0,color: _colors.palidwhite),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: PlayerView(
             isMini: false,
@@ -142,8 +143,8 @@ class AllPodcastState extends State<AllPodcast>
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "all_podcast", "close": false});
     }
-    _localization = Injector.appInstance.getDependency<CuacLocalization>();
-    _presenter = Injector.appInstance.getDependency<AllPodcastPresenter>();
+    _localization = Injector.appInstance.get<CuacLocalization>();
+    _presenter = Injector.appInstance.get<AllPodcastPresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     _podcasts = widget.podcasts;
     _podcastWithFilter = widget.podcasts;
@@ -202,14 +203,14 @@ class AllPodcastState extends State<AllPodcast>
   @override
   void onConnectionError() {
     if (snackBarConnection == null) {
-      scaffoldKey.currentState..removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
       );
-      scaffoldKey.currentState..showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
     }
   }
 

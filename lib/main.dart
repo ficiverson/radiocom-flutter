@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/translations/localizations_delegate.dart';
@@ -6,6 +8,7 @@ import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
 import 'package:flutter/material.dart';
@@ -14,16 +17,21 @@ import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   ErrorWidget.builder =
       (FlutterErrorDetails details) => errorScreen(details.exception);
   DependencyInjector().loadModules();
-  Crashlytics.instance.enableInDevMode = true;
-  FlutterError.onError = (FlutterErrorDetails details) {
-    Crashlytics.instance.recordFlutterError(details);
+  await Firebase.initializeApp();
+  await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+  Function originalOnError = FlutterError.onError;
+  FlutterError.onError = (FlutterErrorDetails errorDetails) async {
+    await FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
+    originalOnError(errorDetails);
   };
-  runApp(new MyApp());
+  runZonedGuarded(() {
+    runApp(MyApp());
+  }, FirebaseCrashlytics.instance.recordError);
 }
 
 class MyApp extends StatelessWidget {
@@ -81,17 +89,17 @@ class MyApp extends StatelessWidget {
 }
 
 Widget errorScreen(dynamic detailsException) {
-  var _localization = Injector.appInstance.getDependency<CuacLocalization>();
+  var _localization = Injector.appInstance.get<CuacLocalization>();
   return Scaffold(
       appBar: AppBar(
         backgroundColor:
-            Injector.appInstance.getDependency<RadiocomColorsConract>().white,
+            Injector.appInstance.get<RadiocomColorsConract>().white,
         title:
             Text(SafeMap.safe(_localization.translateMap('error'), ["title"])),
       ),
       body: Container(
           color:
-              Injector.appInstance.getDependency<RadiocomColorsConract>().white,
+              Injector.appInstance.get<RadiocomColorsConract>().white,
           child: Padding(
             padding: EdgeInsets.all(20.0),
             child: Foundation.kReleaseMode

@@ -24,7 +24,7 @@ class WaveState extends State<Wave> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     if (widget.shouldAnimate) {
       _controller.repeat();
     } else {

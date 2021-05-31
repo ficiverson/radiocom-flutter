@@ -37,24 +37,24 @@ void main() {
     DependencyInjector().loadModules();
     getTranslations();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
-        (_) => mockRepository,
+        () => mockRepository,
         override: true);
     Injector.appInstance
-        .registerDependency<HomeView>((_) => view, override: true);
+        .registerDependency<HomeView>(() => view, override: true);
     Injector.appInstance
-        .registerDependency<HomeRouterContract>((_) => router, override: true);
+        .registerDependency<HomeRouterContract>(() => router, override: true);
     Injector.appInstance.registerDependency<ConnectionContract>(
-        (_) => mockConnection,
+        () => mockConnection,
         override: true);
     Injector.appInstance.registerDependency<CurrentPlayerContract>(
-        (_) => mockPlayer,
+        () => mockPlayer,
         override: true);
-    presenter = Injector.appInstance.getDependency<HomePresenter>();
+    presenter = Injector.appInstance.get<HomePresenter>();
   });
 
   setUp(() async {
     mockPlayer = MockPlayer();
-    presenter = Injector.appInstance.getDependency<HomePresenter>();
+    presenter = Injector.appInstance.get<HomePresenter>();
   });
 
   tearDown(() async {
@@ -338,7 +338,7 @@ void main() {
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.isPodcast).thenReturn(true);
-        when(mockPlayer.playerState).thenReturn(PlayerState.stop);
+        when(mockPlayer.playerState).thenReturn(AudioPlayerState.stop);
 
         presenter.onSelectedEpisode();
         await Future.delayed(Duration(milliseconds: 200));

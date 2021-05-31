@@ -35,9 +35,9 @@ class SettingsPresenter {
 
   SettingsPresenter(this._settingsView, {@required this.invoker, @required this.router,@required this.getLiveDataUseCase,
   }) {
-    notificationSubscription = Injector.appInstance.getDependency<NotificationSubscriptionContract>();
-    connection = Injector.appInstance.getDependency<ConnectionContract>();
-    currentPlayer = Injector.appInstance.getDependency<CurrentPlayerContract>();
+    notificationSubscription = Injector.appInstance.get<NotificationSubscriptionContract>();
+    connection = Injector.appInstance.get<ConnectionContract>();
+    currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
   }
 
   init() async {
@@ -76,7 +76,7 @@ class SettingsPresenter {
   }
 
   onResume() async {
-    if(currentPlayer.playerState == PlayerState.stop){
+    if(currentPlayer.playerState == AudioPlayerState.stop){
       await currentPlayer.play();
     } else {
       await currentPlayer.resume();

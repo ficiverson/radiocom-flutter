@@ -7,8 +7,8 @@ enum PodcastControlState {
 }
 
 class MockPodcastControlsView implements PodcastControlsView {
-  List<PodcastControlState> viewState = List();
-  List<dynamic> data = List();
+  List<PodcastControlState> viewState = [];
+  List<dynamic> data = [];
 
   @override
   onNewData() {

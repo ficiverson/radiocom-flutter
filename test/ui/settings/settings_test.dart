@@ -5,6 +5,7 @@ import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/settings/settings.dart';
 import 'package:cuacfm/ui/settings/settings_presenter.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:injector/injector.dart';
@@ -20,22 +21,25 @@ void main() {
   MockConnection mockConnection = MockConnection();
   MockPlayer mockPlayer = MockPlayer();
 
+  setupCloudFirestoreMocks();
+
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
     SharedPreferences.setMockInitialValues({});
+    await Firebase.initializeApp();
     DependencyInjector().loadModules();
     mockTranslationsWithLocale();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
-            (_) => mockRepository,
+            () => mockRepository,
         override: true);
     Injector.appInstance.registerDependency<ConnectionContract>(
-            (_) => mockConnection,
+            () => mockConnection,
         override: true);
     Injector.appInstance.registerDependency<CurrentPlayerContract>(
-            (_) => mockPlayer,
+            () => mockPlayer,
         override: true);
     Injector.appInstance.registerDependency<RadioStation>(
-            (_) => RadioStationInstrument.givenARadioStation(),
+            () => RadioStationInstrument.givenARadioStation(),
         override: true);
   });
 

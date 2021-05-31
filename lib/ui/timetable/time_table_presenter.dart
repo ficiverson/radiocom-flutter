@@ -28,8 +28,8 @@ class TimeTablePresenter {
     @required this.router,
     @required this.getLiveDataUseCase,
   }) {
-    connection = Injector.appInstance.getDependency<ConnectionContract>();
-    currentPlayer = Injector.appInstance.getDependency<CurrentPlayerContract>();
+    connection = Injector.appInstance.get<ConnectionContract>();
+    currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
   }
 
   onViewResumed() async {
@@ -63,7 +63,7 @@ class TimeTablePresenter {
   }
 
   onResume() async {
-    if(currentPlayer.playerState == PlayerState.stop){
+    if(currentPlayer.playerState == AudioPlayerState.stop){
       await currentPlayer.play();
     } else {
       await currentPlayer.resume();

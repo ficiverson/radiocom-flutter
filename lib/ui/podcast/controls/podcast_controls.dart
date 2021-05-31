@@ -54,7 +54,7 @@ class PodcastControlsState extends State<PodcastControls>
   Widget build(BuildContext context) {
     sleepSelectedIndex = _presenter.currentTimer.currentTime;
     mediaQuery = MediaQuery.of(context);
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     loadingView = loading ? getLoadingState() : Container();
     return new Scaffold(
         key: _scaffoldKey,
@@ -76,11 +76,11 @@ class PodcastControlsState extends State<PodcastControls>
           'changeScreen',
           {"currentScreen": "podcast-controls", "close": false});
     }
-    _localization = Injector.appInstance.getDependency<CuacLocalization>();
-    _presenter = Injector.appInstance.getDependency<PodcastControlsPresenter>();
-    currentPlayer = Injector.appInstance.getDependency<CurrentPlayerContract>();
-    shouldShowTimer = _presenter.currentTimer.currentTime != 0;
-    shouldShowFaster = _presenter.currentTimer.currentTime != 0;
+    _localization = Injector.appInstance.get<CuacLocalization>();
+    _presenter = Injector.appInstance.get<PodcastControlsPresenter>();
+    currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
+    shouldShowTimer = false;
+    shouldShowFaster = false;
     currentPlayer.onUpdate = () {
       if (currentPlayer.isPodcast) {
         setState(() {});
@@ -166,14 +166,14 @@ class PodcastControlsState extends State<PodcastControls>
 
   void onConnectionError() {
     if (snackBarConnection == null) {
-      _scaffoldKey.currentState..removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
       );
-      _scaffoldKey.currentState..showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
     }
   }
 
@@ -205,8 +205,8 @@ class PodcastControlsState extends State<PodcastControls>
                                 opacity: currentPlayer.isPlaying() ? 1.0 : 0.0,
                                 duration: Duration(seconds: 1),
                                 child: Wave(
-                                    size:
-                                    Size(30.0, 20.0), shouldAnimate: currentPlayer.isPlaying())))
+                                    size: Size(30.0, 20.0),
+                                    shouldAnimate: currentPlayer.isPlaying())))
                       ])),
                   Container(
                       margin: EdgeInsets.fromLTRB(
@@ -326,132 +326,7 @@ class PodcastControlsState extends State<PodcastControls>
                                     })
                                 : Container(width: 40)
                           ])),
-                  _presenter.currentPlayer.isPlaying() && _presenter.currentPlayer.isPodcast ?Padding(
-                      padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0.0),
-                      child: NeumorphicCardHorizontal(
-                          showUpDownRight: shouldShowFaster ? 1 : 2,
-                          onElementClicked: () {
-                            setState(() {
-                              shouldShowFaster = !shouldShowFaster;
-                            });
-                          },
-                          active: shouldShowFaster,
-                          image: "assets/graphics/faster.jpg",
-                          label: getTextForFasters())) : Container(),
-                  shouldShowFaster && _presenter.currentPlayer.isPlaying() && _presenter.currentPlayer.isPodcast
-                      ? Padding(
-                      padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
-                      child: NeumorphicView(
-                          isFullScreen: false,
-                          child: Padding(
-                              padding: EdgeInsets.fromLTRB(
-                                  10.0, 20.0, 10.0, 20.0),
-                              child: Wrap(
-                                children: List<Widget>.generate(
-                                  5,
-                                      (int index) {
-                                    return Padding(
-                                        padding: EdgeInsets.fromLTRB(
-                                            2.0, 0.0, 2.0, 0.0),
-                                        child: RawChip(
-                                          key: Key("faster_chip_" + index.toString() + "_speed"),
-                                          showCheckmark: true,
-                                          checkmarkColor: _colors.white,
-                                          labelStyle: TextStyle(
-                                            fontSize: 15.0,
-                                            letterSpacing: 1.1,
-                                            fontWeight: FontWeight.w400,
-                                            color: index == fasterSelectedIndex
-                                                ? _colors.white
-                                                : _colors.fontH1,
-                                          ),
-                                          label: Text('${getValue(index).toString()}x',
-                                              textAlign: TextAlign.center),
-                                          selected: fasterSelectedIndex == index,
-                                          selectedColor: _colors.yellow,
-                                          backgroundColor:
-                                          _colors.palidwhitedark,
-                                          onSelected: (bool selected) {
-                                            setState(() {
-                                              fasterSelectedIndex = index;
-                                              _presenter.onSpeedSelected(getValue(index));
-                                            });
-                                          },
-                                        ));
-                                  },
-                                ).toList(),
-                              ))))
-                      : Container(),
-                  _presenter.currentPlayer.isPlaying()
-                      ? Padding(
-                          padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0.0),
-                          child: NeumorphicCardHorizontal(
-                              showUpDownRight: shouldShowTimer ? 1 : 2,
-                              onElementClicked: () {
-                                setState(() {
-                                  shouldShowTimer = !shouldShowTimer;
-                                });
-                              },
-                              active: shouldShowTimer,
-                              image: "assets/graphics/sleep.jpg",
-                              label: getTextForCountDown()))
-                      : Container(),
-                  _presenter.currentPlayer.isPlaying() && shouldShowTimer
-                      ? Padding(
-                          padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
-                          child: NeumorphicView(
-                              isFullScreen: false,
-                              child: Padding(
-                                  padding: EdgeInsets.fromLTRB(
-                                      10.0, 20.0, 10.0, 20.0),
-                                  child: Wrap(
-                                    children: List<Widget>.generate(
-                                      8,
-                                      (int index) {
-                                        return Padding(
-                                            padding: EdgeInsets.fromLTRB(
-                                                2.0, 0.0, 2.0, 0.0),
-                                            child: RawChip(
-                                              key: Key("timer_chip_" +
-                                                  (index * 15).toString() +
-                                                  "_min"),
-                                              showCheckmark: true,
-                                              checkmarkColor: _colors.white,
-                                              labelStyle: TextStyle(
-                                                fontSize: 15.0,
-                                                letterSpacing: 1.1,
-                                                fontWeight: FontWeight.w400,
-                                                color: index == sleepSelectedIndex
-                                                    ? _colors.white
-                                                    : _colors.fontH1,
-                                              ),
-                                              label: Text(
-                                                  index == 0
-                                                      ? "Off      "
-                                                      : '${index * 15} min',
-                                                  textAlign: TextAlign.center),
-                                              selected: sleepSelectedIndex == index,
-                                              selectedColor: _colors.yellow,
-                                              backgroundColor:
-                                                  _colors.palidwhitedark,
-                                              onSelected: (bool selected) {
-                                                if (index == 0) {
-                                                  currentTimeCountdown =
-                                                      Duration.zero;
-                                                }
-                                                _presenter.onTimerStart(
-                                                    Duration(
-                                                        minutes: index * 15),
-                                                    index);
-                                                setState(() {
-                                                  sleepSelectedIndex = index;
-                                                });
-                                              },
-                                            ));
-                                      },
-                                    ).toList(),
-                                  ))))
-                      : Container()
+                  getBottomBarActions()
                 ]))));
   }
 
@@ -489,9 +364,12 @@ class PodcastControlsState extends State<PodcastControls>
   }
 
   String getTextForFasters() {
-    return fasterSelectedIndex == 1 ? SafeMap.safe(_localization.translateMap("podcast_controls"),
-        ["faster_inactive"]) : SafeMap.safe(_localization.translateMap("podcast_controls"),
-        ["faster_active"]) + '${getValue(fasterSelectedIndex).toString()}x';
+    return fasterSelectedIndex == 1
+        ? SafeMap.safe(
+            _localization.translateMap("podcast_controls"), ["faster_inactive"])
+        : SafeMap.safe(_localization.translateMap("podcast_controls"),
+                ["faster_active"]) +
+            '${getValue(fasterSelectedIndex).toString()}x';
   }
 
   String getTextForCountDown() {
@@ -507,7 +385,9 @@ class PodcastControlsState extends State<PodcastControls>
         ? "00"
         : date.second > 0
             ? date.second > 9
-                ? date.second < 60 ? date.second.toString() : ""
+                ? date.second < 60
+                    ? date.second.toString()
+                    : ""
                 : date.minute == 0
                     ? date.second.toString()
                     : "0" + date.second.toString()
@@ -525,16 +405,183 @@ class PodcastControlsState extends State<PodcastControls>
             ["auto_off_inactive"]);
   }
 
-  double getValue(int index){
+  double getValue(int index) {
     double value = 1.0;
-    switch(index){
-      case 0: value = 0.8;break;
-      case 1: value = 1.0;break;
-      case 2: value = 1.2;break;
-      case 3: value = 1.5;break;
-      case 4: value = 2.0;break;
-      default:value=1.0;
+    switch (index) {
+      case 0:
+        value = 0.8;
+        break;
+      case 1:
+        value = 1.0;
+        break;
+      case 2:
+        value = 1.2;
+        break;
+      case 3:
+        value = 1.5;
+        break;
+      case 4:
+        value = 2.0;
+        break;
+      default:
+        value = 1.0;
     }
     return value;
+  }
+
+  Widget getBottomBarActions() {
+    return Container(child: Column(children: [
+      Row(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.center,children: [
+        _presenter.currentPlayer.isPlaying()
+            ? Padding(
+            padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0.0),
+            child: ActionChip(
+                key: Key("timer_chip"),
+                backgroundColor: !shouldShowTimer ? _colors.neuPalidGrey : _colors.grey,
+                avatar: CircleAvatar(
+                  backgroundColor: !shouldShowTimer ? _colors.neuPalidGrey : _colors.grey,
+                  child: Icon(Icons.timer, color: !shouldShowTimer? _colors.grey : _colors.white),
+                ),
+                label: Text(getTextForCountDown(),style:TextStyle(
+                  fontSize: 13.0,
+                  letterSpacing: 1.1,
+                  fontWeight: FontWeight.w400,
+                  color: !shouldShowTimer? _colors.grey : _colors.white,
+                )),
+                onPressed: () {
+                  setState(() {
+                    shouldShowFaster = false;
+                    shouldShowTimer = !shouldShowTimer;
+                  });
+                }
+            )): Container(),
+        _presenter.currentPlayer.isPlaying() &&
+            _presenter.currentPlayer.isPodcast
+            ? Padding(
+            padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0.0),
+            child: ActionChip(
+                key: Key("faster_chip"),
+                backgroundColor: !shouldShowFaster ? _colors.neuPalidGrey : _colors.grey,
+                avatar: CircleAvatar(
+                  backgroundColor: !shouldShowFaster ? _colors.neuPalidGrey : _colors.grey,
+                  child: Icon(Icons.speed, color: !shouldShowFaster? _colors.grey : _colors.white),
+                ),
+                label: Text(getTextForFasters(),style:TextStyle(
+                  fontSize: 13.0,
+                  letterSpacing: 1.1,
+                  fontWeight: FontWeight.w400,
+                  color: !shouldShowFaster? _colors.grey : _colors.white,
+                )),
+                onPressed: () {
+                  setState(() {
+                    shouldShowTimer = false;
+                    shouldShowFaster = !shouldShowFaster;
+                  });
+                }
+            )) : Container()
+      ]),
+      _presenter.currentPlayer.isPlaying() && shouldShowTimer
+          ? Padding(
+              padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
+              child: NeumorphicView(
+                  isFullScreen: false,
+                  child: Padding(
+                      padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
+                      child: Wrap(
+                        children: List<Widget>.generate(
+                          8,
+                          (int index) {
+                            return Padding(
+                                padding:
+                                    EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
+                                child: RawChip(
+                                  key: Key("timer_chip_" +
+                                      (index * 15).toString() +
+                                      "_min"),
+                                  showCheckmark: true,
+                                  checkmarkColor: _colors.white,
+                                  labelStyle: TextStyle(
+                                    fontSize: 15.0,
+                                    letterSpacing: 1.1,
+                                    fontWeight: FontWeight.w400,
+                                    color: index == sleepSelectedIndex
+                                        ? _colors.white
+                                        : _colors.grey,
+                                  ),
+                                  label: Text(
+                                      index == 0
+                                          ? "Off      "
+                                          : '${index * 15} min',
+                                      textAlign: TextAlign.center),
+                                  selected: sleepSelectedIndex == index,
+                                  selectedColor: _colors.palidwhiteverydark,
+                                  backgroundColor: _colors.palidwhitedark,
+                                  onSelected: (bool selected) {
+                                    if (index == 0) {
+                                      currentTimeCountdown = Duration.zero;
+                                    }
+                                    _presenter.onTimerStart(
+                                        Duration(minutes: index * 15), index);
+                                    setState(() {
+                                      sleepSelectedIndex = index;
+                                    });
+                                  },
+                                ));
+                          },
+                        ).toList(),
+                      ))))
+          : Container(),
+      shouldShowFaster &&
+          _presenter.currentPlayer.isPlaying() &&
+          _presenter.currentPlayer.isPodcast
+          ? Padding(
+          padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
+          child: NeumorphicView(
+              isFullScreen: false,
+              child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                      10.0, 20.0, 10.0, 20.0),
+                  child: Wrap(
+                    children: List<Widget>.generate(
+                      5,
+                          (int index) {
+                        return Padding(
+                            padding: EdgeInsets.fromLTRB(
+                                2.0, 0.0, 2.0, 0.0),
+                            child: RawChip(
+                              key: Key("faster_chip_" +
+                                  index.toString() +
+                                  "_speed"),
+                              showCheckmark: true,
+                              checkmarkColor: _colors.white,
+                              labelStyle: TextStyle(
+                                fontSize: 15.0,
+                                letterSpacing: 1.1,
+                                fontWeight: FontWeight.w400,
+                                color:
+                                index == fasterSelectedIndex
+                                    ? _colors.white
+                                    : _colors.grey,
+                              ),
+                              label: Text(
+                                  '${getValue(index).toString()}x',
+                                  textAlign: TextAlign.center),
+                              selected:
+                              fasterSelectedIndex == index,
+                              selectedColor: _colors.palidwhiteverydark,
+                              backgroundColor:
+                              _colors.palidwhitedark,
+                              onSelected: (bool selected) {
+                                setState(() {
+                                  fasterSelectedIndex = index;
+                                  _presenter.onSpeedSelected(
+                                      getValue(index));
+                                });
+                              },
+                            ));
+                      },
+                    ).toList(),
+                  )))) : Container()
+    ]));
   }
 }

@@ -40,7 +40,7 @@ class NewDetailState extends State<NewDetail>
   @override
   Widget build(BuildContext context) {
     _queryData = MediaQuery.of(context);
-    _colors = Injector.appInstance.getDependency<RadiocomColorsConract>();
+    _colors = Injector.appInstance.get<RadiocomColorsConract>();
     return Scaffold(
         key: scaffoldKey,
         appBar: TopBar("new_detail",
@@ -51,6 +51,7 @@ class NewDetailState extends State<NewDetail>
         }),
         backgroundColor: _colors.palidwhite,
         body: _getBodyLayout(),
+        bottomNavigationBar: Container(height: Platform.isAndroid? 0 : shouldShowPlayer? 60 : 0,color: _colors.palidwhite),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: PlayerView(
             isMini: false,
@@ -81,7 +82,7 @@ class NewDetailState extends State<NewDetail>
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "new_detail", "close": false});
     }
-    _presenter = Injector.appInstance.getDependency<NewDetailPresenter>();
+    _presenter = Injector.appInstance.get<NewDetailPresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
 
     if (Platform.isAndroid) {
@@ -138,13 +139,13 @@ class NewDetailState extends State<NewDetail>
   @override
   void onConnectionError() {
     if (snackBarConnection == null) {
-      scaffoldKey.currentState..removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text("No dispones de conexión a internet"),
       );
-      scaffoldKey.currentState..showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
     }
   }
 
@@ -204,7 +205,7 @@ class NewDetailState extends State<NewDetail>
                   padding: EdgeInsets.fromLTRB(5.0, 00.0, 5.0, 0.0),
                   child: ListTile(
                       title: Html(
-                    blacklistedElements: ["audio", "video"],
+                    tagsList: Html.tags..add("audio")..add("video"),
                     style: {
                       "html": Style(
                           color: _colors.font, whiteSpace: WhiteSpace.PRE),
@@ -217,7 +218,7 @@ class NewDetailState extends State<NewDetail>
                         .replaceAll("\\r", "")
                         .replaceAll("\\n", "")
                         .replaceAll("\\", ""),
-                    onLinkTap: (url) {
+                    onLinkTap: (url, _, __, ___) {
                       _presenter.onLinkClicked(url);
                     },
                   ))),

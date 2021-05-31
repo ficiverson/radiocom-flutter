@@ -36,8 +36,8 @@ enum HomeState {
 }
 
 class MockHomeView implements HomeView {
-  List<HomeState> viewState = List();
-  List<dynamic> data = List();
+  List<HomeState> viewState = [];
+  List<dynamic> data = [];
 
   @override
   onConnectionError() {
@@ -139,8 +139,8 @@ class MockHomeView implements HomeView {
 }
 
 class MockHomeRouter implements HomeRouterContract {
-  List<HomeState> viewState = List();
-  List<dynamic> data = List();
+  List<HomeState> viewState = [];
+  List<dynamic> data = [];
 
   @override
   goToAllPodcast(List<Program> podcasts, {String category}) {
