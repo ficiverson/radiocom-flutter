@@ -37,7 +37,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
   Scaffold _scaffold;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   MediaQueryData queryData;
-  List<Episode> _episodes = List<Episode>();
+  List<Episode> _episodes = [];
   RadiocomColorsConract _colors;
   bool isLoadingEpisodes = true;
   bool isLoadingEpisode = false;
@@ -160,14 +160,14 @@ class DetailPodcastState extends State<DetailPodcastPage>
   @override
   void onConnectionError() {
     if (snackBarConnection == null) {
-      _scaffoldKey.currentState..removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
       );
-      _scaffoldKey.currentState..showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
     }
   }
 

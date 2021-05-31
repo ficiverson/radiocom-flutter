@@ -338,20 +338,20 @@ class MyHomePageState extends State<MyHomePage>
   @override
   void onConnectionError() {
     if (snackBarConnection == null) {
-      scaffoldKey.currentState..removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
       );
-      scaffoldKey.currentState..showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
     }
   }
 
   @override
   void onConnectionSuccess() {
-    scaffoldKey.currentState..removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
     snackBarConnection = null;
   }
 
@@ -478,18 +478,18 @@ class MyHomePageState extends State<MyHomePage>
   @override
   void onRadioStationError(error) {
     if (snackBarConnection == null) {
-      scaffoldKey.currentState..removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       final snackBar = SnackBar(
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["connection_error"])),
         action: SnackBarAction(
           label: SafeMap.safe(_localization.translateMap("actions"), ["close"]),
           onPressed: () {
-            scaffoldKey.currentState.hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
           },
         ),
       );
-      scaffoldKey.currentState..showSnackBar(snackBar);
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 
@@ -546,18 +546,18 @@ class MyHomePageState extends State<MyHomePage>
 
   showTimeTableEmptySnackbar() {
     if (snackBarConnection == null) {
-      scaffoldKey.currentState..removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       final snackBar = SnackBar(
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["connection_error"])),
         action: SnackBarAction(
           label: SafeMap.safe(_localization.translateMap("actions"), ["close"]),
           onPressed: () {
-            scaffoldKey.currentState.hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
           },
         ),
       );
-      scaffoldKey.currentState..showSnackBar(snackBar);
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 

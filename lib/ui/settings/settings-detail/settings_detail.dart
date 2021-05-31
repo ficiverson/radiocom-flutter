@@ -150,14 +150,14 @@ class SettingsDetailState extends State<SettingsDetail>
   @override
   void onConnectionError() {
     if (snackBarConnection == null) {
-      scaffoldKey.currentState..removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
       );
-      scaffoldKey.currentState..showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
     }
   }
 
@@ -185,7 +185,7 @@ class SettingsDetailState extends State<SettingsDetail>
 
   Widget _getLicense() {
     var licenses = License.getAll();
-    var licenseList = List<Widget>();
+    var licenseList = [];
     licenseList.add(SizedBox(height: 10));
     licenses.forEach((license) {
       licenseList.add(Container(

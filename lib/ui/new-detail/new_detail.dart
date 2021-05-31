@@ -139,13 +139,13 @@ class NewDetailState extends State<NewDetail>
   @override
   void onConnectionError() {
     if (snackBarConnection == null) {
-      scaffoldKey.currentState..removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text("No dispones de conexión a internet"),
       );
-      scaffoldKey.currentState..showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
     }
   }
 

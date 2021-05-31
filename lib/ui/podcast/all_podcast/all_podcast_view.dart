@@ -34,8 +34,8 @@ class AllPodcastState extends State<AllPodcast>
   MediaQueryData queryData;
   bool _isSearching = false;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
-  List<Program> _podcasts = new List<Program>();
-  List<Program> _podcastWithFilter = new List<Program>();
+  List<Program> _podcasts = [];
+  List<Program> _podcastWithFilter = [];
   RadiocomColorsConract _colors;
   bool shouldShowPlayer = false;
   bool isContentUpdated = true;
@@ -203,14 +203,14 @@ class AllPodcastState extends State<AllPodcast>
   @override
   void onConnectionError() {
     if (snackBarConnection == null) {
-      scaffoldKey.currentState..removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       snackBarConnection = SnackBar(
         key: Key("connection_snackbar"),
         duration: Duration(seconds: 3),
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
       );
-      scaffoldKey.currentState..showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
     }
   }
 

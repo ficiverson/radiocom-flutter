@@ -210,7 +210,7 @@ class CurrentPlayer implements CurrentPlayerContract {
 
       if (Platform.isIOS) {
         audioPlayer.onNotificationPlayerStateChanged.listen((state) {
-          if (state == AudioPlayerState.play) {
+          if (state == PlayerState.PLAYING) {
             playerState = AudioPlayerState.play;
           } else {
             playerState = AudioPlayerState.pause;
