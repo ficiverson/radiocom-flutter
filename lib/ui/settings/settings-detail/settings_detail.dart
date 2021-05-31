@@ -60,6 +60,7 @@ class SettingsDetailState extends State<SettingsDetail>
             ? _colors.transparent
             : _colors.palidwhite,
         body: _getBodyLayout(widget.legalType),
+        bottomNavigationBar: Container(height: Platform.isAndroid? 0 : shouldShowPlayer? 60 : 0,color: _colors.palidwhite),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: PlayerView(
             isMini: false,

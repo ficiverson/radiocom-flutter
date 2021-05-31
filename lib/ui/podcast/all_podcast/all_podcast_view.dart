@@ -112,6 +112,7 @@ class AllPodcastState extends State<AllPodcast>
         }),
         backgroundColor: _colors.palidwhite,
         body: _getBodyLayout(),
+        bottomNavigationBar: Container(height: Platform.isAndroid? 0 : shouldShowPlayer? 60 : 0,color: _colors.palidwhite),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: PlayerView(
             isMini: false,

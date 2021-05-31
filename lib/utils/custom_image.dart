@@ -36,8 +36,6 @@ class CustomImageState extends State<CustomImage> {
       customImage = new Icon(Icons.warning);
     } else if (widget.resPath.contains("http")) {
       customImage = new CachedNetworkImage(
-          httpHeaders: new Map.fromIterables(
-              ["Cache-control"], ["max-stale=31536000,public"]),
           fit: widget.fit,
           width: widget.width,
           height: widget.height,
