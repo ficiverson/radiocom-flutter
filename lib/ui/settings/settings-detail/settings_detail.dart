@@ -185,7 +185,7 @@ class SettingsDetailState extends State<SettingsDetail>
 
   Widget _getLicense() {
     var licenses = License.getAll();
-    var licenseList = [];
+    List<Widget> licenseList = [];
     licenseList.add(SizedBox(height: 10));
     licenses.forEach((license) {
       licenseList.add(Container(
