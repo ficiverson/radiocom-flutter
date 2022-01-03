@@ -18,7 +18,7 @@
     "msg" : "Streming en directo de la radio comunitaria de A Coruña. 103.4 FM. Para más información visita: www.cuacfm.org",
     "auto_off_active" : "Apagado: ",
     "auto_off_inactive" : "Autoapagado",
-    "faster_inactive" : "Velocidad reproducción",
+    "faster_inactive" : "Velocidad",
     "faster_active" : "Faster: "
   },
   "timetable" : {
