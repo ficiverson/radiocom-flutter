@@ -211,14 +211,6 @@ public class AudioService extends Service {
 		return mediaPlayers;
 	}
 
-	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-	@Override
-	public void onTaskRemoved(Intent rootIntent) {
-		stopForeground(true);
-		removeNotifiction();
-		super.onTaskRemoved(rootIntent);
-	}
-
 	@Override
 	public void onDestroy() {
 		for (Player mediaPlayer : mediaPlayers.values()) {

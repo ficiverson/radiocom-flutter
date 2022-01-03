@@ -63,7 +63,7 @@
             android:name="xyz.luan.audioplayers.AudioService"
             android:enabled="true"
             android:exported="false"
-            android:stopWithTask="true"/>
+            android:stopWithTask="false"/>
 
         <meta-data
             android:name="flutterEmbedding"

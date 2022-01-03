@@ -13,6 +13,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
 import xyz.luan.audioplayers.AudioService
 
+
 class MainActivity : FlutterActivity() {
 
     companion object {
@@ -37,17 +38,8 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine : FlutterEngine) {
         AudioService.registerActivity(flutterEngine)
 
-        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val runningAppProcesses = activityManager.runningAppProcesses
-        if (runningAppProcesses != null) {
-            val importance = runningAppProcesses[0].importance
-            if (importance <= ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                val intent = Intent(this, AudioService::class.java)
-                Handler().postDelayed({
-                    startService(intent)
-                }, 200)
-            }
-        }
+        val intent = Intent(this, AudioService::class.java)
+        startService(intent)
 
         GeneratedPluginRegistrant.registerWith(flutterEngine)
 
@@ -70,7 +62,6 @@ class MainActivity : FlutterActivity() {
             }
         }
     }
-
     override fun onBackPressed() {
         if (screens.size == 1) {
             AudioService.stopComponent(this, this)
