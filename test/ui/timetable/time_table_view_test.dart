@@ -149,7 +149,7 @@ void main() {
       TimeTableInstrument.givenATimeTable(time: 3),
       TimeTableInstrument.givenATimeTable(time: 4),
     ])));
-    mockPlayer.onConnection(true);
+    mockPlayer.onConnection!(true);
     await tester.pumpAndSettle();
 
     expect(find.byKey(Key("connection_snackbar"), skipOffstage: true),

@@ -4,7 +4,7 @@ description: A radio station with radioco integration.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.2.0 <3.0.0"
+  sdk: "2.15.1"
 
 dependencies:
   flutter:
@@ -13,42 +13,36 @@ dependencies:
     sdk: flutter
 
   verbal_expressions: ^1.0.0
-  audioplayers: '0.19.0'
+  audioplayers: ^0.20.1
   intl: ^0.17.0
-  xml2json: ^5.2.0
-  cupertino_icons: ^1.0.3
-  device_info: ^2.0.2
-  http: ^0.13.3
+  xml2json: ^5.3.2
+  cupertino_icons: ^1.0.4
+  device_info: ^2.0.3
+  http: ^0.13.4
   html: ^0.15.0
   share: ^2.0.4
-  shared_preferences: ^2.0.6
+  shared_preferences: ^2.0.11
   injector: ^2.0.0
-  animations: ^2.0.0
-  cached_network_image: ^3.0.0
-  flutter_html: ^2.0.0
-  url_launcher: ^6.0.4
-  font_awesome_flutter: ^9.0.0
-  maps_launcher: ^2.0.0
-  photo_view: ^0.11.1
+  animations: ^2.0.2
+  cached_network_image: ^3.2.0
+  flutter_html: ^3.0.0-alpha.2
+  url_launcher: ^6.0.17
+  font_awesome_flutter: ^9.2.0
+  maps_launcher: ^2.0.1
+  photo_view: ^0.13.0
   progress_indicators: ^1.0.0
   connectivity: ^3.0.6
-  uuid: ^3.0.1
-  provider: ^5.0.0
-  firebase_core: ^1.2.0
-  firebase_messaging: ^10.0.0
-  firebase_performance: ^0.7.0+3
-  firebase_crashlytics: ^2.0.4
-  firebase_analytics: ^8.1.0
-  firebase_in_app_messaging: ^0.5.0+4
+  uuid: ^3.0.5
+  provider: ^6.0.2
+  firebase_core: ^1.11.0
+  firebase_messaging: ^11.2.5
+  firebase_performance: ^0.8.0+4
+  firebase_crashlytics: ^2.4.5
+  firebase_analytics: ^9.0.5
+  firebase_in_app_messaging: ^0.6.0+6
   mock_web_server: ^4.1.1
-  mockito: ^4.1.1
-  countdown: ^0.1.0
-  ozzie: ^2.2.3
-
-dependency_overrides:
-  convert: ^3.0.0
-  crypto: ^3.0.0
-  archive: ^2.0.5
+  mockito: ^5.0.17
+  path_provider: ^2.0.8
 
 dev_dependencies:
   flutter_test:

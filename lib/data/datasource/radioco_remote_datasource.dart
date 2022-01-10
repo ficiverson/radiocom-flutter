@@ -8,7 +8,7 @@ import 'package:cuacfm/models/time_table.dart';
 abstract class RadiocoRemoteDataSourceContract{
   Future<RadioStation> getRadioStationData();
 
-  Future<Now> getLiveBroadcast();
+  Future<Now?> getLiveBroadcast();
 
   Future<List<TimeTable>> getTimetableData(String after, String before);
 

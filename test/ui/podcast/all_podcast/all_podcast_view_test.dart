@@ -165,7 +165,7 @@ void main() {
     });
 
     await tester.pumpWidget(startWidget(AllPodcast(podcasts: [ProgramInstrument.givenAProgram(),ProgramInstrument.givenAProgram()])));
-    mockPlayer.onConnection(true);
+    mockPlayer.onConnection!(true);
     await tester.pumpAndSettle();
 
     expect(

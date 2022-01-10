@@ -143,7 +143,7 @@ class MockHomeRouter implements HomeRouterContract {
   List<dynamic> data = [];
 
   @override
-  goToAllPodcast(List<Program> podcasts, {String category}) {
+  goToAllPodcast(List<Program> podcasts, {String? category}) {
     viewState.add(HomeState.goToAllPodcast);
     data.add(category!=null?category:podcasts);
   }

@@ -16,7 +16,6 @@ import 'package:cuacfm/models/time_table.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/player/current_timer.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:injector/injector.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -61,23 +60,24 @@ class HomePresenter {
   GetTimetableUseCase getTimetableUseCase;
   GetNewsUseCase getNewsUseCase;
   HomeRouterContract router;
-  ConnectionContract connection;
-  CurrentPlayerContract currentPlayer;
-  CurrentTimerContract currentTimer;
-  Timer _timer;
+  late ConnectionContract connection;
+  late CurrentPlayerContract currentPlayer;
+  late CurrentTimerContract currentTimer;
+  Timer? _timer;
   bool isLoading = false;
 
   HomePresenter(this._homeView,
-      {@required this.invoker,
-      @required this.router,
-      @required this.getAllPodcastUseCase,
-      @required this.getStationUseCase,
-      @required this.getLiveDataUseCase,
-      @required this.getTimetableUseCase,
-      @required this.getNewsUseCase}) {
+      {required this.invoker,
+      required this.router,
+      required this.getAllPodcastUseCase,
+      required this.getStationUseCase,
+      required this.getLiveDataUseCase,
+      required this.getTimetableUseCase,
+      required this.getNewsUseCase}) {
     currentTimer = Injector.appInstance.get<CurrentTimerContract>();
     connection = Injector.appInstance.get<ConnectionContract>();
     currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
+
   }
 
   init() async {
@@ -127,8 +127,10 @@ class HomePresenter {
     router.goToPodcastDetail(podcast);
   }
 
-  onPodcastControlsClicked(Episode episode) {
-    router.goToPodcastControls(episode);
+  onPodcastControlsClicked(Episode? episode) {
+    if(episode != null) {
+      router.goToPodcastControls(episode);
+    }
   }
 
   onLiveSelected(Now now) async {
@@ -182,19 +184,19 @@ class HomePresenter {
       _homeView.onNotifyUser(StatusPlayer.FAILED);
     } else {
       if (_timer != null) {
-        _timer.cancel();
+        _timer?.cancel();
       }
       _timer = new Timer.periodic(new Duration(milliseconds: 100), (timer) {
         if (currentPlayer.isStreamingAudio()) {
           isLoading = false;
           _homeView.onNotifyUser(StatusPlayer.PLAYING);
-          _timer.cancel();
+          _timer?.cancel();
           _timer = null;
         } else if (timer.tick > 300) {
           currentPlayer.stop();
           isLoading = false;
           _homeView.onNotifyUser(StatusPlayer.FAILED);
-          _timer.cancel();
+          _timer?.cancel();
           _timer = null;
         }
       });
@@ -211,19 +213,19 @@ class HomePresenter {
       _homeView.onNotifyUser(StatusPlayer.FAILED);
     } else {
       if (_timer != null) {
-        _timer.cancel();
+        _timer?.cancel();
       }
       _timer = new Timer.periodic(new Duration(milliseconds: 100), (timer) {
         if (currentPlayer.isStreamingAudio()) {
           isLoading = false;
           _homeView.onNotifyUser(StatusPlayer.PLAYING);
-          _timer.cancel();
+          _timer?.cancel();
           _timer = null;
         } else if (timer.tick > 300) {
           currentPlayer.stop();
           isLoading = false;
           _homeView.onNotifyUser(StatusPlayer.FAILED);
-          _timer.cancel();
+          _timer?.cancel();
           _timer = null;
         }
       });

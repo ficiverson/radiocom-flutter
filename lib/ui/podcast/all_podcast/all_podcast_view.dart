@@ -9,7 +9,6 @@ import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
 import 'package:cuacfm/utils/top_bar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
@@ -18,10 +17,10 @@ import 'package:intl/intl.dart';
 import 'all_podcast_presenter.dart';
 
 class AllPodcast extends StatefulWidget {
-  AllPodcast({Key key, this.podcasts, this.category}) : super(key: key);
+  AllPodcast({Key? key, required this.podcasts, this.category}) : super(key: key);
 
   final List<Program> podcasts;
-  final String category;
+  final String? category;
 
   @override
   AllPodcastState createState() => new AllPodcastState();
@@ -30,19 +29,19 @@ class AllPodcast extends StatefulWidget {
 class AllPodcastState extends State<AllPodcast>
     with WidgetsBindingObserver
     implements AllPodcastView {
-  AllPodcastPresenter _presenter;
-  MediaQueryData queryData;
+  late AllPodcastPresenter _presenter;
+  late MediaQueryData queryData;
   bool _isSearching = false;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   List<Program> _podcasts = [];
   List<Program> _podcastWithFilter = [];
-  RadiocomColorsConract _colors;
+  late RadiocomColorsConract _colors;
   bool shouldShowPlayer = false;
   bool isContentUpdated = true;
-  EventChannel _notificationEvent =
+  EventChannel? _notificationEvent =
       EventChannel('cuacfm.flutter.io/updateNotification');
-  SnackBar snackBarConnection;
-  CuacLocalization _localization;
+  SnackBar? snackBarConnection;
+  late CuacLocalization _localization;
 
   AllPodcastState() {
     DependencyInjector().injectByView(this);
@@ -70,7 +69,7 @@ class AllPodcastState extends State<AllPodcast>
                 'changeScreen',
                 {"currentScreen": "all_podcast_search", "close": false});
           }
-          ModalRoute.of(context).addLocalHistoryEntry(new LocalHistoryEntry(
+          ModalRoute.of(context)?.addLocalHistoryEntry(new LocalHistoryEntry(
             onRemove: () {
               if (!mounted) return;
               setState(() {
@@ -83,7 +82,7 @@ class AllPodcastState extends State<AllPodcast>
             _isSearching = true;
           });
         }, onQueryCallback: (query) {
-          if (query != null && query.length > 2) {
+          if (query.length > 2) {
             if (!mounted) return;
             setState(() {
               _podcastWithFilter =
@@ -96,7 +95,7 @@ class AllPodcastState extends State<AllPodcast>
             });
           }
         }, onQuerySubmit: (query) {
-          if (query != null && query.length > 2) {
+          if (query.length > 2) {
             if (!mounted) return;
             setState(() {
               _podcastWithFilter =
@@ -150,7 +149,7 @@ class AllPodcastState extends State<AllPodcast>
     _podcastWithFilter = widget.podcasts;
 
     if (Platform.isAndroid) {
-      _notificationEvent.receiveBroadcastStream().listen((onData) {
+      _notificationEvent?.receiveBroadcastStream().listen((onData) {
         if (_notificationEvent != null) {
           setState(() {
             _presenter.currentPlayer.release();
@@ -172,7 +171,7 @@ class AllPodcastState extends State<AllPodcast>
       }
     };
 
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
   }
 
   @override
@@ -195,7 +194,7 @@ class AllPodcastState extends State<AllPodcast>
   @override
   void dispose() {
     _notificationEvent = null;
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     Injector.appInstance.removeByKey<AllPodcastView>();
     super.dispose();
   }
@@ -210,7 +209,7 @@ class AllPodcastState extends State<AllPodcast>
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
       );
-      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection!);
     }
   }
 

@@ -14,27 +14,24 @@ import 'package:injector/injector.dart';
 
 class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
   final CUACClient client = Injector.appInstance.get<CUACClient>();
-  RadiocoAPIContract radiocoAPI;
-  RadiocoRemoteDataSource() {
-    radiocoAPI = Injector.appInstance.get<RadiocoAPIContract>();
-  }
+  RadiocoAPIContract radiocoAPI = Injector.appInstance.get<RadiocoAPIContract>();
 
   Future<RadioStation> getRadioStationData() async {
     Uri url = Uri.parse(radiocoAPI.baseUrl + radiocoAPI.radioStation);
     try {
       var res = await this.client.get(url);
-      return new RadioStation.fromInstance(res);
-    } catch (Exception) {
+      return RadioStation.fromInstance(res);
+    } catch (exception) {
       return RadioStation.base();
     }
   }
 
-  Future<Now> getLiveBroadcast() async {
+  Future<Now?> getLiveBroadcast() async {
     Uri url = Uri.parse(radiocoAPI.baseUrl + radiocoAPI.live);
     try {
       var res = await this.client.get(url);
       return Now.fromInstance(res);
-    } catch (Exception) {
+    } catch (exception) {
       return null;
     }
   }
@@ -51,7 +48,7 @@ class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
       List<TimeTable> programsTimeTable =
           res.map((g) => new TimeTable.fromInstance(g)).toList();
       return programsTimeTable;
-    } catch (Exception) {
+    } catch (exception) {
       return [];
     }
   }
@@ -64,7 +61,7 @@ class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
       List<Program> programs =
           res.map((g) => new Program.fromInstance(g)).toList();
       return programs;
-    } catch (Exception) {
+    } catch (exception) {
       return [];
     }
   }
@@ -95,6 +92,7 @@ class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
           res.map((n) => new Episode.fromInstance(n)).toList();
       return episodesList;
     } catch (err) {
+      print(err);
       return [];
     }
   }

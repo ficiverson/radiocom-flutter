@@ -92,7 +92,6 @@ class DependencyInjector {
       return CurrentPlayer();
     });
     injector.registerSingleton<AudioPlayer>(() {
-      AudioPlayer.logEnabled = false;
       return AudioPlayer();
     });
   }

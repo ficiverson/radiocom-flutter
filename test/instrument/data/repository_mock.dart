@@ -16,6 +16,11 @@ import '../model/radio_station_instrument.dart';
 import '../model/timetable_instrument.dart';
 
 class MockRadiocoRepository extends Mock implements CuacRepositoryContract {
+  @override Future<Result<List<TimeTable>>> getTimetableData(String? after, String? before) =>
+      super.noSuchMethod(Invocation.method(#getTimetableData, [after, before]));
+  @override Future<Result<List<Episode>>> getEpisodes(String? feedUrl) =>
+      super.noSuchMethod(Invocation.method(#getEpisodes, [feedUrl]));
+
   static Future<Result<RadioStation>> radioStation({bool isEmpty = false}) {
     return Future.value(isEmpty
         ? Error(

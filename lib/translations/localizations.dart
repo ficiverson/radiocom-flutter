@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
@@ -11,19 +9,21 @@ abstract class CuacLocalizationContract {
 }
 
 class CuacLocalization implements CuacLocalizationContract {
+
+  Map<String, dynamic>? _sentencesRemote;
+  Map<String, dynamic>? _sentencesLocal;
+  late Locale locale;
+
   CuacLocalization(this.locale);
 
-  final Locale locale;
-
   static CuacLocalization of(BuildContext context) {
-    return Localizations.of<CuacLocalization>(context, CuacLocalization);
+    return Localizations.of(context, CuacLocalization);
   }
 
-  Map<String, dynamic> _sentencesRemote;
-  Map<String, dynamic> _sentencesLocal;
+
 
   Future<bool> load() async {
-    if (_sentencesLocal != null && _sentencesLocal.isNotEmpty) {
+    if (_sentencesLocal != null && _sentencesLocal!.isNotEmpty) {
       return true;
     } else {
       String data = await rootBundle
@@ -32,7 +32,7 @@ class CuacLocalization implements CuacLocalizationContract {
 
       this._sentencesLocal = new Map();
       _result.forEach((String key, dynamic value) {
-        this._sentencesLocal[key] = value;
+        this._sentencesLocal?[key] = value;
       });
       return true;
     }
@@ -53,11 +53,11 @@ class CuacLocalization implements CuacLocalizationContract {
 
   @override
   String getTranslations(String key) {
-    if (_sentencesRemote != null && this._sentencesRemote.containsKey(key)) {
-      return this._sentencesRemote[key];
+    if (_sentencesRemote != null && this._sentencesRemote!.containsKey(key)) {
+      return this._sentencesRemote?[key];
     } else if (_sentencesLocal != null &&
-        this._sentencesLocal.containsKey(key)) {
-      return this._sentencesLocal[key];
+        this._sentencesLocal!.containsKey(key)) {
+      return this._sentencesLocal?[key];
     } else {
       return "";
     }
@@ -65,11 +65,11 @@ class CuacLocalization implements CuacLocalizationContract {
 
   @override
   String translate(String key) {
-    if (_sentencesRemote != null && this._sentencesRemote.containsKey(key)) {
-      return this._sentencesRemote[key].toString();
+    if (_sentencesRemote != null && this._sentencesRemote!.containsKey(key)) {
+      return this._sentencesRemote?[key].toString() ?? "";
     } else if (_sentencesLocal != null &&
-        this._sentencesLocal.containsKey(key)) {
-      return this._sentencesLocal[key].toString();
+        this._sentencesLocal!.containsKey(key)) {
+      return this._sentencesLocal?[key].toString() ?? "";
     } else {
       return "";
     }
@@ -77,11 +77,11 @@ class CuacLocalization implements CuacLocalizationContract {
 
   @override
   Map<String, dynamic> translateMap(String key) {
-    if (_sentencesRemote != null && this._sentencesRemote.containsKey(key)) {
-      return this._sentencesRemote[key];
+    if (_sentencesRemote != null && this._sentencesRemote!.containsKey(key)) {
+      return this._sentencesRemote?[key];
     } else if (_sentencesLocal != null &&
-        this._sentencesLocal.containsKey(key)) {
-      return this._sentencesLocal[key];
+        this._sentencesLocal!.containsKey(key)) {
+      return this._sentencesLocal?[key];
     } else {
       return Map.identity();
     }

@@ -24,7 +24,7 @@ class MockRemoteDataSource extends Mock
     }
   }
 
-  static Future<Now> now(bool isEmpty) {
+  static Future<Now?> now(bool isEmpty) {
     if (isEmpty) {
       return Future.value(null);
     } else {

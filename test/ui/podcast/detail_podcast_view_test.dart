@@ -137,7 +137,7 @@ void main() {
     });
 
     await tester.pumpWidget(startWidget(DetailPodcastPage(program: ProgramInstrument.givenAProgram())));
-    mockPlayer.onConnection(true);
+    mockPlayer.onConnection!(true);
     await tester.pumpAndSettle();
 
     expect(

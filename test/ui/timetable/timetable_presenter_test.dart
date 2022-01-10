@@ -21,7 +21,7 @@ void main() {
   MockTimeTableRouter router = MockTimeTableRouter();
   MockConnection mockConnection = MockConnection();
   MockPlayer mockPlayer = MockPlayer();
-  TimeTablePresenter presenter;
+  late TimeTablePresenter presenter;
 
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -52,7 +52,6 @@ void main() {
     view.data.clear();
     router.viewState.clear();
     router.data.clear();
-    presenter = null;
   });
 
   test('that can init the presenter, then resume the view and realod the data',

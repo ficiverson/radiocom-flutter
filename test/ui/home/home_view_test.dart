@@ -63,7 +63,7 @@ void main() {
         when(mockPlayer.isPodcast).thenReturn(false);
         when(mockPlayer.currentSong).thenReturn("mocklive");
 
-        await tester.pumpWidget(startWidget(MyHomePage()));
+        await tester.pumpWidget(startWidget(MyHomePage(title: "homi")));
         expect(
             find.byKey(Key("bottom_bar"),skipOffstage: true),
             findsOneWidget);
@@ -91,7 +91,7 @@ void main() {
     when(mockPlayer.isPodcast).thenReturn(false);
     when(mockPlayer.currentSong).thenReturn("mocklive");
 
-    await tester.pumpWidget(startWidget(MyHomePage()));
+    await tester.pumpWidget(startWidget(MyHomePage(title: "homi")));
     await tester.tap(find.byKey(Key("bottom_bar_item2")));
     await tester.pump();
     expect(
@@ -118,7 +118,7 @@ void main() {
     when(mockPlayer.isPodcast).thenReturn(false);
     when(mockPlayer.currentSong).thenReturn("mocklive");
 
-    await tester.pumpWidget(startWidget(MyHomePage()));
+    await tester.pumpWidget(startWidget(MyHomePage(title: "homi")));
     await tester.tap(find.byKey(Key("bottom_bar_item3")));
     await tester.pump();
     expect(
@@ -152,8 +152,8 @@ void main() {
       });
     });
 
-    await tester.pumpWidget(startWidget(MyHomePage()));
-    mockPlayer.onConnection(true);
+    await tester.pumpWidget(startWidget(MyHomePage(title: "homi")));
+    mockPlayer.onConnection!(true);
     await tester.pumpAndSettle();
 
     expect(

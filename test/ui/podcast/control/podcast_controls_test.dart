@@ -151,7 +151,7 @@ void main() {
 
     await tester.pumpWidget(startWidget(
         PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
-    mockPlayer.onConnection(true);
+    mockPlayer.onConnection!(true);
     await tester.pumpAndSettle();
 
     expect(find.byKey(Key("connection_snackbar"), skipOffstage: true),

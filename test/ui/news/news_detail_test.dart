@@ -101,7 +101,7 @@ void main() {
     });
 
     await tester.pumpWidget(startWidget(NewDetail(newItem : NewInstrument.givenANew())));
-    mockPlayer.onConnection(true);
+    mockPlayer.onConnection!(true);
     await tester.pumpAndSettle();
 
     expect(

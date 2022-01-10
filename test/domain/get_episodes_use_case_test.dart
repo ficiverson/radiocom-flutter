@@ -8,7 +8,7 @@ import 'package:mockito/mockito.dart';
 import '../instrument/data/repository_mock.dart';
 
 void main() {
-  GetEpisodesUseCase useCase;
+  late GetEpisodesUseCase useCase;
   MockRadiocoRepository mockRepository = MockRadiocoRepository();
   Invoker invoker = Invoker();
 
@@ -20,7 +20,7 @@ void main() {
   tearDownAll(() async {});
 
   test('that can fetch all episodes from network', () {
-    when(mockRepository.getEpisodes(any)).thenAnswer((_) => MockRadiocoRepository.episodes());
+    when(mockRepository.getEpisodes("episodes")).thenAnswer((_) => MockRadiocoRepository.episodes());
 
     invoker.execute(useCase.withParams(GetEpisodesUseCaseParams("myurl"))).listen(expectAsync1((result) {
       expect(result.status, equals(Status.ok));
@@ -30,7 +30,7 @@ void main() {
   });
 
   test('that can fetch all episodes when error in network', () {
-    when(mockRepository.getEpisodes(any)).thenAnswer((_) => MockRadiocoRepository.episodes(isEmpty: true));
+    when(mockRepository.getEpisodes("episodes")).thenAnswer((_) => MockRadiocoRepository.episodes(isEmpty: true));
 
     invoker.execute(useCase.withParams(GetEpisodesUseCaseParams("myurl"))).listen(expectAsync1((result) {
       expect(result.status, equals(Status.fail));

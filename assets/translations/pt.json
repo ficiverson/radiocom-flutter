@@ -6,6 +6,7 @@
     "live_msg" : "Escoitar en directo",
     "recent_msg" : "Podcasts recentes",
     "now_msg" : "Agora soa",
+    "podcast_of_day_msg" : "Un novo podcast para descubrir cada día",
     "empty_podcast" : "Non hai podcasts recentes agora mesmo.",
     "news" : "Novas",
     "news_error" : "Non podemos cargar a novas agora mesmo.",

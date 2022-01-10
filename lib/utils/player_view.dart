@@ -1,6 +1,5 @@
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:injector/injector.dart';
 
@@ -11,16 +10,15 @@ typedef PalyerCallback(bool isPlaying);
 
 class PlayerView extends StatefulWidget {
   PlayerView(
-      {this.isMini,
-      this.isExpanded,
+      {required this.isMini, required this.isExpanded,
       this.onMultimediaClicked,
       this.onDetailClicked,
-      this.shouldShow,
+      required this.shouldShow,
       this.isAtBottom = false,
       this.isPlayingAudio = false});
 
-  final PalyerCallback onMultimediaClicked;
-  final VoidCallback onDetailClicked;
+  final PalyerCallback? onMultimediaClicked;
+  final VoidCallback? onDetailClicked;
   final bool isMini;
   final bool shouldShow;
   final bool isExpanded;
@@ -33,10 +31,10 @@ class PlayerView extends StatefulWidget {
 
 class PlayerViewState extends State<PlayerView> {
   bool showPlayButton = true;
-  RadiocomColorsConract _colors;
+  late RadiocomColorsConract _colors;
 
   _onMultimediaClicked() {
-    widget.onMultimediaClicked(showPlayButton);
+    widget.onMultimediaClicked!(showPlayButton);
     setState(() {
       showPlayButton = !showPlayButton;
     });
@@ -44,7 +42,7 @@ class PlayerViewState extends State<PlayerView> {
 
   _onDetailClicked() {
     if (widget.onDetailClicked != null) {
-      widget.onDetailClicked();
+      widget.onDetailClicked!();
     }
   }
 

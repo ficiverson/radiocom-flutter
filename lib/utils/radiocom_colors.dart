@@ -1,37 +1,37 @@
 import 'package:flutter/material.dart';
 
 abstract class RadiocomColorsConract {
-  Color transparent;
+  late Color transparent;
 
-  Color orange;
-  Color palidwhite;
-  Color palidwhitedark;
-  Color palidwhiteverydark;
-  Color reallypadilwhite;
-  Color white;
-  Color black;
+  late Color orange;
+  late Color palidwhite;
+  late Color palidwhitedark;
+  late Color palidwhiteverydark;
+  late Color reallypadilwhite;
+  late Color white;
+  late Color black;
 
-  Color blackgradient;
-  Color blackgradient65;
-  Color blackgradient30;
-  Color whitegradient;
-  Color palidwhitegradient;
+  late Color blackgradient;
+  late Color blackgradient65;
+  late Color blackgradient30;
+  late Color whitegradient;
+  late Color palidwhitegradient;
 
-  Color yellow;
+  late Color yellow;
 
-  Color fontH1;
-  Color font;
-  Color fontWhite;
-  Color fontGrey;
-  Color fontPurple;
+  late Color fontH1;
+  late Color font;
+  late Color fontWhite;
+  late Color fontGrey;
+  late Color fontPurple;
 
-  Color grey;
+  late Color grey;
 
-  Color darkGrey;
+  late Color darkGrey;
 
-  Color neuPalidGrey;
-  Color neuWhite;
-  Color neuBlackOpacity;
+  late Color neuPalidGrey;
+  late Color neuWhite;
+  late Color neuBlackOpacity;
 }
 
 class RadiocomColorsLight implements RadiocomColorsConract {

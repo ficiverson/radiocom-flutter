@@ -24,7 +24,7 @@ void main() {
   MockPodcastDetailRouter router = MockPodcastDetailRouter();
   MockConnection mockConnection = MockConnection();
   MockPlayer mockPlayer = MockPlayer();
-  DetailPodcastPresenter presenter;
+  late DetailPodcastPresenter presenter;
 
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -55,7 +55,6 @@ void main() {
     view.data.clear();
     router.viewState.clear();
     router.data.clear();
-    presenter = null;
   });
 
   test('that can init the presenter, then resume the view and realod the data',

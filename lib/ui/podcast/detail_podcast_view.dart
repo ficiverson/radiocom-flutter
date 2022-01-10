@@ -13,7 +13,6 @@ import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
 import 'package:cuacfm/utils/top_bar.dart';
 import 'package:cuacfm/utils/wave.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -22,7 +21,7 @@ import 'package:intl/intl.dart';
 import 'package:progress_indicators/progress_indicators.dart';
 
 class DetailPodcastPage extends StatefulWidget {
-  DetailPodcastPage({Key key, this.program}) : super(key: key);
+  DetailPodcastPage({Key? key, required this.program}) : super(key: key);
   final Program program;
 
   @override
@@ -32,22 +31,22 @@ class DetailPodcastPage extends StatefulWidget {
 class DetailPodcastState extends State<DetailPodcastPage>
     with TickerProviderStateMixin, WidgetsBindingObserver
     implements DetailPodcastView {
-  Program _program;
-  DetailPodcastPresenter _presenter;
-  Scaffold _scaffold;
+  late Program _program;
+  late DetailPodcastPresenter _presenter;
+  late Scaffold _scaffold;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  MediaQueryData queryData;
+  late MediaQueryData queryData;
   List<Episode> _episodes = [];
-  RadiocomColorsConract _colors;
+  late RadiocomColorsConract _colors;
   bool isLoadingEpisodes = true;
   bool isLoadingEpisode = false;
   bool emptyState = false;
   bool shouldShowPlayer = false;
   bool isContentUpdated = true;
-  EventChannel _notificationEvent =
+  EventChannel? _notificationEvent =
       EventChannel('cuacfm.flutter.io/updateNotificationPodcastDetail');
-  SnackBar snackBarConnection;
-  CuacLocalization _localization;
+  SnackBar? snackBarConnection;
+  late CuacLocalization _localization;
 
   DetailPodcastState() {
     DependencyInjector().injectByView(this);
@@ -107,7 +106,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
     _presenter.loadEpisodes(_program.rssUrl);
 
     if (Platform.isAndroid) {
-      _notificationEvent.receiveBroadcastStream().listen((onData) {
+      _notificationEvent?.receiveBroadcastStream().listen((onData) {
         if (_notificationEvent != null) {
           setState(() {
             _presenter.currentPlayer.release();
@@ -129,7 +128,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
       }
     };
 
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
   }
 
   @override
@@ -152,7 +151,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
   @override
   void dispose() {
     _notificationEvent = null;
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     Injector.appInstance.removeByKey<DetailPodcastView>();
     super.dispose();
   }
@@ -167,7 +166,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
       );
-      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection!);
     }
   }
 
@@ -244,8 +243,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
                               SafeMap.safe(
                                   _localization.translateMap("general"),
                                   ["minutes"]),
-                          widget.program.description == null ||
-                                  widget.program.description.isEmpty
+                          widget.program.description.isEmpty
                               ? SafeMap.safe(
                                   _localization.translateMap("podcast_detail"),
                                   ["empty_msg"])
@@ -279,9 +277,8 @@ class DetailPodcastState extends State<DetailPodcastPage>
                       child: Padding(
                           padding: EdgeInsets.all(3.0),
                           child: Container(
-                              color: _presenter.currentPlayer.isPlaying() &&
-                                      _presenter
-                                          .isSamePodcast(_episodes[index - 1])
+                              color: (_presenter.currentPlayer.isPlaying() &&
+                                  _presenter.isSamePodcast(_episodes[index - 1]))
                                   ? _colors.palidwhite
                                   : _colors.transparent,
                               child: ListTile(
@@ -347,8 +344,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
                         _presenter.onDetailEpisode(
                             _episodes[index - 1].title,
                             getFormattedDate(_episodes[index - 1].pubDate),
-                            _episodes[index - 1].description == null ||
-                                    _episodes[index - 1].description.isEmpty
+                            _episodes[index - 1].description.isEmpty
                                 ? SafeMap.safe(
                                     _localization
                                         .translateMap("podcast_detail"),

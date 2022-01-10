@@ -38,7 +38,7 @@ BoxDecoration neumorphicInverseBox(RadiocomColorsConract _colors) {
 class NeumorphicView extends StatelessWidget {
   final Widget child;
   final bool isFullScreen;
-  NeumorphicView({this.child, this.isFullScreen = false});
+  NeumorphicView({required this.child, this.isFullScreen = false});
   @override
   Widget build(BuildContext context) {
     RadiocomColorsConract _colors =
@@ -102,7 +102,7 @@ class NeumorphicButton extends StatelessWidget {
   final bool down;
   final IconData icon;
 
-  NeumorphicButton({this.down, this.icon});
+  NeumorphicButton({this.down = false, required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -122,15 +122,15 @@ class NeumorphicButton extends StatelessWidget {
 
 class NeumorphicCardVertical extends StatelessWidget {
   final bool active;
-  final IconData icon;
-  final String label;
-  final String image;
+  final IconData? icon;
+  final String? label;
+  final String? image;
   final bool imageOverLay;
-  final String subtitle;
+  final String? subtitle;
   final bool removeShader;
 
   NeumorphicCardVertical(
-      {this.active,
+      {required this.active,
       this.icon,
       this.label,
       this.image,
@@ -162,7 +162,7 @@ class NeumorphicCardVertical extends StatelessWidget {
                     resPath: image, fit: BoxFit.fitHeight, radius: 15.0)),
         Center(
             child: Text(
-          label,
+          label ?? "",
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.center,
@@ -184,7 +184,7 @@ class NeumorphicCardVertical extends StatelessWidget {
     if (!imageOverLay) {
       elements.add(SizedBox(width: 15, height: 10.0));
       elements.add(Text(
-        label,
+        label ?? "",
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.left,
@@ -192,7 +192,7 @@ class NeumorphicCardVertical extends StatelessWidget {
             color: _colors.font, fontWeight: FontWeight.w700, fontSize: 15),
       ));
       elements.add(Text(
-        subtitle,
+        subtitle ?? "",
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.left,
@@ -213,14 +213,14 @@ class NeumorphicCardVertical extends StatelessWidget {
 
 class NeumorphicCardHorizontal extends StatelessWidget {
   final bool active;
-  final IconData icon;
-  final String label;
-  final String image;
-  final double size;
-  final VoidCallback onElementClicked;
+  final IconData? icon;
+  final String? label;
+  final String? image;
+  final double? size;
+  final VoidCallback? onElementClicked;
   final int showUpDownRight;
   NeumorphicCardHorizontal(
-      {this.active,
+      {required this.active,
       this.icon,
       this.label,
       this.image,
@@ -230,7 +230,7 @@ class NeumorphicCardHorizontal extends StatelessWidget {
 
   _onElementClicked() {
     if (onElementClicked != null) {
-      onElementClicked();
+      onElementClicked!();
     }
   }
 
@@ -257,7 +257,12 @@ class NeumorphicCardHorizontal extends StatelessWidget {
             children: <Widget>[
               iconCard,
               SizedBox(width: 15),
-              Text(label.length > 25 ? label.substring(0, 25) + "..." : label,
+              Text(
+                  label == null
+                      ? ""
+                      : label!.length > 25
+                          ? label!.substring(0, 25) + "..."
+                          : label!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.left,

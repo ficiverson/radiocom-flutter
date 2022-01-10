@@ -26,7 +26,7 @@ void main() {
   MockConnection mockConnection = MockConnection();
   MockNotifcationSubscription notifcationSubscription = MockNotifcationSubscription();
   MockPlayer mockPlayer = MockPlayer();
-  SettingsPresenter presenter;
+  late SettingsPresenter presenter;
 
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -62,7 +62,6 @@ void main() {
     view.data.clear();
     router.viewState.clear();
     router.data.clear();
-    presenter = null;
   });
 
   test('that can init the presenter', () async {

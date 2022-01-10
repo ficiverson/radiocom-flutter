@@ -18,7 +18,7 @@ void main() {
   MockPodcastControlsView view = MockPodcastControlsView();
   MockConnection mockConnection = MockConnection();
   MockPlayer mockPlayer = MockPlayer();
-  PodcastControlsPresenter presenter;
+  late PodcastControlsPresenter presenter;
 
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -45,7 +45,6 @@ void main() {
   tearDown(() async {
     view.viewState.clear();
     view.data.clear();
-    presenter = null;
   });
 
   test('that can init the presenter, then resume the view and realod the data',
@@ -257,7 +256,7 @@ void main() {
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.getPlaybackRate()).thenReturn(2.5);
-        when(mockPlayer.setPlaybackRate(any)).thenReturn({
+        when(mockPlayer.setPlaybackRate(2.0)).thenReturn({
           2.5
         });
 

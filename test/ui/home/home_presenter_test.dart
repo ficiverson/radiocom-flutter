@@ -29,7 +29,7 @@ void main() {
   MockHomeRouter router = MockHomeRouter();
   MockConnection mockConnection = MockConnection();
   MockPlayer mockPlayer = MockPlayer();
-  HomePresenter presenter;
+  late HomePresenter presenter;
 
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -62,7 +62,6 @@ void main() {
     view.data.clear();
     router.viewState.clear();
     router.data.clear();
-    presenter = null;
   });
 
   test('that can init the presenter and load all data',
@@ -216,7 +215,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(any as String, any as String)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.isPodcast).thenReturn(true);

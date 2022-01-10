@@ -5,6 +5,7 @@
     "welcome_msg_3" : "Good evening",
     "live_msg" : "Live broadcast",
     "recent_msg" : "Recent Podcasts",
+    "podcast_of_day_msg" : "Every day a new podcast to discover",
     "now_msg" : "Now",
     "empty_podcast" : "There is no podcast at this moment.",
     "news" : "News",

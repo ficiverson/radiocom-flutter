@@ -18,10 +18,10 @@ import '../instrument/model/radio_station_instrument.dart';
 import '../instrument/remote-data-source/radioco_api_mock.dart';
 
 void main() {
-  RadiocoRemoteDataSource remoteDataSource;
-  MockWebServer server;
+  late RadiocoRemoteDataSource remoteDataSource;
+  late MockWebServer server;
   RadiocoAPIMock mockRaiodocApi = RadiocoAPIMock();
-  String mockUrl;
+  late String mockUrl;
 
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -68,19 +68,19 @@ void main() {
 
   test('that can parse a response for current program data', () async {
     server.enqueue(body: Helper.readFile("test_mocks/get_live_transmission.json"));
-    Now result = await remoteDataSource.getLiveBroadcast();
-    expect(result.name, equals("Radioactiva"));
+    Now? result = await remoteDataSource.getLiveBroadcast();
+    expect(result?.name, equals("Radioactiva"));
   });
 
   test('that can handle get current program data internal server error', () async {
     server.enqueue(body: "", httpCode: 500);
-    Now result = await remoteDataSource.getLiveBroadcast();
+    Now? result = await remoteDataSource.getLiveBroadcast();
     expect(result, equals(null));
   });
 
   test('that can handle current program not found error', () async {
     server.enqueue(body: "", httpCode: 401);
-    Now result = await remoteDataSource.getLiveBroadcast();
+    Now? result = await remoteDataSource.getLiveBroadcast();
     expect(result, equals(null));
   });
 

@@ -4,6 +4,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/now.dart';
+import 'package:cuacfm/models/radiostation.dart';
 import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
 
@@ -12,9 +13,9 @@ typedef void ConnectionCallback(bool isError);
 enum AudioPlayerState { play, stop, pause }
 
 abstract class CurrentPlayerContract {
-  Now now;
-  Episode episode;
-  Episode tempEpisode;
+  Now? now;
+  Episode? episode;
+  Episode? tempEpisode;
   AudioPlayerState playerState = AudioPlayerState.stop;
   AudioPlayer audioPlayer = Injector.appInstance.get<AudioPlayer>();
   String currentSong = ":";
@@ -27,10 +28,10 @@ abstract class CurrentPlayerContract {
   Duration restorePosition = Duration(seconds: 0);
   double volume = 1.0;
   double playbackRate = 1.0;
-  VoidCallback onUpdate;
-  ConnectionCallback onConnection;
-  ConnectionCallback podcastConnectivityResult;
-  ConnectivityResult connectivityResult;
+  VoidCallback? onUpdate;
+  ConnectionCallback? onConnection;
+  ConnectionCallback? podcastConnectivityResult;
+  ConnectivityResult? connectivityResult;
 
   void restorePlayer(ConnectivityResult connection);
   Future<bool> seek(Duration position);
@@ -50,11 +51,11 @@ abstract class CurrentPlayerContract {
 
 class CurrentPlayer implements CurrentPlayerContract {
   @override
-  Now now;
+  Now? now;
   @override
-  Episode episode;
+  Episode? episode;
   @override
-  Episode tempEpisode;
+  Episode? tempEpisode;
   @override
   AudioPlayerState playerState = AudioPlayerState.stop;
   @override
@@ -79,13 +80,13 @@ class CurrentPlayer implements CurrentPlayerContract {
   @override
   double playbackRate = 1.0;
   @override
-  VoidCallback onUpdate;
+  VoidCallback? onUpdate;
   @override
-  ConnectionCallback onConnection;
+  ConnectionCallback? onConnection;
   @override
-  ConnectionCallback podcastConnectivityResult;
+  ConnectionCallback? podcastConnectivityResult;
   @override
-  ConnectivityResult connectivityResult;
+  ConnectivityResult? connectivityResult;
 
   @override
   void restorePlayer(ConnectivityResult connection) async {
@@ -99,10 +100,10 @@ class CurrentPlayer implements CurrentPlayerContract {
         stop();
         play();
         if (onConnection != null) {
-          onConnection(false);
+          onConnection!(false);
         }
         if (podcastConnectivityResult != null) {
-          podcastConnectivityResult(false);
+          podcastConnectivityResult!(false);
         }
       } else if (connection == ConnectivityResult.none) {
         if (Platform.isIOS) {
@@ -112,10 +113,10 @@ class CurrentPlayer implements CurrentPlayerContract {
         release();
 
         if (onConnection != null) {
-          onConnection(true);
+          onConnection!(true);
         }
         if (podcastConnectivityResult != null) {
-          podcastConnectivityResult(true);
+          podcastConnectivityResult!(true);
         }
       }
     }
@@ -162,7 +163,7 @@ class CurrentPlayer implements CurrentPlayerContract {
           restorePosition = Duration(seconds: 0);
           seek(position);
           if (onUpdate != null) {
-            onUpdate();
+            onUpdate!();
           }
         });
 
@@ -170,43 +171,41 @@ class CurrentPlayer implements CurrentPlayerContract {
           print(d);
           duration = d;
           if (onUpdate != null) {
-            onUpdate();
+            onUpdate!();
           }
         });
       }
-        audioPlayer.onAudioPositionChanged.listen((Duration p) {
-          if(isPodcast) {
-            if (p.inSeconds.ceilToDouble() >= 0.0 &&
-                p.inSeconds.ceilToDouble() <=
-                    duration.inSeconds.ceilToDouble()) {
-              position = p;
-              if (onUpdate != null) {
-                onUpdate();
-              }
-              if (Platform.isIOS) {
-                audioPlayer.notificationService.setNotification(
-                    title: currentSong,
-                    imageUrl: currentImage,
-                    artist: "CUAC FM",
-                    albumTitle: "Podcast",
-                    forwardSkipInterval: const Duration(seconds: 30),
-                    backwardSkipInterval: const Duration(seconds: 30),
-                    duration: duration,
-                    elapsedTime: position);
-              }
-            }
-          } else {
+      audioPlayer.onAudioPositionChanged.listen((Duration p) {
+        if (isPodcast) {
+          if (p.inSeconds.ceilToDouble() >= 0.0 &&
+              p.inSeconds.ceilToDouble() <= duration.inSeconds.ceilToDouble()) {
             position = p;
+            if (onUpdate != null) {
+              onUpdate!();
+            }
             if (Platform.isIOS) {
               audioPlayer.notificationService.setNotification(
                   title: currentSong,
                   imageUrl: currentImage,
-                  albumTitle: "Live",
-                  artist: "CUAC FM");
+                  artist: "CUAC FM",
+                  albumTitle: "Podcast",
+                  forwardSkipInterval: const Duration(seconds: 30),
+                  backwardSkipInterval: const Duration(seconds: 30),
+                  duration: duration,
+                  elapsedTime: position);
             }
           }
-        });
-
+        } else {
+          position = p;
+          if (Platform.isIOS) {
+            audioPlayer.notificationService.setNotification(
+                title: currentSong,
+                imageUrl: currentImage,
+                albumTitle: "Live",
+                artist: "CUAC FM");
+          }
+        }
+      });
 
       if (Platform.isIOS) {
         audioPlayer.onNotificationPlayerStateChanged.listen((state) {
@@ -216,7 +215,7 @@ class CurrentPlayer implements CurrentPlayerContract {
             playerState = AudioPlayerState.pause;
           }
           if (onUpdate != null) {
-            onUpdate();
+            onUpdate!();
           }
         });
       }
@@ -225,16 +224,18 @@ class CurrentPlayer implements CurrentPlayerContract {
         print(onError);
       });
       setVolume(1.0);
-      if ((isPodcast && episode.audio != null && episode.audio.isNotEmpty) ||
+      if ((isPodcast && episode?.audio != null && episode!.audio.isNotEmpty) ||
           (!isPodcast &&
-              now.streamUrl() != null &&
-              now.streamUrl().isNotEmpty)) {
-        if(!isPodcast){
-          playbackRate =1.0;
-          audioPlayer.setPlaybackRate(playbackRate: playbackRate);
+              now?.streamUrl() != null &&
+              now!.streamUrl().isNotEmpty)) {
+        if (!isPodcast) {
+          playbackRate = 1.0;
+          audioPlayer.setPlaybackRate(playbackRate);
         }
         final result = await audioPlayer.play(
-            isPodcast ? episode.audio : now.streamUrl(),
+            isPodcast
+                ? episode?.audio ?? RadioStation.base().streamUrl
+                : now?.streamUrl() ?? RadioStation.base().streamUrl,
             isLocal: false,
             respectSilence: false);
         if (result == 1) playerState = AudioPlayerState.play;
@@ -268,10 +269,11 @@ class CurrentPlayer implements CurrentPlayerContract {
 
   @override
   Future<bool> stopAndPlay() async {
-    if (playerState == AudioPlayerState.play || playerState == AudioPlayerState.pause) {
-      if(!isPodcast){
-        playbackRate =1.0;
-        audioPlayer.setPlaybackRate(playbackRate: playbackRate);
+    if (playerState == AudioPlayerState.play ||
+        playerState == AudioPlayerState.pause) {
+      if (!isPodcast) {
+        playbackRate = 1.0;
+        audioPlayer.setPlaybackRate(playbackRate);
       }
       final result = await audioPlayer.pause();
       if (result == 1) playerState = AudioPlayerState.pause;
@@ -281,7 +283,9 @@ class CurrentPlayer implements CurrentPlayerContract {
         setVolume(1.0);
       }
       final playResult = await audioPlayer.play(
-          isPodcast ? episode.audio : now.streamUrl(),
+          isPodcast
+              ? episode?.audio ?? RadioStation.base().streamUrl
+              : now?.streamUrl() ?? RadioStation.base().streamUrl,
           isLocal: false,
           respectSilence: false);
       if (playResult == 1) playerState = AudioPlayerState.play;
@@ -301,7 +305,8 @@ class CurrentPlayer implements CurrentPlayerContract {
 
   @override
   void stop() async {
-    if (playerState == AudioPlayerState.play || playerState == AudioPlayerState.pause) {
+    if (playerState == AudioPlayerState.play ||
+        playerState == AudioPlayerState.pause) {
       playerState = AudioPlayerState.stop;
       if (isPodcast) {
         tempEpisode = episode;
@@ -369,6 +374,6 @@ class CurrentPlayer implements CurrentPlayerContract {
   @override
   void setPlaybackRate(double playbackRate) {
     this.playbackRate = playbackRate;
-    audioPlayer.setPlaybackRate(playbackRate: playbackRate);
+    audioPlayer.setPlaybackRate(playbackRate);
   }
 }

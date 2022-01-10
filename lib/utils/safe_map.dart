@@ -22,7 +22,7 @@ class SafeMap {
         }
       });
       return result;
-    } catch (Exception) {
+    } catch (exception) {
       return "";
     }
   }

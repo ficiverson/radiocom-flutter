@@ -8,7 +8,7 @@ import 'package:mockito/mockito.dart';
 import '../instrument/data/repository_mock.dart';
 
 void main() {
-  GetLiveProgramUseCase useCase;
+  late GetLiveProgramUseCase useCase;
   MockRadiocoRepository mockRepository = MockRadiocoRepository();
   Invoker invoker = Invoker();
 

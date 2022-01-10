@@ -102,12 +102,12 @@ String getMonthOfYear(DateTime date){
 }
 
 class Episode {
-  String title;
-  String link;
-  String description;
-  String audio;
-  DateTime pubDate;
-  String duration;
+  late String title;
+  late String link;
+  late String description;
+  late String audio;
+  late DateTime pubDate;
+  late String duration;
 
   Episode.fromInstance(Map<String, dynamic> map)
       :
@@ -118,7 +118,7 @@ class Episode {
         duration = map.containsKey("itunes\$duration")
   ? getDuration(map["itunes\$duration"]["\$t"])
       : "__",
-        description = map["description"]["\$t"];
+        description = map["description"]["\$t"] ?? "";
 
   static DateTime getDate(String content) {
     return DateFormat("EEE, dd MMM yyyy hh:mm:ss zzzz")
@@ -130,7 +130,7 @@ class Episode {
       DateFormat format = new DateFormat("hh:mm:ss");
       var parsed = format.parse(duration);
       return (parsed.minute * 60 ).toString() + " mins.";
-    } catch (Exception) {
+    } catch (exception) {
       return "__";
     }
   }

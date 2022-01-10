@@ -264,7 +264,7 @@ void main() {
 
     await tester
         .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.NONE)));
-    mockPlayer.onConnection(true);
+    mockPlayer.onConnection!(true);
     await tester.pumpAndSettle();
 
     expect(

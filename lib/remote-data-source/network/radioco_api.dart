@@ -1,12 +1,12 @@
 abstract class RadiocoAPIContract {
-  String baseUrl;
-  String radioStation;
-  String podcast;
-  String timetable;
-  String timetableAfter;
-  String timetableBefore;
-  String live;
-  String feedUrl;
+  String baseUrl = "";
+  String radioStation = "";
+  String podcast = "";
+  String timetable = "";
+  String timetableAfter = "";
+  String timetableBefore = "";
+  String live = "";
+  String feedUrl = "";
 }
 
 class RadiocoAPI implements RadiocoAPIContract {

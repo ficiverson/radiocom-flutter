@@ -9,12 +9,11 @@ import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_html/style.dart';
 import 'package:injector/injector.dart';
 import 'new_detail_presenter.dart';
 
 class NewDetail extends StatefulWidget {
-  NewDetail({Key key, this.newItem}) : super(key: key);
+  NewDetail({Key? key, required this.newItem}) : super(key: key);
   final New newItem;
   @override
   State createState() => new NewDetailState();
@@ -23,15 +22,15 @@ class NewDetail extends StatefulWidget {
 class NewDetailState extends State<NewDetail>
     with WidgetsBindingObserver
     implements NewDetailView {
-  MediaQueryData _queryData;
+  late MediaQueryData _queryData;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
-  NewDetailPresenter _presenter;
-  RadiocomColorsConract _colors;
+  late NewDetailPresenter _presenter;
+  late RadiocomColorsConract _colors;
   bool shouldShowPlayer = false;
   bool isContentUpdated = true;
-  EventChannel _notificationEvent =
+  EventChannel? _notificationEvent =
       EventChannel('cuacfm.flutter.io/updateNotificationNewDetail');
-  SnackBar snackBarConnection;
+  SnackBar? snackBarConnection;
 
   NewDetailState() {
     DependencyInjector().injectByView(this);
@@ -86,7 +85,7 @@ class NewDetailState extends State<NewDetail>
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
 
     if (Platform.isAndroid) {
-      _notificationEvent.receiveBroadcastStream().listen((onData) {
+      _notificationEvent?.receiveBroadcastStream().listen((onData) {
         if (_notificationEvent != null) {
           setState(() {
             _presenter.currentPlayer.release();
@@ -108,7 +107,7 @@ class NewDetailState extends State<NewDetail>
       }
     };
 
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
   }
 
   @override
@@ -131,7 +130,7 @@ class NewDetailState extends State<NewDetail>
   @override
   void dispose() {
     _notificationEvent = null;
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     Injector.appInstance.removeByKey<NewDetailView>();
     super.dispose();
   }
@@ -145,7 +144,7 @@ class NewDetailState extends State<NewDetail>
         duration: Duration(seconds: 3),
         content: Text("No dispones de conexión a internet"),
       );
-      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection!);
     }
   }
 

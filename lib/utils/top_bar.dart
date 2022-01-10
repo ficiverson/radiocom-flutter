@@ -22,14 +22,14 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
       this.onQueryCallback,
       this.onQuerySubmit});
 
-  final String title;
+  final String? title;
   final TopBarOption topBarOption;
-  final IconData rightIcon;
-  final VoidCallback onRightClicked;
+  final IconData? rightIcon;
+  final VoidCallback? onRightClicked;
   final bool isSearch;
-  final QueryCallback onQueryCallback;
-  final QueryCallback onQuerySubmit;
-  final String screenName;
+  final QueryCallback? onQueryCallback;
+  final QueryCallback? onQuerySubmit;
+  final String? screenName;
 
   @override
   State<StatefulWidget> createState() => TopBarState();
@@ -39,27 +39,27 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class TopBarState extends State<TopBar> {
-  MediaQueryData queryData;
-  String currentQuery;
-  RadiocomColorsConract _colors;
+  late MediaQueryData queryData;
+  String currentQuery = "";
+  late RadiocomColorsConract _colors;
   final TextEditingController _searchQuery = new TextEditingController();
-  String screenName;
+  String? screenName;
 
   _onRightClicked() {
     if (widget.onRightClicked != null) {
-      widget.onRightClicked();
+      widget.onRightClicked!();
     }
   }
 
   _onQueryCallback() {
     if (widget.onQueryCallback != null) {
-      widget.onQueryCallback(currentQuery);
+      widget.onQueryCallback!(currentQuery);
     }
   }
 
   _onQuerySubmit() {
     if (widget.onQuerySubmit != null) {
-      widget.onQuerySubmit(currentQuery);
+      widget.onQuerySubmit!(currentQuery);
     }
   }
 
@@ -69,7 +69,7 @@ class TopBarState extends State<TopBar> {
     queryData = MediaQuery.of(context);
     return Container(
         width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).padding.top + 60,
+        height: 90,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.only(
                 bottomRight: Radius.circular(25.0),
@@ -123,13 +123,14 @@ class TopBarState extends State<TopBar> {
                             {"currentScreen": screenName, "close": true});
                       }
                       if (widget.isSearch) {
-                        if (currentQuery == null || currentQuery.isEmpty) {
+                        if (currentQuery.isEmpty) {
                           if (Navigator.of(context).canPop()) {
                             Navigator.of(context).pop();
                           }
                         }
                         _searchQuery.clear();
                         currentQuery = "";
+                        _onQueryCallback();
                       } else {
                         Navigator.of(context).pop();
                       }
@@ -139,7 +140,7 @@ class TopBarState extends State<TopBar> {
                       ? buildSearchBarPodcast()
                       : Center(
                           child: Text(
-                          widget.title,
+                          widget.title ?? "",
                           style: TextStyle(
                               letterSpacing: 1.5,
                               fontSize: 20,
@@ -174,7 +175,7 @@ class TopBarState extends State<TopBar> {
           key: Key("top_bar_search_input"),
           maxLines: 1,
           style: TextStyle(
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               letterSpacing: 1.1,
               color: _colors.font),
           onSubmitted: (queryText) {
@@ -189,6 +190,14 @@ class TopBarState extends State<TopBar> {
           autofocus: true,
           autocorrect: false,
           decoration: InputDecoration(
+            contentPadding: EdgeInsets.all(10),
+            suffixIcon: Icon(Icons.search),
+            fillColor: _colors.neuWhite,
+            filled: true,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+              borderSide: BorderSide.none,
+            ),
             hintText:  SafeMap.safe(
                 Injector.appInstance.get<CuacLocalization>().translateMap("all_podcast"), ["search"]),
           ),
