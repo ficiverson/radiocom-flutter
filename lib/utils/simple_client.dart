@@ -20,7 +20,7 @@ class SimpleRequest {
   final Map<String, String> headers = new Map<String, String>();
 
   SimpleRequest(this.method, this.url,
-      {this.body, Map<String, String> headers}) {
+      {this.body, Map<String, String>? headers}) {
     if (headers != null) {
       this.headers.addAll(headers);
     }
@@ -44,7 +44,7 @@ class SimpleClient {
     }
   }
 
-  Future<dynamic> get(Uri url, {Map<String, String> headers, responseType = HTTPResponseType.JSON}) {
+  Future<dynamic> get(Uri url, {Map<String, String>? headers, responseType = HTTPResponseType.JSON}) {
     return sendRequest(
         new SimpleRequest(
             HTTPMethod.GET,
@@ -55,7 +55,7 @@ class SimpleClient {
     );
   }
 
-  Future<dynamic> post(Uri url, { dynamic body, Map<String, String> headers,responseType = HTTPResponseType.JSON}) {
+  Future<dynamic> post(Uri url, { dynamic body, Map<String, String>? headers,responseType = HTTPResponseType.JSON}) {
     return sendRequest(
         new SimpleRequest(
           HTTPMethod.POST,
@@ -107,7 +107,7 @@ class SimpleClient {
       if (responseType == HTTPResponseType.JSON) {
         //decode due to a radioco problem with utf8 encoding
         var encoding = Encoding.getByName("utf-8");
-        String responseUTF8 = encoding.decode(response.bodyBytes);
+        String responseUTF8 = encoding?.decode(response.bodyBytes) ?? "";
 
         respBody = json.decode(responseUTF8);
       } else if (responseType == HTTPResponseType.XML) {

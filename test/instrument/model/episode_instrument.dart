@@ -1,7 +1,7 @@
 import 'package:cuacfm/models/episode.dart';
 
 class EpisodeInstrument {
-  static Episode givenAnEpisode({String audioUrl}) {
+  static Episode givenAnEpisode({String? audioUrl}) {
     return Episode.fromInstance({
       "title": {"\$t": "title"},
       "link": {"\$t": "http://social"},

@@ -5,10 +5,12 @@ import 'package:cuacfm/domain/result/result.dart';
 import 'package:cuacfm/domain/usecase/get_all_podcast_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_live_program_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_news_use_case.dart';
+import 'package:cuacfm/domain/usecase/get_outstanding_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_station_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_timetable_use_case.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
+import 'package:cuacfm/models/outstanding.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
@@ -16,10 +18,10 @@ import 'package:cuacfm/models/time_table.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/player/current_timer.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:injector/injector.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'home_router.dart';
 
@@ -48,6 +50,9 @@ abstract class HomeView {
   void onNotifyUser(StatusPlayer status);
 
   void onDarkModeStatus(bool status);
+
+  void onLoadOutstanding(Outstanding outstanding);
+  void onLoadOutstandingError(dynamic error);
 }
 
 enum StatusPlayer { PLAYING, FAILED, STOP }
@@ -60,24 +65,27 @@ class HomePresenter {
   GetLiveProgramUseCase getLiveDataUseCase;
   GetTimetableUseCase getTimetableUseCase;
   GetNewsUseCase getNewsUseCase;
+  GetOutstandingUseCase getOutstandingUseCase;
   HomeRouterContract router;
-  ConnectionContract connection;
-  CurrentPlayerContract currentPlayer;
-  CurrentTimerContract currentTimer;
-  Timer _timer;
+  late ConnectionContract connection;
+  late CurrentPlayerContract currentPlayer;
+  late CurrentTimerContract currentTimer;
+  Timer? _timer;
   bool isLoading = false;
 
   HomePresenter(this._homeView,
-      {@required this.invoker,
-      @required this.router,
-      @required this.getAllPodcastUseCase,
-      @required this.getStationUseCase,
-      @required this.getLiveDataUseCase,
-      @required this.getTimetableUseCase,
-      @required this.getNewsUseCase}) {
+      {required this.invoker,
+      required this.router,
+      required this.getAllPodcastUseCase,
+      required this.getStationUseCase,
+      required this.getLiveDataUseCase,
+      required this.getTimetableUseCase,
+      required this.getNewsUseCase,
+      required this.getOutstandingUseCase}) {
     currentTimer = Injector.appInstance.get<CurrentTimerContract>();
     connection = Injector.appInstance.get<ConnectionContract>();
     currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
+
   }
 
   init() async {
@@ -93,6 +101,7 @@ class HomePresenter {
       _homeView.onNewsError("connectionerror");
       _homeView.onPodcastError("connectionerror");
       _homeView.onTimetableError("connectionerror");
+      _homeView.onLoadOutstandingError("connectionerror");
     }
   }
 
@@ -127,8 +136,19 @@ class HomePresenter {
     router.goToPodcastDetail(podcast);
   }
 
-  onPodcastControlsClicked(Episode episode) {
-    router.goToPodcastControls(episode);
+  onOutstandingClicked(Outstanding outstanding) {
+    if(outstanding.isJoinForm){
+      _launchURL(outstanding.description);
+    } else {
+      New itemNew = New.fromOutstanding(outstanding);
+      router.goToNewDetail(itemNew);
+    }
+  }
+
+  onPodcastControlsClicked(Episode? episode) {
+    if(episode != null) {
+      router.goToPodcastControls(episode);
+    }
   }
 
   onLiveSelected(Now now) async {
@@ -166,6 +186,14 @@ class HomePresenter {
 
   //private methods
 
+  _launchURL(String url, {bool universalLink = true}) async {
+    if (await canLaunch(url)) {
+      await launch(url, universalLinksOnly: universalLink);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   _getDarkModeStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var result =  prefs.getBool('dark_mode_enabled');
@@ -182,19 +210,19 @@ class HomePresenter {
       _homeView.onNotifyUser(StatusPlayer.FAILED);
     } else {
       if (_timer != null) {
-        _timer.cancel();
+        _timer?.cancel();
       }
       _timer = new Timer.periodic(new Duration(milliseconds: 100), (timer) {
         if (currentPlayer.isStreamingAudio()) {
           isLoading = false;
           _homeView.onNotifyUser(StatusPlayer.PLAYING);
-          _timer.cancel();
+          _timer?.cancel();
           _timer = null;
         } else if (timer.tick > 300) {
           currentPlayer.stop();
           isLoading = false;
           _homeView.onNotifyUser(StatusPlayer.FAILED);
-          _timer.cancel();
+          _timer?.cancel();
           _timer = null;
         }
       });
@@ -211,19 +239,19 @@ class HomePresenter {
       _homeView.onNotifyUser(StatusPlayer.FAILED);
     } else {
       if (_timer != null) {
-        _timer.cancel();
+        _timer?.cancel();
       }
       _timer = new Timer.periodic(new Duration(milliseconds: 100), (timer) {
         if (currentPlayer.isStreamingAudio()) {
           isLoading = false;
           _homeView.onNotifyUser(StatusPlayer.PLAYING);
-          _timer.cancel();
+          _timer?.cancel();
           _timer = null;
         } else if (timer.tick > 300) {
           currentPlayer.stop();
           isLoading = false;
           _homeView.onNotifyUser(StatusPlayer.FAILED);
-          _timer.cancel();
+          _timer?.cancel();
           _timer = null;
         }
       });
@@ -277,6 +305,18 @@ class HomePresenter {
         _homeView.onLiveDataError((result as Error).status);
       }
       _getRecentPodcast(refreshAll);
+
+    });
+  }
+
+  _getOutstanding() {
+    invoker.execute(getOutstandingUseCase).listen((result) {
+      if (result is Success) {
+        _homeView.onLoadOutstanding(result.data);
+      } else {
+        _homeView.onLoadOutstandingError((result as Error).status);
+      }
+      _getTimetable();
     });
   }
 
@@ -313,7 +353,7 @@ class HomePresenter {
         _homeView.onLoadRecentsError((result as Error).status);
       }
       if(refreshAll) {
-        _getTimetable();
+        _getOutstanding();
       }
     });
   }

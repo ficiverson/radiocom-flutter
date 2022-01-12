@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/now.dart';
+import 'package:cuacfm/models/outstanding.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/models/time_table.dart';
@@ -32,7 +33,9 @@ enum HomeState {
   goToEpisode,
   goToPodcast,
   goToSettings,
-  goToTimeTable
+  goToTimeTable,
+  onOutstanding,
+  onOutstandingError
 }
 
 class MockHomeView implements HomeView {
@@ -136,6 +139,18 @@ class MockHomeView implements HomeView {
     viewState.add(HomeState.onDarkMode);
     data.add(status);
   }
+
+  @override
+  void onLoadOutstanding(Outstanding outstanding) {
+    viewState.add(HomeState.onOutstanding);
+    data.add(outstanding);
+  }
+
+  @override
+  void onLoadOutstandingError(error) {
+    viewState.add(HomeState.onOutstandingError);
+    data.add(error);
+  }
 }
 
 class MockHomeRouter implements HomeRouterContract {
@@ -143,7 +158,7 @@ class MockHomeRouter implements HomeRouterContract {
   List<dynamic> data = [];
 
   @override
-  goToAllPodcast(List<Program> podcasts, {String category}) {
+  goToAllPodcast(List<Program> podcasts, {String? category}) {
     viewState.add(HomeState.goToAllPodcast);
     data.add(category!=null?category:podcasts);
   }

@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/translations/localizations.dart';
@@ -7,13 +6,11 @@ import 'package:cuacfm/ui/home/home_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as Foundation;
-import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -24,20 +21,14 @@ void main() async {
   DependencyInjector().loadModules();
   await Firebase.initializeApp();
   await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-  Function originalOnError = FlutterError.onError;
-  FlutterError.onError = (FlutterErrorDetails errorDetails) async {
-    await FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
-    originalOnError(errorDetails);
-  };
-  runZonedGuarded(() {
-    runApp(MyApp());
-  }, FirebaseCrashlytics.instance.recordError);
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   static FirebaseInAppMessaging firebaseInAppMessaging =
-      FirebaseInAppMessaging();
+      FirebaseInAppMessaging.instance;
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -58,7 +49,7 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate
       ],
       localeResolutionCallback:
-          (Locale locale, Iterable<Locale> supportedLocales) {
+          (Locale? locale, Iterable<Locale> supportedLocales) {
         if (locale != null) {
           for (Locale supportedLocale in supportedLocales) {
             if (supportedLocale.languageCode == locale.languageCode &&
@@ -76,10 +67,10 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         canvasColor: Colors.transparent,
         primarySwatch: Colors.grey,
-        primaryColorBrightness: Brightness.light,
+        brightness: Brightness.light
       ),
       darkTheme: ThemeData(
-        primaryColorBrightness: Brightness.dark,
+        brightness: Brightness.dark,
         canvasColor: Colors.black,
         primarySwatch: Colors.blue,
       ),
@@ -98,8 +89,7 @@ Widget errorScreen(dynamic detailsException) {
             Text(SafeMap.safe(_localization.translateMap('error'), ["title"])),
       ),
       body: Container(
-          color:
-              Injector.appInstance.get<RadiocomColorsConract>().white,
+          color: Injector.appInstance.get<RadiocomColorsConract>().white,
           child: Padding(
             padding: EdgeInsets.all(20.0),
             child: Foundation.kReleaseMode

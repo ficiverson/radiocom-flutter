@@ -1,6 +1,6 @@
 class IntroItem {
   IntroItem({
-    this.imageUrl,
+    required this.imageUrl,
   });
 
   final String imageUrl;

@@ -16,7 +16,7 @@ import 'package:injector/injector.dart';
 import 'settings_presenter.dart';
 
 class Settings extends StatefulWidget {
-  Settings({Key key}) : super(key: key);
+  Settings({Key? key}) : super(key: key);
   @override
   State createState() => new SettingsState();
 }
@@ -24,19 +24,19 @@ class Settings extends StatefulWidget {
 class SettingsState extends State<Settings>
     with WidgetsBindingObserver
     implements SettingsView {
-  MediaQueryData _queryData;
+  late MediaQueryData _queryData;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
-  SettingsPresenter _presenter;
-  RadioStation _radioStation;
-  RadiocomColorsConract _colors;
+  late SettingsPresenter _presenter;
+  late RadioStation _radioStation;
+  late RadiocomColorsConract _colors;
   bool shouldShowPlayer = false;
   bool isContentUpdated = true;
-  EventChannel _notificationEvent =
+  EventChannel? _notificationEvent =
       EventChannel('cuacfm.flutter.io/updateNotification');
-  SnackBar snackBarConnection;
+  SnackBar? snackBarConnection;
   bool isDarkModeEnabled = false;
   bool isLiveNotificationEnabled = false;
-  CuacLocalization _localization;
+  late CuacLocalization _localization;
 
   SettingsState() {
     DependencyInjector().injectByView(this);
@@ -52,7 +52,13 @@ class SettingsState extends State<Settings>
             title: "Menu", topBarOption: TopBarOption.NORMAL),
         backgroundColor: _colors.palidwhite,
         body: _getBodyLayout(),
-        bottomNavigationBar: Container(height: Platform.isAndroid? 0 : shouldShowPlayer? 60 : 0,color: _colors.palidwhite),
+        bottomNavigationBar: Container(
+            height: Platform.isAndroid
+                ? 0
+                : shouldShowPlayer
+                    ? 60
+                    : 0,
+            color: _colors.palidwhite),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: PlayerView(
             isMini: false,
@@ -61,8 +67,7 @@ class SettingsState extends State<Settings>
             isPlayingAudio: _presenter.currentPlayer.isPlaying(),
             isExpanded: true,
             onDetailClicked: () {
-              _presenter
-                  .onPodcastControlsClicked(_presenter.currentPlayer.episode);
+              _presenter.onPodcastControlsClicked(_presenter.currentPlayer.episode);
             },
             onMultimediaClicked: (isPlaying) {
               if (!mounted) return;
@@ -90,7 +95,7 @@ class SettingsState extends State<Settings>
     _radioStation = Injector.appInstance.get<RadioStation>();
 
     if (Platform.isAndroid) {
-      _notificationEvent.receiveBroadcastStream().listen((onData) {
+      _notificationEvent?.receiveBroadcastStream().listen((onData) {
         if (_notificationEvent != null) {
           setState(() {
             _presenter.currentPlayer.release();
@@ -150,7 +155,7 @@ class SettingsState extends State<Settings>
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
       );
-      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection!);
     }
   }
 
@@ -176,7 +181,7 @@ class SettingsState extends State<Settings>
 
   void setBrightness() {
     final Brightness brightness =
-        WidgetsBinding.instance.window.platformBrightness;
+        WidgetsBinding.instance.window.platformBrightness ?? Brightness.light;
     if (brightness == Brightness.light && !isDarkModeEnabled) {
       Injector.appInstance.registerSingleton<RadiocomColorsConract>(
           () => RadiocomColorsLight(),
@@ -209,8 +214,8 @@ class SettingsState extends State<Settings>
                   Container(
                       margin: EdgeInsets.fromLTRB(25.0, 0.0, 0.0, 0.0),
                       child: Text(
-                        SafeMap.safe(
-                            _localization.translateMap("settings"), ["station_section","name"]),
+                        SafeMap.safe(_localization.translateMap("settings"),
+                            ["station_section", "name"]),
                         maxLines: 1,
                         textAlign: TextAlign.left,
                         overflow: TextOverflow.ellipsis,
@@ -231,7 +236,8 @@ class SettingsState extends State<Settings>
                               child: ListTile(
                                   title: Text(
                                     SafeMap.safe(
-                                        _localization.translateMap("settings"), ["station_section","item1"]),
+                                        _localization.translateMap("settings"),
+                                        ["station_section", "item1"]),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
@@ -254,7 +260,8 @@ class SettingsState extends State<Settings>
                               child: ListTile(
                                   title: Text(
                                     SafeMap.safe(
-                                        _localization.translateMap("settings"), ["station_section","item2"]),
+                                        _localization.translateMap("settings"),
+                                        ["station_section", "item2"]),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
@@ -270,8 +277,8 @@ class SettingsState extends State<Settings>
                   Container(
                       margin: EdgeInsets.fromLTRB(25.0, 0.0, 0.0, 0.0),
                       child: Text(
-                        SafeMap.safe(
-                            _localization.translateMap("settings"), ["config_section","name"]),
+                        SafeMap.safe(_localization.translateMap("settings"),
+                            ["config_section", "name"]),
                         maxLines: 1,
                         textAlign: TextAlign.left,
                         overflow: TextOverflow.ellipsis,
@@ -288,7 +295,8 @@ class SettingsState extends State<Settings>
                           child: ListTile(
                               title: Text(
                                 SafeMap.safe(
-                                  _localization.translateMap("settings"), ["config_section","item1"]),
+                                    _localization.translateMap("settings"),
+                                    ["config_section", "item1"]),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -298,20 +306,22 @@ class SettingsState extends State<Settings>
                                     fontSize: 16),
                               ),
                               trailing: WidgetsBinding.instance.window
-                                  .platformBrightness ==
-                                  Brightness.light ? Switch(
-                                value: isDarkModeEnabled,
-                                onChanged:(value) {
-                                  _presenter.onDarkMode(value);
-                                  setState(() {
-                                    isDarkModeEnabled = value;
-                                    setBrightness();
-                                  });
-                                },
-                                activeTrackColor: _colors.yellow,
-                                activeColor: _colors.yellow,
-                              ):Icon(Icons.lock,
-                                  color: _colors.grey, size: 25.0)))),
+                                          .platformBrightness ==
+                                      Brightness.light
+                                  ? Switch(
+                                      value: isDarkModeEnabled,
+                                      onChanged: (value) {
+                                        _presenter.onDarkMode(value);
+                                        setState(() {
+                                          isDarkModeEnabled = value;
+                                          setBrightness();
+                                        });
+                                      },
+                                      activeTrackColor: _colors.yellow,
+                                      activeColor: _colors.yellow,
+                                    )
+                                  : Icon(Icons.lock,
+                                      color: _colors.grey, size: 25.0)))),
                   getDivider(),
                   Material(
                       color: _colors.transparent,
@@ -320,7 +330,8 @@ class SettingsState extends State<Settings>
                           child: ListTile(
                               title: Text(
                                 SafeMap.safe(
-                                    _localization.translateMap("settings"), ["config_section","item2"]),
+                                    _localization.translateMap("settings"),
+                                    ["config_section", "item2"]),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -329,9 +340,9 @@ class SettingsState extends State<Settings>
                                     fontWeight: FontWeight.w400,
                                     fontSize: 16),
                               ),
-                              trailing:  Switch(
+                              trailing: Switch(
                                 value: isLiveNotificationEnabled,
-                                onChanged:(value) {
+                                onChanged: (value) {
                                   _presenter.onLiveNotificationStatus(value);
                                   setState(() {
                                     isLiveNotificationEnabled = value;
@@ -345,8 +356,8 @@ class SettingsState extends State<Settings>
                   Container(
                       margin: EdgeInsets.fromLTRB(25.0, 0.0, 0.0, 0.0),
                       child: Text(
-                        SafeMap.safe(
-                            _localization.translateMap("settings"), ["social_section","name"]),
+                        SafeMap.safe(_localization.translateMap("settings"),
+                            ["social_section", "name"]),
                         maxLines: 1,
                         textAlign: TextAlign.left,
                         overflow: TextOverflow.ellipsis,
@@ -368,7 +379,8 @@ class SettingsState extends State<Settings>
                               child: ListTile(
                                   title: Text(
                                     SafeMap.safe(
-                                        _localization.translateMap("settings"), ["social_section","item1"]),
+                                        _localization.translateMap("settings"),
+                                        ["social_section", "item1"]),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
@@ -392,7 +404,8 @@ class SettingsState extends State<Settings>
                               child: ListTile(
                                   title: Text(
                                     SafeMap.safe(
-                                        _localization.translateMap("settings"), ["social_section","item2"]),
+                                        _localization.translateMap("settings"),
+                                        ["social_section", "item2"]),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
@@ -408,8 +421,8 @@ class SettingsState extends State<Settings>
                   Container(
                       margin: EdgeInsets.fromLTRB(25.0, 0.0, 0.0, 0.0),
                       child: Text(
-                        SafeMap.safe(
-                            _localization.translateMap("settings"), ["more_info_section","name"]),
+                        SafeMap.safe(_localization.translateMap("settings"),
+                            ["more_info_section", "name"]),
                         maxLines: 1,
                         textAlign: TextAlign.left,
                         overflow: TextOverflow.ellipsis,
@@ -430,7 +443,8 @@ class SettingsState extends State<Settings>
                               child: ListTile(
                                   title: Text(
                                     SafeMap.safe(
-                                        _localization.translateMap("settings"), ["more_info_section","item1"]),
+                                        _localization.translateMap("settings"),
+                                        ["more_info_section", "item1"]),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
@@ -454,7 +468,8 @@ class SettingsState extends State<Settings>
                               child: ListTile(
                                   title: Text(
                                     SafeMap.safe(
-                                        _localization.translateMap("settings"), ["more_info_section","item2"]),
+                                        _localization.translateMap("settings"),
+                                        ["more_info_section", "item2"]),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
@@ -470,8 +485,8 @@ class SettingsState extends State<Settings>
                   Container(
                       margin: EdgeInsets.fromLTRB(25.0, 0.0, 0.0, 0.0),
                       child: Text(
-                        SafeMap.safe(
-                            _localization.translateMap("settings"), ["legal_info_section","name"]),
+                        SafeMap.safe(_localization.translateMap("settings"),
+                            ["legal_info_section", "name"]),
                         maxLines: 1,
                         textAlign: TextAlign.left,
                         overflow: TextOverflow.ellipsis,
@@ -492,7 +507,8 @@ class SettingsState extends State<Settings>
                               child: ListTile(
                                   title: Text(
                                     SafeMap.safe(
-                                        _localization.translateMap("settings"), ["legal_info_section","item1"]),
+                                        _localization.translateMap("settings"),
+                                        ["legal_info_section", "item1"]),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
@@ -515,7 +531,8 @@ class SettingsState extends State<Settings>
                               child: ListTile(
                                   title: Text(
                                     SafeMap.safe(
-                                        _localization.translateMap("settings"), ["legal_info_section","item2"]),
+                                        _localization.translateMap("settings"),
+                                        ["legal_info_section", "item2"]),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
@@ -540,7 +557,8 @@ class SettingsState extends State<Settings>
                               child: ListTile(
                                   title: Text(
                                     SafeMap.safe(
-                                        _localization.translateMap("settings"), ["legal_info_section","item3"]),
+                                        _localization.translateMap("settings"),
+                                        ["legal_info_section", "item3"]),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:animations/animations.dart';
@@ -7,6 +8,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/now.dart';
+import 'package:cuacfm/models/outstanding.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/models/time_table.dart';
@@ -20,7 +22,6 @@ import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
@@ -30,7 +31,7 @@ import 'package:progress_indicators/progress_indicators.dart';
 class MyHomePage extends StatefulWidget {
   final String title;
 
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   @override
   MyHomePageState createState() => new MyHomePageState();
@@ -39,14 +40,15 @@ class MyHomePage extends StatefulWidget {
 class MyHomePageState extends State<MyHomePage>
     with WidgetsBindingObserver
     implements HomeView {
-  HomePresenter _presenter;
-  MediaQueryData queryData;
-  BuildContext context;
+  late HomePresenter _presenter;
+  late MediaQueryData queryData;
+  late BuildContext context;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   BottomBarOption bottomBarOption = BottomBarOption.HOME;
   bool shouldShowPlayer = false;
   bool isMini = true;
   Now _nowProgram = Now.mock();
+  Outstanding? _outstanding;
   List<Program> _podcast = [];
   List<New> _lastNews = [];
   List<TimeTable> _timeTable = [];
@@ -64,7 +66,8 @@ class MyHomePageState extends State<MyHomePage>
   List<Program> podcast9 = [];
   List<Program> podcast10 = [];
   List<Program> podcast11 = [];
-  RadiocomColorsConract _colors;
+  RadiocomColorsConract _colors =
+      Injector.appInstance.get<RadiocomColorsConract>();
   bool isLoadingHome = true;
   bool isLoadingPodcast = true;
   bool isLoadingNews = true;
@@ -73,14 +76,14 @@ class MyHomePageState extends State<MyHomePage>
   bool isEmptyNews = false;
   bool isTimeTableEmpty = false;
   bool isLoadingPlay = false;
-  SnackBar snackBarConnection;
+  SnackBar? snackBarConnection;
   var connectionSubscription;
   bool isContentUpdated = true;
-  EventChannel _notificationEvent =
+  EventChannel? _notificationEvent =
       EventChannel('cuacfm.flutter.io/updateNotificationMain');
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   bool isDarkModeEnabled = false;
-  CuacLocalization _localization;
+  CuacLocalization _localization = Injector.appInstance.get<CuacLocalization>();
 
   MyHomePageState() {
     DependencyInjector().injectByView(this);
@@ -225,7 +228,7 @@ class MyHomePageState extends State<MyHomePage>
       });
 
       if (categoryPodcast.isNotEmpty) {
-        categoryPodcast.shuffle();
+        categoryPodcast.shuffle(Random(DateTime.now().day));
       }
 
       if (index == 0) {
@@ -271,28 +274,25 @@ class MyHomePageState extends State<MyHomePage>
   @override
   void initState() {
     super.initState();
-    FirebaseAnalytics().setCurrentScreen(screenName: "home_screen");
+    FirebaseAnalytics.instance.setCurrentScreen(screenName: "home_screen");
     if (Platform.isAndroid) {
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "main", "close": false});
     }
-    _localization = Injector.appInstance.get<CuacLocalization>();
     _presenter = Injector.appInstance.get<HomePresenter>();
     _presenter.init();
     _nowProgram = new Now.mock();
 
     categories.addAll(ProgramCategories.values);
-    categories.shuffle();
-
+    categories.shuffle(Random(DateTime.now().day));
 
     _firebaseMessaging.requestPermission(sound: true, badge: true, alert: true);
-    _firebaseMessaging.getToken().then((String token) {
-      assert(token != null);
+    _firebaseMessaging.getToken().then((String? token) {
       print(token);
     });
 
     if (Platform.isAndroid) {
-      _notificationEvent.receiveBroadcastStream().listen((onData) {
+      _notificationEvent?.receiveBroadcastStream().listen((onData) {
         print("pause/notification");
         if (_notificationEvent != null) {
           setState(() {
@@ -345,7 +345,7 @@ class MyHomePageState extends State<MyHomePage>
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
       );
-      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection!);
     }
   }
 
@@ -437,6 +437,19 @@ class MyHomePageState extends State<MyHomePage>
   void onLoadTimetable(List<TimeTable> programsTimeTable) {
     isTimeTableEmpty = programsTimeTable.isEmpty;
     _timeTable = programsTimeTable;
+  }
+
+  @override
+  void onLoadOutstanding(Outstanding outstanding) {
+    if (!mounted) return;
+    setState(() {
+      _outstanding = outstanding;
+    });
+  }
+
+  @override
+  void onLoadOutstandingError(error) {
+    _outstanding = null;
   }
 
   @override
@@ -532,7 +545,7 @@ class MyHomePageState extends State<MyHomePage>
 
   void setBrightness() {
     final Brightness brightness =
-        WidgetsBinding.instance.window.platformBrightness;
+        WidgetsBinding.instance.window.platformBrightness ?? Brightness.light;
     if (brightness == Brightness.light && !isDarkModeEnabled) {
       Injector.appInstance.registerSingleton<RadiocomColorsConract>(
           () => RadiocomColorsLight(),
@@ -648,6 +661,7 @@ class MyHomePageState extends State<MyHomePage>
         color: _colors.palidwhite,
         width: queryData.size.width,
         height: queryData.size.height,
+        padding: EdgeInsets.fromLTRB(0.0, 20.0,0.0,0.0),
         child: SingleChildScrollView(
             key: PageStorageKey<String>(BottomBarOption.HOME.toString()),
             physics: BouncingScrollPhysics(),
@@ -675,7 +689,7 @@ class MyHomePageState extends State<MyHomePage>
                           ? Container(height: 80.0, child: getLoadingState())
                           : Padding(
                               padding:
-                                  EdgeInsets.fromLTRB(25.0, 30.0, 25.0, 0.0),
+                                  EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 0.0),
                               child: NeumorphicCardHorizontal(
                                   onElementClicked: () {
                                     if (!mounted) return;
@@ -690,16 +704,55 @@ class MyHomePageState extends State<MyHomePage>
                                       _localization.translateMap("home"),
                                       ["live_msg"]),
                                   size: 80.0)),
+                  _outstanding == null ? Container() : Padding(
+                      padding: const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
+                      child: Text(
+                        SafeMap.safe(_localization.translateMap("home"),
+                            ["outstanding_msg"]),
+                        style: TextStyle(
+                            letterSpacing: 1.3,
+                            color: _colors.font,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600),
+                      )),
+                  _outstanding == null ? Container() : Container(
+                      color: _colors.palidwhitedark,
+                      child: _getHomeOutstandingInfo(_outstanding!)),
+                  Padding(
+                      padding: EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
+                      child: Text(
+                        SafeMap.safe(
+                            _localization.translateMap("home"), ["now_msg"]),
+                        style: TextStyle(
+                            letterSpacing: 1.3,
+                            color: _colors.font,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600),
+                      )),
+                  Padding(
+                      padding: EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
+                      child: NeumorphicCardHorizontal(
+                        onElementClicked: () {
+                          if (isTimeTableEmpty) {
+                            showTimeTableEmptySnackbar();
+                          } else {
+                            _presenter.nowPlayingClicked(_timeTable);
+                          }
+                        },
+                        active: false,
+                        image: _nowProgram.logoUrl,
+                        label: _nowProgram.name,
+                      )),
                   Padding(
                       padding: const EdgeInsets.fromLTRB(25.0, 30.0, 25.0, 0.0),
                       child: Text(
                         SafeMap.safe(
                             _localization.translateMap("home"), ["recent_msg"]),
                         style: TextStyle(
-                            letterSpacing: 1.5,
+                            letterSpacing: 1.3,
                             color: _colors.font,
                             fontSize: 20,
-                            fontWeight: FontWeight.w500),
+                            fontWeight: FontWeight.w600),
                       )),
                   isEmptyHome
                       ? Padding(
@@ -748,30 +801,23 @@ class MyHomePageState extends State<MyHomePage>
                                         SizedBox(width: 22.0)
                                       ]))),
                   Padding(
-                      padding: EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
+                      padding: const EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
                       child: Text(
                         SafeMap.safe(
-                            _localization.translateMap("home"), ["now_msg"]),
+                            _localization.translateMap("home"), ["join_msg"]),
                         style: TextStyle(
-                            letterSpacing: 1.5,
+                            letterSpacing: 1.2,
                             color: _colors.font,
                             fontSize: 20,
-                            fontWeight: FontWeight.w500),
+                            fontWeight: FontWeight.w600),
                       )),
+                  Container(
+                      color: _colors.palidwhitedark,
+                      child: _getHomeOutstandingInfo(Outstanding.joinUS())),
                   Padding(
-                      padding: const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
-                      child: NeumorphicCardHorizontal(
-                        onElementClicked: () {
-                          if (isTimeTableEmpty) {
-                            showTimeTableEmptySnackbar();
-                          } else {
-                            _presenter.nowPlayingClicked(_timeTable);
-                          }
-                        },
-                        active: false,
-                        image: _nowProgram.logoUrl,
-                        label: _nowProgram.name,
-                      )),
+                      padding: EdgeInsets.fromLTRB(
+                          20.0, 0.0, (queryData.size.width * 2) / 3, 0.0),
+                      child: Container(height: 0.5, color: _colors.yellow)),
                   shouldShowPlayer
                       ? Container(
                           width: queryData.size.width,
@@ -889,6 +935,94 @@ class MyHomePageState extends State<MyHomePage>
             }));
   }
 
+  Widget _getHomeOutstandingInfo(Outstanding outstanding) {
+    return GestureDetector(
+        onTap: () {
+          _presenter.onOutstandingClicked(outstanding);
+        },
+        child: Padding(
+            padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 5.0),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(height: 20),
+                  Container(
+                      width: queryData.size.width,
+                      height: 200.0,
+                      child: CustomImage(
+                        radius: 20,
+                        background: true,
+                        fit: BoxFit.fitWidth,
+                        resPath: outstanding.logoUrl,
+                      )),
+                  Padding(
+                      padding: const EdgeInsets.fromLTRB(6.0, 10.0, 25.0, 2.0),
+                      child: Text(
+                        outstanding.title,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            letterSpacing: 1.1,
+                            color: _colors.font,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400),
+                      )),
+                  SizedBox(height: 5)
+                ])));
+  }
+
+  Widget _getPodcastOfTheDay(Program podcast) {
+    return GestureDetector(
+        onTap: () {
+          _presenter.onPodcastClicked(podcast);
+        },
+        child: Padding(
+            padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 10.0),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(height: 20),
+                  Container(
+                      width: queryData.size.width,
+                      height: 200.0,
+                      child: CustomImage(
+                        radius: 20,
+                        background: true,
+                        fit: BoxFit.fitWidth,
+                        resPath: podcast.logoUrl,
+                      )),
+                  Padding(
+                      padding: const EdgeInsets.fromLTRB(2.0, 10.0, 25.0, 2.0),
+                      child: Text(
+                        podcast.name,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            letterSpacing: 1.2,
+                            color: _colors.font,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700),
+                      )),
+                  SizedBox(height: 5),
+                  Padding(
+                      padding: const EdgeInsets.fromLTRB(2.0, 0.0, 25.0, 2.0),
+                      child: Text(
+                        SafeMap.safe(_localization.translateMap("home"),
+                            ["podcast_of_day_msg"]),
+                        textAlign: TextAlign.left,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            letterSpacing: 1.1,
+                            color: _colors.font,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400),
+                      ))
+                ])));
+  }
+
   Widget _getPodcastByCategory(
       ProgramCategories category, List<Program> podcast) {
     return Column(
@@ -944,6 +1078,7 @@ class MyHomePageState extends State<MyHomePage>
         color: _colors.palidwhitedark,
         width: queryData.size.width,
         height: queryData.size.height,
+        padding: EdgeInsets.fromLTRB(0.0, 20.0,0.0,0.0),
         child: SingleChildScrollView(
             key: PageStorageKey<String>(BottomBarOption.SEARCH.toString()),
             physics: BouncingScrollPhysics(),
@@ -987,7 +1122,8 @@ class MyHomePageState extends State<MyHomePage>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Padding(
-                                      padding: EdgeInsets.fromLTRB(20.0,20.0,0.0,0.0),
+                                      padding: EdgeInsets.fromLTRB(
+                                          20.0, 20.0, 0.0, 0.0),
                                       child: Text(
                                         SafeMap.safe(
                                             _localization.translateMap("home"),
@@ -999,7 +1135,8 @@ class MyHomePageState extends State<MyHomePage>
                                             fontWeight: FontWeight.w900),
                                       )),
                                   Padding(
-                                      padding: EdgeInsets.fromLTRB(20.0,10.0,0.0,20.0),
+                                      padding: EdgeInsets.fromLTRB(
+                                          20.0, 10.0, 0.0, 20.0),
                                       child: IconButton(
                                         icon: Icon(Icons.search,
                                             color: _colors.font, size: 30),
@@ -1008,8 +1145,10 @@ class MyHomePageState extends State<MyHomePage>
                                         },
                                       ))
                                 ])),
-                        _getPodcastByCategory(categories[0], podcast0),
+                        _getPodcastOfTheDay(
+                            _podcast[DateTime.now().day % _podcast.length]),
                         _getCategoriesLayout(),
+                        _getPodcastByCategory(categories[0], podcast0),
                         _getPodcastByCategory(categories[1], podcast1),
                         _getPodcastByCategory(categories[2], podcast2),
                         _getPodcastByCategory(categories[3], podcast3),

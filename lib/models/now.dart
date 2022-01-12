@@ -9,19 +9,21 @@ class Now {
   String rssUrl;
 
   Now.mock()
-      :
-        name = "Continuidad CUAC FM",
-        logoUrl = "https://cuacfm.org/wp-content/uploads/2015/04/cousomicros1.jpg";
+      : name = "Continuidad CUAC FM",
+        logoUrl =
+            "https://cuacfm.org/wp-content/uploads/2015/04/cousomicros1.jpg",
+        description = "",
+        programmeUrl = "https://cuacfm.org",
+        rssUrl = "https://cuacfm.org";
 
   Now.fromInstance(Map<String, dynamic> map)
-      :
-        name = map["name"],
+      : name = map["name"],
         description = map["description"],
         programmeUrl = map["programme_url"],
         logoUrl = map["logo_url"],
         rssUrl = map["rss_url"];
 
-  String streamUrl(){
+  String streamUrl() {
     return Injector.appInstance.get<RadioStation>().streamUrl;
   }
 }

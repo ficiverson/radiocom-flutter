@@ -1,10 +1,10 @@
 name: cuacfm
 description: A radio station with radioco integration.
 
-version: 1.0.0+1
+version: 3.0.0
 
 environment:
-  sdk: ">=2.2.0 <3.0.0"
+  sdk: "3.2.3"
 
 dependencies:
   flutter:
@@ -13,42 +13,36 @@ dependencies:
     sdk: flutter
 
   verbal_expressions: ^1.0.0
-  audioplayers: '0.19.0'
-  intl: ^0.17.0
-  xml2json: ^5.2.0
-  cupertino_icons: ^1.0.3
-  device_info: ^2.0.2
-  http: ^0.13.3
-  html: ^0.15.0
+  audioplayers: ^0.20.1
+  intl:
+  xml2json: ^6.2.2
+  cupertino_icons: ^1.0.6
+  device_info: ^2.0.3
+  http: ^0.13.5
+  html: ^0.15.4
   share: ^2.0.4
-  shared_preferences: ^2.0.6
-  injector: ^2.0.0
-  animations: ^2.0.0
-  cached_network_image: ^3.0.0
-  flutter_html: ^2.0.0
-  url_launcher: ^6.0.4
-  font_awesome_flutter: ^9.0.0
-  maps_launcher: ^2.0.0
-  photo_view: ^0.11.1
+  shared_preferences: ^2.2.2
+  injector: ^3.0.0
+  animations: ^2.0.11
+  cached_network_image: ^3.3.1
+  flutter_widget_from_html: ^0.14.11
+  url_launcher: ^6.2.2
+  font_awesome_flutter: ^10.6.0
+  maps_launcher: ^2.2.0
+  photo_view: ^0.14.0
   progress_indicators: ^1.0.0
   connectivity: ^3.0.6
-  uuid: ^3.0.1
-  provider: ^5.0.0
-  firebase_core: ^1.2.0
-  firebase_messaging: ^10.0.0
-  firebase_performance: ^0.7.0+3
-  firebase_crashlytics: ^2.0.4
-  firebase_analytics: ^8.1.0
-  firebase_in_app_messaging: ^0.5.0+4
-  mock_web_server: ^4.1.1
-  mockito: ^4.1.1
-  countdown: ^0.1.0
-  ozzie: ^2.2.3
-
-dependency_overrides:
-  convert: ^3.0.0
-  crypto: ^3.0.0
-  archive: ^2.0.5
+  uuid:
+  provider: ^6.1.1
+  firebase_core: ^2.24.2
+  firebase_messaging: ^14.7.10
+  firebase_performance: ^0.9.3+8
+  firebase_crashlytics: ^3.4.9
+  firebase_analytics: ^10.8.0
+  firebase_in_app_messaging: ^0.7.4+8
+  mock_web_server: ^5.0.0-nullsafety.1
+  mockito: ^5.4.4
+  path_provider: ^2.1.1
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +60,7 @@ flutter:
       - assets/graphics/play_podcast.png
       - assets/graphics/cuac-logo.png
       - assets/graphics/empty-logo.png
+      - assets/graphics/joinus.jpg
       - assets/graphics/categories/tv.jpeg
       - assets/graphics/categories/news.jpeg
       - assets/graphics/categories/sports.jpeg

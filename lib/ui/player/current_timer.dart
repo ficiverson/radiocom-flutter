@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:countdown/countdown.dart';
+
+import 'package:cuacfm/utils/timer.dart';
 
 typedef void CurrentTimerCallback(bool finnish);
 typedef void CurrentDurationCallback(Duration time);
@@ -8,24 +9,24 @@ abstract class CurrentTimerContract {
   void startTimer(Duration time);
   void stopTimer();
   bool isTimerRunning();
-  int currentTime;
-  CurrentTimerCallback timerCallback;
-  CurrentTimerCallback timerControlsCallback;
-  CurrentDurationCallback timeControlsDurationCallback;
+  late int currentTime;
+  CurrentTimerCallback? timerCallback;
+  CurrentTimerCallback? timerControlsCallback;
+  CurrentDurationCallback? timeControlsDurationCallback;
 }
 
 class CurrentTimer implements CurrentTimerContract {
   bool isStarted = false;
   @override
-  CurrentTimerCallback timerCallback;
+  CurrentTimerCallback? timerCallback;
   @override
-  CurrentTimerCallback timerControlsCallback;
+  CurrentTimerCallback? timerControlsCallback;
   @override
-  CurrentDurationCallback timeControlsDurationCallback;
+  CurrentDurationCallback? timeControlsDurationCallback;
   @override
   int currentTime = 0;
-  CountDown countDown;
-  StreamSubscription subscription;
+  CountDown? countDown;
+  StreamSubscription? subscription;
 
   void timerToWait() {}
 
@@ -39,17 +40,17 @@ class CurrentTimer implements CurrentTimerContract {
     if (currentTime != 0) {
       isStarted = true;
       countDown = CountDown(time);
-      subscription = countDown.stream.listen(null);
-      subscription.onData((data) {
+      subscription = countDown?.stream.listen(null);
+      subscription?.onData((data) {
         if (timeControlsDurationCallback != null) {
-          timeControlsDurationCallback(data);
+          timeControlsDurationCallback!(data);
         }
       });
-      subscription.onDone(() {
+      subscription?.onDone(() {
         if (timerCallback != null && currentTime != 0) {
-          timerCallback(true);
+          timerCallback!(true);
         }else if (timerControlsCallback != null && currentTime != 0) {
-          timerControlsCallback(true);
+          timerControlsCallback!(true);
         }
         stopTimer();
       });
@@ -60,7 +61,7 @@ class CurrentTimer implements CurrentTimerContract {
   void stopTimer() {
     isStarted = false;
     if (subscription != null) {
-      subscription.cancel();
+      subscription?.cancel();
       subscription = null;
     }
     currentTime = 0;

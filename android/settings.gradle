@@ -10,7 +10,7 @@ if (pluginsFile.exists()) {
 
 plugins.each { name, path ->
     def pluginDirectory = flutterProjectRoot.resolve(path).resolve('android').toFile()
-    if(!name.toString().contains("audioplayers")){
+    if(!name.toString().contains("audioplayers")){ //check line 498 flutter.groovy to delete null
         include ":$name"
         project(":$name").projectDir = pluginDirectory
     }

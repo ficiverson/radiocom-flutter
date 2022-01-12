@@ -9,7 +9,7 @@ import '../instrument/data/repository_mock.dart';
 import '../instrument/helper/helper-instrument.dart';
 
 void main() {
-  GetAllPodcastUseCase useCase;
+  late GetAllPodcastUseCase useCase;
   MockRadiocoRepository mockRepository = MockRadiocoRepository();
   Invoker invoker = Invoker();
 

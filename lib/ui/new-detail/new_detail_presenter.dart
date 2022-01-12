@@ -6,7 +6,6 @@ import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:injector/injector.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -22,15 +21,15 @@ class NewDetailPresenter {
   NewDetailView view;
   Invoker invoker;
   GetLiveProgramUseCase getLiveDataUseCase;
-  ConnectionContract connection;
-  CurrentPlayerContract currentPlayer;
+  late ConnectionContract connection;
+  late CurrentPlayerContract currentPlayer;
   NewDetailRouterContract router;
 
   NewDetailPresenter(
     this.view, {
-    @required this.invoker,
-    @required this.router,
-    @required this.getLiveDataUseCase,
+    required this.invoker,
+    required this.router,
+    required this.getLiveDataUseCase,
   }) {
     connection = Injector.appInstance.get<ConnectionContract>();
     currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
@@ -62,8 +61,10 @@ class NewDetailPresenter {
     });
   }
 
-  onPodcastControlsClicked(Episode episode) {
-    router.goToPodcastControls(episode);
+  onPodcastControlsClicked(Episode? episode) {
+    if(episode != null){
+      router.goToPodcastControls(episode);
+    }
   }
 
   onResume() async {
@@ -82,8 +83,10 @@ class NewDetailPresenter {
     Share.share(item.title + " via " + item.link);
   }
 
-  onLinkClicked(String url) {
-    _launchURL(url);
+  onLinkClicked(String? url) {
+    if(url != null) {
+      _launchURL(url);
+    }
   }
 
   _launchURL(String url, {bool universalLink = true}) async {

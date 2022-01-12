@@ -21,7 +21,7 @@ import 'settings_presenter_detail.dart';
 enum LegalType { TERMS, PRIVACY, LICENSE, NONE }
 
 class SettingsDetail extends StatefulWidget {
-  SettingsDetail({Key key, this.legalType}) : super(key: key);
+  SettingsDetail({Key? key, required this.legalType}) : super(key: key);
   final LegalType legalType;
 
   @override
@@ -31,17 +31,17 @@ class SettingsDetail extends StatefulWidget {
 class SettingsDetailState extends State<SettingsDetail>
     with WidgetsBindingObserver
     implements SettingsDetailView {
-  MediaQueryData _queryData;
+  late MediaQueryData _queryData;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
-  SettingsDetailPresenter _presenter;
-  RadioStation _radioStation;
-  RadiocomColorsConract _colors;
+  late SettingsDetailPresenter _presenter;
+  late RadioStation _radioStation;
+  late RadiocomColorsConract _colors;
   bool shouldShowPlayer = false;
   bool isContentUpdated = true;
-  EventChannel _notificationEvent =
+  EventChannel? _notificationEvent =
       EventChannel('cuacfm.flutter.io/updateNotification');
-  SnackBar snackBarConnection;
-  CuacLocalization _localization;
+  SnackBar? snackBarConnection;
+  late CuacLocalization _localization;
 
   SettingsDetailState() {
     DependencyInjector().injectByView(this);
@@ -69,8 +69,7 @@ class SettingsDetailState extends State<SettingsDetail>
             isPlayingAudio: _presenter.currentPlayer.isPlaying(),
             isExpanded: true,
             onDetailClicked: () {
-              _presenter
-                  .onPodcastControlsClicked(_presenter.currentPlayer.episode);
+              _presenter.onPodcastControlsClicked(_presenter.currentPlayer.episode);
             },
             onMultimediaClicked: (isPlaying) {
               if (!mounted) return;
@@ -97,7 +96,7 @@ class SettingsDetailState extends State<SettingsDetail>
     _radioStation = Injector.appInstance.get<RadioStation>();
 
     if (Platform.isAndroid) {
-      _notificationEvent.receiveBroadcastStream().listen((onData) {
+      _notificationEvent?.receiveBroadcastStream().listen((onData) {
         if (_notificationEvent != null) {
           setState(() {
             _presenter.currentPlayer.release();
@@ -157,7 +156,7 @@ class SettingsDetailState extends State<SettingsDetail>
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
       );
-      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection!);
     }
   }
 
@@ -259,7 +258,7 @@ class SettingsDetailState extends State<SettingsDetail>
                       value: event == null
                           ? 0
                           : event.cumulativeBytesLoaded /
-                              event.expectedTotalBytes,
+                              event.expectedTotalBytes!,
                     ),
                   ),
                 )));
