@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cuacfm/models/outstanding.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:intl/intl.dart';
 
@@ -31,7 +32,7 @@ class New {
   }
 
   static String getDate(String content) {
-    return new DateFormat("EEE, dd MMM yyyy hh:mm:ss zzzz")
+    return DateFormat("EEE, dd MMM yyyy hh:mm:ss zzzz")
         .parse(content)
         .toString()
         .split(" ")[0];
@@ -87,6 +88,15 @@ class New {
         content,
         "",
         getDate("Wed, 20 Mar 1996 12:00:00 +0000"));
+  }
+
+  static New fromOutstanding(Outstanding outstanding) {
+    return New(
+        outstanding.title,
+        "https://cuacfm.org/avisos-movil/",
+        outstanding.description,
+        outstanding.logoUrl,
+        DateFormat("dd MMM yyyy").format(DateTime.now()));
   }
 
   static New fromPodcast(

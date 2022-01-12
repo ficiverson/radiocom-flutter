@@ -8,6 +8,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/now.dart';
+import 'package:cuacfm/models/outstanding.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/models/time_table.dart';
@@ -47,6 +48,7 @@ class MyHomePageState extends State<MyHomePage>
   bool shouldShowPlayer = false;
   bool isMini = true;
   Now _nowProgram = Now.mock();
+  Outstanding? _outstanding;
   List<Program> _podcast = [];
   List<New> _lastNews = [];
   List<TimeTable> _timeTable = [];
@@ -438,6 +440,19 @@ class MyHomePageState extends State<MyHomePage>
   }
 
   @override
+  void onLoadOutstanding(Outstanding outstanding) {
+    if (!mounted) return;
+    setState(() {
+      _outstanding = outstanding;
+    });
+  }
+
+  @override
+  void onLoadOutstandingError(error) {
+    _outstanding = null;
+  }
+
+  @override
   void onNewsError(error) {
     isLoadingNews = false;
     isEmptyNews = true;
@@ -673,7 +688,7 @@ class MyHomePageState extends State<MyHomePage>
                           ? Container(height: 80.0, child: getLoadingState())
                           : Padding(
                               padding:
-                                  EdgeInsets.fromLTRB(25.0, 30.0, 25.0, 0.0),
+                                  EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 0.0),
                               child: NeumorphicCardHorizontal(
                                   onElementClicked: () {
                                     if (!mounted) return;
@@ -688,16 +703,55 @@ class MyHomePageState extends State<MyHomePage>
                                       _localization.translateMap("home"),
                                       ["live_msg"]),
                                   size: 80.0)),
+                  _outstanding == null ? Container() : Padding(
+                      padding: const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
+                      child: Text(
+                        SafeMap.safe(_localization.translateMap("home"),
+                            ["outstanding_msg"]),
+                        style: TextStyle(
+                            letterSpacing: 1.3,
+                            color: _colors.font,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600),
+                      )),
+                  _outstanding == null ? Container() : Container(
+                      color: _colors.palidwhitedark,
+                      child: _getHomeOutstandingInfo(_outstanding!)),
+                  Padding(
+                      padding: EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
+                      child: Text(
+                        SafeMap.safe(
+                            _localization.translateMap("home"), ["now_msg"]),
+                        style: TextStyle(
+                            letterSpacing: 1.3,
+                            color: _colors.font,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600),
+                      )),
+                  Padding(
+                      padding: EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
+                      child: NeumorphicCardHorizontal(
+                        onElementClicked: () {
+                          if (isTimeTableEmpty) {
+                            showTimeTableEmptySnackbar();
+                          } else {
+                            _presenter.nowPlayingClicked(_timeTable);
+                          }
+                        },
+                        active: false,
+                        image: _nowProgram.logoUrl,
+                        label: _nowProgram.name,
+                      )),
                   Padding(
                       padding: const EdgeInsets.fromLTRB(25.0, 30.0, 25.0, 0.0),
                       child: Text(
                         SafeMap.safe(
                             _localization.translateMap("home"), ["recent_msg"]),
                         style: TextStyle(
-                            letterSpacing: 1.5,
+                            letterSpacing: 1.3,
                             color: _colors.font,
                             fontSize: 20,
-                            fontWeight: FontWeight.w500),
+                            fontWeight: FontWeight.w600),
                       )),
                   isEmptyHome
                       ? Padding(
@@ -746,30 +800,23 @@ class MyHomePageState extends State<MyHomePage>
                                         SizedBox(width: 22.0)
                                       ]))),
                   Padding(
-                      padding: EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
+                      padding: const EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
                       child: Text(
                         SafeMap.safe(
-                            _localization.translateMap("home"), ["now_msg"]),
+                            _localization.translateMap("home"), ["join_msg"]),
                         style: TextStyle(
-                            letterSpacing: 1.5,
+                            letterSpacing: 1.2,
                             color: _colors.font,
                             fontSize: 20,
-                            fontWeight: FontWeight.w500),
+                            fontWeight: FontWeight.w600),
                       )),
+                  Container(
+                      color: _colors.palidwhitedark,
+                      child: _getHomeOutstandingInfo(Outstanding.joinUS())),
                   Padding(
-                      padding: const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
-                      child: NeumorphicCardHorizontal(
-                        onElementClicked: () {
-                          if (isTimeTableEmpty) {
-                            showTimeTableEmptySnackbar();
-                          } else {
-                            _presenter.nowPlayingClicked(_timeTable);
-                          }
-                        },
-                        active: false,
-                        image: _nowProgram.logoUrl,
-                        label: _nowProgram.name,
-                      )),
+                      padding: EdgeInsets.fromLTRB(
+                          20.0, 0.0, (queryData.size.width * 2) / 3, 0.0),
+                      child: Container(height: 0.5, color: _colors.yellow)),
                   shouldShowPlayer
                       ? Container(
                           width: queryData.size.width,
@@ -887,6 +934,43 @@ class MyHomePageState extends State<MyHomePage>
             }));
   }
 
+  Widget _getHomeOutstandingInfo(Outstanding outstanding) {
+    return GestureDetector(
+        onTap: () {
+          _presenter.onOutstandingClicked(outstanding);
+        },
+        child: Padding(
+            padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 5.0),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(height: 20),
+                  Container(
+                      width: queryData.size.width,
+                      height: 200.0,
+                      child: CustomImage(
+                        radius: 20,
+                        background: true,
+                        fit: BoxFit.fitWidth,
+                        resPath: outstanding.logoUrl,
+                      )),
+                  Padding(
+                      padding: const EdgeInsets.fromLTRB(6.0, 10.0, 25.0, 2.0),
+                      child: Text(
+                        outstanding.title,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            letterSpacing: 1.1,
+                            color: _colors.font,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400),
+                      )),
+                  SizedBox(height: 5)
+                ])));
+  }
+
   Widget _getPodcastOfTheDay(Program podcast) {
     return GestureDetector(
         onTap: () {
@@ -901,13 +985,12 @@ class MyHomePageState extends State<MyHomePage>
                   Container(
                       width: queryData.size.width,
                       height: 200.0,
-                      child:  CustomImage(
+                      child: CustomImage(
                         radius: 20,
                         background: true,
                         fit: BoxFit.fitWidth,
                         resPath: podcast.logoUrl,
-                      )
-                  ),
+                      )),
                   Padding(
                       padding: const EdgeInsets.fromLTRB(2.0, 10.0, 25.0, 2.0),
                       child: Text(

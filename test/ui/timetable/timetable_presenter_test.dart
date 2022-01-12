@@ -63,7 +63,7 @@ void main() {
     when(mockPlayer.isPlaying()).thenReturn(true);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(false);
+    mockPlayer.isPodcast = false;
 
     presenter.onViewResumed();
     await Future.delayed(Duration(milliseconds: 200));
@@ -80,7 +80,7 @@ void main() {
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.stop()).thenReturn(true);
         when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+        mockPlayer.isPodcast = false;
 
         presenter.onViewResumed();
         await Future.delayed(Duration(milliseconds: 200));
@@ -98,7 +98,7 @@ void main() {
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.stop()).thenReturn(true);
         when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+        mockPlayer.isPodcast = false;
 
         presenter.onViewResumed();
         await Future.delayed(Duration(milliseconds: 200));
@@ -113,7 +113,7 @@ void main() {
                 (_) => MockRadiocoRepository.now());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
 
         presenter.onViewResumed();
         await Future.delayed(Duration(milliseconds: 200));
@@ -129,7 +129,7 @@ void main() {
                 (_) => MockRadiocoRepository.now());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
 
         presenter.onPodcastControlsClicked(EpisodeInstrument.givenAnEpisode());
         await Future.delayed(Duration(milliseconds: 200));

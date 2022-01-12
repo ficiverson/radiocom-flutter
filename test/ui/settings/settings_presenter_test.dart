@@ -72,7 +72,7 @@ void main() {
     when(mockPlayer.isPlaying()).thenReturn(true);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(false);
+    mockPlayer.isPodcast = false;
 
     presenter.onViewResumed();
     await Future.delayed(Duration(milliseconds: 200));
@@ -88,7 +88,7 @@ void main() {
     when(mockPlayer.isPlaying()).thenReturn(true);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(false);
+    mockPlayer.isPodcast = false;
     when(notifcationSubscription.subscribeToTopic(any)).thenAnswer((_) => Future.value(true));
     when(notifcationSubscription.unsubscribeFromTopic(any)).thenAnswer((_) => Future.value(true));
 
@@ -109,7 +109,7 @@ void main() {
     when(mockPlayer.isPlaying()).thenReturn(true);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(false);
+    mockPlayer.isPodcast = false;
 
     presenter.onViewResumed();
     await Future.delayed(Duration(milliseconds: 200));
@@ -127,7 +127,7 @@ void main() {
     when(mockPlayer.isPlaying()).thenReturn(true);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(false);
+    mockPlayer.isPodcast = false;
 
     presenter.onViewResumed();
     await Future.delayed(Duration(milliseconds: 200));
@@ -142,7 +142,7 @@ void main() {
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(true);
+    mockPlayer.isPodcast = true;
 
     presenter.onViewResumed();
     await Future.delayed(Duration(milliseconds: 200));
@@ -155,7 +155,7 @@ void main() {
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(true);
+    mockPlayer.isPodcast = true;
 
     presenter.onPodcastControlsClicked(EpisodeInstrument.givenAnEpisode());
     await Future.delayed(Duration(milliseconds: 200));
@@ -170,7 +170,7 @@ void main() {
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(true);
+    mockPlayer.isPodcast = true;
 
     presenter.onHistoryClicked("my content");
     await Future.delayed(Duration(milliseconds: 200));
@@ -184,7 +184,7 @@ void main() {
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(true);
+    mockPlayer.isPodcast = true;
 
     presenter.onGalleryClicked();
     await Future.delayed(Duration(milliseconds: 200));
@@ -198,7 +198,7 @@ void main() {
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(true);
+    mockPlayer.isPodcast = true;
 
     presenter.onTermsClicked();
     await Future.delayed(Duration(milliseconds: 200));
@@ -212,7 +212,7 @@ void main() {
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(true);
+    mockPlayer.isPodcast = true;
 
     presenter.onPrivacyClicked();
     await Future.delayed(Duration(milliseconds: 200));
@@ -226,7 +226,7 @@ void main() {
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(true);
+    mockPlayer.isPodcast = true;
 
     presenter.onSoftwareLicenseClicked();
     await Future.delayed(Duration(milliseconds: 200));

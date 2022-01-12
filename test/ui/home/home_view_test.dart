@@ -55,13 +55,14 @@ void main() {
         when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
         when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
         when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
+        when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.stop()).thenReturn(true);
         when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
-        when(mockPlayer.currentSong).thenReturn("mocklive");
+        mockPlayer.isPodcast = false;
+        mockPlayer.currentSong = "mocklive";
 
         await tester.pumpWidget(startWidget(MyHomePage(title: "homi")));
         expect(
@@ -83,13 +84,14 @@ void main() {
     when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
     when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
     when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
+    when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
     when(mockPlayer.isPlaying()).thenReturn(false);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(false);
-    when(mockPlayer.currentSong).thenReturn("mocklive");
+    mockPlayer.isPodcast = false;
+    mockPlayer.currentSong = "mocklive";
 
     await tester.pumpWidget(startWidget(MyHomePage(title: "homi")));
     await tester.tap(find.byKey(Key("bottom_bar_item2")));
@@ -110,13 +112,14 @@ void main() {
     when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
     when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
     when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
+    when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
     when(mockPlayer.isPlaying()).thenReturn(false);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(false);
-    when(mockPlayer.currentSong).thenReturn("mocklive");
+    mockPlayer.isPodcast = false;
+    mockPlayer.currentSong = "mocklive";
 
     await tester.pumpWidget(startWidget(MyHomePage(title: "homi")));
     await tester.tap(find.byKey(Key("bottom_bar_item3")));
@@ -137,16 +140,18 @@ void main() {
     when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
     when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
     when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
+    when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
     when(mockPlayer.isPlaying()).thenReturn(true);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(false);
-    when(mockPlayer.currentSong).thenReturn("mocklive");
+    mockPlayer.isPodcast = false;
+    mockPlayer.currentSong = "mocklive";
+
     when(mockPlayer.onConnection).thenReturn((isError){
       tester.allStates.forEach((state){
-        if( state is MyHomePageState){
+        if(state is MyHomePageState){
           state.onConnectionError();
         }
       });
@@ -154,7 +159,7 @@ void main() {
 
     await tester.pumpWidget(startWidget(MyHomePage(title: "homi")));
     mockPlayer.onConnection!(true);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(Duration(milliseconds: 500));
 
     expect(
         find.byKey(Key("connection_snackbar"),skipOffstage: true),

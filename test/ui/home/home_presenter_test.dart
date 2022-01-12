@@ -20,6 +20,7 @@ import '../../instrument/helper/helper-instrument.dart';
 import '../../instrument/model/episode_instrument.dart';
 import '../../instrument/model/news_instrument.dart';
 import '../../instrument/model/now_instrument.dart';
+import '../../instrument/model/outstanding_instrument.dart';
 import '../../instrument/model/program_instrument.dart';
 import '../../instrument/ui/mock_home_view.dart';
 
@@ -73,12 +74,13 @@ void main() {
         when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
         when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
         when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
+        when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.stop()).thenReturn(true);
         when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+        mockPlayer.isPodcast = false;
 
         presenter.init();
         await Future.delayed(Duration(milliseconds: 200));
@@ -88,9 +90,10 @@ void main() {
         expect(view.viewState[2], equals(HomeState.loadStation));
         expect(view.viewState[3], equals(HomeState.liveDataLoaded));
         expect(view.viewState[4], equals(HomeState.loadRecent));
-        expect(view.viewState[5], equals(HomeState.loadTimetable));
-        expect(view.viewState[6], equals(HomeState.loadPodcast));
-        expect(view.viewState[7], equals(HomeState.loadNews));
+        expect(view.viewState[5], equals(HomeState.onOutstanding));
+        expect(view.viewState[6], equals(HomeState.loadTimetable));
+        expect(view.viewState[7], equals(HomeState.loadPodcast));
+        expect(view.viewState[8], equals(HomeState.loadNews));
       });
 
   test('that can init the presenter without connection',
@@ -107,7 +110,7 @@ void main() {
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.stop()).thenReturn(true);
         when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+        mockPlayer.isPodcast = false;
 
         presenter.init();
         await Future.delayed(Duration(milliseconds: 200));
@@ -129,12 +132,13 @@ void main() {
         when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts(isEmpty: true));
         when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation(isEmpty: true));
         when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news(isEmpty: true));
+        when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.stop()).thenReturn(true);
         when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+        mockPlayer.isPodcast = false;
 
         presenter.init();
         await Future.delayed(Duration(milliseconds: 200));
@@ -144,9 +148,10 @@ void main() {
         expect(view.viewState[2], equals(HomeState.stationError));
         expect(view.viewState[3], equals(HomeState.liveDataError));
         expect(view.viewState[4], equals(HomeState.recenterror));
-        expect(view.viewState[5], equals(HomeState.timetableError));
-        expect(view.viewState[6], equals(HomeState.podcastError));
-        expect(view.viewState[7], equals(HomeState.newsError));
+        expect(view.viewState[5], equals(HomeState.onOutstanding));
+        expect(view.viewState[6], equals(HomeState.timetableError));
+        expect(view.viewState[7], equals(HomeState.podcastError));
+        expect(view.viewState[8], equals(HomeState.newsError));
       });
 
   test('that can resume the view and realod the data',
@@ -159,7 +164,7 @@ void main() {
     when(mockPlayer.isPlaying()).thenReturn(true);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(false);
+    mockPlayer.isPodcast = false;
 
     presenter.onHomeResumed();
     await Future.delayed(Duration(milliseconds: 200));
@@ -181,7 +186,7 @@ void main() {
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.stop()).thenReturn(true);
         when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+        mockPlayer.isPodcast = false;
 
         presenter.onHomeResumed();
         await Future.delayed(Duration(milliseconds: 200));
@@ -201,7 +206,7 @@ void main() {
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.stop()).thenReturn(true);
         when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+        mockPlayer.isPodcast = false;
 
         presenter.onHomeResumed();
         await Future.delayed(Duration(milliseconds: 200));
@@ -215,10 +220,10 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any as String, any as String)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
 
         presenter.onPodcastControlsClicked(EpisodeInstrument.givenAnEpisode());
         await Future.delayed(Duration(milliseconds: 200));
@@ -235,7 +240,7 @@ void main() {
         when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
 
         presenter.onSeeAllPodcast([]);
         await Future.delayed(Duration(milliseconds: 200));
@@ -252,7 +257,7 @@ void main() {
         when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
 
         presenter.onSeeCategory([], "Humor");
         await Future.delayed(Duration(milliseconds: 200));
@@ -269,7 +274,7 @@ void main() {
         when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
 
         presenter.nowPlayingClicked([]);
         await Future.delayed(Duration(milliseconds: 200));
@@ -286,7 +291,7 @@ void main() {
         when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
 
         presenter.onNewClicked(NewInstrument.givenANew());
         await Future.delayed(Duration(milliseconds: 200));
@@ -303,7 +308,7 @@ void main() {
         when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
 
         presenter.onMenuClicked();
         await Future.delayed(Duration(milliseconds: 200));
@@ -319,13 +324,29 @@ void main() {
         when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
 
         presenter.onPodcastClicked(ProgramInstrument.givenAProgram());
         await Future.delayed(Duration(milliseconds: 200));
 
         expect(router.viewState[0], equals(HomeState.goToPodcast));
         expect((router.data[0] as Program).name, equals(ProgramInstrument.givenAProgram().name));
+      });
+
+  test(
+      'that can navigate to outstanding detail',
+          () async {
+        when(mockRepository.getLiveBroadcast()).thenAnswer(
+                (_) => MockRadiocoRepository.now());
+        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockConnection.isConnectionAvailable())
+            .thenAnswer((_) => Future.value(true));
+        mockPlayer.isPodcast = true;
+
+        presenter.onOutstandingClicked(OutstandingInstrument.givenAOutstanding());
+        await Future.delayed(Duration(milliseconds: 200));
+
+        expect(router.viewState[0], equals(HomeState.goToNewDetail));
       });
 
   test(
@@ -336,8 +357,10 @@ void main() {
         when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
-        when(mockPlayer.playerState).thenReturn(AudioPlayerState.stop);
+        when(mockPlayer.play())
+            .thenAnswer((_) => Future.value(true));
+        mockPlayer.isPodcast = true;
+        mockPlayer.playerState = AudioPlayerState.stop;
 
         presenter.onSelectedEpisode();
         await Future.delayed(Duration(milliseconds: 200));
@@ -354,7 +377,9 @@ void main() {
         when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        when(mockPlayer.play())
+            .thenAnswer((_) => Future.value(true));
+        mockPlayer.isPodcast = true;
 
         presenter.onSelectedEpisode();
         await Future.delayed(Duration(milliseconds: 200));
@@ -371,7 +396,7 @@ void main() {
         when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+        mockPlayer.isPodcast = false;
         when(mockPlayer.stop()).thenAnswer(
                 (_) => Future.value(true));
 
@@ -390,7 +415,7 @@ void main() {
         when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
         when(mockPlayer.pause()).thenAnswer(
                 (_) => Future.value(true));
 
@@ -409,7 +434,7 @@ void main() {
         when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+        mockPlayer.isPodcast = false;
         when(mockPlayer.isPlaying()).thenReturn(false);
         when(mockPlayer.isStreamingAudio()).thenReturn(true);
         when(mockPlayer.play()).thenAnswer(
@@ -432,7 +457,7 @@ void main() {
         when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+        mockPlayer.isPodcast = false;
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.isStreamingAudio()).thenReturn(true);
         when(mockPlayer.stopAndPlay()).thenAnswer(
@@ -456,7 +481,7 @@ void main() {
         when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+        mockPlayer.isPodcast = false;
         when(mockPlayer.isPlaying()).thenReturn(false);
         when(mockPlayer.isStreamingAudio()).thenReturn(true);
         when(mockPlayer.play()).thenAnswer(
@@ -477,7 +502,7 @@ void main() {
         when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+        mockPlayer.isPodcast = false;
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.isStreamingAudio()).thenReturn(true);
         when(mockPlayer.stopAndPlay()).thenAnswer(

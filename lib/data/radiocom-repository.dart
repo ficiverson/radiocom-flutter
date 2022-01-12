@@ -4,6 +4,7 @@ import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/domain/result/result.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
+import 'package:cuacfm/models/outstanding.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
@@ -65,6 +66,16 @@ class CuacRepository implements CuacRepositoryContract {
       return Error([], Status.fail, "cannot connect");
     } else {
       return Success(episodes, Status.ok);
+    }
+  }
+
+  @override
+  Future<Result<Outstanding>> getOutStanding() async {
+    Outstanding? outstanding = await remoteDataSource.getOutstanding();
+    if (outstanding == null) {
+      return Error(Outstanding.mock(), Status.fail, "cannot connect");
+    } else {
+      return Success(outstanding, Status.ok);
     }
   }
 }

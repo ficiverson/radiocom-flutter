@@ -2,6 +2,7 @@ import 'package:cuacfm/data/radiocom-repository.dart';
 import 'package:cuacfm/domain/result/result.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/now.dart';
+import 'package:cuacfm/models/outstanding.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/models/time_table.dart';
@@ -112,5 +113,21 @@ void main() {
     expect(result.getData()?.length, equals(0));
   });
 
+  test('that can fetch outstanding from network', () async {
+    when(mockRemoteDataSource.getOutstanding())
+        .thenAnswer((_) => MockRemoteDataSource.outstanding(false));
+    Result<Outstanding> result = await repository.getOutStanding();
+
+    expect(result.status, equals(Status.ok));
+    expect(result.data?.title, contains("Nada"));
+  });
+
+  test('that can fetch empty outstanding when data from network fail', () async {
+    when(mockRemoteDataSource.getOutstanding())
+        .thenAnswer((_) => MockRemoteDataSource.outstanding(true));
+    Result<Outstanding> result = await repository.getOutStanding();
+
+    expect(result.status, equals(Status.fail));
+  });
 
 }

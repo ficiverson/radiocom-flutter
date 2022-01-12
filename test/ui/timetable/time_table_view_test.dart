@@ -50,8 +50,8 @@ void main() {
     when(mockPlayer.isPlaying()).thenReturn(true);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(false);
-    when(mockPlayer.currentSong).thenReturn("mocklive");
+    mockPlayer.isPodcast = false;
+    mockPlayer.currentSong = "mocklive";
 
     await tester.pumpWidget(startWidget(Timetable(timeTables: [
       TimeTableInstrument.givenATimeTable(time: 0),
@@ -99,8 +99,8 @@ void main() {
     when(mockPlayer.isPlaying()).thenReturn(false);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(false);
-    when(mockPlayer.currentSong).thenReturn("mocklive");
+    mockPlayer.isPodcast = false;
+    mockPlayer.currentSong = "mocklive";
 
     await tester.pumpWidget(startWidget(Timetable(timeTables: [
       TimeTableInstrument.givenATimeTable(time: 0),
@@ -133,8 +133,8 @@ void main() {
     when(mockPlayer.isPlaying()).thenReturn(true);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(false);
-    when(mockPlayer.currentSong).thenReturn("mocklive");
+    mockPlayer.isPodcast = false;
+    mockPlayer.currentSong = "mocklive";
     when(mockPlayer.onConnection).thenReturn((isError) {
       tester.allStates.forEach((state) {
         if (state is TimetableState) {

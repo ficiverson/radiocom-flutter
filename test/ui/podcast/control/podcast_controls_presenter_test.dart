@@ -34,11 +34,8 @@ void main() {
     Injector.appInstance.registerDependency<CurrentPlayerContract>(
         () => mockPlayer,
         override: true);
-    presenter = Injector.appInstance.get<PodcastControlsPresenter>();
-  });
-
-  setUp(() async {
     mockPlayer = MockPlayer();
+    when(mockPlayer.getPlaybackRate()).thenReturn(0.0);
     presenter = Injector.appInstance.get<PodcastControlsPresenter>();
   });
 
@@ -56,7 +53,7 @@ void main() {
     when(mockPlayer.isPlaying()).thenReturn(true);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(false);
+    mockPlayer.isPodcast = false;
 
     presenter.onViewResumed();
     await Future.delayed(Duration(milliseconds: 200));
@@ -73,12 +70,12 @@ void main() {
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.stop()).thenReturn(true);
         when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+        mockPlayer.isPodcast = false;
 
         presenter.onViewResumed();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
+        expect(view.viewState[0], equals(PodcastControlState.onNewData));
       });
 
   test(
@@ -91,13 +88,12 @@ void main() {
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.stop()).thenReturn(true);
         when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+        mockPlayer.isPodcast = false;
 
         presenter.onViewResumed();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState.isEmpty, equals(false));
-        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
+        expect(view.viewState.isEmpty, equals(true));
       });
 
   test(
@@ -107,13 +103,13 @@ void main() {
                 (_) => MockRadiocoRepository.now());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = false;
 
         presenter.onViewResumed();
         await Future.delayed(Duration(milliseconds: 200));
 
         expect(view.viewState.isEmpty, equals(false));
-        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
+        expect(view.viewState[0], equals(PodcastControlState.onNewData));
 
       });
 
@@ -124,14 +120,13 @@ void main() {
                 (_) => MockRadiocoRepository.now());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
-        when(mockPlayer.position).thenReturn(Duration(seconds: 10));
+        mockPlayer.isPodcast = false;
+        mockPlayer.position = Duration(seconds: 10);
 
         presenter.onSeek(200);
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
-        expect(view.viewState[1], equals(PodcastControlState.onNewData));
+        expect(view.viewState.length, equals(0));
       });
 
   test(
@@ -141,14 +136,13 @@ void main() {
                 (_) => MockRadiocoRepository.now());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
-        when(mockPlayer.position).thenReturn(Duration(seconds: 10));
+        mockPlayer.isPodcast = false;
+        mockPlayer.position = Duration(seconds: 10);
 
         presenter.onSeek(200);
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState.isEmpty, equals(false));
-        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
+        expect(view.viewState.isEmpty, equals(true));
       });
 
 
@@ -160,13 +154,12 @@ void main() {
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.isPlaying()).thenReturn(false);
-        when(mockPlayer.playerState).thenReturn(AudioPlayerState.stop);
+        mockPlayer.playerState = AudioPlayerState.stop;
 
         presenter.onPlayPause();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
-        expect(view.viewState[1], equals(PodcastControlState.onNewData));
+        expect(view.viewState[0], equals(PodcastControlState.onNewData));
       });
 
   test(
@@ -181,8 +174,7 @@ void main() {
         presenter.onPlayPause();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
-        expect(view.viewState[1], equals(PodcastControlState.onNewData));
+        expect(view.viewState[0], equals(PodcastControlState.onNewData));
       });
 
   test(
@@ -193,12 +185,12 @@ void main() {
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.isPlaying()).thenReturn(true);
+        when(mockPlayer.pause()).thenAnswer((_)=> Future.value());
 
         presenter.onPlayPause();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
-        expect(view.viewState[1], equals(PodcastControlState.onNewData));
+        expect(view.viewState[0], equals(PodcastControlState.onNewData));
       });
 
   test(
@@ -262,7 +254,7 @@ void main() {
 
         presenter.onSpeedSelected(2.5);
 
-        expect(view.viewState[0], equals(PodcastControlState.setupInitialRate));
+        expect(view.viewState.length, equals(0));
       });
 
 

@@ -239,7 +239,7 @@ class AllPodcastState extends State<AllPodcast>
                 crossAxisCount: 2),
             itemBuilder: (BuildContext context, int index) {
               return Padding(
-                  padding: EdgeInsets.fromLTRB(20.0, 0.0, 30.0, 0.0),
+                  padding: EdgeInsets.fromLTRB(20.0, 10.0, 30.0, 0.0),
                   child: GestureDetector(
                       onTap: () {
                         _presenter.onPodcastClicked(_podcastWithFilter[index]);

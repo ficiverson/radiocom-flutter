@@ -1,9 +1,7 @@
 import 'dart:io';
-
 import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
@@ -108,25 +106,31 @@ class TopBarState extends State<TopBar> {
                   IconButton(
                     icon: Icon(
                         widget.topBarOption == TopBarOption.MODAL
-                            ? Icons.clear
+                            ? currentQuery.isEmpty
+                                ? Icons.clear
+                                : Platform.isIOS
+                                    ? Icons.navigate_before
+                                    : Icons.arrow_back
                             : Platform.isIOS
                                 ? Icons.navigate_before
                                 : Icons.arrow_back,
                         color: _colors.font,
                         size: widget.topBarOption == TopBarOption.MODAL
-                            ? Platform.isIOS ? 28 : 27
-                            : Platform.isIOS ? 35 : 27),
+                            ? Platform.isIOS
+                                ? 28
+                                : 27
+                            : Platform.isIOS
+                                ? 35
+                                : 27),
                     onPressed: () {
                       if (Platform.isAndroid) {
-                        MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
-                            'changeScreen',
-                            {"currentScreen": screenName, "close": true});
+                        MethodChannel('cuacfm.flutter.io/changeScreen')
+                            .invokeMethod('changeScreen',
+                                {"currentScreen": screenName, "close": true});
                       }
                       if (widget.isSearch) {
-                        if (currentQuery.isEmpty) {
-                          if (Navigator.of(context).canPop()) {
-                            Navigator.of(context).pop();
-                          }
+                        if (Navigator.of(context).canPop()) {
+                          Navigator.of(context).pop();
                         }
                         _searchQuery.clear();
                         currentQuery = "";
@@ -148,7 +152,8 @@ class TopBarState extends State<TopBar> {
                               fontWeight: FontWeight.w600),
                         )),
                   widget.rightIcon != null && !widget.isSearch
-                      ? IconButton(key: Key("top_bar_search"),
+                      ? IconButton(
+                          key: Key("top_bar_search"),
                           icon: Icon(widget.rightIcon,
                               color: _colors.font, size: 30),
                           onPressed: () {
@@ -191,15 +196,26 @@ class TopBarState extends State<TopBar> {
           autocorrect: false,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.all(10),
-            suffixIcon: Icon(Icons.search),
+            suffixIcon: currentQuery.isEmpty
+                ? Icon(Icons.search)
+                : IconButton(
+                    onPressed: () {
+                      _searchQuery.clear();
+                      currentQuery = "";
+                      _onQueryCallback();
+                    },
+                    icon: Icon(Icons.clear)),
             fillColor: _colors.neuWhite,
             filled: true,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
               borderSide: BorderSide.none,
             ),
-            hintText:  SafeMap.safe(
-                Injector.appInstance.get<CuacLocalization>().translateMap("all_podcast"), ["search"]),
+            hintText: SafeMap.safe(
+                Injector.appInstance
+                    .get<CuacLocalization>()
+                    .translateMap("all_podcast"),
+                ["search"]),
           ),
         ));
   }

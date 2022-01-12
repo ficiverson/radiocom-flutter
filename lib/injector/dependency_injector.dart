@@ -4,6 +4,7 @@ import 'package:cuacfm/domain/usecase/get_all_podcast_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_episodes_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_live_program_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_news_use_case.dart';
+import 'package:cuacfm/domain/usecase/get_outstanding_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_station_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_timetable_use_case.dart';
 import 'package:cuacfm/models/radiostation.dart';
@@ -73,14 +74,11 @@ class DependencyInjector {
     } else if (view is SettingsState) {
       injector.registerDependency<SettingsView>(() => view);
     } else if (view is SettingsDetailState) {
-      injector
-          .registerDependency<SettingsDetailView>(() => view);
+      injector.registerDependency<SettingsDetailView>(() => view);
     } else if (view is DetailPodcastState) {
-      injector
-          .registerDependency<DetailPodcastView>(() => view);
+      injector.registerDependency<DetailPodcastView>(() => view);
     } else if (view is PodcastControlsState) {
-      injector
-          .registerDependency<PodcastControlsView>(() => view);
+      injector.registerDependency<PodcastControlsView>(() => view);
     }
   }
 
@@ -124,8 +122,7 @@ class DependencyInjector {
       return AllPodcastRouter();
     });
 
-    injector
-        .registerDependency<DetailPodcastRouterContract>(() {
+    injector.registerDependency<DetailPodcastRouterContract>(() {
       return DetailPodcastRouter();
     });
 
@@ -133,8 +130,7 @@ class DependencyInjector {
       return NewDetailRouter();
     });
 
-    injector
-        .registerDependency<SettingsDetailRouterContract>(() {
+    injector.registerDependency<SettingsDetailRouterContract>(() {
       return SettingsDetailRouter();
     });
 
@@ -150,7 +146,8 @@ class DependencyInjector {
           getStationUseCase: injector.get<GetStationUseCase>(),
           getLiveDataUseCase: injector.get<GetLiveProgramUseCase>(),
           getTimetableUseCase: injector.get<GetTimetableUseCase>(),
-          getNewsUseCase: injector.get<GetNewsUseCase>());
+          getNewsUseCase: injector.get<GetNewsUseCase>(),
+          getOutstandingUseCase: injector.get<GetOutstandingUseCase>());
     });
 
     injector.registerDependency<TimeTablePresenter>(() {
@@ -181,16 +178,14 @@ class DependencyInjector {
           getLiveDataUseCase: injector.get<GetLiveProgramUseCase>());
     });
     injector.registerDependency<SettingsDetailPresenter>(() {
-      return new SettingsDetailPresenter(
-          injector.get<SettingsDetailView>(),
+      return new SettingsDetailPresenter(injector.get<SettingsDetailView>(),
           invoker: injector.get<Invoker>(),
           router: injector.get<SettingsDetailRouterContract>(),
           getLiveDataUseCase: injector.get<GetLiveProgramUseCase>());
     });
 
     injector.registerDependency<DetailPodcastPresenter>(() {
-      return new DetailPodcastPresenter(
-          injector.get<DetailPodcastView>(),
+      return new DetailPodcastPresenter(injector.get<DetailPodcastView>(),
           invoker: injector.get<Invoker>(),
           router: injector.get<DetailPodcastRouterContract>(),
           getEpisodesUseCase: injector.get<GetEpisodesUseCase>(),
@@ -198,8 +193,7 @@ class DependencyInjector {
     });
 
     injector.registerDependency<PodcastControlsPresenter>(() {
-      return new PodcastControlsPresenter(
-          injector.get<PodcastControlsView>(),
+      return new PodcastControlsPresenter(injector.get<PodcastControlsView>(),
           invoker: injector.get<Invoker>(),
           getLiveDataUseCase: injector.get<GetLiveProgramUseCase>());
     });
@@ -212,6 +206,11 @@ class DependencyInjector {
     injector.registerDependency<GetAllPodcastUseCase>(() {
       var radiocoRepository = injector.get<CuacRepositoryContract>();
       return GetAllPodcastUseCase(radiocoRepository: radiocoRepository);
+    });
+
+    injector.registerDependency<GetOutstandingUseCase>(() {
+      var radiocoRepository = injector.get<CuacRepositoryContract>();
+      return GetOutstandingUseCase(radiocoRepository: radiocoRepository);
     });
 
     injector.registerDependency<GetStationUseCase>(() {
@@ -242,18 +241,15 @@ class DependencyInjector {
 
   loadDataModules() {
     injector.registerDependency<CuacRepositoryContract>(() {
-      var remoteDataSource =
-          injector.get<RadiocoRemoteDataSourceContract>();
+      var remoteDataSource = injector.get<RadiocoRemoteDataSourceContract>();
       return CuacRepository(remoteDataSource: remoteDataSource);
     });
   }
 
   loadRemoteDatasourceModules() {
-    injector.registerDependency<CUACClient>(() => CUACClient(),
-        override: true);
+    injector.registerDependency<CUACClient>(() => CUACClient(), override: true);
     injector.registerDependency<RadiocoAPIContract>(() => RadiocoAPI());
-    injector.registerDependency<RadiocoRemoteDataSourceContract>(
-        () {
+    injector.registerDependency<RadiocoRemoteDataSourceContract>(() {
       return new RadiocoRemoteDataSource();
     });
   }

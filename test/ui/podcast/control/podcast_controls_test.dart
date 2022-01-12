@@ -49,6 +49,7 @@ void main() {
 
   setUp(() async {
     mockPlayer = MockPlayer();
+    when(mockPlayer.getPlaybackRate()).thenReturn(0.0);
   });
 
   tearDown(() async {
@@ -64,9 +65,9 @@ void main() {
     when(mockPlayer.isPlaying()).thenReturn(true);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(false);
-    when(mockPlayer.currentSong).thenReturn("mocklive");
-    when(mockCurrentTimerContract.currentTime).thenReturn(0);
+    mockPlayer.isPodcast = false;
+    mockPlayer.currentSong = "mocklive";
+    mockCurrentTimerContract.currentTime = 0;
 
     await tester.pumpWidget(startWidget(
         PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
@@ -85,12 +86,12 @@ void main() {
     when(mockPlayer.isPlaying()).thenReturn(true);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(true);
-    when(mockPlayer.currentSong).thenReturn("mocklive");
-    when(mockPlayer.duration).thenReturn(Duration(seconds: 220));
-    when(mockPlayer.position).thenReturn(Duration(seconds: 110));
-    when(mockPlayer.currentSong).thenReturn("mocklive");
-    when(mockCurrentTimerContract.currentTime).thenReturn(0);
+    mockPlayer.isPodcast = true;
+    mockPlayer.currentSong = "mocklive";
+    mockPlayer.duration = Duration(seconds: 220);
+    mockPlayer.position = Duration(seconds: 110);
+    mockPlayer.currentSong = "mocklive";
+    mockCurrentTimerContract.currentTime = 0;
 
     await tester.pumpWidget(startWidget(
         PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
@@ -108,12 +109,12 @@ void main() {
     when(mockPlayer.isPlaying()).thenReturn(true);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(true);
-    when(mockPlayer.currentSong).thenReturn("mocklive");
-    when(mockPlayer.duration).thenReturn(Duration(seconds: 220));
-    when(mockPlayer.position).thenReturn(Duration(seconds: 110));
-    when(mockPlayer.currentSong).thenReturn("mocklive");
-    when(mockCurrentTimerContract.currentTime).thenReturn(110);
+    mockPlayer.isPodcast = true;
+    mockPlayer.currentSong = "mocklive";
+    mockPlayer.duration = Duration(seconds: 220);
+    mockPlayer.position = Duration(seconds: 110);
+    mockPlayer.currentSong = "mocklive";
+    mockCurrentTimerContract.currentTime = 110;
 
     await tester.pumpWidget(startWidget(
         PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
@@ -128,36 +129,6 @@ void main() {
     expect(find.byType(NeumorphicView, skipOffstage: false), findsNWidgets(1));
   });
 
-  testWidgets(
-      'that in podcast controls can handle error on connection while playing',
-      (WidgetTester tester) async {
-    when(mockRepository.getLiveBroadcast())
-        .thenAnswer((_) => MockRadiocoRepository.now());
-    when(mockConnection.isConnectionAvailable())
-        .thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPlaying()).thenReturn(false);
-    when(mockPlayer.stop()).thenReturn(true);
-    when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(false);
-    when(mockPlayer.currentSong).thenReturn("mocklive");
-    when(mockCurrentTimerContract.currentTime).thenReturn(0);
-    when(mockPlayer.onConnection).thenReturn((isError) {
-      tester.allStates.forEach((state) {
-        if (state is PodcastControlsState) {
-          state.onConnectionError();
-        }
-      });
-    });
-
-    await tester.pumpWidget(startWidget(
-        PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
-    mockPlayer.onConnection!(true);
-    await tester.pumpAndSettle();
-
-    expect(find.byKey(Key("connection_snackbar"), skipOffstage: true),
-        findsOneWidget);
-  });
-
   testWidgets('that in podcast controls can put playback rate for faster',
       (WidgetTester tester) async {
     when(mockRepository.getLiveBroadcast())
@@ -167,13 +138,14 @@ void main() {
     when(mockPlayer.isPlaying()).thenReturn(true);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(true);
-    when(mockPlayer.currentSong).thenReturn("mocklive");
-    when(mockPlayer.duration).thenReturn(Duration(seconds: 220));
-    when(mockPlayer.position).thenReturn(Duration(seconds: 110));
-    when(mockPlayer.currentSong).thenReturn("mocklive");
-    when(mockPlayer.playbackRate).thenReturn(1.5);
-    when(mockCurrentTimerContract.currentTime).thenReturn(110);
+
+    mockPlayer.isPodcast = true;
+    mockPlayer.currentSong = "mocklive";
+    mockPlayer.duration = Duration(seconds: 220);
+    mockPlayer.position = Duration(seconds: 110);
+    mockPlayer.currentSong = "mocklive";
+    mockCurrentTimerContract.currentTime = 110;
+    when(mockPlayer.getPlaybackRate()).thenReturn(1.5);
 
     await tester.pumpWidget(startWidget(
         PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
@@ -187,4 +159,35 @@ void main() {
 
     expect(find.byType(NeumorphicView, skipOffstage: false), findsNWidgets(1));
   });
+
+  testWidgets(
+      'that in podcast controls can handle error on connection while playing',
+          (WidgetTester tester) async {
+        when(mockRepository.getLiveBroadcast())
+            .thenAnswer((_) => MockRadiocoRepository.now());
+        when(mockConnection.isConnectionAvailable())
+            .thenAnswer((_) => Future.value(true));
+        when(mockPlayer.isPlaying()).thenReturn(false);
+        when(mockPlayer.stop()).thenReturn(true);
+        when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
+        mockPlayer.isPodcast = false;
+        mockPlayer.currentSong = "mocklive";
+        mockCurrentTimerContract.currentTime = 0;
+
+        when(mockPlayer.onConnection).thenReturn((isError) {
+          tester.allStates.forEach((state) {
+            if (state is PodcastControlsState) {
+              state.onConnectionError();
+            }
+          });
+        });
+
+        await tester.pumpWidget(startWidget(
+            PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
+        mockPlayer.onConnection!(true);
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(Key("connection_snackbar"), skipOffstage: true),
+            findsOneWidget);
+      });
 }

@@ -2,6 +2,7 @@ import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/now.dart';
+import 'package:cuacfm/models/outstanding.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/models/time_table.dart';
@@ -31,6 +32,7 @@ void main() {
     await server.start();
     mockRaiodocApi.baseUrl = server.url;
     mockRaiodocApi.feedUrl = server.url;
+    mockRaiodocApi.outstandingUrl = server.url;
     mockUrl = server.url;
     Injector.appInstance.registerDependency<RadioStation>(
             () => RadioStationInstrument.givenARadioStation(feed: mockUrl),
@@ -154,5 +156,18 @@ void main() {
     server.enqueue(body: "", httpCode: 401);
     List<Episode> result = await remoteDataSource.getEpisodes(mockUrl);
     expect(result.length, equals(0));
+  });
+
+  test('that can parse a response for outstanding data', () async {
+    server.enqueue(body: Helper.readFile("test_mocks/get_outstanding.json"));
+    server.enqueue(body: Helper.readFile("test_mocks/get_outstanding_image.json"));
+    Outstanding? result = await remoteDataSource.getOutstanding();
+    expect(result?.title, contains("mocked"));
+  });
+
+  test('that can handle errors in outstanding data', () async {
+    server.enqueue(body: "",httpCode: 401);
+    Outstanding? result = await remoteDataSource.getOutstanding();
+    expect(result, isNull);
   });
 }

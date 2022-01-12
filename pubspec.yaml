@@ -40,7 +40,7 @@ dependencies:
   firebase_crashlytics: ^2.4.5
   firebase_analytics: ^9.0.5
   firebase_in_app_messaging: ^0.6.0+6
-  mock_web_server: ^4.1.1
+  mock_web_server: ^5.0.0-nullsafety.1
   mockito: ^5.0.17
   path_provider: ^2.0.8
 
@@ -60,6 +60,7 @@ flutter:
       - assets/graphics/play_podcast.png
       - assets/graphics/cuac-logo.png
       - assets/graphics/empty-logo.png
+      - assets/graphics/joinus.jpg
       - assets/graphics/categories/tv.jpeg
       - assets/graphics/categories/news.jpeg
       - assets/graphics/categories/sports.jpeg

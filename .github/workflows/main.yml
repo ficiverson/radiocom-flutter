@@ -11,7 +11,7 @@ jobs:
           flutter-version: '2.8.1'
           channel: 'stable'
       - run: flutter pub get
-      - run: flutter  analyze
+      - run: flutter analyze
       - run: flutter test --coverage
       - run: flutter pub global activate remove_from_coverage
       - run: flutter pub global run remove_from_coverage:remove_from_coverage -f coverage/lcov.info -r '.g.dart,license.dart,_router.dart,current_player.dart,bottom_bar.dart,connection_contract.dart,custom_image.dart,neumorfism.dart,notification_subscription_contract.dart,player_view.dart,top_bar.dart$'

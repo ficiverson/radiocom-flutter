@@ -17,4 +17,6 @@ class RadiocoAPIMock extends RadiocoAPIContract {
     var live = "radiocom/transmissions/now?format=json";
     @override
     var feedUrl = "https://cuacfm.org/feed/";
+    @override String
+    outstandingUrl = "https://cuacfm.org/wp-json/wp/v2/pages/4621";
 }

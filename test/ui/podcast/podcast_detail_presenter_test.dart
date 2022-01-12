@@ -66,7 +66,7 @@ void main() {
     when(mockPlayer.isPlaying()).thenReturn(true);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(false);
+    mockPlayer.isPodcast = false;
 
     presenter.onViewResumed();
     await Future.delayed(Duration(milliseconds: 200));
@@ -83,7 +83,7 @@ void main() {
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.stop()).thenReturn(true);
         when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+        mockPlayer.isPodcast = false;
 
         presenter.onViewResumed();
         await Future.delayed(Duration(milliseconds: 200));
@@ -101,7 +101,7 @@ void main() {
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.stop()).thenReturn(true);
         when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+        mockPlayer.isPodcast = false;
 
         presenter.onViewResumed();
         await Future.delayed(Duration(milliseconds: 200));
@@ -116,7 +116,7 @@ void main() {
                 (_) => MockRadiocoRepository.now());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
 
         presenter.onViewResumed();
         await Future.delayed(Duration(milliseconds: 200));
@@ -134,7 +134,7 @@ void main() {
                 (_) => MockRadiocoRepository.episodes());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
 
         presenter.loadEpisodes("feed");
         await Future.delayed(Duration(milliseconds: 200));
@@ -152,7 +152,7 @@ void main() {
                 (_) => MockRadiocoRepository.episodes(isEmpty: true));
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
 
         presenter.loadEpisodes("feed");
         await Future.delayed(Duration(milliseconds: 200));
@@ -170,11 +170,11 @@ void main() {
                 (_) => MockRadiocoRepository.episodes(isEmpty: true));
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
-        when(mockPlayer.episode).thenReturn(EpisodeInstrument.givenAnEpisode());
+        mockPlayer.isPodcast = true;
+        mockPlayer.episode = EpisodeInstrument.givenAnEpisode();
 
 
-       expect( presenter.isSamePodcast(EpisodeInstrument.givenAnEpisode()), true);
+       expect(presenter.isSamePodcast(EpisodeInstrument.givenAnEpisode()), true);
       });
 
 
@@ -187,8 +187,8 @@ void main() {
                 (_) => MockRadiocoRepository.episodes(isEmpty: true));
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
-        when(mockPlayer.episode).thenReturn(EpisodeInstrument.givenAnEpisode());
+        mockPlayer.isPodcast = true;
+        mockPlayer.episode = EpisodeInstrument.givenAnEpisode();
 
 
         expect( presenter.isSamePodcast(EpisodeInstrument.givenAnEpisode(audioUrl: "http://myaudio")), false);
@@ -203,11 +203,11 @@ void main() {
                 (_) => MockRadiocoRepository.episodes(isEmpty: true));
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.isStreamingAudio()).thenReturn(true);
         when(mockPlayer.stopAndPlay()).thenAnswer((_) => Future.value(true));
-        when(mockPlayer.episode).thenReturn(EpisodeInstrument.givenAnEpisode(audioUrl: "http://random"));
+        mockPlayer.episode = EpisodeInstrument.givenAnEpisode(audioUrl: "http://random");
 
         presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image");
         await Future.delayed(Duration(milliseconds: 200));
@@ -225,11 +225,11 @@ void main() {
                 (_) => MockRadiocoRepository.episodes(isEmpty: true));
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
         when(mockPlayer.isPlaying()).thenReturn(true);
         when(mockPlayer.isStreamingAudio()).thenReturn(true);
         when(mockPlayer.stopAndPlay()).thenAnswer((_) => Future.value(false));
-        when(mockPlayer.episode).thenReturn(EpisodeInstrument.givenAnEpisode(audioUrl: "http://random"));
+        mockPlayer.episode = EpisodeInstrument.givenAnEpisode(audioUrl: "http://random");
 
         presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image");
         await Future.delayed(Duration(milliseconds: 200));
@@ -247,11 +247,11 @@ void main() {
                 (_) => MockRadiocoRepository.episodes(isEmpty: true));
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
         when(mockPlayer.isPlaying()).thenReturn(false);
         when(mockPlayer.isStreamingAudio()).thenReturn(true);
         when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-        when(mockPlayer.episode).thenReturn(EpisodeInstrument.givenAnEpisode(audioUrl: "http://random"));
+        mockPlayer.episode = EpisodeInstrument.givenAnEpisode(audioUrl: "http://random");
 
         presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image");
         await Future.delayed(Duration(milliseconds: 200));
@@ -269,11 +269,11 @@ void main() {
                 (_) => MockRadiocoRepository.episodes(isEmpty: true));
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
         when(mockPlayer.isPlaying()).thenReturn(false);
         when(mockPlayer.isStreamingAudio()).thenReturn(true);
         when(mockPlayer.play()).thenAnswer((_) => Future.value(false));
-        when(mockPlayer.episode).thenReturn(EpisodeInstrument.givenAnEpisode(audioUrl: "http://random"));
+        mockPlayer.episode = EpisodeInstrument.givenAnEpisode(audioUrl: "http://random");
 
         presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image");
         await Future.delayed(Duration(milliseconds: 200));
@@ -291,9 +291,11 @@ void main() {
                 (_) => MockRadiocoRepository.episodes(isEmpty: true));
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
+        mockPlayer.episode = EpisodeInstrument.givenAnEpisode();
         when(mockPlayer.isPlaying()).thenReturn(false);
-        when(mockPlayer.episode).thenReturn(EpisodeInstrument.givenAnEpisode());
+        when(mockPlayer.resume()).thenAnswer((_) => Future.value());
+
 
         presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image");
         await Future.delayed(Duration(milliseconds: 200));
@@ -309,7 +311,7 @@ void main() {
                 (_) => MockRadiocoRepository.now());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
 
         presenter.onPodcastControlsClicked(EpisodeInstrument.givenAnEpisode());
         await Future.delayed(Duration(milliseconds: 200));
@@ -325,7 +327,7 @@ void main() {
                 (_) => MockRadiocoRepository.now());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
 
         presenter.onDetailPodcast("title","subtile","content","http://url");
         await Future.delayed(Duration(milliseconds: 200));
@@ -341,7 +343,7 @@ void main() {
                 (_) => MockRadiocoRepository.now());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+        mockPlayer.isPodcast = true;
 
         presenter.onDetailEpisode("title","subtile","content","http://url");
         await Future.delayed(Duration(milliseconds: 200));

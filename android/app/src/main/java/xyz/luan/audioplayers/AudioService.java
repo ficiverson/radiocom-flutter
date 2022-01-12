@@ -283,13 +283,24 @@ public class AudioService extends Service {
 		void sendNotification(@ColorInt int color, Bitmap result) {
 			// Create notification default intent.
 			Intent intent = new Intent(context, MainActivity.class);
-			PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+			PendingIntent pendingIntent;
+			if (Build.VERSION.SDK_INT >= 23) {
+				pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+			} else {
+				pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+			}
 
 			final NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
 			Intent stopIntent = new Intent(context, AudioService.class);
 			stopIntent.setAction("ACTION.CLOSE_ACTION");
-			PendingIntent closeIntent = PendingIntent.getService(context, 0, stopIntent, 0);
+			PendingIntent closeIntent;
+			if (Build.VERSION.SDK_INT >= 23) {
+				closeIntent = PendingIntent.getService(context, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE);
+			} else {
+				closeIntent = PendingIntent.getService(context, 0, stopIntent, 0);
+			}
+
 
 			NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
 					.setStyle(
