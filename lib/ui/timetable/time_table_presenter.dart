@@ -6,7 +6,6 @@ import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/timetable/time_table_router.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
-import 'package:flutter/widgets.dart';
 import 'package:injector/injector.dart';
 
 abstract class TimeTableView {
@@ -19,14 +18,14 @@ class TimeTablePresenter {
   Invoker invoker;
   TimeTableRouterContract router;
   GetLiveProgramUseCase getLiveDataUseCase;
-  ConnectionContract connection;
-  CurrentPlayerContract currentPlayer;
+  late ConnectionContract connection;
+  late CurrentPlayerContract currentPlayer;
 
   TimeTablePresenter(
     this.view, {
-    @required this.invoker,
-    @required this.router,
-    @required this.getLiveDataUseCase,
+    required this.invoker,
+    required this.router,
+    required this.getLiveDataUseCase,
   }) {
     connection = Injector.appInstance.get<ConnectionContract>();
     currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
@@ -74,7 +73,9 @@ class TimeTablePresenter {
     await currentPlayer.pause();
   }
 
-  onPodcastControlsClicked(Episode episode) {
-    router.goToPodcastControls(episode);
+  onPodcastControlsClicked(Episode? episode) {
+    if(episode != null) {
+      router.goToPodcastControls(episode);
+    }
   }
 }

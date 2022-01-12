@@ -9,7 +9,7 @@ class Wave extends StatefulWidget {
   final Size size;
   final bool shouldAnimate;
 
-  const Wave({Key key, @required this.size, @required this.shouldAnimate})
+  const Wave({Key? key, required this.size, required this.shouldAnimate})
       : super(key: key);
 
   @override
@@ -17,10 +17,10 @@ class Wave extends StatefulWidget {
 }
 
 class WaveState extends State<Wave> with SingleTickerProviderStateMixin {
-  List<Offset> _points;
-  AnimationController _controller;
+  late List<Offset> _points;
+  late AnimationController _controller;
 
-  RadiocomColorsConract _colors;
+  late RadiocomColorsConract _colors;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class WaveState extends State<Wave> with SingleTickerProviderStateMixin {
     }
     return AnimatedBuilder(
       animation: _controller,
-      builder: (BuildContext context, Widget child) {
+      builder: (BuildContext context, Widget? child) {
         return ClipPath(
           clipper: WaveClipper(_points),
           child: Container(

@@ -6,7 +6,6 @@ import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:injector/injector.dart';
 
 import 'all_podcast_router.dart';
@@ -21,13 +20,13 @@ class AllPodcastPresenter {
   AllPodcastView view;
   Invoker invoker;
   GetLiveProgramUseCase getLiveDataUseCase;
-  ConnectionContract connection;
-  CurrentPlayerContract currentPlayer;
+  late ConnectionContract connection;
+  late CurrentPlayerContract currentPlayer;
 
   AllPodcastPresenter(this.view,
-      {@required this.invoker,
-      @required this.router,
-      @required this.getLiveDataUseCase}) {
+      {required this.invoker,
+      required this.router,
+      required this.getLiveDataUseCase}) {
     connection = Injector.appInstance.get<ConnectionContract>();
     currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
   }
@@ -74,7 +73,9 @@ class AllPodcastPresenter {
     router.goToPodcastDetail(podcast);
   }
 
-  onPodcastControlsClicked(Episode episode) {
-    router.goToPodcastControls(episode);
+  onPodcastControlsClicked(Episode? episode) {
+    if(episode != null){
+      router.goToPodcastControls(episode);
+    }
   }
 }

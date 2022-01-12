@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
-import 'package:meta/meta.dart';
 
 // workaround for iPhone X which draws navigation in the bottom of the screen.
 // Wait until https://github.com/flutter/flutter/issues/12099 is fixed
@@ -9,7 +8,7 @@ class IPhoneXPadding extends Container {
   final Widget child;
 
   IPhoneXPadding({
-    @required this.child,
+    required this.child,
   });
 
   @override

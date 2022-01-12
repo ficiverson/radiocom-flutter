@@ -10,21 +10,21 @@ enum DataProvider { local, network}
 
 class Result<T> {
 
-  Status status;
-  DataProvider provider;
+  Status? status;
+  DataProvider? provider;
 
-  T data;
+  T? data;
 
-  Result(Status status, T data){
+  Result(Status? status, T? data){
     this.status = status;
     this.data = data;
   }
 
-  T getData() {
+  T? getData() {
     return data;
   }
 
-  Status getStatus(){
+  Status? getStatus(){
     return status;
   }
 }

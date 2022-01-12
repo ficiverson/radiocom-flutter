@@ -11,7 +11,6 @@ import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
 import 'package:cuacfm/utils/top_bar.dart';
 import 'package:cuacfm/utils/wave.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
@@ -19,7 +18,7 @@ import 'package:intl/intl.dart';
 import 'package:progress_indicators/progress_indicators.dart';
 
 class PodcastControls extends StatefulWidget {
-  PodcastControls({Key key, this.episode}) : super(key: key);
+  PodcastControls({Key? key, required this.episode}) : super(key: key);
   final Episode episode;
   @override
   PodcastControlsState createState() => PodcastControlsState();
@@ -28,23 +27,23 @@ class PodcastControls extends StatefulWidget {
 class PodcastControlsState extends State<PodcastControls>
     with WidgetsBindingObserver
     implements PodcastControlsView {
-  CurrentPlayerContract currentPlayer;
+  late CurrentPlayerContract currentPlayer;
   var mediaQuery;
-  RadiocomColorsConract _colors;
+  late RadiocomColorsConract _colors;
   var loadingView;
   var loading = false;
-  PodcastControlsPresenter _presenter;
+  late PodcastControlsPresenter _presenter;
   bool isContentUpdated = true;
-  EventChannel _notificationEvent =
+  EventChannel? _notificationEvent =
       EventChannel('cuacfm.flutter.io/updateNotificationPodcastControl');
-  SnackBar snackBarConnection;
+  SnackBar? snackBarConnection;
   int sleepSelectedIndex = 0;
   int fasterSelectedIndex = 1;
   Duration currentTimeCountdown = Duration.zero;
   bool shouldShowTimer = false;
   bool shouldShowFaster = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  CuacLocalization _localization;
+  late CuacLocalization _localization;
 
   PodcastControlsState() {
     DependencyInjector().injectByView(this);
@@ -87,7 +86,7 @@ class PodcastControlsState extends State<PodcastControls>
       }
     };
     if (Platform.isAndroid) {
-      _notificationEvent.receiveBroadcastStream().listen((onData) {
+      _notificationEvent?.receiveBroadcastStream().listen((onData) {
         if (_notificationEvent != null) {
           setState(() {
             currentPlayer.release();
@@ -122,7 +121,7 @@ class PodcastControlsState extends State<PodcastControls>
       }
     };
 
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
   }
 
   @override
@@ -131,7 +130,7 @@ class PodcastControlsState extends State<PodcastControls>
     _notificationEvent = null;
     currentPlayer.onUpdate = null;
     Injector.appInstance.removeByKey<PodcastControlsView>();
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
   }
 
@@ -173,7 +172,7 @@ class PodcastControlsState extends State<PodcastControls>
         content: Text(SafeMap.safe(
             _localization.translateMap("error"), ["internet_error"])),
       );
-      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection);
+      ScaffoldMessenger.of(context).showSnackBar(snackBarConnection!);
     }
   }
 
@@ -187,7 +186,9 @@ class PodcastControlsState extends State<PodcastControls>
             physics: BouncingScrollPhysics(),
             child: new Container(
                 width: mediaQuery.size.width,
-                height: mediaQuery.size.height + (shouldShowFaster?150.0:70.0) + (shouldShowTimer?150.0:0.0),
+                height: mediaQuery.size.height +
+                    (shouldShowFaster ? 150.0 : 70.0) +
+                    (shouldShowTimer ? 150.0 : 0.0),
                 child: Column(children: <Widget>[
                   Container(
                       margin: EdgeInsets.fromLTRB(5.0, 15.0, 0.0, 0.0),
@@ -338,7 +339,7 @@ class PodcastControlsState extends State<PodcastControls>
     return iconPlayer;
   }
 
-  String printDuration(Duration duration) {
+  String printDuration(Duration? duration) {
     if (duration == null) {
       return "";
     } else {
@@ -430,56 +431,80 @@ class PodcastControlsState extends State<PodcastControls>
   }
 
   Widget getBottomBarActions() {
-    return Container(child: Column(children: [
-      Row(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.center,children: [
-        _presenter.currentPlayer.isPlaying()
-            ? Padding(
-            padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0.0),
-            child: ActionChip(
-                key: Key("timer_chip"),
-                backgroundColor: !shouldShowTimer ? _colors.neuPalidGrey : _colors.grey,
-                avatar: CircleAvatar(
-                  backgroundColor: !shouldShowTimer ? _colors.neuPalidGrey : _colors.grey,
-                  child: Icon(Icons.timer, color: !shouldShowTimer? _colors.grey : _colors.white),
-                ),
-                label: Text(getTextForCountDown(),style:TextStyle(
-                  fontSize: 13.0,
-                  letterSpacing: 1.1,
-                  fontWeight: FontWeight.w400,
-                  color: !shouldShowTimer? _colors.grey : _colors.white,
-                )),
-                onPressed: () {
-                  setState(() {
-                    shouldShowFaster = false;
-                    shouldShowTimer = !shouldShowTimer;
-                  });
-                }
-            )): Container(),
-        _presenter.currentPlayer.isPlaying() &&
-            _presenter.currentPlayer.isPodcast
-            ? Padding(
-            padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0.0),
-            child: ActionChip(
-                key: Key("faster_chip"),
-                backgroundColor: !shouldShowFaster ? _colors.neuPalidGrey : _colors.grey,
-                avatar: CircleAvatar(
-                  backgroundColor: !shouldShowFaster ? _colors.neuPalidGrey : _colors.grey,
-                  child: Icon(Icons.speed, color: !shouldShowFaster? _colors.grey : _colors.white),
-                ),
-                label: Text(getTextForFasters(),style:TextStyle(
-                  fontSize: 13.0,
-                  letterSpacing: 1.1,
-                  fontWeight: FontWeight.w400,
-                  color: !shouldShowFaster? _colors.grey : _colors.white,
-                )),
-                onPressed: () {
-                  setState(() {
-                    shouldShowTimer = false;
-                    shouldShowFaster = !shouldShowFaster;
-                  });
-                }
-            )) : Container()
-      ]),
+    return Container(
+        child: Column(children: [
+      Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _presenter.currentPlayer.isPlaying()
+                ? Padding(
+                    padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0.0),
+                    child: ActionChip(
+                        key: Key("timer_chip"),
+                        backgroundColor: !shouldShowTimer
+                            ? _colors.neuPalidGrey
+                            : _colors.grey,
+                        avatar: CircleAvatar(
+                          backgroundColor: !shouldShowTimer
+                              ? _colors.neuPalidGrey
+                              : _colors.grey,
+                          child: Icon(Icons.timer,
+                              color: !shouldShowTimer
+                                  ? _colors.grey
+                                  : _colors.white),
+                        ),
+                        label: Text(getTextForCountDown(),
+                            style: TextStyle(
+                              fontSize: 13.0,
+                              letterSpacing: 1.1,
+                              fontWeight: FontWeight.w400,
+                              color: !shouldShowTimer
+                                  ? _colors.grey
+                                  : _colors.white,
+                            )),
+                        onPressed: () {
+                          setState(() {
+                            shouldShowFaster = false;
+                            shouldShowTimer = !shouldShowTimer;
+                          });
+                        }))
+                : Container(),
+            _presenter.currentPlayer.isPlaying() &&
+                    _presenter.currentPlayer.isPodcast
+                ? Padding(
+                    padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0.0),
+                    child: ActionChip(
+                        key: Key("faster_chip"),
+                        backgroundColor: !shouldShowFaster
+                            ? _colors.neuPalidGrey
+                            : _colors.grey,
+                        avatar: CircleAvatar(
+                          backgroundColor: !shouldShowFaster
+                              ? _colors.neuPalidGrey
+                              : _colors.grey,
+                          child: Icon(Icons.speed,
+                              color: !shouldShowFaster
+                                  ? _colors.grey
+                                  : _colors.white),
+                        ),
+                        label: Text(getTextForFasters(),
+                            style: TextStyle(
+                              fontSize: 13.0,
+                              letterSpacing: 1.1,
+                              fontWeight: FontWeight.w400,
+                              color: !shouldShowFaster
+                                  ? _colors.grey
+                                  : _colors.white,
+                            )),
+                        onPressed: () {
+                          setState(() {
+                            shouldShowTimer = false;
+                            shouldShowFaster = !shouldShowFaster;
+                          });
+                        }))
+                : Container()
+          ]),
       _presenter.currentPlayer.isPlaying() && shouldShowTimer
           ? Padding(
               padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
@@ -532,56 +557,52 @@ class PodcastControlsState extends State<PodcastControls>
                       ))))
           : Container(),
       shouldShowFaster &&
-          _presenter.currentPlayer.isPlaying() &&
-          _presenter.currentPlayer.isPodcast
+              _presenter.currentPlayer.isPlaying() &&
+              _presenter.currentPlayer.isPodcast
           ? Padding(
-          padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
-          child: NeumorphicView(
-              isFullScreen: false,
-              child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                      10.0, 20.0, 10.0, 20.0),
-                  child: Wrap(
-                    children: List<Widget>.generate(
-                      5,
+              padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
+              child: NeumorphicView(
+                  isFullScreen: false,
+                  child: Padding(
+                      padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
+                      child: Wrap(
+                        children: List<Widget>.generate(
+                          5,
                           (int index) {
-                        return Padding(
-                            padding: EdgeInsets.fromLTRB(
-                                2.0, 0.0, 2.0, 0.0),
-                            child: RawChip(
-                              key: Key("faster_chip_" +
-                                  index.toString() +
-                                  "_speed"),
-                              showCheckmark: true,
-                              checkmarkColor: _colors.white,
-                              labelStyle: TextStyle(
-                                fontSize: 15.0,
-                                letterSpacing: 1.1,
-                                fontWeight: FontWeight.w400,
-                                color:
-                                index == fasterSelectedIndex
-                                    ? _colors.white
-                                    : _colors.grey,
-                              ),
-                              label: Text(
-                                  '${getValue(index).toString()}x',
-                                  textAlign: TextAlign.center),
-                              selected:
-                              fasterSelectedIndex == index,
-                              selectedColor: _colors.palidwhiteverydark,
-                              backgroundColor:
-                              _colors.palidwhitedark,
-                              onSelected: (bool selected) {
-                                setState(() {
-                                  fasterSelectedIndex = index;
-                                  _presenter.onSpeedSelected(
-                                      getValue(index));
-                                });
-                              },
-                            ));
-                      },
-                    ).toList(),
-                  )))) : Container()
+                            return Padding(
+                                padding:
+                                    EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
+                                child: RawChip(
+                                  key: Key("faster_chip_" +
+                                      index.toString() +
+                                      "_speed"),
+                                  showCheckmark: true,
+                                  checkmarkColor: _colors.white,
+                                  labelStyle: TextStyle(
+                                    fontSize: 15.0,
+                                    letterSpacing: 1.1,
+                                    fontWeight: FontWeight.w400,
+                                    color: index == fasterSelectedIndex
+                                        ? _colors.white
+                                        : _colors.grey,
+                                  ),
+                                  label: Text('${getValue(index).toString()}x',
+                                      textAlign: TextAlign.center),
+                                  selected: fasterSelectedIndex == index,
+                                  selectedColor: _colors.palidwhiteverydark,
+                                  backgroundColor: _colors.palidwhitedark,
+                                  onSelected: (bool selected) {
+                                    setState(() {
+                                      fasterSelectedIndex = index;
+                                      _presenter
+                                          .onSpeedSelected(getValue(index));
+                                    });
+                                  },
+                                ));
+                          },
+                        ).toList(),
+                      ))))
+          : Container()
     ]));
   }
 }

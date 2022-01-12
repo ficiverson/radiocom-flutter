@@ -1,6 +1,5 @@
 
 import 'package:cuacfm/utils/radiocom_colors.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:injector/injector.dart';
@@ -10,36 +9,35 @@ class CustomImage extends StatefulWidget {
   CustomImage(
       {this.resPath,
       this.fit,
-      this.width,
-      this.height,
-      this.radius, this.background = true,
+      this.width, this.height,
+      required this.radius, this.background = true,
       this.alignment = Alignment.center});
 
-  final String resPath;
-  final BoxFit fit;
-  final double width;
-  final double height;
+  final String? resPath;
+  final BoxFit? fit;
+  final double? width;
+  final double? height;
   final double radius;
   final bool background;
-  final AlignmentGeometry alignment;
+  final Alignment alignment;
   @override
   State<StatefulWidget> createState() => CustomImageState();
 }
 
 class CustomImageState extends State<CustomImage> {
-  RadiocomColorsConract _colors;
+  late RadiocomColorsConract _colors;
   @override
   Widget build(BuildContext context) {
     _colors = Injector.appInstance.get<RadiocomColorsConract>();
     var customImage;
     if (widget.resPath == null) {
       customImage = new Icon(Icons.warning);
-    } else if (widget.resPath.contains("http")) {
+    } else if (widget.resPath!.contains("http")) {
       customImage = new CachedNetworkImage(
           fit: widget.fit,
           width: widget.width,
           height: widget.height,
-          imageUrl: widget.resPath,
+          imageUrl: widget.resPath!,
           alignment: widget.alignment,
           placeholder: (context, url) => JumpingDotsProgressIndicator(
                 numberOfDots: 3,
@@ -48,9 +46,9 @@ class CustomImageState extends State<CustomImage> {
                 dotSpacing: 5.0
               ),
           errorWidget: (context, url, error) => new Icon(Icons.error));
-    } else if (widget.resPath.isNotEmpty) {
+    } else if (widget.resPath!.isNotEmpty) {
       customImage = Image.asset(
-        widget.resPath,
+        widget.resPath!,
         fit: widget.fit,
         width: widget.width,
         height: widget.height,

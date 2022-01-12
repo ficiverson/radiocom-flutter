@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:cuacfm/utils/radiocom_colors.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:injector/injector.dart';
@@ -13,7 +12,7 @@ typedef void MenuOptionCallback(BottomBarOption option, bool isMenu);
 enum BottomBarOption { HOME, SEARCH, NEWS }
 
 class BottomBar extends StatefulWidget {
-  BottomBar({this.onOptionSelected});
+  BottomBar({required this.onOptionSelected});
 
   final MenuOptionCallback onOptionSelected;
 
@@ -22,8 +21,8 @@ class BottomBar extends StatefulWidget {
 }
 
 class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
-  RadiocomColorsConract _colors;
-  AnimationController _resizableController;
+  late RadiocomColorsConract _colors;
+  late AnimationController _resizableController;
   var bottomBarOption = BottomBarOption.HOME;
 
   _onOptionSelected(bool isMenu) {

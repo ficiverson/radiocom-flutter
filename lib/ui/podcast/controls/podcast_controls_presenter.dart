@@ -5,7 +5,6 @@ import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/player/current_timer.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
-import 'package:flutter/widgets.dart';
 import 'package:injector/injector.dart';
 import 'package:share/share.dart';
 
@@ -17,13 +16,13 @@ abstract class PodcastControlsView {
 class PodcastControlsPresenter {
   PodcastControlsView _view;
   Invoker invoker;
-  CurrentTimerContract currentTimer;
-  CurrentPlayerContract currentPlayer;
-  ConnectionContract connection;
+  late CurrentTimerContract currentTimer;
+  late CurrentPlayerContract currentPlayer;
+  late ConnectionContract connection;
   GetLiveProgramUseCase getLiveDataUseCase;
 
   PodcastControlsPresenter(this._view,
-      {@required this.invoker, @required this.getLiveDataUseCase}) {
+      {required this.invoker, required this.getLiveDataUseCase}) {
     currentTimer = Injector.appInstance.get<CurrentTimerContract>();
     connection = Injector.appInstance.get<ConnectionContract>();
     currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
@@ -75,7 +74,7 @@ class PodcastControlsPresenter {
   onShareClicked() {
     String link = "https://cuacfm.org";
     if (currentPlayer.isPodcast) {
-      link = currentPlayer.episode.link;
+      link = currentPlayer.episode?.link ?? "https://cuacfm.org";
     }
     Share.share(currentPlayer.currentSong + " via " + link);
   }

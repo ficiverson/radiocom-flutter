@@ -13,7 +13,7 @@ import 'package:injector/injector.dart';
 
 abstract class HomeRouterContract {
   goToTimeTable(List<TimeTable> timeTables);
-  goToAllPodcast(List<Program> podcasts, {String category});
+  goToAllPodcast(List<Program> podcasts, {String? category});
   goToNewDetail(New itemNew);
   goToSettings(VoidCallback invokeResult);
   goToPodcastDetail(Program podcast);
@@ -32,7 +32,7 @@ class HomeRouter implements HomeRouterContract {
   }
 
   @override
-  goToAllPodcast(List<Program> podcasts, {String category}) {
+  goToAllPodcast(List<Program> podcasts, {String? category}) {
     Navigator.of(Injector.appInstance.get<BuildContext>()).push(
         MaterialPageRoute(
             settings: RouteSettings(name: "allpodcast"),

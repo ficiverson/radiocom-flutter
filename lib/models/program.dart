@@ -38,11 +38,11 @@ class Program {
             map["category"] != null ? map["category"] : "Otros"),
         category = mapCategory(map["category"] != null ? map["category"] : "");
 
-  static String getLanguage(String language){
+  static String getLanguage(String language) {
     var language = "Español";
-    if(language == "es"){
+    if (language == "es") {
       language = "Español";
-    } else if(language == "gl"){
+    } else if (language == "gl") {
       language = "Galego";
     }
     return language;
@@ -50,7 +50,7 @@ class Program {
 
   static ProgramCategories mapCategoryType(String content) {
     //THINK about shows
-    ProgramCategories categoryType;
+    ProgramCategories categoryType = ProgramCategories.TV;
     switch (content) {
       case "TV & Film":
         categoryType = ProgramCategories.TV;
@@ -95,45 +95,46 @@ class Program {
   }
 
   static String mapCategory(String content) {
-    CuacLocalization _localization = Injector.appInstance.get<CuacLocalization>();
-    String category = SafeMap.safe(
-        _localization.translateMap("categories"), ["others"]);
+    CuacLocalization _localization =
+        Injector.appInstance.get<CuacLocalization>();
+    String category =
+        SafeMap.safe(_localization.translateMap("categories"), ["others"]);
     switch (content) {
       case "TV & Film":
-        category = SafeMap.safe(
-            _localization.translateMap("categories"), ["tv"]);
+        category =
+            SafeMap.safe(_localization.translateMap("categories"), ["tv"]);
         break;
       case "News & Politics":
-        category = SafeMap.safe(
-            _localization.translateMap("categories"), ["news"]);
+        category =
+            SafeMap.safe(_localization.translateMap("categories"), ["news"]);
         break;
       case "Sports & Recreation":
-        category = SafeMap.safe(
-            _localization.translateMap("categories"), ["sport"]);
+        category =
+            SafeMap.safe(_localization.translateMap("categories"), ["sport"]);
         break;
       case "Society & Culture":
         category = SafeMap.safe(
             _localization.translateMap("categories"), ["magazine"]);
         break;
       case "Education":
-        category = SafeMap.safe(
-            _localization.translateMap("categories"), ["edu"]);
+        category =
+            SafeMap.safe(_localization.translateMap("categories"), ["edu"]);
         break;
       case "Comedy":
-        category = SafeMap.safe(
-            _localization.translateMap("categories"), ["comedy"]);
+        category =
+            SafeMap.safe(_localization.translateMap("categories"), ["comedy"]);
         break;
       case "Music":
-        category = SafeMap.safe(
-            _localization.translateMap("categories"), ["music"]);
+        category =
+            SafeMap.safe(_localization.translateMap("categories"), ["music"]);
         break;
       case "Science & Medicine":
-        category = SafeMap.safe(
-            _localization.translateMap("categories"), ["science"]);
+        category =
+            SafeMap.safe(_localization.translateMap("categories"), ["science"]);
         break;
       case "Arts":
-        category = SafeMap.safe(
-            _localization.translateMap("categories"), ["art"]);
+        category =
+            SafeMap.safe(_localization.translateMap("categories"), ["art"]);
         break;
       case "Government & Organizations":
         category = SafeMap.safe(
@@ -144,8 +145,8 @@ class Program {
             _localization.translateMap("categories"), ["goverment"]);
         break;
       case "Technology":
-        category = SafeMap.safe(
-            _localization.translateMap("categories"), ["tech"]);
+        category =
+            SafeMap.safe(_localization.translateMap("categories"), ["tech"]);
         break;
       default:
         break;
@@ -154,57 +155,58 @@ class Program {
   }
 
   static String getCategory(ProgramCategories category) {
-    CuacLocalization _localization = Injector.appInstance.get<CuacLocalization>();
-    String content =  SafeMap.safe(
-        _localization.translateMap("categories"), ["others"]);
+    CuacLocalization _localization =
+        Injector.appInstance.get<CuacLocalization>();
+    String content =
+        SafeMap.safe(_localization.translateMap("categories"), ["others"]);
     switch (category) {
       case ProgramCategories.TV:
-        content =SafeMap.safe(
-            _localization.translateMap("categories"), ["tv"]);
+        content =
+            SafeMap.safe(_localization.translateMap("categories"), ["tv"]);
         break;
       case ProgramCategories.NEWS:
-        content = SafeMap.safe(
-        _localization.translateMap("categories"), ["news"]);
+        content =
+            SafeMap.safe(_localization.translateMap("categories"), ["news"]);
         break;
       case ProgramCategories.SPORTS:
-        content =  SafeMap.safe(
-            _localization.translateMap("categories"), ["sport"]);
+        content =
+            SafeMap.safe(_localization.translateMap("categories"), ["sport"]);
         break;
       case ProgramCategories.SOCIETY:
-        content =  SafeMap.safe(
+        content = SafeMap.safe(
             _localization.translateMap("categories"), ["magazine"]);
         break;
       case ProgramCategories.EDUCATION:
-        content =  SafeMap.safe(
-            _localization.translateMap("categories"), ["edu"]);
+        content =
+            SafeMap.safe(_localization.translateMap("categories"), ["edu"]);
         break;
       case ProgramCategories.COMEDY:
-        content =  SafeMap.safe(
-            _localization.translateMap("categories"), ["comedy"]);
+        content =
+            SafeMap.safe(_localization.translateMap("categories"), ["comedy"]);
         break;
       case ProgramCategories.MUSIC:
-        content =  SafeMap.safe(
-            _localization.translateMap("categories"), ["music"]);
+        content =
+            SafeMap.safe(_localization.translateMap("categories"), ["music"]);
         break;
       case ProgramCategories.SCIENCE:
-        content =  SafeMap.safe(
-            _localization.translateMap("categories"), ["science"]);
+        content =
+            SafeMap.safe(_localization.translateMap("categories"), ["science"]);
         break;
       case ProgramCategories.ARTS:
-        content =  SafeMap.safe(
-            _localization.translateMap("categories"), ["art"]);
+        content =
+            SafeMap.safe(_localization.translateMap("categories"), ["art"]);
         break;
       case ProgramCategories.GOVERNMENT:
-        content =  SafeMap.safe(
+        content = SafeMap.safe(
             _localization.translateMap("categories"), ["goverment"]);
         break;
       case ProgramCategories.HEALTH:
-        content =  SafeMap.safe(
-            _localization.translateMap("categories"), ["health"]);
+        content =
+            SafeMap.safe(_localization.translateMap("categories"), ["health"]);
         break;
       case ProgramCategories.TECH:
-        content =  SafeMap.safe(
-            _localization.translateMap("categories"), ["tech"]);
+        content =
+            SafeMap.safe(_localization.translateMap("categories"), ["tech"]);
         break;
       default:
         break;
@@ -216,52 +218,40 @@ class Program {
     String content = "";
     switch (category) {
       case ProgramCategories.TV:
-        content =
-            "assets/graphics/categories/tv.jpeg";
+        content = "assets/graphics/categories/tv.jpeg";
         break;
       case ProgramCategories.NEWS:
-        content =
-            "assets/graphics/categories/news.jpeg";
+        content = "assets/graphics/categories/news.jpeg";
         break;
       case ProgramCategories.SPORTS:
-        content =
-            "assets/graphics/categories/sports.jpeg";
+        content = "assets/graphics/categories/sports.jpeg";
         break;
       case ProgramCategories.SOCIETY:
-        content =
-            "assets/graphics/categories/society.jpeg";
+        content = "assets/graphics/categories/society.jpeg";
         break;
       case ProgramCategories.EDUCATION:
-        content =
-            "assets/graphics/categories/education.jpeg";
+        content = "assets/graphics/categories/education.jpeg";
         break;
       case ProgramCategories.COMEDY:
-        content =
-            "assets/graphics/categories/comedy.jpeg";
+        content = "assets/graphics/categories/comedy.jpeg";
         break;
       case ProgramCategories.MUSIC:
-        content =
-            "assets/graphics/categories/music.jpeg";
+        content = "assets/graphics/categories/music.jpeg";
         break;
       case ProgramCategories.SCIENCE:
-        content =
-            "assets/graphics/categories/science.jpeg";
+        content = "assets/graphics/categories/science.jpeg";
         break;
       case ProgramCategories.ARTS:
-        content =
-            "assets/graphics/categories/arts.jpeg";
+        content = "assets/graphics/categories/arts.jpeg";
         break;
       case ProgramCategories.GOVERNMENT:
-        content =
-            "assets/graphics/categories/goverment.jpeg";
+        content = "assets/graphics/categories/goverment.jpeg";
         break;
       case ProgramCategories.HEALTH:
-        content =
-            "assets/graphics/categories/health.jpeg";
+        content = "assets/graphics/categories/health.jpeg";
         break;
       case ProgramCategories.TECH:
-        content =
-            "assets/graphics/categories/tech.jpeg";
+        content = "assets/graphics/categories/tech.jpeg";
         break;
       default:
         break;

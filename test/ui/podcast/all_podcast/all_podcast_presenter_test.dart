@@ -23,7 +23,7 @@ void main() {
   MockAllPodcastDetailRouter router = MockAllPodcastDetailRouter();
   MockConnection mockConnection = MockConnection();
   MockPlayer mockPlayer = MockPlayer();
-  AllPodcastPresenter presenter;
+  late AllPodcastPresenter presenter;
 
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -34,8 +34,9 @@ void main() {
         override: true);
     Injector.appInstance
         .registerDependency<AllPodcastView>(() => view, override: true);
-    Injector.appInstance
-        .registerDependency<AllPodcastRouterContract>(() => router, override: true);
+    Injector.appInstance.registerDependency<AllPodcastRouterContract>(
+        () => router,
+        override: true);
     Injector.appInstance.registerDependency<ConnectionContract>(
         () => mockConnection,
         override: true);
@@ -55,7 +56,6 @@ void main() {
     view.data.clear();
     router.viewState.clear();
     router.data.clear();
-    presenter = null;
   });
 
   test('that can init the presenter, then resume the view and realod the data',
@@ -67,7 +67,7 @@ void main() {
     when(mockPlayer.isPlaying()).thenReturn(true);
     when(mockPlayer.stop()).thenReturn(true);
     when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-    when(mockPlayer.isPodcast).thenReturn(false);
+    mockPlayer.isPodcast = false;
 
     presenter.onViewResumed();
     await Future.delayed(Duration(milliseconds: 200));
@@ -75,86 +75,84 @@ void main() {
     expect(view.viewState[0], equals(AllPodcastState.onNewData));
   });
 
-  test('that can init the presenter, then resume the view and realod the data with error response reload the view with base now',
-          () async {
-        when(mockRepository.getLiveBroadcast())
-            .thenAnswer((_) => MockRadiocoRepository.now(isEmpty: true));
-        when(mockConnection.isConnectionAvailable())
-            .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPlaying()).thenReturn(true);
-        when(mockPlayer.stop()).thenReturn(true);
-        when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+  test(
+      'that can init the presenter, then resume the view and realod the data with error response reload the view with base now',
+      () async {
+    when(mockRepository.getLiveBroadcast())
+        .thenAnswer((_) => MockRadiocoRepository.now(isEmpty: true));
+    when(mockConnection.isConnectionAvailable())
+        .thenAnswer((_) => Future.value(true));
+    when(mockPlayer.isPlaying()).thenReturn(true);
+    when(mockPlayer.stop()).thenReturn(true);
+    when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
+    mockPlayer.isPodcast = false;
 
-        presenter.onViewResumed();
-        await Future.delayed(Duration(milliseconds: 200));
+    presenter.onViewResumed();
+    await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState[0], equals(AllPodcastState.onNewData));
-      });
+    expect(view.viewState[0], equals(AllPodcastState.onNewData));
+  });
 
   test(
       'that can init the presenter, then resume the view and connection error then nothing happens in the view',
-          () async {
-        when(mockRepository.getLiveBroadcast()).thenAnswer(
-                (_) => MockRadiocoRepository.now());
-        when(mockConnection.isConnectionAvailable())
-            .thenAnswer((_) => Future.value(false));
-        when(mockPlayer.isPlaying()).thenReturn(true);
-        when(mockPlayer.stop()).thenReturn(true);
-        when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(false);
+      () async {
+    when(mockRepository.getLiveBroadcast())
+        .thenAnswer((_) => MockRadiocoRepository.now());
+    when(mockConnection.isConnectionAvailable())
+        .thenAnswer((_) => Future.value(false));
+    when(mockPlayer.isPlaying()).thenReturn(true);
+    when(mockPlayer.stop()).thenReturn(true);
+    when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
+    mockPlayer.isPodcast = false;
 
-        presenter.onViewResumed();
-        await Future.delayed(Duration(milliseconds: 200));
+    presenter.onViewResumed();
+    await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState.isEmpty, equals(true));
-      });
+    expect(view.viewState.isEmpty, equals(true));
+  });
 
   test(
       'that can init the presenter, then resume the view with a podcast then nothing happens in the view',
-          () async {
-        when(mockRepository.getLiveBroadcast()).thenAnswer(
-                (_) => MockRadiocoRepository.now());
-        when(mockConnection.isConnectionAvailable())
-            .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+      () async {
+    when(mockRepository.getLiveBroadcast())
+        .thenAnswer((_) => MockRadiocoRepository.now());
+    when(mockConnection.isConnectionAvailable())
+        .thenAnswer((_) => Future.value(true));
+    mockPlayer.isPodcast = true;
 
-        presenter.onViewResumed();
-        await Future.delayed(Duration(milliseconds: 200));
+    presenter.onViewResumed();
+    await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState.isEmpty, equals(true));
+    expect(view.viewState.isEmpty, equals(true));
+  });
 
-      });
+  test('that can navigate to podcast controls', () async {
+    when(mockRepository.getLiveBroadcast())
+        .thenAnswer((_) => MockRadiocoRepository.now());
+    when(mockConnection.isConnectionAvailable())
+        .thenAnswer((_) => Future.value(true));
+    mockPlayer.isPodcast = true;
 
-  test(
-      'that can navigate to podcast controls',
-          () async {
-        when(mockRepository.getLiveBroadcast()).thenAnswer(
-                (_) => MockRadiocoRepository.now());
-        when(mockConnection.isConnectionAvailable())
-            .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+    presenter.onPodcastControlsClicked(EpisodeInstrument.givenAnEpisode());
+    await Future.delayed(Duration(milliseconds: 200));
 
-        presenter.onPodcastControlsClicked(EpisodeInstrument.givenAnEpisode());
-        await Future.delayed(Duration(milliseconds: 200));
+    expect(router.viewState[0], equals(AllPodcastState.goToEpisode));
+    expect((router.data[0] as Episode).title,
+        equals(EpisodeInstrument.givenAnEpisode().title));
+  });
 
-        expect(router.viewState[0], equals(AllPodcastState.goToEpisode));
-        expect((router.data[0] as Episode).title, equals(EpisodeInstrument.givenAnEpisode().title));
-      });
+  test('that can navigate to podcast detail', () async {
+    when(mockRepository.getLiveBroadcast())
+        .thenAnswer((_) => MockRadiocoRepository.now());
+    when(mockConnection.isConnectionAvailable())
+        .thenAnswer((_) => Future.value(true));
+    mockPlayer.isPodcast = true;
 
-  test(
-      'that can navigate to podcast detail',
-          () async {
-        when(mockRepository.getLiveBroadcast()).thenAnswer(
-                (_) => MockRadiocoRepository.now());
-        when(mockConnection.isConnectionAvailable())
-            .thenAnswer((_) => Future.value(true));
-        when(mockPlayer.isPodcast).thenReturn(true);
+    presenter.onPodcastClicked(ProgramInstrument.givenAProgram());
+    await Future.delayed(Duration(milliseconds: 200));
 
-        presenter.onPodcastClicked(ProgramInstrument.givenAProgram());
-        await Future.delayed(Duration(milliseconds: 200));
-
-        expect(router.viewState[0], equals(AllPodcastState.goToPodcastDetail));
-        expect((router.data[0] as Program).name, equals(ProgramInstrument.givenAProgram().name));
-      });
+    expect(router.viewState[0], equals(AllPodcastState.goToPodcastDetail));
+    expect((router.data[0] as Program).name,
+        equals(ProgramInstrument.givenAProgram().name));
+  });
 }

@@ -1,7 +1,7 @@
 import 'package:cuacfm/models/time_table.dart';
 
 class TimeTableInstrument {
-  static TimeTable givenATimeTable({bool isLive, int time}) {
+  static TimeTable givenATimeTable({bool? isLive, int? time}) {
     return TimeTable.fromInstance({
       "name": "Spoiler",
       "description": "desc",

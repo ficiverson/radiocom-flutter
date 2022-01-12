@@ -6,7 +6,6 @@ import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/settings/settings-detail/settings_detail_router.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:injector/injector.dart';
 
 abstract class SettingsDetailView {
@@ -19,14 +18,14 @@ class SettingsDetailPresenter {
   Invoker invoker;
   SettingsDetailRouterContract router;
   GetLiveProgramUseCase getLiveDataUseCase;
-  ConnectionContract connection;
-  CurrentPlayerContract currentPlayer;
+  late ConnectionContract connection;
+  late CurrentPlayerContract currentPlayer;
 
   SettingsDetailPresenter(
     this.view, {
-    @required this.invoker,
-    @required this.router,
-    @required this.getLiveDataUseCase,
+    required this.invoker,
+    required this.router,
+    required this.getLiveDataUseCase,
   }) {
     connection = Injector.appInstance.get<ConnectionContract>();
     currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
@@ -70,7 +69,9 @@ class SettingsDetailPresenter {
     await currentPlayer.pause();
   }
 
-  onPodcastControlsClicked(Episode episode) {
-    router.goToPodcastControls(episode);
+  onPodcastControlsClicked(Episode? episode) {
+    if(episode != null) {
+      router.goToPodcastControls(episode);
+    }
   }
 }

@@ -1,7 +1,7 @@
 import 'package:cuacfm/models/radiostation.dart';
 
 class RadioStationInstrument {
-  static RadioStation givenARadioStation({String feed}) {
+  static RadioStation givenARadioStation({String? feed}) {
     return RadioStation.fromInstance({
       "station_name": "CUAC FM INSTRUMENT",
       "icon_url": "assets/graphics/cuac-logo.png",

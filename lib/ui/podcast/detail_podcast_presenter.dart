@@ -11,7 +11,6 @@ import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/ui/home/home_presenter.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:injector/injector.dart';
 import 'package:share/share.dart';
 import 'package:uuid/uuid.dart';
@@ -31,18 +30,18 @@ class DetailPodcastPresenter {
   Invoker invoker;
   DetailPodcastRouter router;
   GetLiveProgramUseCase getLiveDataUseCase;
-  ConnectionContract connection;
-  CurrentPlayerContract currentPlayer;
+  late ConnectionContract connection;
+  late CurrentPlayerContract currentPlayer;
   GetEpisodesUseCase getEpisodesUseCase;
   bool isLoading = false;
-  Timer _timer;
+  Timer? _timer;
 
   DetailPodcastPresenter(
     this._view, {
-    @required this.invoker,
-    @required this.router,
-    @required this.getEpisodesUseCase,
-    @required this.getLiveDataUseCase,
+    required this.invoker,
+    required this.router,
+    required this.getEpisodesUseCase,
+    required this.getLiveDataUseCase,
   }) {
     connection = Injector.appInstance.get<ConnectionContract>();
     currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
@@ -91,7 +90,7 @@ class DetailPodcastPresenter {
     var uuid = Uuid();
     return currentPlayer.episode != null &&
         uuid.v5(Uuid.NAMESPACE_URL, episode.audio) ==
-            uuid.v5(Uuid.NAMESPACE_URL, currentPlayer.episode.audio) &&
+            uuid.v5(Uuid.NAMESPACE_URL, currentPlayer.episode?.audio ?? "no_audio") &&
         currentPlayer.isPodcast;
   }
 
@@ -134,8 +133,10 @@ class DetailPodcastPresenter {
     router.goToNewDetail(New.fromPodcast(title, subtitle, content, link));
   }
 
-  onPodcastControlsClicked(Episode episode) {
-    router.goToPodcastControls(episode);
+  onPodcastControlsClicked(Episode? episode) {
+    if(episode != null) {
+      router.goToPodcastControls(episode);
+    }
   }
 
 //private methods
@@ -158,19 +159,19 @@ class DetailPodcastPresenter {
       _view.onPlayerData(StatusPlayer.FAILED);
     } else {
       if (_timer != null) {
-        _timer.cancel();
+        _timer?.cancel();
       }
       _timer = new Timer.periodic(new Duration(milliseconds: 100), (timer) {
         if (currentPlayer.isStreamingAudio()) {
           isLoading = false;
           _view.onPlayerData(StatusPlayer.PLAYING);
-          _timer.cancel();
+          _timer?.cancel();
           _timer = null;
         } else if (timer.tick > 300) {
           currentPlayer.stop();
           isLoading = false;
           _view.onPlayerData(StatusPlayer.FAILED);
-          _timer.cancel();
+          _timer?.cancel();
           _timer = null;
         }
       });
@@ -187,19 +188,19 @@ class DetailPodcastPresenter {
       _view.onPlayerData(StatusPlayer.FAILED);
     } else {
       if (_timer != null) {
-        _timer.cancel();
+        _timer?.cancel();
       }
       _timer = new Timer.periodic(new Duration(milliseconds: 100), (timer) {
         if (currentPlayer.isStreamingAudio()) {
           isLoading = false;
           _view.onPlayerData(StatusPlayer.PLAYING);
-          _timer.cancel();
+          _timer?.cancel();
           _timer = null;
         } else if (timer.tick > 300) {
           currentPlayer.stop();
           isLoading = false;
           _view.onPlayerData(StatusPlayer.FAILED);
-          _timer.cancel();
+          _timer?.cancel();
           _timer = null;
         }
       });

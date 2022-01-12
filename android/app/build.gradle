@@ -7,26 +7,13 @@ if (localPropertiesFile.exists()) {
 }
 
 def flutterRoot = localProperties.getProperty('flutter.sdk')
-if (flutterRoot == null) {
-    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
-}
-
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '4'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '4.0'
-}
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 31
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -34,53 +21,50 @@ android {
     }
 
     lintOptions {
-        disable 'InvalidPackage'
+        disable "InvalidPackage"
     }
 
     defaultConfig {
         applicationId "com.app.cuacfm.radio.coruna"
         minSdkVersion 21
-        targetSdkVersion 29
-        versionCode 21
-        versionName "3.2.0"
+        targetSdkVersion 31
+        versionCode 24
+        versionName "3.3.0"
         multiDexEnabled true
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
     //flutter build appbundle
     signingConfigs {
         release {
-            keyAlias "i*****"
-            keyPassword "1****e"
-            storeFile file("/Users/username/Desktop/keystore")
-            storePassword "1*****e"
+            keyAlias "i**************"
+            keyPassword "1************"
+            storeFile file("/Users/User/Desktop/keystore")
+            storePassword "********e"
         }
     }
     buildTypes {
         release {
             signingConfig signingConfigs.release
             minifyEnabled false
-            useProguard true
             shrinkResources false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
 
 flutter {
-    source '../..'
+    source "../.."
 }
 
 dependencies {
-    implementation "com.android.support:support-v4:28.0.0"
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    testImplementation 'junit:junit:4.12'
-    implementation 'com.google.android.gms:play-services-basement:17.6.0'
-    implementation 'com.android.support:multidex:1.0.3'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    testImplementation 'junit:junit:4.13.2'
+    implementation 'com.google.android.gms:play-services-basement:18.0.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     implementation 'androidx.palette:palette:1.0.0'
 }
 
-apply plugin: 'io.fabric'
 apply plugin: "com.google.gms.google-services"

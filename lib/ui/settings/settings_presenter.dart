@@ -10,7 +10,6 @@ import 'package:cuacfm/ui/settings/settings-detail/settings_detail.dart';
 import 'package:cuacfm/ui/settings/settings_router.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:cuacfm/utils/notification_subscription_contract.dart';
-import 'package:flutter/material.dart';
 import 'package:injector/injector.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,11 +28,11 @@ class SettingsPresenter {
   SettingsRouterContract router;
   Invoker invoker;
   GetLiveProgramUseCase getLiveDataUseCase;
-  ConnectionContract connection;
-  CurrentPlayerContract currentPlayer;
-  NotificationSubscriptionContract notificationSubscription;
+  late ConnectionContract connection;
+  late CurrentPlayerContract currentPlayer;
+  late NotificationSubscriptionContract notificationSubscription;
 
-  SettingsPresenter(this._settingsView, {@required this.invoker, @required this.router,@required this.getLiveDataUseCase,
+  SettingsPresenter(this._settingsView, {required this.invoker, required this.router,required this.getLiveDataUseCase,
   }) {
     notificationSubscription = Injector.appInstance.get<NotificationSubscriptionContract>();
     connection = Injector.appInstance.get<ConnectionContract>();
@@ -128,8 +127,10 @@ class SettingsPresenter {
     router.goToLegal(LegalType.LICENSE);
   }
 
-  onPodcastControlsClicked(Episode episode) {
-    router.goToPodcastControls(episode);
+  onPodcastControlsClicked(Episode? episode) {
+    if(episode != null) {
+      router.goToPodcastControls(episode);
+    }
   }
 
   onDarkMode(bool setting) async {
