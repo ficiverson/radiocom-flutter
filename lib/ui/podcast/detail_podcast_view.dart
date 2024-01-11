@@ -267,7 +267,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
                                   color: _colors.palidwhitedark),
                               margin:
                                   EdgeInsets.fromLTRB(215.0, 15.0, 0.0, 0.0),
-                              child: Icon(FontAwesomeIcons.infoCircle,
+                              child: Icon(FontAwesomeIcons.circleInfo,
                                   size: 25.0, color: _colors.yellow))
                         ])));
               } else if (index < _episodes.length + 1) {

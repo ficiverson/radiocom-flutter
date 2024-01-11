@@ -545,7 +545,7 @@ class MyHomePageState extends State<MyHomePage>
 
   void setBrightness() {
     final Brightness brightness =
-        WidgetsBinding.instance.window.platformBrightness ?? Brightness.light;
+        WidgetsBinding.instance.platformDispatcher.platformBrightness;
     if (brightness == Brightness.light && !isDarkModeEnabled) {
       Injector.appInstance.registerSingleton<RadiocomColorsConract>(
           () => RadiocomColorsLight(),

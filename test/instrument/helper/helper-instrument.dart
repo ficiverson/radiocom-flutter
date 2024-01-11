@@ -5,7 +5,6 @@ import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/player/current_timer.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:cuacfm/utils/notification_subscription_contract.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -144,7 +143,7 @@ setupCloudFirestoreMocks([Callback? customHandlers]) {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   var channel =  MethodChannel(MethodChannelFirebase.appInstances.values.first.name);
-  channel.setMockMethodCallHandler((call) async {
+  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (call)  async {
     if (call.method == 'Firebase#initializeCore') {
       return [
         {

@@ -186,9 +186,9 @@ class HomePresenter {
 
   //private methods
 
-  _launchURL(String url, {bool universalLink = true}) async {
-    if (await canLaunch(url)) {
-      await launch(url, universalLinksOnly: universalLink);
+  _launchURL(String url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.platformDefault);
     } else {
       throw 'Could not launch $url';
     }
