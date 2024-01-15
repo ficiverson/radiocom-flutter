@@ -40,6 +40,7 @@ dependencies:
   firebase_crashlytics: ^3.4.9
   firebase_analytics: ^10.8.0
   firebase_in_app_messaging: ^0.7.4+8
+  firebase_database_mocks: 0.6.1
   mock_web_server: ^5.0.0-nullsafety.1
   mockito: ^5.4.4
   path_provider: ^2.1.1

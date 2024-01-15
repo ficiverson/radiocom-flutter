@@ -5,6 +5,7 @@ import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/player/current_timer.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:cuacfm/utils/notification_subscription_contract.dart';
+import 'package:firebase_database_mocks/firebase_database_mocks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -140,37 +141,5 @@ void getTranslations() {
 typedef Callback(MethodCall call);
 
 setupCloudFirestoreMocks([Callback? customHandlers]) {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
-  var channel =  MethodChannel(MethodChannelFirebase.appInstances.values.first.name);
-  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (call)  async {
-    if (call.method == 'Firebase#initializeCore') {
-      return [
-        {
-          'name': defaultFirebaseAppName,
-          'options': {
-            'apiKey': '123',
-            'appId': '123',
-            'messagingSenderId': '123',
-            'projectId': '123',
-          },
-          'pluginConstants': {},
-        }
-      ];
-    }
-
-    if (call.method == 'Firebase#initializeApp') {
-      return {
-        'name': call.arguments['appName'],
-        'options': call.arguments['options'],
-        'pluginConstants': {},
-      };
-    }
-
-    if (customHandlers != null) {
-      customHandlers(call);
-    }
-
-    return null;
-  });
+  setupFirebaseMocks();
 }
