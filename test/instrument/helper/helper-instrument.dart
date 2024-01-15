@@ -9,7 +9,6 @@ import 'package:firebase_database_mocks/firebase_database_mocks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart';
 import 'package:injector/injector.dart';
 import 'package:mockito/mockito.dart';
 
