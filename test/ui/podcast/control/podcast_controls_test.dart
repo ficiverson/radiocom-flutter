@@ -119,6 +119,7 @@ void main() {
     await tester.pumpWidget(startWidget(
         PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
     final gesture = await tester.startGesture(Offset(0, 600));
+    await tester.ensureVisible(find.byKey(Key("timer_chip")));
     await tester.tap(find.byKey(Key("timer_chip")));
     await tester.pump();
     await gesture.moveBy(Offset(0, -600));
@@ -150,6 +151,7 @@ void main() {
     await tester.pumpWidget(startWidget(
         PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
     final gesture = await tester.startGesture(Offset(0, 600));
+    await tester.ensureVisible(find.byKey(Key("faster_chip")));
     await tester.tap(find.byKey(Key("faster_chip")));
     await tester.pump();
     await gesture.moveBy(Offset(0, -600));

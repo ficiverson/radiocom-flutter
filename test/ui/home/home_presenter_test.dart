@@ -9,6 +9,7 @@ import 'package:cuacfm/ui/home/home_presenter.dart';
 import 'package:cuacfm/ui/home/home_router.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
+import 'package:cuacfm/utils/notification_subscription_contract.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:injector/injector.dart';
@@ -30,6 +31,7 @@ void main() {
   MockHomeRouter router = MockHomeRouter();
   MockConnection mockConnection = MockConnection();
   MockPlayer mockPlayer = MockPlayer();
+  MockNotifcationSubscription notifcationSubscription = MockNotifcationSubscription();
   late HomePresenter presenter;
 
   setUpAll(() async {
@@ -50,7 +52,11 @@ void main() {
     Injector.appInstance.registerDependency<CurrentPlayerContract>(
         () => mockPlayer,
         override: true);
+    Injector.appInstance.registerDependency<NotificationSubscriptionContract>(
+            () => notifcationSubscription,
+        override: true);
     presenter = Injector.appInstance.get<HomePresenter>();
+
   });
 
   setUp(() async {
@@ -513,5 +519,21 @@ void main() {
 
         expect(view.viewState[0], equals(HomeState.notifyUser));
         expect((view.data[0] as StatusPlayer), equals(StatusPlayer.FAILED));
+      });
+
+  test(
+      'that can start analytics engine',
+          () async {
+
+        presenter.onSetScreen();
+        verify(notifcationSubscription.setScreen("home_screen")).called(1);
+      });
+
+  test(
+      'that can start notifications engine',
+          () async {
+
+        presenter.onGetToken();
+        verify(notifcationSubscription.getToken()).called(1);
       });
 }

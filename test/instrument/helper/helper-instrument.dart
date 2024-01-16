@@ -5,10 +5,10 @@ import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/player/current_timer.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:cuacfm/utils/notification_subscription_contract.dart';
-import 'package:firebase_database_mocks/firebase_database_mocks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart';
 import 'package:injector/injector.dart';
 import 'package:mockito/mockito.dart';
 
@@ -30,10 +30,14 @@ class MockNotifcationSubscription extends Mock
     implements NotificationSubscriptionContract {
   @override
   Future<void> subscribeToTopic(String? channelName) =>
-      super.noSuchMethod(Invocation.method(#subscribeToTopic, [channelName]), returnValue: Future.value());
+      super.noSuchMethod(Invocation.method(#subscribeToTopic, [channelName]), returnValue: Future.value(),returnValueForMissingStub: Future.value());
   @override
   Future<void> unsubscribeFromTopic(String? channelName) => super
       .noSuchMethod(Invocation.method(#unsubscribeFromTopic, [channelName]), returnValue: Future.value());
+  @override
+  void getToken() => super.noSuchMethod(Invocation.method(#getToken, []));
+  @override
+  void setScreen(String name) => super.noSuchMethod(Invocation.method(#setScreen, [name]));
 }
 
 class MockConnection extends Mock implements ConnectionContract {
@@ -105,7 +109,7 @@ class MockCurrentTimerContract extends Mock implements CurrentTimerContract {
   @override void stopTimer() =>
       super.noSuchMethod(Invocation.method(#stopTimer, []));
   @override bool isTimerRunning() =>
-      super.noSuchMethod(Invocation.method(#isTimerRunning, []), returnValue: true);
+      super.noSuchMethod(Invocation.method(#isTimerRunning, []), returnValue: true, returnValueForMissingStub: true);
   @override int currentTime = 0;
 }
 
@@ -115,8 +119,32 @@ void mockTranslationsWithLocale() {
       override: true);
 }
 
+
+void ignoreOverflowErrors(
+    FlutterErrorDetails details, {
+      bool forceReport = false,
+    }) {
+  bool ifIsOverflowError = false;
+  bool isUnableToLoadAsset = false;
+
+  var exception = details.exception;
+  if (exception is FlutterError) {
+    ifIsOverflowError = !exception.diagnostics.any(
+          (e) => e.value.toString().startsWith("A RenderFlex overflowed by"),
+    );
+    isUnableToLoadAsset = !exception.diagnostics.any(
+          (e) => e.value.toString().startsWith("Unable to load asset"),
+    );
+  }
+  if (ifIsOverflowError || isUnableToLoadAsset) {
+    debugPrint('Ignored Error');
+  } else {
+    FlutterError.dumpErrorToConsole(details, forceReport: forceReport);
+  }
+}
+
 Widget startWidget(Widget widgetToStart) {
-  FlutterError.onError = null;
+  FlutterError.onError = ignoreOverflowErrors;
   var size = Size(768, 1024);
   return MaterialApp(
       home: MediaQuery(data: MediaQueryData(size: size), child: widgetToStart));
@@ -140,5 +168,7 @@ void getTranslations() {
 typedef Callback(MethodCall call);
 
 setupCloudFirestoreMocks([Callback? customHandlers]) {
-  setupFirebaseMocks();
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setupFirebaseCoreMocks();
 }
