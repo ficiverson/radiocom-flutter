@@ -99,6 +99,6 @@ Widget errorScreen(dynamic detailsException) {
                             _localization.translateMap('error'), ["message"]),
                         style: TextStyle(fontSize: 24.0)))
                 : SingleChildScrollView(
-                    child: Text('Exeption Details:\n\n$detailsException')),
+                    child: Text('Exception Details:\n\n$detailsException')),
           )));
 }
