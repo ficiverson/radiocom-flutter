@@ -5,7 +5,7 @@ import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/settings/settings.dart';
 import 'package:cuacfm/ui/settings/settings_presenter.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:cuacfm/utils/notification_subscription_contract.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:injector/injector.dart';
@@ -20,13 +20,11 @@ void main() {
   MockRadiocoRepository mockRepository = MockRadiocoRepository();
   MockConnection mockConnection = MockConnection();
   MockPlayer mockPlayer = MockPlayer();
-
-  setupCloudFirestoreMocks();
+  MockNotifcationSubscription notifcationSubscription = MockNotifcationSubscription();
 
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
     SharedPreferences.setMockInitialValues({});
-    await Firebase.initializeApp();
     DependencyInjector().loadModules();
     mockTranslationsWithLocale();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
@@ -40,6 +38,9 @@ void main() {
         override: true);
     Injector.appInstance.registerDependency<RadioStation>(
             () => RadioStationInstrument.givenARadioStation(),
+        override: true);
+    Injector.appInstance.registerDependency<NotificationSubscriptionContract>(
+            () => notifcationSubscription,
         override: true);
   });
 

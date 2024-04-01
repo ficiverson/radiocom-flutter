@@ -171,7 +171,7 @@ class AllPodcastState extends State<AllPodcast>
       }
     };
 
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -194,7 +194,7 @@ class AllPodcastState extends State<AllPodcast>
   @override
   void dispose() {
     _notificationEvent = null;
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<AllPodcastView>();
     super.dispose();
   }

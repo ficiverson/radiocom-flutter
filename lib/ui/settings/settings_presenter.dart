@@ -88,7 +88,7 @@ class SettingsPresenter {
 
   onMailClicked(String mailTo){
     var url = "mailto:$mailTo";
-    _launchURL(url, universalLink: false);
+    _launchURL(url);
   }
 
   onHistoryClicked(String content){
@@ -165,9 +165,9 @@ class SettingsPresenter {
     return result==null? false : result;
   }
 
-  _launchURL(String url, {bool universalLink = true}) async {
-    if (await canLaunch(url)) {
-      await launch(url, universalLinksOnly: universalLink);
+  _launchURL(String url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.platformDefault);
     } else {
       throw 'Could not launch $url';
     }

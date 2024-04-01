@@ -118,7 +118,7 @@ class SettingsDetailState extends State<SettingsDetail>
       }
     };
 
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -141,7 +141,7 @@ class SettingsDetailState extends State<SettingsDetail>
   @override
   void dispose() {
     _notificationEvent = null;
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<SettingsDetailView>();
     super.dispose();
   }

@@ -30,10 +30,14 @@ class MockNotifcationSubscription extends Mock
     implements NotificationSubscriptionContract {
   @override
   Future<void> subscribeToTopic(String? channelName) =>
-      super.noSuchMethod(Invocation.method(#subscribeToTopic, [channelName]), returnValue: Future.value());
+      super.noSuchMethod(Invocation.method(#subscribeToTopic, [channelName]), returnValue: Future.value(),returnValueForMissingStub: Future.value());
   @override
   Future<void> unsubscribeFromTopic(String? channelName) => super
       .noSuchMethod(Invocation.method(#unsubscribeFromTopic, [channelName]), returnValue: Future.value());
+  @override
+  void getToken() => super.noSuchMethod(Invocation.method(#getToken, []));
+  @override
+  void setScreen(String name) => super.noSuchMethod(Invocation.method(#setScreen, [name]));
 }
 
 class MockConnection extends Mock implements ConnectionContract {
@@ -105,7 +109,7 @@ class MockCurrentTimerContract extends Mock implements CurrentTimerContract {
   @override void stopTimer() =>
       super.noSuchMethod(Invocation.method(#stopTimer, []));
   @override bool isTimerRunning() =>
-      super.noSuchMethod(Invocation.method(#isTimerRunning, []), returnValue: true);
+      super.noSuchMethod(Invocation.method(#isTimerRunning, []), returnValue: true, returnValueForMissingStub: true);
   @override int currentTime = 0;
 }
 
@@ -115,8 +119,32 @@ void mockTranslationsWithLocale() {
       override: true);
 }
 
+
+void ignoreOverflowErrors(
+    FlutterErrorDetails details, {
+      bool forceReport = false,
+    }) {
+  bool ifIsOverflowError = false;
+  bool isUnableToLoadAsset = false;
+
+  var exception = details.exception;
+  if (exception is FlutterError) {
+    ifIsOverflowError = !exception.diagnostics.any(
+          (e) => e.value.toString().startsWith("A RenderFlex overflowed by"),
+    );
+    isUnableToLoadAsset = !exception.diagnostics.any(
+          (e) => e.value.toString().startsWith("Unable to load asset"),
+    );
+  }
+  if (ifIsOverflowError || isUnableToLoadAsset) {
+    debugPrint('Ignored Error');
+  } else {
+    FlutterError.dumpErrorToConsole(details, forceReport: forceReport);
+  }
+}
+
 Widget startWidget(Widget widgetToStart) {
-  FlutterError.onError = null;
+  FlutterError.onError = ignoreOverflowErrors;
   var size = Size(768, 1024);
   return MaterialApp(
       home: MediaQuery(data: MediaQueryData(size: size), child: widgetToStart));
@@ -142,34 +170,5 @@ typedef Callback(MethodCall call);
 setupCloudFirestoreMocks([Callback? customHandlers]) {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  MethodChannelFirebase.channel.setMockMethodCallHandler((call) async {
-    if (call.method == 'Firebase#initializeCore') {
-      return [
-        {
-          'name': defaultFirebaseAppName,
-          'options': {
-            'apiKey': '123',
-            'appId': '123',
-            'messagingSenderId': '123',
-            'projectId': '123',
-          },
-          'pluginConstants': {},
-        }
-      ];
-    }
-
-    if (call.method == 'Firebase#initializeApp') {
-      return {
-        'name': call.arguments['appName'],
-        'options': call.arguments['options'],
-        'pluginConstants': {},
-      };
-    }
-
-    if (customHandlers != null) {
-      customHandlers(call);
-    }
-
-    return null;
-  });
+  setupFirebaseCoreMocks();
 }

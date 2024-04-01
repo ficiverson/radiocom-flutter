@@ -1,10 +1,10 @@
 name: cuacfm
 description: A radio station with radioco integration.
 
-version: 1.0.0+1
+version: 3.0.0
 
 environment:
-  sdk: "2.15.1"
+  sdk: "3.2.3"
 
 dependencies:
   flutter:
@@ -14,35 +14,36 @@ dependencies:
 
   verbal_expressions: ^1.0.0
   audioplayers: ^0.20.1
-  intl: ^0.17.0
-  xml2json: ^5.3.2
-  cupertino_icons: ^1.0.4
+  intl:
+  xml2json: ^6.2.2
+  cupertino_icons: ^1.0.6
   device_info: ^2.0.3
-  http: ^0.13.4
-  html: ^0.15.0
+  http: ^0.13.5
+  html: ^0.15.4
   share: ^2.0.4
-  shared_preferences: ^2.0.11
-  injector: ^2.0.0
-  animations: ^2.0.2
-  cached_network_image: ^3.2.0
-  flutter_html: ^3.0.0-alpha.2
-  url_launcher: ^6.0.17
-  font_awesome_flutter: ^9.2.0
-  maps_launcher: ^2.0.1
-  photo_view: ^0.13.0
+  shared_preferences: ^2.2.2
+  injector: ^3.0.0
+  animations: ^2.0.11
+  cached_network_image: ^3.3.1
+  flutter_widget_from_html: ^0.14.11
+  url_launcher: ^6.2.2
+  font_awesome_flutter: ^10.6.0
+  maps_launcher: ^2.2.0
+  photo_view: ^0.14.0
   progress_indicators: ^1.0.0
   connectivity: ^3.0.6
-  uuid: ^3.0.5
-  provider: ^6.0.2
-  firebase_core: ^1.11.0
-  firebase_messaging: ^11.2.5
-  firebase_performance: ^0.8.0+4
-  firebase_crashlytics: ^2.4.5
-  firebase_analytics: ^9.0.5
-  firebase_in_app_messaging: ^0.6.0+6
+  uuid:
+  provider: ^6.1.1
+  firebase_core: ^2.24.2
+  firebase_messaging: ^14.7.10
+  firebase_performance: ^0.9.3+8
+  firebase_crashlytics: ^3.4.9
+  firebase_analytics: ^10.8.0
+  firebase_in_app_messaging: ^0.7.4+8
+  fake_cloud_firestore: ^2.4.8
   mock_web_server: ^5.0.0-nullsafety.1
-  mockito: ^5.0.17
-  path_provider: ^2.0.8
+  mockito: ^5.4.4
+  path_provider: ^2.1.1
 
 dev_dependencies:
   flutter_test:

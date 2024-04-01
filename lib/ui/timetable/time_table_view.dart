@@ -117,9 +117,9 @@ class TimetableState extends State<Timetable>
       }
       currentIndex = currentIndex + 1;
     });
-    if (SchedulerBinding.instance?.schedulerPhase ==
+    if (SchedulerBinding.instance.schedulerPhase ==
         SchedulerPhase.persistentCallbacks) {
-      SchedulerBinding.instance?.addPostFrameCallback((_) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
         _scrollController.jumpTo(50.0 * jumpIndex);
       });
     }
@@ -147,7 +147,7 @@ class TimetableState extends State<Timetable>
       }
     };
 
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -171,7 +171,7 @@ class TimetableState extends State<Timetable>
   void dispose() {
     _notificationEvent = null;
     _scrollController.dispose();
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<TimeTableView>();
     super.dispose();
   }

@@ -58,8 +58,8 @@ class DetailPodcastState extends State<DetailPodcastPage>
     _scaffold = new Scaffold(
         key: _scaffoldKey,
         appBar: TopBar("podcast_detail",
-            title: widget.program.name.length > 23
-                ? widget.program.name.substring(0, 22) + "..."
+            title: widget.program.name.length > 20
+                ? widget.program.name.substring(0, 19) + "..."
                 : widget.program.name,
             topBarOption: TopBarOption.NORMAL,
             rightIcon: Icons.share, onRightClicked: () {
@@ -128,7 +128,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
       }
     };
 
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -151,7 +151,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
   @override
   void dispose() {
     _notificationEvent = null;
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<DetailPodcastView>();
     super.dispose();
   }
@@ -267,7 +267,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
                                   color: _colors.palidwhitedark),
                               margin:
                                   EdgeInsets.fromLTRB(215.0, 15.0, 0.0, 0.0),
-                              child: Icon(FontAwesomeIcons.infoCircle,
+                              child: Icon(FontAwesomeIcons.circleInfo,
                                   size: 25.0, color: _colors.yellow))
                         ])));
               } else if (index < _episodes.length + 1) {

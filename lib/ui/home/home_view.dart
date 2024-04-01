@@ -20,8 +20,6 @@ import 'package:cuacfm/utils/neumorfism.dart';
 import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
@@ -81,7 +79,6 @@ class MyHomePageState extends State<MyHomePage>
   bool isContentUpdated = true;
   EventChannel? _notificationEvent =
       EventChannel('cuacfm.flutter.io/updateNotificationMain');
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   bool isDarkModeEnabled = false;
   CuacLocalization _localization = Injector.appInstance.get<CuacLocalization>();
 
@@ -197,7 +194,7 @@ class MyHomePageState extends State<MyHomePage>
     _notificationEvent = null;
     connectionSubscription.cancel();
     Injector.appInstance.removeByKey<HomeView>();
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -274,22 +271,19 @@ class MyHomePageState extends State<MyHomePage>
   @override
   void initState() {
     super.initState();
-    FirebaseAnalytics.instance.setCurrentScreen(screenName: "home_screen");
     if (Platform.isAndroid) {
       MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
           'changeScreen', {"currentScreen": "main", "close": false});
     }
     _presenter = Injector.appInstance.get<HomePresenter>();
     _presenter.init();
+    _presenter.onSetScreen();
     _nowProgram = new Now.mock();
 
     categories.addAll(ProgramCategories.values);
     categories.shuffle(Random(DateTime.now().day));
 
-    _firebaseMessaging.requestPermission(sound: true, badge: true, alert: true);
-    _firebaseMessaging.getToken().then((String? token) {
-      print(token);
-    });
+    _presenter.onGetToken();
 
     if (Platform.isAndroid) {
       _notificationEvent?.receiveBroadcastStream().listen((onData) {
@@ -332,7 +326,7 @@ class MyHomePageState extends State<MyHomePage>
       }
     };
 
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -545,7 +539,7 @@ class MyHomePageState extends State<MyHomePage>
 
   void setBrightness() {
     final Brightness brightness =
-        WidgetsBinding.instance?.window.platformBrightness ?? Brightness.light;
+        WidgetsBinding.instance.platformDispatcher.platformBrightness;
     if (brightness == Brightness.light && !isDarkModeEnabled) {
       Injector.appInstance.registerSingleton<RadiocomColorsConract>(
           () => RadiocomColorsLight(),
@@ -661,6 +655,7 @@ class MyHomePageState extends State<MyHomePage>
         color: _colors.palidwhite,
         width: queryData.size.width,
         height: queryData.size.height,
+        padding: EdgeInsets.fromLTRB(0.0, 20.0,0.0,0.0),
         child: SingleChildScrollView(
             key: PageStorageKey<String>(BottomBarOption.HOME.toString()),
             physics: BouncingScrollPhysics(),
@@ -1077,6 +1072,7 @@ class MyHomePageState extends State<MyHomePage>
         color: _colors.palidwhitedark,
         width: queryData.size.width,
         height: queryData.size.height,
+        padding: EdgeInsets.fromLTRB(0.0, 20.0,0.0,0.0),
         child: SingleChildScrollView(
             key: PageStorageKey<String>(BottomBarOption.SEARCH.toString()),
             physics: BouncingScrollPhysics(),

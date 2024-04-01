@@ -5,13 +5,12 @@ import 'package:cuacfm/ui/home/home_view.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/utils/bottom_bar.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:cuacfm/utils/notification_subscription_contract.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:injector/injector.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../instrument/data/repository_mock.dart';
 import '../../instrument/helper/helper-instrument.dart';
 
@@ -19,13 +18,13 @@ void main() {
   MockRadiocoRepository mockRepository = MockRadiocoRepository();
   MockConnection mockConnection = MockConnection();
   MockPlayer mockPlayer = MockPlayer();
+  MockNotifcationSubscription notifcationSubscription = MockNotifcationSubscription();
 
   setupCloudFirestoreMocks();
 
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
     SharedPreferences.setMockInitialValues({});
-    await Firebase.initializeApp();
     DependencyInjector().loadModules();
     mockTranslationsWithLocale();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
@@ -36,6 +35,9 @@ void main() {
         override: true);
     Injector.appInstance.registerDependency<CurrentPlayerContract>(
         () => mockPlayer,
+        override: true);
+    Injector.appInstance.registerDependency<NotificationSubscriptionContract>(
+            () => notifcationSubscription,
         override: true);
   });
 

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:cuacfm/models/episode.dart';

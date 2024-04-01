@@ -6,7 +6,6 @@ import 'package:cuacfm/domain/usecase/get_all_podcast_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_live_program_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_news_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_outstanding_use_case.dart';
-import 'package:cuacfm/domain/usecase/get_station_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_timetable_use_case.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
@@ -23,6 +22,8 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../domain/usecase/get_station_use_case.dart';
+import '../../utils/notification_subscription_contract.dart';
 import 'home_router.dart';
 
 abstract class HomeView {
@@ -70,6 +71,7 @@ class HomePresenter {
   late ConnectionContract connection;
   late CurrentPlayerContract currentPlayer;
   late CurrentTimerContract currentTimer;
+  late NotificationSubscriptionContract notificationSubscription;
   Timer? _timer;
   bool isLoading = false;
 
@@ -85,7 +87,7 @@ class HomePresenter {
     currentTimer = Injector.appInstance.get<CurrentTimerContract>();
     connection = Injector.appInstance.get<ConnectionContract>();
     currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
-
+    notificationSubscription = Injector.appInstance.get<NotificationSubscriptionContract>();
   }
 
   init() async {
@@ -184,11 +186,19 @@ class HomePresenter {
     }
   }
 
+  onGetToken(){
+    notificationSubscription.getToken();
+  }
+
+  onSetScreen(){
+    notificationSubscription.setScreen("home_screen");
+  }
+
   //private methods
 
-  _launchURL(String url, {bool universalLink = true}) async {
-    if (await canLaunch(url)) {
-      await launch(url, universalLinksOnly: universalLink);
+  _launchURL(String url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.platformDefault);
     } else {
       throw 'Could not launch $url';
     }

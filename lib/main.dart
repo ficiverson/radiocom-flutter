@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/translations/localizations.dart';
@@ -22,14 +21,8 @@ void main() async {
   DependencyInjector().loadModules();
   await Firebase.initializeApp();
   await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-  Function originalOnError = FlutterError.onError as Function;
-  FlutterError.onError = (FlutterErrorDetails errorDetails) async {
-    await FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
-    originalOnError(errorDetails);
-  };
-  runZonedGuarded(() {
-    runApp(MyApp());
-  }, FirebaseCrashlytics.instance.recordError);
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -74,10 +67,10 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         canvasColor: Colors.transparent,
         primarySwatch: Colors.grey,
-        primaryColorBrightness: Brightness.light,
+        brightness: Brightness.light
       ),
       darkTheme: ThemeData(
-        primaryColorBrightness: Brightness.dark,
+        brightness: Brightness.dark,
         canvasColor: Colors.black,
         primarySwatch: Colors.blue,
       ),
@@ -106,6 +99,6 @@ Widget errorScreen(dynamic detailsException) {
                             _localization.translateMap('error'), ["message"]),
                         style: TextStyle(fontSize: 24.0)))
                 : SingleChildScrollView(
-                    child: Text('Exeption Details:\n\n$detailsException')),
+                    child: Text('Exception Details:\n\n$detailsException')),
           )));
 }

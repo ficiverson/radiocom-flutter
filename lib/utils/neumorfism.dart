@@ -178,8 +178,8 @@ class NeumorphicCardVertical extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(15.0)),
             color: _colors.transparent),
         decoration: neumorphicBox(_colors),
-        width: imageOverLay ? 260.0 : 165.0,
-        height: imageOverLay ? 180.0 : 165.0,
+        width: imageOverLay ? 260.0 : 145.0,
+        height: imageOverLay ? 180.0 : 145.0,
         child: imageContent));
     if (!imageOverLay) {
       elements.add(SizedBox(width: 15, height: 10.0));
@@ -202,7 +202,7 @@ class NeumorphicCardVertical extends StatelessWidget {
       elements.add(Spacer());
     }
     return Container(
-      height: imageOverLay ? 200.0 : 250.0,
+      height: imageOverLay ? 200.0 : 230.0,
       width: imageOverLay ? 260.0 : queryData.size.width * 0.42,
       padding: EdgeInsets.symmetric(horizontal: 11, vertical: 7),
       child: Column(
@@ -260,8 +260,8 @@ class NeumorphicCardHorizontal extends StatelessWidget {
               Text(
                   label == null
                       ? ""
-                      : label!.length > 25
-                          ? label!.substring(0, 25) + "..."
+                      : label!.length > 19
+                          ? label!.substring(0, 19) + "..."
                           : label!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

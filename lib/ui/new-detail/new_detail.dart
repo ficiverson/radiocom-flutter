@@ -8,7 +8,7 @@ import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:injector/injector.dart';
 import 'new_detail_presenter.dart';
 
@@ -107,7 +107,7 @@ class NewDetailState extends State<NewDetail>
       }
     };
 
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -130,7 +130,7 @@ class NewDetailState extends State<NewDetail>
   @override
   void dispose() {
     _notificationEvent = null;
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<NewDetailView>();
     super.dispose();
   }
@@ -201,27 +201,31 @@ class NewDetailState extends State<NewDetail>
                   ])),
               SizedBox(height: 20),
               Padding(
-                  padding: EdgeInsets.fromLTRB(5.0, 00.0, 5.0, 0.0),
-                  child: ListTile(
-                      title: Html(
-                    tagsList: Html.tags..add("audio")..add("video"),
-                    style: {
-                      "html": Style(
-                          color: _colors.font, whiteSpace: WhiteSpace.PRE),
-                      "a": Style(
-                          color: Colors.grey,
-                          textDecoration: TextDecoration.underline,
-                          textDecorationColor: Colors.grey),
-                    },
-                    data: widget.newItem.description
-                        .replaceAll("\\r", "")
-                        .replaceAll("\\n", "")
-                        .replaceAll("\\", ""),
-                    onLinkTap: (url, _, __, ___) {
-                      _presenter.onLinkClicked(url);
-                    },
-                  ))),
+                  padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
+                  child: ListTile(title: HtmlWidget(widget.newItem.description.replaceAll("\\r", "")
+                      .replaceAll("\\n", "")
+                      .replaceAll("\\", ""),onTapUrl: _presenter.onLinkClicked(null),
+                    textStyle: TextStyle(
+                        color: _colors.font,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 18),
+                    customStylesBuilder: (element) {
+                      if (element.localName == 'a') {
+                        return {'color': '${_colors.grey.toHTMLHex()}'};
+                      } else if (element.localName == 'body') {
+                        return {'text-align' : 'justify' , 'text-justify' : 'inter-word'};
+                      }
+                      return null;
+                    }))),
               SizedBox(height: 70),
             ]))));
   }
+}
+
+extension HexColor on Color {
+  /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
+  String toHTMLHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
+      '${red.toRadixString(16).padLeft(2, '0')}'
+      '${green.toRadixString(16).padLeft(2, '0')}'
+      '${blue.toRadixString(16).padLeft(2, '0')}';
 }

@@ -121,7 +121,7 @@ class PodcastControlsState extends State<PodcastControls>
       }
     };
 
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -130,7 +130,7 @@ class PodcastControlsState extends State<PodcastControls>
     _notificationEvent = null;
     currentPlayer.onUpdate = null;
     Injector.appInstance.removeByKey<PodcastControlsView>();
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 

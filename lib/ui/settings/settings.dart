@@ -117,7 +117,7 @@ class SettingsState extends State<Settings>
       }
     };
 
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -140,7 +140,7 @@ class SettingsState extends State<Settings>
   @override
   void dispose() {
     _notificationEvent = null;
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<SettingsView>();
     super.dispose();
   }
@@ -181,7 +181,7 @@ class SettingsState extends State<Settings>
 
   void setBrightness() {
     final Brightness brightness =
-        WidgetsBinding.instance?.window.platformBrightness ?? Brightness.light;
+        WidgetsBinding.instance.platformDispatcher.platformBrightness;
     if (brightness == Brightness.light && !isDarkModeEnabled) {
       Injector.appInstance.registerSingleton<RadiocomColorsConract>(
           () => RadiocomColorsLight(),
@@ -305,9 +305,7 @@ class SettingsState extends State<Settings>
                                     fontWeight: FontWeight.w400,
                                     fontSize: 16),
                               ),
-                              trailing: WidgetsBinding.instance?.window
-                                          .platformBrightness ==
-                                      Brightness.light
+                              trailing: WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light
                                   ? Switch(
                                       value: isDarkModeEnabled,
                                       onChanged: (value) {

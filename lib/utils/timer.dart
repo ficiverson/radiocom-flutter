@@ -20,7 +20,7 @@ class CountDown {
 
   /// once you instantiate the CountDown you need to register to receive information
   CountDown(Duration duration,
-      {Duration refresh: const Duration(milliseconds: 10), int everyTick: 1}) {
+      {Duration refresh = const Duration(milliseconds: 10), int everyTick = 1}) {
     _refresh = refresh;
     _everyTick = everyTick;
 

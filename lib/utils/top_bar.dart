@@ -67,7 +67,7 @@ class TopBarState extends State<TopBar> {
     queryData = MediaQuery.of(context);
     return Container(
         width: MediaQuery.of(context).size.width,
-        height: 90,
+        height: 100,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.only(
                 bottomRight: Radius.circular(25.0),
@@ -98,7 +98,7 @@ class TopBarState extends State<TopBar> {
               ).createShader(bounds);
             },
             child: Container(
-              margin: EdgeInsets.fromLTRB(0, 30, 0, 0),
+              margin: EdgeInsets.fromLTRB(0, 50, 0, 0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
