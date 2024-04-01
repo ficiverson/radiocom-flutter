@@ -35,6 +35,6 @@ class NotificationSubscription implements NotificationSubscriptionContract {
 
   @override
   void setScreen(String name) {
-    FirebaseAnalytics.instance.setCurrentScreen(screenName: name);
+    FirebaseAnalytics.instance.logScreenView(screenName: name);
   }
 }
