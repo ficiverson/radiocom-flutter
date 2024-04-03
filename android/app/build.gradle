@@ -27,8 +27,8 @@ android {
         applicationId "com.app.cuacfm.radio.coruna"
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 24
-        versionName "3.4.0"
+        versionCode 26
+        versionName "3.4.1"
         multiDexEnabled true
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
