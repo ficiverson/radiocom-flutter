@@ -194,7 +194,6 @@ void main() {
   testWidgets(
       'that can init the setting detail screen screen with player playing in gallery',
       (WidgetTester tester) async {
-    //TODO
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -219,7 +218,6 @@ void main() {
   testWidgets(
       'that can init the setting detail screen screen with player no playing in gallery',
       (WidgetTester tester) async {
-    //TODO
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())

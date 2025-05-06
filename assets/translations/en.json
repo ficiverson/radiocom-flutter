@@ -33,7 +33,7 @@
     "search" : "Search podcast"
   },
   "podcast_detail" : {
-    "empty_msg" : "<p> There is not description yet :(</p> <br/><br/><img src=\"https://cuacfm.org/wp-content/uploads/2015/04/cuacfm-banner-top.png\">",
+    "empty_msg" : "<p> There is not description yet :(</p> <br/><br/><img src=\"https://cuacfm.org/wp-content/uploads/2025/05/cuacfm-banner-top-2.png\">",
     "empty_episodes_msg" : "There is no episodes at this moment :("
   },
   "settings" : {
@@ -50,7 +50,7 @@
     "social_section" : {
       "name" : "SOCIAL NETWORK",
       "item1" : "Facebook",
-      "item2" : "Twitter"
+      "item2" : "Bluesky"
     },
     "more_info_section" : {
       "name" : "MORE INFO",

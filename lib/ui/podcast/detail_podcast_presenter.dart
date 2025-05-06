@@ -12,7 +12,7 @@ import 'package:cuacfm/ui/home/home_presenter.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:injector/injector.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:uuid/uuid.dart';
 
 import 'detail_podcast_router.dart';
@@ -75,8 +75,9 @@ class DetailPodcastPresenter {
 
   loadEpisodes(String feedProgram) async {
     invoker
-        .execute(getEpisodesUseCase
-            .withParams(GetEpisodesUseCaseParams(feedProgram)))
+        .execute(
+      getEpisodesUseCase.withParams(GetEpisodesUseCaseParams(feedProgram)),
+    )
         .listen((result) {
       if (result is Success) {
         _view.onLoadEpidoses(result.data);
@@ -90,12 +91,15 @@ class DetailPodcastPresenter {
     var uuid = Uuid();
     return currentPlayer.episode != null &&
         uuid.v5(Uuid.NAMESPACE_URL, episode.audio) ==
-            uuid.v5(Uuid.NAMESPACE_URL, currentPlayer.episode?.audio ?? "no_audio") &&
+            uuid.v5(
+              Uuid.NAMESPACE_URL,
+              currentPlayer.episode?.audio ?? "no_audio",
+            ) &&
         currentPlayer.isPodcast;
   }
 
   onResume() async {
-    if(currentPlayer.playerState == AudioPlayerState.stop){
+    if (currentPlayer.playerState == AudioPlayerState.stop) {
       await currentPlayer.play();
     } else {
       await currentPlayer.resume();
@@ -134,12 +138,12 @@ class DetailPodcastPresenter {
   }
 
   onPodcastControlsClicked(Episode? episode) {
-    if(episode != null) {
+    if (episode != null) {
       router.goToPodcastControls(episode);
     }
   }
 
-//private methods
+  //private methods
 
   _onPlayEpisode(Episode episode) {
     if (currentPlayer.isPlaying()) {
@@ -167,7 +171,7 @@ class DetailPodcastPresenter {
           _view.onPlayerData(StatusPlayer.PLAYING);
           _timer?.cancel();
           _timer = null;
-        } else if (timer.tick > 300) {
+        } else if (timer.tick > 500) {
           currentPlayer.stop();
           isLoading = false;
           _view.onPlayerData(StatusPlayer.FAILED);
@@ -196,7 +200,7 @@ class DetailPodcastPresenter {
           _view.onPlayerData(StatusPlayer.PLAYING);
           _timer?.cancel();
           _timer = null;
-        } else if (timer.tick > 300) {
+        } else if (timer.tick > 500) {
           currentPlayer.stop();
           isLoading = false;
           _view.onPlayerData(StatusPlayer.FAILED);

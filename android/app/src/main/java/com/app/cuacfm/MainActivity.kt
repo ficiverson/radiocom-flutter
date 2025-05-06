@@ -11,10 +11,8 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
-import xyz.luan.audioplayers.AudioService
-
-
-class MainActivity : FlutterActivity() {
+import com.ryanheise.audioservice.AudioServiceActivity
+class MainActivity : AudioServiceActivity() {
 
     companion object {
         private val CHANGE_LOCALE = "cuacfm.flutter.io/changeScreen"
@@ -27,7 +25,6 @@ class MainActivity : FlutterActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         if (Build.VERSION.SDK_INT > 16) {
             val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
             StrictMode.setThreadPolicy(policy)
@@ -36,13 +33,7 @@ class MainActivity : FlutterActivity() {
     }
 
     override fun configureFlutterEngine(flutterEngine : FlutterEngine) {
-        AudioService.registerActivity(flutterEngine)
-
-        val intent = Intent(this, AudioService::class.java)
-        startService(intent)
-
         GeneratedPluginRegistrant.registerWith(flutterEngine)
-
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANGE_LOCALE).setMethodCallHandler { call, result ->
             if (call.method == "changeScreen") {
                 changeScreen = result
@@ -63,9 +54,7 @@ class MainActivity : FlutterActivity() {
         }
     }
     override fun onBackPressed() {
-        if (screens.size == 1) {
-            AudioService.stopComponent(this, this)
-        } else {
+        if (screens.size != 1) {
             screens.removeAll { it == currentScreen }
             if (screens.isNotEmpty()) {
                 currentScreen = screens.last()
@@ -74,7 +63,6 @@ class MainActivity : FlutterActivity() {
                 currentScreen = ""
                 tempCurrentScreen = ""
             }
-
         }
         super.onBackPressed();
     }

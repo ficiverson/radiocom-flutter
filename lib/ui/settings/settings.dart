@@ -67,7 +67,8 @@ class SettingsState extends State<Settings>
             isPlayingAudio: _presenter.currentPlayer.isPlaying(),
             isExpanded: true,
             onDetailClicked: () {
-              _presenter.onPodcastControlsClicked(_presenter.currentPlayer.episode);
+              _presenter
+                  .onPodcastControlsClicked(_presenter.currentPlayer.episode);
             },
             onMultimediaClicked: (isPlaying) {
               if (!mounted) return;
@@ -305,7 +306,11 @@ class SettingsState extends State<Settings>
                                     fontWeight: FontWeight.w400,
                                     fontSize: 16),
                               ),
-                              trailing: WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light
+                              trailing: WidgetsBinding
+                                          .instance
+                                          .platformDispatcher
+                                          .platformBrightness ==
+                                      Brightness.light
                                   ? Switch(
                                       value: isDarkModeEnabled,
                                       onChanged: (value) {
@@ -395,7 +400,7 @@ class SettingsState extends State<Settings>
                       child: InkWell(
                           onTap: () {
                             _presenter
-                                .onTwitterClicked(_radioStation.twitterUrl);
+                                .onTwitterClicked(_radioStation.blueskyUrl);
                           },
                           child: Container(
                               margin: EdgeInsets.fromLTRB(10.0, 0.0, 20.0, 0.0),
@@ -412,7 +417,7 @@ class SettingsState extends State<Settings>
                                         fontWeight: FontWeight.w400,
                                         fontSize: 16),
                                   ),
-                                  trailing: FaIcon(FontAwesomeIcons.twitter,
+                                  trailing: FaIcon(FontAwesomeIcons.bluesky,
                                       color: _colors.grey, size: 25.0))))),
                   getDivider(),
                   SizedBox(height: 15),
