@@ -17,13 +17,13 @@ class New {
       : title = map["title"]?["\$t"] ?? map["title"] ?? "",
         link = map["link"]?["\$t"] ?? map["link"] ?? "",
         pubDate = getDate(map["pubDate"]?["\$t"] ?? map["pubDate"] ?? ""),
-        description = getCleanContent(map["content:encoded"]?["\$t"] ??
+        image = getImage(map["content:encoded"]?["\$t"] ??
             map["content\$encoded"]?["__cdata"] ??
             map["description"]?["\$t"] ??
             map["description"]?["__cdata"] ??
             map["description"] ??
             ""),
-        image = getImage(map["content:encoded"]?["\$t"] ??
+        description = getCleanContent(map["content:encoded"]?["\$t"] ??
             map["content\$encoded"]?["__cdata"] ??
             map["description"]?["\$t"] ??
             map["description"]?["__cdata"] ??
