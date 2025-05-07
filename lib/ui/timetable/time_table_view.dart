@@ -16,8 +16,7 @@ import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
 
 class Timetable extends StatefulWidget {
-  Timetable({Key? key, this.timeTables})
-      : super(key: key);
+  Timetable({Key? key, this.timeTables}) : super(key: key);
 
   final List<TimeTable>? timeTables;
 
@@ -35,8 +34,6 @@ class TimetableState extends State<Timetable>
   late RadiocomColorsConract _colors;
   bool shouldShowPlayer = false;
   bool isContentUpdated = true;
-  EventChannel? _notificationEvent =
-      EventChannel('cuacfm.flutter.io/updateNotificationMain');
   SnackBar? snackBarConnection;
   late CuacLocalization _localization;
 
@@ -124,18 +121,6 @@ class TimetableState extends State<Timetable>
       });
     }
 
-    if (Platform.isAndroid) {
-      _notificationEvent?.receiveBroadcastStream().listen((onData) {
-        if (_notificationEvent != null) {
-          setState(() {
-            _presenter.currentPlayer.release();
-            _presenter.currentPlayer.isPodcast = false;
-            shouldShowPlayer = false;
-          });
-        }
-      });
-    }
-
     _presenter.currentPlayer.onConnection = (isError) {
       if (mounted) {
         new Timer(new Duration(milliseconds: 300), () {
@@ -169,7 +154,6 @@ class TimetableState extends State<Timetable>
 
   @override
   void dispose() {
-    _notificationEvent = null;
     _scrollController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<TimeTableView>();

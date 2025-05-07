@@ -38,8 +38,6 @@ class SettingsDetailState extends State<SettingsDetail>
   late RadiocomColorsConract _colors;
   bool shouldShowPlayer = false;
   bool isContentUpdated = true;
-  EventChannel? _notificationEvent =
-      EventChannel('cuacfm.flutter.io/updateNotification');
   SnackBar? snackBarConnection;
   late CuacLocalization _localization;
 
@@ -60,7 +58,13 @@ class SettingsDetailState extends State<SettingsDetail>
             ? _colors.transparent
             : _colors.palidwhite,
         body: _getBodyLayout(widget.legalType),
-        bottomNavigationBar: Container(height: Platform.isAndroid? 0 : shouldShowPlayer? 60 : 0,color: _colors.palidwhite),
+        bottomNavigationBar: Container(
+            height: Platform.isAndroid
+                ? 0
+                : shouldShowPlayer
+                    ? 60
+                    : 0,
+            color: _colors.palidwhite),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: PlayerView(
             isMini: false,
@@ -69,7 +73,8 @@ class SettingsDetailState extends State<SettingsDetail>
             isPlayingAudio: _presenter.currentPlayer.isPlaying(),
             isExpanded: true,
             onDetailClicked: () {
-              _presenter.onPodcastControlsClicked(_presenter.currentPlayer.episode);
+              _presenter
+                  .onPodcastControlsClicked(_presenter.currentPlayer.episode);
             },
             onMultimediaClicked: (isPlaying) {
               if (!mounted) return;
@@ -94,18 +99,6 @@ class SettingsDetailState extends State<SettingsDetail>
     _presenter = Injector.appInstance.get<SettingsDetailPresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     _radioStation = Injector.appInstance.get<RadioStation>();
-
-    if (Platform.isAndroid) {
-      _notificationEvent?.receiveBroadcastStream().listen((onData) {
-        if (_notificationEvent != null) {
-          setState(() {
-            _presenter.currentPlayer.release();
-            _presenter.currentPlayer.isPodcast = false;
-            shouldShowPlayer = false;
-          });
-        }
-      });
-    }
 
     _presenter.currentPlayer.onConnection = (isError) {
       if (mounted) {
@@ -140,7 +133,6 @@ class SettingsDetailState extends State<SettingsDetail>
 
   @override
   void dispose() {
-    _notificationEvent = null;
     WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<SettingsDetailView>();
     super.dispose();
@@ -245,9 +237,9 @@ class SettingsDetailState extends State<SettingsDetail>
             scrollPhysics: BouncingScrollPhysics(),
             builder: (BuildContext context, int index) {
               return PhotoViewGalleryPageOptions(
-                imageProvider: CachedNetworkImageProvider(_radioStation.stationPhotos[index]),
-                initialScale: PhotoViewComputedScale.contained * 0.8
-              );
+                  imageProvider: CachedNetworkImageProvider(
+                      _radioStation.stationPhotos[index]),
+                  initialScale: PhotoViewComputedScale.contained * 0.8);
             },
             itemCount: _radioStation.stationPhotos.length,
             loadingBuilder: (context, event) => Center(

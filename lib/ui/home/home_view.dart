@@ -77,9 +77,6 @@ class MyHomePageState extends State<MyHomePage>
   SnackBar? snackBarConnection;
   var connectionSubscription;
   bool isContentUpdated = true;
-  EventChannel? _notificationEvent = EventChannel(
-    'cuacfm.flutter.io/updateNotificationMain',
-  );
   bool isDarkModeEnabled = false;
   CuacLocalization _localization = Injector.appInstance.get<CuacLocalization>();
 
@@ -110,24 +107,23 @@ class MyHomePageState extends State<MyHomePage>
             child: child,
           );
         },
-        child:
-            Platform.isIOS
-                ? Stack(
-                  children: [
-                    _getBodyLayout(),
-                    ClipRect(
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).padding.top,
-                          color: _colors.palidwhitegradient,
-                        ),
+        child: Platform.isIOS
+            ? Stack(
+                children: [
+                  _getBodyLayout(),
+                  ClipRect(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).padding.top,
+                        color: _colors.palidwhitegradient,
                       ),
                     ),
-                  ],
-                )
-                : _getBodyLayout(),
+                  ),
+                ],
+              )
+            : _getBodyLayout(),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: PlayerView(
@@ -199,7 +195,6 @@ class MyHomePageState extends State<MyHomePage>
 
   @override
   void dispose() {
-    _notificationEvent = null;
     connectionSubscription.cancel();
     Injector.appInstance.removeByKey<HomeView>();
     WidgetsBinding.instance.removeObserver(this);
@@ -294,19 +289,6 @@ class MyHomePageState extends State<MyHomePage>
     categories.shuffle(Random(DateTime.now().day));
 
     _presenter.onGetToken();
-
-    if (Platform.isAndroid) {
-      _notificationEvent?.receiveBroadcastStream().listen((onData) {
-        print("pause/notification");
-        if (_notificationEvent != null) {
-          setState(() {
-            _presenter.currentPlayer.release();
-            _presenter.currentPlayer.isPodcast = false;
-            shouldShowPlayer = false;
-          });
-        }
-      });
-    }
 
     connectionSubscription = Connectivity().onConnectivityChanged.listen((
       connection,
@@ -562,11 +544,33 @@ class MyHomePageState extends State<MyHomePage>
         () => RadiocomColorsLight(),
         override: true,
       );
+      //Setting SysemUIOverlay
+      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+          systemStatusBarContrastEnforced: true,
+          systemNavigationBarColor: Colors.transparent,
+          systemNavigationBarDividerColor: Colors.transparent,
+          systemNavigationBarIconBrightness: Brightness.dark,
+          statusBarIconBrightness: Brightness.dark));
+
+      //Setting SystmeUIMode
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
+          overlays: [SystemUiOverlay.top]);
     } else {
       Injector.appInstance.registerSingleton<RadiocomColorsConract>(
         () => RadiocomColorsDark(),
         override: true,
       );
+      //Setting SysemUIOverlay
+      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+          systemStatusBarContrastEnforced: true,
+          systemNavigationBarColor: Colors.transparent,
+          systemNavigationBarDividerColor: Colors.transparent,
+          systemNavigationBarIconBrightness: Brightness.light,
+          statusBarIconBrightness: Brightness.light));
+
+      //Setting SystmeUIMode
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
+          overlays: [SystemUiOverlay.top]);
     }
   }
 
@@ -657,27 +661,26 @@ class MyHomePageState extends State<MyHomePage>
               physics: BouncingScrollPhysics(),
               scrollDirection: Axis.horizontal,
               itemCount: categories.length,
-              itemBuilder:
-                  (_, int index) => Row(
-                    children: [
-                      SizedBox(width: 15.0),
-                      GestureDetector(
-                        child: NeumorphicCardVertical(
-                          imageOverLay: true,
-                          active: false,
-                          image: Program.getImages(categories[index]),
-                          label: Program.getCategory(categories[index]),
-                          subtitle: "",
-                        ),
-                        onTap: () {
-                          _presenter.onSeeCategory(
-                            podcastByCategory(index),
-                            Program.getCategory(categories[index]),
-                          );
-                        },
-                      ),
-                    ],
+              itemBuilder: (_, int index) => Row(
+                children: [
+                  SizedBox(width: 15.0),
+                  GestureDetector(
+                    child: NeumorphicCardVertical(
+                      imageOverLay: true,
+                      active: false,
+                      image: Program.getImages(categories[index]),
+                      label: Program.getCategory(categories[index]),
+                      subtitle: "",
+                    ),
+                    onTap: () {
+                      _presenter.onSeeCategory(
+                        podcastByCategory(index),
+                        Program.getCategory(categories[index]),
+                      );
+                    },
                   ),
+                ],
+              ),
             ),
           ),
         ],
@@ -691,7 +694,7 @@ class MyHomePageState extends State<MyHomePage>
       color: _colors.palidwhite,
       width: queryData.size.width,
       height: queryData.size.height,
-      padding: EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 0.0),
+      padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
       child: SingleChildScrollView(
         key: PageStorageKey<String>(BottomBarOption.HOME.toString()),
         physics: BouncingScrollPhysics(),
@@ -718,47 +721,48 @@ class MyHomePageState extends State<MyHomePage>
               shouldShowPlayer
                   ? SizedBox(height: 10)
                   : isLoadingPlay
-                  ? Container(height: 80.0, child: getLoadingState())
-                  : Padding(
-                    padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 0.0),
-                    child: NeumorphicCardHorizontal(
-                      onElementClicked: () {
-                        if (!mounted) return;
-                        setState(() {
-                          isLoadingPlay = true;
-                          _presenter.onLiveSelected(_nowProgram);
-                        });
-                      },
-                      icon: Icons.play_arrow,
-                      active: true,
-                      label: SafeMap.safe(_localization.translateMap("home"), [
-                        "live_msg",
-                      ]),
-                      size: 80.0,
-                    ),
-                  ),
+                      ? Container(height: 80.0, child: getLoadingState())
+                      : Padding(
+                          padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 0.0),
+                          child: NeumorphicCardHorizontal(
+                            onElementClicked: () {
+                              if (!mounted) return;
+                              setState(() {
+                                isLoadingPlay = true;
+                                _presenter.onLiveSelected(_nowProgram);
+                              });
+                            },
+                            icon: Icons.play_arrow,
+                            active: true,
+                            label: SafeMap.safe(
+                                _localization.translateMap("home"), [
+                              "live_msg",
+                            ]),
+                            size: 80.0,
+                          ),
+                        ),
               _outstanding == null
                   ? Container()
                   : Padding(
-                    padding: const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
-                    child: Text(
-                      SafeMap.safe(_localization.translateMap("home"), [
-                        "outstanding_msg",
-                      ]),
-                      style: TextStyle(
-                        letterSpacing: 1.3,
-                        color: _colors.font,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
+                      padding: const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
+                      child: Text(
+                        SafeMap.safe(_localization.translateMap("home"), [
+                          "outstanding_msg",
+                        ]),
+                        style: TextStyle(
+                          letterSpacing: 1.3,
+                          color: _colors.font,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                  ),
               _outstanding == null
                   ? Container()
                   : Container(
-                    color: _colors.palidwhitedark,
-                    child: _getHomeOutstandingInfo(_outstanding!),
-                  ),
+                      color: _colors.palidwhitedark,
+                      child: _getHomeOutstandingInfo(_outstanding!),
+                    ),
               Padding(
                 padding: EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
                 child: Text(
@@ -802,58 +806,55 @@ class MyHomePageState extends State<MyHomePage>
               ),
               isEmptyHome
                   ? Padding(
-                    padding: EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 20.0),
-                    child: NeumorphicEmptyView(
-                      SafeMap.safe(_localization.translateMap("home"), [
-                        "empty_podcast",
-                      ]),
+                      padding: EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 20.0),
+                      child: NeumorphicEmptyView(
+                        SafeMap.safe(_localization.translateMap("home"), [
+                          "empty_podcast",
+                        ]),
+                        width: queryData.size.width,
+                        height: 280.0,
+                      ),
+                    )
+                  : Container(
+                      color: _colors.transparent,
                       width: queryData.size.width,
                       height: 280.0,
-                    ),
-                  )
-                  : Container(
-                    color: _colors.transparent,
-                    width: queryData.size.width,
-                    height: 280.0,
-                    child:
-                        isLoadingHome
-                            ? Container(height: 280.0, child: getLoadingState())
-                            : ListView.builder(
+                      child: isLoadingHome
+                          ? Container(height: 280.0, child: getLoadingState())
+                          : ListView.builder(
                               key: PageStorageKey<String>("home_last_episodes"),
                               physics: BouncingScrollPhysics(),
                               scrollDirection: Axis.horizontal,
                               itemCount: _recentPodcast.length,
-                              itemBuilder:
-                                  (_, int index) => Row(
-                                    children: [
-                                      SizedBox(width: 15.0),
-                                      GestureDetector(
-                                        onTap: () {
-                                          _presenter.onPodcastClicked(
-                                            findPodcastByName(
-                                              _recentPodcast[index].rssUrl,
-                                            ),
-                                          );
-                                        },
-                                        child: NeumorphicCardVertical(
-                                          active: false,
-                                          image: _recentPodcast[index].logoUrl,
-                                          label: _recentPodcast[index].name,
-                                          subtitle:
-                                              _recentPodcast[index].duration +
-                                              SafeMap.safe(
-                                                _localization.translateMap(
-                                                  "general",
-                                                ),
-                                                ["minutes"],
-                                              ),
+                              itemBuilder: (_, int index) => Row(
+                                children: [
+                                  SizedBox(width: 15.0),
+                                  GestureDetector(
+                                    onTap: () {
+                                      _presenter.onPodcastClicked(
+                                        findPodcastByName(
+                                          _recentPodcast[index].rssUrl,
                                         ),
-                                      ),
-                                      SizedBox(width: 22.0),
-                                    ],
+                                      );
+                                    },
+                                    child: NeumorphicCardVertical(
+                                      active: false,
+                                      image: _recentPodcast[index].logoUrl,
+                                      label: _recentPodcast[index].name,
+                                      subtitle: _recentPodcast[index].duration +
+                                          SafeMap.safe(
+                                            _localization.translateMap(
+                                              "general",
+                                            ),
+                                            ["minutes"],
+                                          ),
+                                    ),
                                   ),
+                                  SizedBox(width: 22.0),
+                                ],
+                              ),
                             ),
-                  ),
+                    ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
                 child: Text(
@@ -883,40 +884,40 @@ class MyHomePageState extends State<MyHomePage>
               ),
               shouldShowPlayer
                   ? Container(
-                    width: queryData.size.width,
-                    padding: EdgeInsets.fromLTRB(80.0, 30.0, 80.0, 00.0),
-                    child: Column(
-                      children: <Widget>[
-                        CustomImage(
-                          resPath: "assets/graphics/cuac-logo.png",
-                          radius: 0.0,
-                          background: false,
-                        ),
-                        SizedBox(height: 60),
-                      ],
-                    ),
-                  )
-                  : isLoadingHome
-                  ? GlowingProgressIndicator(
-                    child: Container(
                       width: queryData.size.width,
-                      padding: EdgeInsets.fromLTRB(80.0, 40.0, 80.0, 0.0),
-                      child: CustomImage(
-                        resPath: "assets/graphics/cuac-logo.png",
-                        radius: 0.0,
-                        background: false,
+                      padding: EdgeInsets.fromLTRB(80.0, 30.0, 80.0, 00.0),
+                      child: Column(
+                        children: <Widget>[
+                          CustomImage(
+                            resPath: "assets/graphics/cuac-logo.png",
+                            radius: 0.0,
+                            background: false,
+                          ),
+                          SizedBox(height: 60),
+                        ],
                       ),
-                    ),
-                  )
-                  : Container(
-                    width: queryData.size.width,
-                    padding: EdgeInsets.fromLTRB(80.0, 40.0, 80.0, 0.0),
-                    child: CustomImage(
-                      resPath: "assets/graphics/cuac-logo.png",
-                      radius: 0.0,
-                      background: false,
-                    ),
-                  ),
+                    )
+                  : isLoadingHome
+                      ? GlowingProgressIndicator(
+                          child: Container(
+                            width: queryData.size.width,
+                            padding: EdgeInsets.fromLTRB(80.0, 40.0, 80.0, 0.0),
+                            child: CustomImage(
+                              resPath: "assets/graphics/cuac-logo.png",
+                              radius: 0.0,
+                              background: false,
+                            ),
+                          ),
+                        )
+                      : Container(
+                          width: queryData.size.width,
+                          padding: EdgeInsets.fromLTRB(80.0, 40.0, 80.0, 0.0),
+                          child: CustomImage(
+                            resPath: "assets/graphics/cuac-logo.png",
+                            radius: 0.0,
+                            background: false,
+                          ),
+                        ),
               SizedBox(height: 20.0),
             ],
           ),
@@ -1001,17 +1002,16 @@ class MyHomePageState extends State<MyHomePage>
               ),
             );
           } else {
-            element =
-                isEmptyNews
-                    ? Padding(
-                      padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 0.0),
-                      child: NeumorphicEmptyView(
-                        SafeMap.safe(_localization.translateMap("home"), [
-                          "news_error",
-                        ]),
-                      ),
-                    )
-                    : SizedBox(height: shouldShowPlayer ? 60.0 : 10.0);
+            element = isEmptyNews
+                ? Padding(
+                    padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 0.0),
+                    child: NeumorphicEmptyView(
+                      SafeMap.safe(_localization.translateMap("home"), [
+                        "news_error",
+                      ]),
+                    ),
+                  )
+                : SizedBox(height: shouldShowPlayer ? 60.0 : 10.0);
           }
           return element;
         },
@@ -1152,33 +1152,31 @@ class MyHomePageState extends State<MyHomePage>
             physics: BouncingScrollPhysics(),
             scrollDirection: Axis.horizontal,
             itemCount: podcast.length,
-            itemBuilder:
-                (_, int index) => Row(
-                  children: [
-                    SizedBox(width: 15.0),
-                    GestureDetector(
-                      onTap: () {
-                        _presenter.onPodcastClicked(podcast[index]);
-                      },
-                      child: NeumorphicCardVertical(
-                        active: false,
-                        image: podcast[index].logoUrl,
-                        label: podcast[index].name,
-                        subtitle:
-                            (DateFormat(
-                                      "hh:mm:ss",
-                                    ).parse(podcast[index].duration).hour *
-                                    60)
-                                .toString() +
-                            SafeMap.safe(
-                              _localization.translateMap("general"),
-                              ["minutes"],
-                            ),
-                      ),
-                    ),
-                    SizedBox(width: 22.0),
-                  ],
+            itemBuilder: (_, int index) => Row(
+              children: [
+                SizedBox(width: 15.0),
+                GestureDetector(
+                  onTap: () {
+                    _presenter.onPodcastClicked(podcast[index]);
+                  },
+                  child: NeumorphicCardVertical(
+                    active: false,
+                    image: podcast[index].logoUrl,
+                    label: podcast[index].name,
+                    subtitle: (DateFormat(
+                                  "hh:mm:ss",
+                                ).parse(podcast[index].duration).hour *
+                                60)
+                            .toString() +
+                        SafeMap.safe(
+                          _localization.translateMap("general"),
+                          ["minutes"],
+                        ),
+                  ),
                 ),
+                SizedBox(width: 22.0),
+              ],
+            ),
           ),
         ),
       ],
@@ -1191,104 +1189,103 @@ class MyHomePageState extends State<MyHomePage>
       color: _colors.palidwhitedark,
       width: queryData.size.width,
       height: queryData.size.height,
-      padding: EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 0.0),
+      padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
       child: SingleChildScrollView(
         key: PageStorageKey<String>(BottomBarOption.SEARCH.toString()),
         physics: BouncingScrollPhysics(),
-        child:
-            isEmptyPodcast
-                ? Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    SizedBox(height: 45.0),
-                    Padding(
-                      padding: EdgeInsets.all(20.0),
-                      child: Text(
-                        SafeMap.safe(_localization.translateMap("home"), [
-                          "podcast",
-                        ]),
-                        style: TextStyle(
-                          letterSpacing: 1.5,
-                          color: _colors.font,
-                          fontSize: 30,
-                          fontWeight: FontWeight.w900,
-                        ),
+        child: isEmptyPodcast
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(height: 45.0),
+                  Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: Text(
+                      SafeMap.safe(_localization.translateMap("home"), [
+                        "podcast",
+                      ]),
+                      style: TextStyle(
+                        letterSpacing: 1.5,
+                        color: _colors.font,
+                        fontSize: 30,
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 0.0),
-                      child: NeumorphicEmptyView(
-                        SafeMap.safe(_localization.translateMap("home"), [
-                          "podcast_error",
-                        ]),
-                        width: queryData.size.width,
-                      ),
-                    ),
-                  ],
-                )
-                : Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    SizedBox(height: 35.0),
-                    Container(
-                      height: 60.0,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 0.0),
+                    child: NeumorphicEmptyView(
+                      SafeMap.safe(_localization.translateMap("home"), [
+                        "podcast_error",
+                      ]),
                       width: queryData.size.width,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(20.0, 20.0, 0.0, 0.0),
-                            child: Text(
-                              SafeMap.safe(_localization.translateMap("home"), [
-                                "podcast",
-                              ]),
-                              style: TextStyle(
-                                letterSpacing: 1.5,
-                                color: _colors.font,
-                                fontSize: 30,
-                                fontWeight: FontWeight.w900,
-                              ),
+                    ),
+                  ),
+                ],
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(height: 35.0),
+                  Container(
+                    height: 60.0,
+                    width: queryData.size.width,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(20.0, 20.0, 0.0, 0.0),
+                          child: Text(
+                            SafeMap.safe(_localization.translateMap("home"), [
+                              "podcast",
+                            ]),
+                            style: TextStyle(
+                              letterSpacing: 1.5,
+                              color: _colors.font,
+                              fontSize: 30,
+                              fontWeight: FontWeight.w900,
                             ),
                           ),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(20.0, 10.0, 0.0, 20.0),
-                            child: IconButton(
-                              icon: Icon(
-                                Icons.search,
-                                color: _colors.font,
-                                size: 30,
-                              ),
-                              onPressed: () {
-                                _presenter.onSeeAllPodcast(_podcast);
-                              },
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(20.0, 10.0, 0.0, 20.0),
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.search,
+                              color: _colors.font,
+                              size: 30,
                             ),
+                            onPressed: () {
+                              _presenter.onSeeAllPodcast(_podcast);
+                            },
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    _getPodcastOfTheDay(
-                      _podcast[DateTime.now().day % _podcast.length],
-                    ),
-                    _getCategoriesLayout(),
-                    _getPodcastByCategory(categories[0], podcast0),
-                    _getPodcastByCategory(categories[1], podcast1),
-                    _getPodcastByCategory(categories[2], podcast2),
-                    _getPodcastByCategory(categories[3], podcast3),
-                    _getPodcastByCategory(categories[4], podcast4),
-                    _getPodcastByCategory(categories[5], podcast5),
-                    _getPodcastByCategory(categories[6], podcast6),
-                    _getPodcastByCategory(categories[7], podcast7),
-                    _getPodcastByCategory(categories[8], podcast8),
-                    _getPodcastByCategory(categories[9], podcast9),
-                    _getPodcastByCategory(categories[10], podcast10),
-                    _getPodcastByCategory(categories[11], podcast11),
-                    SizedBox(height: shouldShowPlayer ? 60.0 : 10.0),
-                  ],
-                ),
+                  ),
+                  _getPodcastOfTheDay(
+                    _podcast[DateTime.now().day % _podcast.length],
+                  ),
+                  _getCategoriesLayout(),
+                  _getPodcastByCategory(categories[0], podcast0),
+                  _getPodcastByCategory(categories[1], podcast1),
+                  _getPodcastByCategory(categories[2], podcast2),
+                  _getPodcastByCategory(categories[3], podcast3),
+                  _getPodcastByCategory(categories[4], podcast4),
+                  _getPodcastByCategory(categories[5], podcast5),
+                  _getPodcastByCategory(categories[6], podcast6),
+                  _getPodcastByCategory(categories[7], podcast7),
+                  _getPodcastByCategory(categories[8], podcast8),
+                  _getPodcastByCategory(categories[9], podcast9),
+                  _getPodcastByCategory(categories[10], podcast10),
+                  _getPodcastByCategory(categories[11], podcast11),
+                  SizedBox(height: shouldShowPlayer ? 60.0 : 10.0),
+                ],
+              ),
       ),
     );
   }
@@ -1317,18 +1314,17 @@ class MyHomePageState extends State<MyHomePage>
   _updateRecentPodcasts(List<TimeTable> programsTimeTable) {
     _recentPodcast = programsTimeTable;
     _recentPodcast.removeWhere((element) => element.type == "S");
-    _recentPodcast =
-        _recentPodcast
-            .where(
-              (element) =>
-                  element.start.isBefore(
-                    DateTime.now().subtract(Duration(hours: 1)),
-                  ) &&
-                  element.start.isAfter(
-                    DateTime.now().subtract(Duration(hours: 12)),
-                  ),
-            )
-            .toList();
+    _recentPodcast = _recentPodcast
+        .where(
+          (element) =>
+              element.start.isBefore(
+                DateTime.now().subtract(Duration(hours: 1)),
+              ) &&
+              element.start.isAfter(
+                DateTime.now().subtract(Duration(hours: 12)),
+              ),
+        )
+        .toList();
     isEmptyHome = _recentPodcast.isEmpty;
   }
 }

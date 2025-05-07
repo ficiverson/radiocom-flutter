@@ -31,8 +31,6 @@ class SettingsState extends State<Settings>
   late RadiocomColorsConract _colors;
   bool shouldShowPlayer = false;
   bool isContentUpdated = true;
-  EventChannel? _notificationEvent =
-      EventChannel('cuacfm.flutter.io/updateNotification');
   SnackBar? snackBarConnection;
   bool isDarkModeEnabled = false;
   bool isLiveNotificationEnabled = false;
@@ -95,18 +93,6 @@ class SettingsState extends State<Settings>
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     _radioStation = Injector.appInstance.get<RadioStation>();
 
-    if (Platform.isAndroid) {
-      _notificationEvent?.receiveBroadcastStream().listen((onData) {
-        if (_notificationEvent != null) {
-          setState(() {
-            _presenter.currentPlayer.release();
-            _presenter.currentPlayer.isPodcast = false;
-            shouldShowPlayer = false;
-          });
-        }
-      });
-    }
-
     _presenter.currentPlayer.onConnection = (isError) {
       if (mounted) {
         new Timer(new Duration(milliseconds: 300), () {
@@ -140,7 +126,6 @@ class SettingsState extends State<Settings>
 
   @override
   void dispose() {
-    _notificationEvent = null;
     WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<SettingsView>();
     super.dispose();
