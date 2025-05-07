@@ -1,4 +1,3 @@
-
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/translations/localizations_delegate.dart';
@@ -13,6 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as Foundation;
 import 'package:injector/injector.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:just_audio_background/just_audio_background.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +23,23 @@ void main() async {
   await Firebase.initializeApp();
   await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  //Setting SysemUIOverlay
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      systemStatusBarContrastEnforced: true,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+      systemNavigationBarIconBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.dark));
+
+  //Setting SystmeUIMode
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
+      overlays: [SystemUiOverlay.top]);
+
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+    androidNotificationChannelName: 'Media player',
+    androidNotificationOngoing: true,
+  );
   runApp(MyApp());
 }
 
@@ -65,10 +83,9 @@ class MyApp extends StatelessWidget {
         FirebaseAnalyticsObserver(analytics: analytics),
       ],
       theme: new ThemeData(
-        canvasColor: Colors.transparent,
-        primarySwatch: Colors.grey,
-        brightness: Brightness.light
-      ),
+          canvasColor: Colors.transparent,
+          primarySwatch: Colors.grey,
+          brightness: Brightness.light),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         canvasColor: Colors.black,

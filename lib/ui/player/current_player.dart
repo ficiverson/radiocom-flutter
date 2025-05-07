@@ -1,11 +1,13 @@
-import 'dart:io';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:connectivity/connectivity.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
+import 'package:just_audio_background/just_audio_background.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 
 typedef void ConnectionCallback(bool isError);
 
@@ -105,9 +107,6 @@ class CurrentPlayer implements CurrentPlayerContract {
           podcastConnectivityResult!(false);
         }
       } else if (connection == ConnectivityResult.none) {
-        if (Platform.isIOS) {
-          await audioPlayer.play("file://audio");
-        }
         stop();
         release();
 
@@ -126,11 +125,11 @@ class CurrentPlayer implements CurrentPlayerContract {
   Future<bool> seek(Duration position) async {
     if (playerState == AudioPlayerState.play) {
       if (position <= duration) {
-        final result = await audioPlayer.seek(position);
-        return result == 1;
+        await audioPlayer.seek(position);
+        return true;
       } else {
-        final result = await audioPlayer.seek(duration);
-        return result == 1;
+        await audioPlayer.seek(duration);
+        return true;
       }
     } else {
       return false;
@@ -141,8 +140,8 @@ class CurrentPlayer implements CurrentPlayerContract {
   Future<bool> setVolume(double volume) async {
     if (playerState == AudioPlayerState.play) {
       this.volume = volume;
-      final result = await audioPlayer.setVolume(volume);
-      return result == 1;
+      await audioPlayer.setVolume(volume);
+      return true;
     } else {
       return false;
     }
@@ -151,30 +150,29 @@ class CurrentPlayer implements CurrentPlayerContract {
   @override
   Future<bool> play() async {
     if (playerState != AudioPlayerState.play) {
-      if (Platform.isIOS) {
-        audioPlayer.notificationService.startHeadlessService();
-      }
       if (isPodcast) {
-        audioPlayer.onPlayerCompletion.listen((event) {
-          stop();
-          position = Duration(seconds: 0);
-          restoreDuration = Duration(seconds: 0);
-          restorePosition = Duration(seconds: 0);
-          seek(position);
-          if (onUpdate != null) {
-            onUpdate!();
+        audioPlayer.playerStateStream.listen((event) {
+          if (event.processingState == ProcessingState.completed) {
+            stop();
+            position = Duration(seconds: 0);
+            restoreDuration = Duration(seconds: 0);
+            restorePosition = Duration(seconds: 0);
+            seek(position);
+            if (onUpdate != null) {
+              onUpdate!();
+            }
           }
         });
 
-        audioPlayer.onDurationChanged.listen((Duration d) {
+        audioPlayer.durationStream.listen((Duration? d) {
           print(d);
-          duration = d;
-          if (onUpdate != null) {
+          duration = d ?? Duration(hours: 1);
+          if (onUpdate != null && duration > Duration(seconds: 0)) {
             onUpdate!();
           }
         });
       }
-      audioPlayer.onAudioPositionChanged.listen((Duration p) {
+      audioPlayer.positionStream.listen((Duration p) {
         if (isPodcast) {
           if (p.inSeconds.ceilToDouble() >= 0.0 &&
               p.inSeconds.ceilToDouble() <= duration.inSeconds.ceilToDouble()) {
@@ -182,46 +180,13 @@ class CurrentPlayer implements CurrentPlayerContract {
             if (onUpdate != null) {
               onUpdate!();
             }
-            if (Platform.isIOS) {
-              audioPlayer.notificationService.setNotification(
-                  title: currentSong,
-                  imageUrl: currentImage,
-                  artist: "CUAC FM",
-                  albumTitle: "Podcast",
-                  forwardSkipInterval: const Duration(seconds: 30),
-                  backwardSkipInterval: const Duration(seconds: 30),
-                  duration: duration,
-                  elapsedTime: position);
-            }
           }
         } else {
-          position = p;
-          if (Platform.isIOS) {
-            audioPlayer.notificationService.setNotification(
-                title: currentSong,
-                imageUrl: currentImage,
-                albumTitle: "Live",
-                artist: "CUAC FM");
-          }
+          position = Duration(seconds: 1);
+          duration = Duration(hours: 24);
         }
       });
 
-      if (Platform.isIOS) {
-        audioPlayer.onNotificationPlayerStateChanged.listen((state) {
-          if (state == PlayerState.PLAYING) {
-            playerState = AudioPlayerState.play;
-          } else {
-            playerState = AudioPlayerState.pause;
-          }
-          if (onUpdate != null) {
-            onUpdate!();
-          }
-        });
-      }
-
-      audioPlayer.onPlayerError.listen((onError) {
-        print(onError);
-      });
       setVolume(1.0);
       if ((isPodcast && episode?.audio != null && episode!.audio.isNotEmpty) ||
           (!isPodcast &&
@@ -229,23 +194,24 @@ class CurrentPlayer implements CurrentPlayerContract {
               now!.streamUrl().isNotEmpty)) {
         if (!isPodcast) {
           playbackRate = 1.0;
-          audioPlayer.setPlaybackRate(playbackRate);
+          audioPlayer.setSpeed(playbackRate);
         }
-        final result = await audioPlayer.play(
-            isPodcast
+        AudioSource audioSource = AudioSource.uri(
+            Uri.parse(isPodcast
                 ? episode?.audio ?? RadioStation.base().streamUrl
-                : now?.streamUrl() ?? RadioStation.base().streamUrl,
-            isLocal: false,
-            respectSilence: false);
-        if (result == 1) playerState = AudioPlayerState.play;
-        if (Platform.isAndroid) {
-          MethodChannel('cuacfm.flutter.io/notificationInfo')
-              .invokeMethod('notificationInfo', {
-            "notificationTitle": isPodcast ? "Podcast" : "Directo",
-            "notificationImage": currentImage,
-            "notificationSubtitle": currentSong
-          });
-        }
+                : now?.streamUrl() ?? RadioStation.base().streamUrl),
+            tag: MediaItem(
+              id: urlToHashId(
+                  isPodcast ? episode?.audio ?? "" : now?.streamUrl() ?? ""),
+              album: isPodcast ? "Podcast CUAC FM" : "Directo CUAC FM",
+              title: isPodcast ? episode?.title ?? "" : "Streaming en directo",
+              artist: "CUAC FM",
+              artUri: Uri.parse(currentImage),
+            ));
+        audioPlayer.setAudioSource(audioSource);
+        await audioPlayer.play();
+        await audioPlayer.seek(position);
+        if (audioPlayer.playing) playerState = AudioPlayerState.play;
         if (restorePosition != Duration(seconds: 0) &&
             restoreDuration != Duration(seconds: 0) &&
             isPodcast &&
@@ -257,7 +223,7 @@ class CurrentPlayer implements CurrentPlayerContract {
           restoreDuration = Duration(seconds: 0);
           restorePosition = Duration(seconds: 0);
         }
-        return result == 1;
+        return true;
       } else {
         return false;
       }
@@ -272,31 +238,32 @@ class CurrentPlayer implements CurrentPlayerContract {
         playerState == AudioPlayerState.pause) {
       if (!isPodcast) {
         playbackRate = 1.0;
-        audioPlayer.setPlaybackRate(playbackRate);
+        audioPlayer.setSpeed(playbackRate);
       }
-      final result = await audioPlayer.pause();
-      if (result == 1) playerState = AudioPlayerState.pause;
+      await audioPlayer.pause();
+      if (!audioPlayer.playing) playerState = AudioPlayerState.pause;
       duration = Duration(seconds: 0);
       position = Duration(seconds: 0);
       if (!isPodcast) {
         setVolume(1.0);
       }
-      final playResult = await audioPlayer.play(
-          isPodcast
+      AudioSource audioSource = AudioSource.uri(
+          Uri.parse(isPodcast
               ? episode?.audio ?? RadioStation.base().streamUrl
-              : now?.streamUrl() ?? RadioStation.base().streamUrl,
-          isLocal: false,
-          respectSilence: false);
-      if (playResult == 1) playerState = AudioPlayerState.play;
-      if (Platform.isAndroid) {
-        MethodChannel('cuacfm.flutter.io/notificationInfo')
-            .invokeMethod('notificationInfo', {
-          "notificationTitle": isPodcast ? "Podcast" : "Directo",
-          "notificationImage": currentImage,
-          "notificationSubtitle": currentSong
-        });
-      }
-      return playResult == 1;
+              : now?.streamUrl() ?? RadioStation.base().streamUrl),
+          tag: MediaItem(
+            id: urlToHashId(
+                isPodcast ? episode?.audio ?? "" : now?.streamUrl() ?? ""),
+            album: isPodcast ? "Podcast CUAC FM" : "Directo CUAC FM",
+            title: isPodcast ? episode?.title ?? "" : "Streaming en directo",
+            artist: "CUAC FM",
+            artUri: Uri.parse(currentImage),
+          ));
+      audioPlayer.setAudioSource(audioSource);
+      await audioPlayer.play();
+      await audioPlayer.seek(position);
+      if (audioPlayer.playing) playerState = AudioPlayerState.play;
+      return true;
     } else {
       return false;
     }
@@ -321,23 +288,15 @@ class CurrentPlayer implements CurrentPlayerContract {
   Future resume() async {
     if (playerState == AudioPlayerState.pause) {
       playerState = AudioPlayerState.play;
-      await audioPlayer.resume();
-      if (Platform.isAndroid) {
-        MethodChannel('cuacfm.flutter.io/notificationInfo')
-            .invokeMethod('notificationInfo', {
-          "notificationTitle": isPodcast ? "Podcast" : "Directo",
-          "notificationImage": currentImage,
-          "notificationSubtitle": currentSong
-        });
-      }
+      await audioPlayer.play();
     }
   }
 
   @override
   Future pause() async {
     if (playerState == AudioPlayerState.play) {
-      final result = await audioPlayer.pause();
-      if (result == 1) playerState = AudioPlayerState.pause;
+      await audioPlayer.pause();
+      if (!audioPlayer.playing) playerState = AudioPlayerState.pause;
     }
   }
 
@@ -361,8 +320,7 @@ class CurrentPlayer implements CurrentPlayerContract {
     playerState = AudioPlayerState.stop;
     position = Duration(seconds: 0);
     duration = Duration(seconds: 0);
-    audioPlayer.setReleaseMode(ReleaseMode.RELEASE);
-    await audioPlayer.release();
+    await audioPlayer.dispose();
   }
 
   @override
@@ -373,6 +331,10 @@ class CurrentPlayer implements CurrentPlayerContract {
   @override
   void setPlaybackRate(double playbackRate) {
     this.playbackRate = playbackRate;
-    audioPlayer.setPlaybackRate(playbackRate);
+    audioPlayer.setSpeed(playbackRate);
+  }
+
+  String urlToHashId(String url) {
+    return md5.convert(utf8.encode(url)).toString();
   }
 }

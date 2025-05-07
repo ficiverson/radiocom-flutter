@@ -7,7 +7,7 @@ import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:injector/injector.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'new_detail_router.dart';
@@ -62,13 +62,13 @@ class NewDetailPresenter {
   }
 
   onPodcastControlsClicked(Episode? episode) {
-    if(episode != null){
+    if (episode != null) {
       router.goToPodcastControls(episode);
     }
   }
 
   onResume() async {
-    if(currentPlayer.playerState == AudioPlayerState.stop){
+    if (currentPlayer.playerState == AudioPlayerState.stop) {
       await currentPlayer.play();
     } else {
       await currentPlayer.resume();
@@ -84,7 +84,7 @@ class NewDetailPresenter {
   }
 
   onLinkClicked(String? url) {
-    if(url != null) {
+    if (url != null) {
       _launchURL(url);
     }
   }

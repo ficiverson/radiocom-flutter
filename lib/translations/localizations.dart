@@ -9,7 +9,6 @@ abstract class CuacLocalizationContract {
 }
 
 class CuacLocalization implements CuacLocalizationContract {
-
   Map<String, dynamic>? _sentencesRemote;
   Map<String, dynamic>? _sentencesLocal;
   late Locale locale;
@@ -19,8 +18,6 @@ class CuacLocalization implements CuacLocalizationContract {
   static CuacLocalization of(BuildContext context) {
     return Localizations.of(context, CuacLocalization);
   }
-
-
 
   Future<bool> load() async {
     if (_sentencesLocal != null && _sentencesLocal!.isNotEmpty) {
@@ -37,19 +34,6 @@ class CuacLocalization implements CuacLocalizationContract {
       return true;
     }
   }
-
-//  Future<bool> loadRemote() async {
-//    try {
-//      if (_sentencesRemote != null && _sentencesRemote.isNotEmpty) {
-//        return true;
-//      } else {
-//        //TODO download from network translations
-//        return true;
-//      }
-//    } catch (FormatException) {
-//      return false;
-//    }
-//  }
 
   @override
   String getTranslations(String key) {

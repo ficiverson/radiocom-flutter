@@ -21,17 +21,16 @@ class IPhoneXPadding extends Container {
     }
 
     var homeIndicatorHeight =
-    // TODO verify exact values
-    mediaQueryData.orientation == Orientation.portrait ? 6.0 : 5.0;
+        mediaQueryData.orientation == Orientation.portrait ? 6.0 : 5.0;
 
     var outer = mediaQueryData.padding;
     var bottom = outer.bottom + homeIndicatorHeight;
 
-    return new MediaQuery(data: new MediaQueryData(
-        padding: new EdgeInsets.fromLTRB(
-            outer.left, outer.top, outer.right, bottom)),
-        child: child
-    );
+    return new MediaQuery(
+        data: new MediaQueryData(
+            padding: new EdgeInsets.fromLTRB(
+                outer.left, outer.top, outer.right, bottom)),
+        child: child);
   }
 
   bool _isIPhoneX(MediaQueryData mediaQuery) {

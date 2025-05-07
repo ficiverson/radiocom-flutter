@@ -5,6 +5,7 @@
 .pub/
 build/
 ios/.generated/
+ios/Runner/GoogleService-Info.plist
 packages
 pubspec.lock
 .flutter-plugins
@@ -15,5 +16,7 @@ ios/.symlinks/plugins/
 android/app/google-services.json
 .dart_tool/
 android/app/src/main/gen/
+android/app/google-services.json
+android/app/.cxx
 ios/Flutter/flutter_export_environment.sh
 ios/.symlinks/

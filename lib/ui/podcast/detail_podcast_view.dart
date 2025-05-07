@@ -43,8 +43,6 @@ class DetailPodcastState extends State<DetailPodcastPage>
   bool emptyState = false;
   bool shouldShowPlayer = false;
   bool isContentUpdated = true;
-  EventChannel? _notificationEvent =
-      EventChannel('cuacfm.flutter.io/updateNotificationPodcastDetail');
   SnackBar? snackBarConnection;
   late CuacLocalization _localization;
 
@@ -67,7 +65,13 @@ class DetailPodcastState extends State<DetailPodcastPage>
         }),
         backgroundColor: _colors.palidwhite,
         body: _getBodyLayout(),
-        bottomNavigationBar: Container(height: Platform.isAndroid? 0 : shouldShowPlayer? 60 : 0,color: _colors.palidwhite),
+        bottomNavigationBar: Container(
+            height: Platform.isAndroid
+                ? 0
+                : shouldShowPlayer
+                    ? 60
+                    : 0,
+            color: _colors.palidwhite),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: PlayerView(
             isMini: false,
@@ -105,18 +109,6 @@ class DetailPodcastState extends State<DetailPodcastPage>
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     _presenter.loadEpisodes(_program.rssUrl);
 
-    if (Platform.isAndroid) {
-      _notificationEvent?.receiveBroadcastStream().listen((onData) {
-        if (_notificationEvent != null) {
-          setState(() {
-            _presenter.currentPlayer.release();
-            _presenter.currentPlayer.isPodcast = false;
-            shouldShowPlayer = false;
-          });
-        }
-      });
-    }
-
     _presenter.currentPlayer.onConnection = (isError) {
       if (mounted) {
         new Timer(new Duration(milliseconds: 300), () {
@@ -150,7 +142,6 @@ class DetailPodcastState extends State<DetailPodcastPage>
 
   @override
   void dispose() {
-    _notificationEvent = null;
     WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<DetailPodcastView>();
     super.dispose();
@@ -278,7 +269,8 @@ class DetailPodcastState extends State<DetailPodcastPage>
                           padding: EdgeInsets.all(3.0),
                           child: Container(
                               color: (_presenter.currentPlayer.isPlaying() &&
-                                  _presenter.isSamePodcast(_episodes[index - 1]))
+                                      _presenter
+                                          .isSamePodcast(_episodes[index - 1]))
                                   ? _colors.palidwhite
                                   : _colors.transparent,
                               child: ListTile(
@@ -327,18 +319,25 @@ class DetailPodcastState extends State<DetailPodcastPage>
                                         ? Container(
                                             child: getLoadingStatePlayer(),
                                             width: 40.0)
-                                        :  _presenter.currentPlayer
-                                        .isPlaying() &&
-                                        _presenter.isSamePodcast(
-                                            _episodes[index - 1])
-                                        ? AnimatedOpacity(
-                                        opacity: _presenter.currentPlayer.isPlaying() ? 1.0 : 0.0,
-                                        duration: Duration(seconds: 1),
-                                        child: Wave(
-                                            size:
-                                            Size(30.0, 20.0), shouldAnimate: _presenter.currentPlayer.isPlaying())) : Icon(Icons.play_circle_outline,
-                                            color: _colors.yellow,
-                                            size: 38.0)),
+                                        : _presenter.currentPlayer
+                                                    .isPlaying() &&
+                                                _presenter.isSamePodcast(
+                                                    _episodes[index - 1])
+                                            ? AnimatedOpacity(
+                                                opacity: _presenter
+                                                        .currentPlayer
+                                                        .isPlaying()
+                                                    ? 1.0
+                                                    : 0.0,
+                                                duration: Duration(seconds: 1),
+                                                child: Wave(
+                                                    size: Size(30.0, 20.0),
+                                                    shouldAnimate: _presenter
+                                                        .currentPlayer
+                                                        .isPlaying()))
+                                            : Icon(Icons.play_circle_outline,
+                                                color: _colors.yellow,
+                                                size: 38.0)),
                               ))),
                       onTap: () {
                         _presenter.onDetailEpisode(

@@ -6,7 +6,7 @@ import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/player/current_timer.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:injector/injector.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 
 abstract class PodcastControlsView {
   onNewData();
@@ -21,8 +21,11 @@ class PodcastControlsPresenter {
   late ConnectionContract connection;
   GetLiveProgramUseCase getLiveDataUseCase;
 
-  PodcastControlsPresenter(this._view,
-      {required this.invoker, required this.getLiveDataUseCase}) {
+  PodcastControlsPresenter(
+    this._view, {
+    required this.invoker,
+    required this.getLiveDataUseCase,
+  }) {
     currentTimer = Injector.appInstance.get<CurrentTimerContract>();
     connection = Injector.appInstance.get<ConnectionContract>();
     currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
@@ -82,7 +85,7 @@ class PodcastControlsPresenter {
   onPlayPause() async {
     if (currentPlayer.isPlaying()) {
       await currentPlayer.pause();
-    } else if(currentPlayer.playerState == AudioPlayerState.stop) {
+    } else if (currentPlayer.playerState == AudioPlayerState.stop) {
       await currentPlayer.play();
     } else {
       await currentPlayer.resume();
@@ -92,23 +95,24 @@ class PodcastControlsPresenter {
 
   onSeek(int timeSeek) async {
     if (currentPlayer.isPodcast) {
-      await currentPlayer
-          .seek(Duration(seconds: currentPlayer.position.inSeconds + timeSeek));
+      await currentPlayer.seek(
+        Duration(seconds: currentPlayer.position.inSeconds + timeSeek),
+      );
       _view.onNewData();
     }
   }
 
-  int _getRateIndex(double speed){
+  int _getRateIndex(double speed) {
     int index = 1;
-    if(speed == 0.8){
+    if (speed == 0.8) {
       index = 0;
-    } else if(speed ==1.0) {
+    } else if (speed == 1.0) {
       index = 1;
-    } else if(speed == 1.2){
+    } else if (speed == 1.2) {
       index = 2;
-    } else if(speed ==1.5){
+    } else if (speed == 1.5) {
       index = 3;
-    } else if(speed ==2.0){
+    } else if (speed == 2.0) {
       index = 4;
     }
     return index;

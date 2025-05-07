@@ -34,8 +34,6 @@ class PodcastControlsState extends State<PodcastControls>
   var loading = false;
   late PodcastControlsPresenter _presenter;
   bool isContentUpdated = true;
-  EventChannel? _notificationEvent =
-      EventChannel('cuacfm.flutter.io/updateNotificationPodcastControl');
   SnackBar? snackBarConnection;
   int sleepSelectedIndex = 0;
   int fasterSelectedIndex = 1;
@@ -85,15 +83,7 @@ class PodcastControlsState extends State<PodcastControls>
         setState(() {});
       }
     };
-    if (Platform.isAndroid) {
-      _notificationEvent?.receiveBroadcastStream().listen((onData) {
-        if (_notificationEvent != null) {
-          setState(() {
-            currentPlayer.release();
-          });
-        }
-      });
-    }
+
     currentPlayer.onConnection = (isError) {
       if (mounted) {
         new Timer(new Duration(milliseconds: 300), () {
@@ -127,7 +117,6 @@ class PodcastControlsState extends State<PodcastControls>
   @override
   void dispose() {
     currentPlayer.onConnection = null;
-    _notificationEvent = null;
     currentPlayer.onUpdate = null;
     Injector.appInstance.removeByKey<PodcastControlsView>();
     WidgetsBinding.instance.removeObserver(this);

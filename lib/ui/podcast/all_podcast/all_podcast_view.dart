@@ -17,7 +17,8 @@ import 'package:intl/intl.dart';
 import 'all_podcast_presenter.dart';
 
 class AllPodcast extends StatefulWidget {
-  AllPodcast({Key? key, required this.podcasts, this.category}) : super(key: key);
+  AllPodcast({Key? key, required this.podcasts, this.category})
+      : super(key: key);
 
   final List<Program> podcasts;
   final String? category;
@@ -38,8 +39,6 @@ class AllPodcastState extends State<AllPodcast>
   late RadiocomColorsConract _colors;
   bool shouldShowPlayer = false;
   bool isContentUpdated = true;
-  EventChannel? _notificationEvent =
-      EventChannel('cuacfm.flutter.io/updateNotification');
   SnackBar? snackBarConnection;
   late CuacLocalization _localization;
 
@@ -111,7 +110,13 @@ class AllPodcastState extends State<AllPodcast>
         }),
         backgroundColor: _colors.palidwhite,
         body: _getBodyLayout(),
-        bottomNavigationBar: Container(height: Platform.isAndroid? 0 : shouldShowPlayer? 60 : 0,color: _colors.palidwhite),
+        bottomNavigationBar: Container(
+            height: Platform.isAndroid
+                ? 0
+                : shouldShowPlayer
+                    ? 60
+                    : 0,
+            color: _colors.palidwhite),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: PlayerView(
             isMini: false,
@@ -148,18 +153,6 @@ class AllPodcastState extends State<AllPodcast>
     _podcasts = widget.podcasts;
     _podcastWithFilter = widget.podcasts;
 
-    if (Platform.isAndroid) {
-      _notificationEvent?.receiveBroadcastStream().listen((onData) {
-        if (_notificationEvent != null) {
-          setState(() {
-            _presenter.currentPlayer.release();
-            _presenter.currentPlayer.isPodcast = false;
-            shouldShowPlayer = false;
-          });
-        }
-      });
-    }
-
     _presenter.currentPlayer.onConnection = (isError) {
       if (mounted) {
         new Timer(new Duration(milliseconds: 300), () {
@@ -193,7 +186,6 @@ class AllPodcastState extends State<AllPodcast>
 
   @override
   void dispose() {
-    _notificationEvent = null;
     WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<AllPodcastView>();
     super.dispose();

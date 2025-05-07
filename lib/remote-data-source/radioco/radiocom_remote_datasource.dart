@@ -15,7 +15,8 @@ import 'package:injector/injector.dart';
 
 class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
   final CUACClient client = Injector.appInstance.get<CUACClient>();
-  RadiocoAPIContract radiocoAPI = Injector.appInstance.get<RadiocoAPIContract>();
+  RadiocoAPIContract radiocoAPI =
+      Injector.appInstance.get<RadiocoAPIContract>();
   final String publishState = "publish";
 
   Future<RadioStation> getRadioStationData() async {
@@ -39,12 +40,14 @@ class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
   }
 
   Future<List<TimeTable>> getTimetableData(String after, String before) async {
-    Uri url = Uri.parse(radiocoAPI.baseUrl +
-        radiocoAPI.timetable +
-        radiocoAPI.timetableAfter +
-        after +
-        radiocoAPI.timetableBefore +
-        before);
+    Uri url = Uri.parse(
+      radiocoAPI.baseUrl +
+          radiocoAPI.timetable +
+          radiocoAPI.timetableAfter +
+          after +
+          radiocoAPI.timetableBefore +
+          before,
+    );
     try {
       List<dynamic> res = await this.client.get(url);
       List<TimeTable> programsTimeTable =
@@ -71,12 +74,12 @@ class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
   @override
   Future<List<New>> getNews() async {
     try {
-      RadioStation radioStation =
-          Injector.appInstance.get<RadioStation>();
+      RadioStation radioStation = Injector.appInstance.get<RadioStation>();
 
       List<dynamic> res = await this.client.get(
-          Uri.parse(radioStation.newsRss),
-          responseType: HTTPResponseType.XML);
+        Uri.parse(radioStation.newsRss),
+        responseType: HTTPResponseType.XML,
+      );
       List<New> newsList = res.map((n) => new New.fromInstance(n)).toList();
       return newsList;
     } catch (err) {
@@ -87,9 +90,10 @@ class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
   @override
   Future<List<Episode>> getEpisodes(String feedUrl) async {
     try {
-      List<dynamic> res = await this
-          .client
-          .get(Uri.parse(feedUrl), responseType: HTTPResponseType.XML);
+      List<dynamic> res = await this.client.get(
+        Uri.parse(feedUrl),
+        responseType: HTTPResponseType.XML,
+      );
       List<Episode> episodesList =
           res.map((n) => new Episode.fromInstance(n)).toList();
       return episodesList;
@@ -102,15 +106,16 @@ class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
   @override
   Future<Outstanding?> getOutstanding() async {
     try {
-      dynamic res = await this
-          .client
-          .get(Uri.parse(radiocoAPI.outstandingUrl), responseType: HTTPResponseType.JSON);
-      if(res["status"] == publishState) {
+      dynamic res = await this.client.get(
+        Uri.parse(radiocoAPI.outstandingUrl),
+        responseType: HTTPResponseType.JSON,
+      );
+      if (res["status"] == publishState) {
         Outstanding outstandingTemp = Outstanding.fromInstance(res);
-        dynamic resPicture = await this
-            .client
-            .get(Uri.parse(outstandingTemp.logoUrl),
-            responseType: HTTPResponseType.JSON);
+        dynamic resPicture = await this.client.get(
+          Uri.parse(outstandingTemp.logoUrl),
+          responseType: HTTPResponseType.JSON,
+        );
         outstandingTemp.updatePicture(resPicture["source_url"]);
         return outstandingTemp;
       } else {

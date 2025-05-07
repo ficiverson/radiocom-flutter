@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-import "package:device_info/device_info.dart";
+import "package:device_info_plus/device_info_plus.dart";
 import 'package:flutter/cupertino.dart';
 
 class RadiocomUtils {
-
   static final double largeFontSize = 18.0;
   static final double mediumFontSize = 14.0;
   static final double smallFontSize = 12.0;
@@ -35,11 +34,10 @@ class RadiocomUtils {
   static Future<bool> isiPad() async {
     DeviceInfoPlugin deviceInfo = new DeviceInfoPlugin();
     IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-    if(iosInfo.model.contains("iPad")){
+    if (iosInfo.model.contains("iPad")) {
       return true;
     } else {
       return false;
     }
   }
-
 }

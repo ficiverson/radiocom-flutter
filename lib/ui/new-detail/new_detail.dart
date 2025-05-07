@@ -28,8 +28,6 @@ class NewDetailState extends State<NewDetail>
   late RadiocomColorsConract _colors;
   bool shouldShowPlayer = false;
   bool isContentUpdated = true;
-  EventChannel? _notificationEvent =
-      EventChannel('cuacfm.flutter.io/updateNotificationNewDetail');
   SnackBar? snackBarConnection;
 
   NewDetailState() {
@@ -50,7 +48,13 @@ class NewDetailState extends State<NewDetail>
         }),
         backgroundColor: _colors.palidwhite,
         body: _getBodyLayout(),
-        bottomNavigationBar: Container(height: Platform.isAndroid? 0 : shouldShowPlayer? 60 : 0,color: _colors.palidwhite),
+        bottomNavigationBar: Container(
+            height: Platform.isAndroid
+                ? 0
+                : shouldShowPlayer
+                    ? 60
+                    : 0,
+            color: _colors.palidwhite),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: PlayerView(
             isMini: false,
@@ -83,18 +87,6 @@ class NewDetailState extends State<NewDetail>
     }
     _presenter = Injector.appInstance.get<NewDetailPresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
-
-    if (Platform.isAndroid) {
-      _notificationEvent?.receiveBroadcastStream().listen((onData) {
-        if (_notificationEvent != null) {
-          setState(() {
-            _presenter.currentPlayer.release();
-            _presenter.currentPlayer.isPodcast = false;
-            shouldShowPlayer = false;
-          });
-        }
-      });
-    }
 
     _presenter.currentPlayer.onConnection = (isError) {
       if (mounted) {
@@ -129,7 +121,6 @@ class NewDetailState extends State<NewDetail>
 
   @override
   void dispose() {
-    _notificationEvent = null;
     WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<NewDetailView>();
     super.dispose();
@@ -202,21 +193,27 @@ class NewDetailState extends State<NewDetail>
               SizedBox(height: 20),
               Padding(
                   padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
-                  child: ListTile(title: HtmlWidget(widget.newItem.description.replaceAll("\\r", "")
-                      .replaceAll("\\n", "")
-                      .replaceAll("\\", ""),onTapUrl: _presenter.onLinkClicked(null),
-                    textStyle: TextStyle(
-                        color: _colors.font,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 18),
-                    customStylesBuilder: (element) {
-                      if (element.localName == 'a') {
-                        return {'color': '${_colors.grey.toHTMLHex()}'};
-                      } else if (element.localName == 'body') {
-                        return {'text-align' : 'justify' , 'text-justify' : 'inter-word'};
-                      }
-                      return null;
-                    }))),
+                  child: ListTile(
+                      title: HtmlWidget(
+                          widget.newItem.description
+                              .replaceAll("\\r", "")
+                              .replaceAll("\\n", "")
+                              .replaceAll("\\", ""),
+                          onTapUrl: _presenter.onLinkClicked(null),
+                          textStyle: TextStyle(
+                              color: _colors.font,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 18), customStylesBuilder: (element) {
+                    if (element.localName == 'a') {
+                      return {'color': '${_colors.grey.toHTMLHex()}'};
+                    } else if (element.localName == 'body') {
+                      return {
+                        'text-align': 'justify',
+                        'text-justify': 'inter-word'
+                      };
+                    }
+                    return null;
+                  }))),
               SizedBox(height: 70),
             ]))));
   }
@@ -224,7 +221,8 @@ class NewDetailState extends State<NewDetail>
 
 extension HexColor on Color {
   /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
-  String toHTMLHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
+  String toHTMLHex({bool leadingHashSign = true}) =>
+      '${leadingHashSign ? '#' : ''}'
       '${red.toRadixString(16).padLeft(2, '0')}'
       '${green.toRadixString(16).padLeft(2, '0')}'
       '${blue.toRadixString(16).padLeft(2, '0')}';

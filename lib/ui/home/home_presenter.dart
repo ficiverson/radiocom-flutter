@@ -87,7 +87,8 @@ class HomePresenter {
     currentTimer = Injector.appInstance.get<CurrentTimerContract>();
     connection = Injector.appInstance.get<ConnectionContract>();
     currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
-    notificationSubscription = Injector.appInstance.get<NotificationSubscriptionContract>();
+    notificationSubscription =
+        Injector.appInstance.get<NotificationSubscriptionContract>();
   }
 
   init() async {
@@ -131,7 +132,9 @@ class HomePresenter {
   }
 
   onMenuClicked() {
-    router.goToSettings((){onHomeResumed();});
+    router.goToSettings(() {
+      onHomeResumed();
+    });
   }
 
   onPodcastClicked(Program podcast) {
@@ -139,7 +142,7 @@ class HomePresenter {
   }
 
   onOutstandingClicked(Outstanding outstanding) {
-    if(outstanding.isJoinForm){
+    if (outstanding.isJoinForm) {
       _launchURL(outstanding.description);
     } else {
       New itemNew = New.fromOutstanding(outstanding);
@@ -148,7 +151,7 @@ class HomePresenter {
   }
 
   onPodcastControlsClicked(Episode? episode) {
-    if(episode != null) {
+    if (episode != null) {
       router.goToPodcastControls(episode);
     }
   }
@@ -169,7 +172,7 @@ class HomePresenter {
   }
 
   onSelectedEpisode() async {
-    if(currentPlayer.playerState == AudioPlayerState.stop){
+    if (currentPlayer.playerState == AudioPlayerState.stop) {
       await currentPlayer.play();
     } else {
       await currentPlayer.resume();
@@ -186,11 +189,11 @@ class HomePresenter {
     }
   }
 
-  onGetToken(){
+  onGetToken() {
     notificationSubscription.getToken();
   }
 
-  onSetScreen(){
+  onSetScreen() {
     notificationSubscription.setScreen("home_screen");
   }
 
@@ -206,8 +209,8 @@ class HomePresenter {
 
   _getDarkModeStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var result =  prefs.getBool('dark_mode_enabled');
-    return result==null? false : result;
+    var result = prefs.getBool('dark_mode_enabled');
+    return result == null ? false : result;
   }
 
   _play() async {
@@ -228,7 +231,7 @@ class HomePresenter {
           _homeView.onNotifyUser(StatusPlayer.PLAYING);
           _timer?.cancel();
           _timer = null;
-        } else if (timer.tick > 300) {
+        } else if (timer.tick > 500) {
           currentPlayer.stop();
           isLoading = false;
           _homeView.onNotifyUser(StatusPlayer.FAILED);
@@ -257,7 +260,7 @@ class HomePresenter {
           _homeView.onNotifyUser(StatusPlayer.PLAYING);
           _timer?.cancel();
           _timer = null;
-        } else if (timer.tick > 300) {
+        } else if (timer.tick > 500) {
           currentPlayer.stop();
           isLoading = false;
           _homeView.onNotifyUser(StatusPlayer.FAILED);
@@ -305,17 +308,12 @@ class HomePresenter {
       } else {
         if (!currentPlayer.isPodcast) {
           currentPlayer.now = Now.mock();
-          currentPlayer.currentSong = Now
-              .mock()
-              .name;
-          currentPlayer.currentImage = Now
-              .mock()
-              .logoUrl;
+          currentPlayer.currentSong = Now.mock().name;
+          currentPlayer.currentImage = Now.mock().logoUrl;
         }
         _homeView.onLiveDataError((result as Error).status);
       }
       _getRecentPodcast(refreshAll);
-
     });
   }
 
@@ -336,7 +334,7 @@ class HomePresenter {
     String now = formatter.format(nowDate);
     invoker
         .execute(
-        getTimetableUseCase.withParams(GetTimetableUseCaseParams(now, now)))
+            getTimetableUseCase.withParams(GetTimetableUseCaseParams(now, now)))
         .listen((result) {
       if (result is Success) {
         _homeView.onLoadTimetable(result.data);
@@ -352,17 +350,17 @@ class HomePresenter {
     var formatter = new DateFormat('dd/MM/yyyy');
     String now = formatter.format(nowDate);
     String yesterday =
-    formatter.format(nowDate.toUtc().subtract(new Duration(days: 1)));
+        formatter.format(nowDate.toUtc().subtract(new Duration(days: 1)));
     invoker
         .execute(getTimetableUseCase
-        .withParams(GetTimetableUseCaseParams(yesterday, now)))
+            .withParams(GetTimetableUseCaseParams(yesterday, now)))
         .listen((result) {
       if (result is Success) {
         _homeView.onLoadRecents(result.data);
       } else {
         _homeView.onLoadRecentsError((result as Error).status);
       }
-      if(refreshAll) {
+      if (refreshAll) {
         _getOutstanding();
       }
     });

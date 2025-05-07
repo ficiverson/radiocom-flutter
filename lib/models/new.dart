@@ -14,11 +14,21 @@ class New {
   New(this.title, this.link, this.description, this.image, this.pubDate);
 
   New.fromInstance(Map<String, dynamic> map)
-      : title = map["title"]["\$t"],
-        link = map["link"]["\$t"],
-        pubDate = getDate(map["pubDate"]["\$t"]),
-        image = getImage(map["description"]["__cdata"]),
-        description = getCleanContent(map["content\$encoded"]["__cdata"]);
+      : title = map["title"]?["\$t"] ?? map["title"] ?? "",
+        link = map["link"]?["\$t"] ?? map["link"] ?? "",
+        pubDate = getDate(map["pubDate"]?["\$t"] ?? map["pubDate"] ?? ""),
+        image = getImage(map["content:encoded"]?["\$t"] ??
+            map["content\$encoded"]?["__cdata"] ??
+            map["description"]?["\$t"] ??
+            map["description"]?["__cdata"] ??
+            map["description"] ??
+            ""),
+        description = getCleanContent(map["content:encoded"]?["\$t"] ??
+            map["content\$encoded"]?["__cdata"] ??
+            map["description"]?["\$t"] ??
+            map["description"]?["__cdata"] ??
+            map["description"] ??
+            "");
 
   static String getCleanContent(String content) {
     var document = parse(content);
@@ -32,10 +42,15 @@ class New {
   }
 
   static String getDate(String content) {
-    return DateFormat("EEE, dd MMM yyyy hh:mm:ss zzzz")
-        .parse(content)
-        .toString()
-        .split(" ")[0];
+    if (content == null || content.isEmpty) return "";
+    try {
+      return DateFormat("EEE, dd MMM yyyy HH:mm:ss Z", "en_US")
+          .parse(content)
+          .toString()
+          .split(" ")[0];
+    } catch (e) {
+      return content;
+    }
   }
 
   static String getImage(String content) {
@@ -58,19 +73,19 @@ class New {
       switch (Random().nextInt(5)) {
         case 0:
           baseImage =
-              "https://i1.wp.com/cuacfm.org/wp-content/uploads/2014/05/parrulo-violeta.jpg?ssl=1";
+              "https://cuacfm.org/wp-content/uploads/2025/05/parrulo-violeta.jpg?ssl=1";
           break;
         case 1:
           baseImage =
-              "https://i1.wp.com/cuacfm.org/wp-content/uploads/2014/05/parrulo-amarillo.jpg?ssl=1";
+              "https://cuacfm.org/wp-content/uploads/2025/05/parrulo-amarillo.jpg?ssl=1";
           break;
         case 2:
           baseImage =
-              "https://i1.wp.com/cuacfm.org/wp-content/uploads/2014/05/parrulo-azul.jpg?ssl=1";
+              "https://cuacfm.org/wp-content/uploads/2025/05/parrulo-azul.jpg?ssl=1";
           break;
         case 3:
           baseImage =
-              "https://i1.wp.com/cuacfm.org/wp-content/uploads/2014/05/parrulo-naranja.jpg?ssl=1";
+              "https://cuacfm.org/wp-content/uploads/2025/05/parrulo-naranja.jpg?ssl=1";
           break;
         case 4:
           baseImage =
