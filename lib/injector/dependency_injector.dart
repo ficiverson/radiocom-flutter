@@ -1,5 +1,6 @@
 import 'package:just_audio/just_audio.dart';
 import 'package:cuacfm/data/datasource/radioco_remote_datasource.dart';
+import 'package:cuacfm/data/datasource/radiocult_remote_datasource.dart';
 import 'package:cuacfm/domain/usecase/get_all_podcast_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_episodes_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_live_program_use_case.dart';
@@ -7,12 +8,19 @@ import 'package:cuacfm/domain/usecase/get_news_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_outstanding_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_station_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_timetable_use_case.dart';
+import 'package:cuacfm/domain/usecase/radiocult/radiocult_use_cases.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/remote-data-source/network/radioco_api.dart';
+import 'package:cuacfm/remote-data-source/network/radiocult_api.dart';
 import 'package:cuacfm/data/radiocom-repository.dart';
+import 'package:cuacfm/data/radiocult_repository.dart';
 import 'package:cuacfm/domain/invoker/invoker.dart';
 import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
+import 'package:cuacfm/domain/repository/radiocult_repository_contract.dart';
 import 'package:cuacfm/remote-data-source/radioco/radiocom_remote_datasource.dart';
+import 'package:cuacfm/remote-data-source/radiocult/radiocult_remote_datasource.dart';
+import 'package:cuacfm/utils/simple_client.dart';
+import 'package:cuacfm/config/radiocult_config.dart';
 import 'package:cuacfm/ui/home/home_presenter.dart';
 import 'package:cuacfm/ui/home/home_router.dart';
 import 'package:cuacfm/ui/home/home_view.dart';
@@ -54,10 +62,14 @@ class DependencyInjector {
 
   loadModules() {
     loadPlayerModules();
-    loadPresentationModules();
-    loadDomainModules();
-    loadDataModules();
+    // Load in dependency order: remote -> data -> domain -> presentation
     loadRemoteDatasourceModules();
+    loadRadioCultRemoteDatasourceModules();
+    loadDataModules();
+    loadRadioCultDataModules();
+    loadDomainModules();
+    loadRadioCultDomainModules();
+    loadPresentationModules();
   }
 
   injectByView(dynamic view) {
@@ -248,9 +260,80 @@ class DependencyInjector {
 
   loadRemoteDatasourceModules() {
     injector.registerDependency<CUACClient>(() => CUACClient(), override: true);
+    injector.registerDependency<SimpleClient>(() => SimpleClient(), override: true);
     injector.registerDependency<RadiocoAPIContract>(() => RadiocoAPI());
     injector.registerDependency<RadiocoRemoteDataSourceContract>(() {
       return new RadiocoRemoteDataSource();
+    });
+  }
+
+  /// Load RadioCult remote data source modules
+  /// Uses credentials from RadioCultConfig by default
+  /// You can also pass custom credentials as parameters
+  loadRadioCultRemoteDatasourceModules({
+    String? stationId,
+    String? apiKey,
+  }) {
+    final effectiveStationId = stationId ?? RadioCultConfig.stationId;
+    final effectiveApiKey = apiKey ?? RadioCultConfig.apiKey;
+
+    injector.registerDependency<RadioCultAPIContract>(
+      () => RadioCultAPI(stationId: effectiveStationId, apiKey: effectiveApiKey),
+      override: true,
+    );
+    injector.registerDependency<RadioCultRemoteDataSourceContract>(() {
+      return RadioCultRemoteDataSource();
+    });
+  }
+
+  /// Load RadioCult data modules (repository)
+  loadRadioCultDataModules() {
+    injector.registerDependency<RadioCultRepositoryContract>(() {
+      var remoteDataSource = injector.get<RadioCultRemoteDataSourceContract>();
+      return RadioCultRepository(remoteDataSource: remoteDataSource);
+    });
+  }
+
+  /// Load RadioCult domain modules (use cases)
+  loadRadioCultDomainModules() {
+    injector.registerDependency<GetRadioCultArtistsUseCase>(() {
+      var repository = injector.get<RadioCultRepositoryContract>();
+      return GetRadioCultArtistsUseCase(repository: repository);
+    });
+
+    injector.registerDependency<GetRadioCultArtistUseCase>(() {
+      var repository = injector.get<RadioCultRepositoryContract>();
+      return GetRadioCultArtistUseCase(repository: repository);
+    });
+
+    injector.registerDependency<GetRadioCultLiveStatusUseCase>(() {
+      var repository = injector.get<RadioCultRepositoryContract>();
+      return GetRadioCultLiveStatusUseCase(repository: repository);
+    });
+
+    injector.registerDependency<GetRadioCultScheduleUseCase>(() {
+      var repository = injector.get<RadioCultRepositoryContract>();
+      return GetRadioCultScheduleUseCase(repository: repository);
+    });
+
+    injector.registerDependency<GetRadioCultHistoryUseCase>(() {
+      var repository = injector.get<RadioCultRepositoryContract>();
+      return GetRadioCultHistoryUseCase(repository: repository);
+    });
+
+    injector.registerDependency<GetRadioCultPlaylistsUseCase>(() {
+      var repository = injector.get<RadioCultRepositoryContract>();
+      return GetRadioCultPlaylistsUseCase(repository: repository);
+    });
+
+    injector.registerDependency<GetRadioCultTagsUseCase>(() {
+      var repository = injector.get<RadioCultRepositoryContract>();
+      return GetRadioCultTagsUseCase(repository: repository);
+    });
+
+    injector.registerDependency<GetRadioCultArtistScheduleUseCase>(() {
+      var repository = injector.get<RadioCultRepositoryContract>();
+      return GetRadioCultArtistScheduleUseCase(repository: repository);
     });
   }
 }
