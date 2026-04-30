@@ -9,9 +9,8 @@ class Now {
   String rssUrl;
 
   Now.mock()
-      : name = "Continuidad CUAC FM",
-        logoUrl =
-            "https://cuacfm.org/wp-content/uploads/2015/04/cousomicros1.jpg",
+      : name = "Continuidade CUAC FM",
+        logoUrl = "assets/graphics/cuac_music_cover.png",
         description = "",
         programmeUrl = "https://cuacfm.org",
         rssUrl = "https://cuacfm.org";
