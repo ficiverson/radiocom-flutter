@@ -410,7 +410,7 @@ void main() {
         await Future.delayed(Duration(milliseconds: 200));
 
         expect(view.viewState[0], equals(HomeState.notifyUser));
-        expect((view.data[0] as StatusPlayer), equals(StatusPlayer.STOP));
+        expect((view.data[0] as StatusPlayer), equals(StatusPlayer.PAUSED));
       });
 
   test(
@@ -429,7 +429,7 @@ void main() {
         await Future.delayed(Duration(milliseconds: 200));
 
         expect(view.viewState[0], equals(HomeState.notifyUser));
-        expect((view.data[0] as StatusPlayer), equals(StatusPlayer.STOP));
+        expect((view.data[0] as StatusPlayer), equals(StatusPlayer.PAUSED));
       });
 
   test(

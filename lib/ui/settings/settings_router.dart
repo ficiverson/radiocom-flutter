@@ -15,30 +15,41 @@ abstract class SettingsRouterContract{
 class SettingsRouter extends SettingsRouterContract {
   @override
   goToLegal(LegalType legalType) {
-    Navigator.of(Injector.appInstance.get<BuildContext>())
-        .push(MaterialPageRoute(
-        settings: RouteSettings(name: "settingsDetail"),
-        builder: (BuildContext context) => SettingsDetail(legalType:legalType),
-        fullscreenDialog: true));
+    Navigator.of(Injector.appInstance.get<BuildContext>()).push(
+        PageRouteBuilder(
+            settings: RouteSettings(name: "settingsDetail"),
+            pageBuilder: (_, __, ___) => SettingsDetail(legalType: legalType),
+            transitionsBuilder: (_, animation, __, child) =>
+                FadeTransition(opacity: animation, child: child),
+            transitionDuration: const Duration(milliseconds: 200)));
   }
 
   @override
   goToHistory(New newItem) {
-    Navigator.of(Injector.appInstance.get<BuildContext>())
-        .push(MaterialPageRoute(
-        settings: RouteSettings(name: "historyDetail"),
-        builder: (BuildContext context) => NewDetail(newItem:newItem),
-        fullscreenDialog: false));
+    Navigator.of(Injector.appInstance.get<BuildContext>()).push(
+        PageRouteBuilder(
+            settings: RouteSettings(name: "historyDetail"),
+            pageBuilder: (_, __, ___) => NewDetail(newItem: newItem),
+            transitionsBuilder: (_, animation, __, child) =>
+                FadeTransition(opacity: animation, child: child),
+            transitionDuration: const Duration(milliseconds: 200)));
   }
 
   @override
   goToPodcastControls(Episode episode) {
     Navigator.of(Injector.appInstance.get<BuildContext>()).push(
-        MaterialPageRoute(
-            settings: RouteSettings(name: "podcastcontrolshomne"),
-            builder: (BuildContext context) =>
-                PodcastControls(episode: episode),
-            fullscreenDialog: true));
+        PageRouteBuilder(
+            settings: RouteSettings(name: "podcastcontrolssettings"),
+            pageBuilder: (_, __, ___) => PodcastControls(episode: episode),
+            transitionsBuilder: (_, animation, __, child) {
+              return SlideTransition(
+                position: Tween(begin: const Offset(0, 1), end: Offset.zero)
+                    .chain(CurveTween(curve: Curves.easeOutCubic))
+                    .animate(animation),
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 350)));
   }
 
 }

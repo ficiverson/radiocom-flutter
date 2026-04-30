@@ -154,7 +154,8 @@ class DependencyInjector {
       return new TimeTablePresenter(injector.get<TimeTableView>(),
           invoker: injector.get<Invoker>(),
           router: injector.get<TimeTableRouterContract>(),
-          getLiveDataUseCase: injector.get<GetLiveProgramUseCase>());
+          getLiveDataUseCase: injector.get<GetLiveProgramUseCase>(),
+          getTimetableUseCase: injector.get<GetTimetableUseCase>());
     });
 
     injector.registerDependency<AllPodcastPresenter>(() {

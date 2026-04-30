@@ -14,8 +14,6 @@ import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
-import 'package:photo_view/photo_view.dart';
-import 'package:photo_view/photo_view_gallery.dart';
 import 'settings_presenter_detail.dart';
 
 enum LegalType { TERMS, PRIVACY, LICENSE, NONE }
@@ -40,6 +38,8 @@ class SettingsDetailState extends State<SettingsDetail>
   bool isContentUpdated = true;
   SnackBar? snackBarConnection;
   late CuacLocalization _localization;
+  int _currentGalleryPage = 0;
+  late PageController _galleryController;
 
   SettingsDetailState() {
     DependencyInjector().injectByView(this);
@@ -49,7 +49,15 @@ class SettingsDetailState extends State<SettingsDetail>
   Widget build(BuildContext context) {
     _queryData = MediaQuery.of(context);
     _colors = Injector.appInstance.get<RadiocomColorsConract>();
-    return Scaffold(
+    final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        systemNavigationBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+        systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      ),
+      child: Scaffold(
         key: scaffoldKey,
         appBar: TopBar("settings_detail",
             title: getTitle(widget.legalType),
@@ -59,11 +67,7 @@ class SettingsDetailState extends State<SettingsDetail>
             : _colors.palidwhite,
         body: _getBodyLayout(widget.legalType),
         bottomNavigationBar: Container(
-            height: Platform.isAndroid
-                ? 0
-                : shouldShowPlayer
-                    ? 60
-                    : 0,
+            height: shouldShowPlayer ? 0 : MediaQuery.of(context).padding.bottom,
             color: _colors.palidwhite),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: PlayerView(
@@ -76,6 +80,10 @@ class SettingsDetailState extends State<SettingsDetail>
               _presenter
                   .onPodcastControlsClicked(_presenter.currentPlayer.episode);
             },
+            onCloseClicked: () {
+              _presenter.currentPlayer.stop();
+              if (mounted) setState(() { shouldShowPlayer = false; });
+            },
             onMultimediaClicked: (isPlaying) {
               if (!mounted) return;
               setState(() {
@@ -85,7 +93,9 @@ class SettingsDetailState extends State<SettingsDetail>
                   _presenter.onResume();
                 }
               });
-            }));
+            }),
+      ),
+    );
   }
 
   @override
@@ -111,6 +121,7 @@ class SettingsDetailState extends State<SettingsDetail>
       }
     };
 
+    _galleryController = PageController();
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -133,6 +144,7 @@ class SettingsDetailState extends State<SettingsDetail>
 
   @override
   void dispose() {
+    _galleryController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<SettingsDetailView>();
     super.dispose();
@@ -186,7 +198,7 @@ class SettingsDetailState extends State<SettingsDetail>
           child: ListTile(
               title: Text(license.name.toUpperCase(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: _colors.black)),
+                  style: TextStyle(color: _colors.font)),
               subtitle: new Column(children: <Widget>[
                 Container(
                     margin: EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 8.0),
@@ -195,12 +207,12 @@ class SettingsDetailState extends State<SettingsDetail>
                     color: _colors.yellow),
                 Text(license.description,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: _colors.darkGrey))
+                    style: TextStyle(color: _colors.fontGrey))
               ]))));
     });
     licenseList.add(SizedBox(height: 80));
     return Container(
-        color: _colors.palidwhitedark,
+        color: _colors.palidwhite,
         child: SingleChildScrollView(
             physics: BouncingScrollPhysics(),
             key: new ValueKey<String>("licenseNote"),
@@ -211,7 +223,7 @@ class SettingsDetailState extends State<SettingsDetail>
     String content =
         (legalType == LegalType.TERMS) ? Legal.terms : Legal.privacy;
     return Container(
-        color: _colors.palidwhitedark,
+        color: _colors.palidwhite,
         child: SingleChildScrollView(
             physics: BouncingScrollPhysics(),
             key: new ValueKey<String>("termsprivacynote"),
@@ -219,8 +231,8 @@ class SettingsDetailState extends State<SettingsDetail>
               SizedBox(height: 20),
               ListTile(
                   title: Text(content,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: _colors.black))),
+                      textAlign: TextAlign.left,
+                      style: TextStyle(color: _colors.font))),
               Container(
                   margin: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 8.0),
                   height: 0.5,
@@ -231,29 +243,71 @@ class SettingsDetailState extends State<SettingsDetail>
   }
 
   Widget _getGallery() {
+    final photos = _radioStation.stationPhotos;
+    final total = photos.length;
     return Container(
-        key: ValueKey<String>("gallery_cotainer"),
-        child: PhotoViewGallery.builder(
-            scrollPhysics: BouncingScrollPhysics(),
-            builder: (BuildContext context, int index) {
-              return PhotoViewGalleryPageOptions(
-                  imageProvider: CachedNetworkImageProvider(
-                      _radioStation.stationPhotos[index]),
-                  initialScale: PhotoViewComputedScale.contained * 0.8);
-            },
-            itemCount: _radioStation.stationPhotos.length,
-            loadingBuilder: (context, event) => Center(
-                  child: Container(
-                    width: 20.0,
-                    height: 20.0,
-                    child: CircularProgressIndicator(
-                      value: event == null
-                          ? 0
-                          : event.cumulativeBytesLoaded /
-                              event.expectedTotalBytes!,
+      key: ValueKey<String>("gallery_container"),
+      color: _colors.palidwhite,
+      child: Column(
+        children: [
+          Expanded(
+            child: PageView.builder(
+              controller: _galleryController,
+              physics: BouncingScrollPhysics(),
+              onPageChanged: (index) {
+                setState(() { _currentGalleryPage = index; });
+              },
+              itemCount: total,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: CachedNetworkImage(
+                      imageUrl: photos[index],
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        color: _colors.palidwhitedark,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: _colors.yellow,
+                            strokeWidth: 2,
+                          ),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: _colors.palidwhitedark,
+                        child: Icon(Icons.broken_image_outlined,
+                            color: _colors.grey, size: 48),
+                      ),
                     ),
                   ),
-                )));
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 32),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(total, (index) {
+                final active = index == _currentGalleryPage;
+                return AnimatedContainer(
+                  duration: Duration(milliseconds: 250),
+                  margin: EdgeInsets.symmetric(horizontal: 4),
+                  width: active ? 20 : 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: active ? _colors.yellow : _colors.grey.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                );
+              }),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   String getTitle(LegalType legalType) {

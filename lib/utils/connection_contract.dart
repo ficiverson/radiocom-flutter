@@ -7,8 +7,8 @@ abstract class ConnectionContract {
 class Connection implements ConnectionContract {
   @override
   Future<bool> isConnectionAvailable() async {
-    List<ConnectivityResult> connectivityResult =
+    ConnectivityResult connectivityResult =
         await (Connectivity().checkConnectivity());
-    return connectivityResult.last != ConnectivityResult.none;
+    return connectivityResult != ConnectivityResult.none;
   }
 }

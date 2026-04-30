@@ -209,7 +209,7 @@ void main() {
         when(mockPlayer.stopAndPlay()).thenAnswer((_) => Future.value(true));
         mockPlayer.episode = EpisodeInstrument.givenAnEpisode(audioUrl: "http://random");
 
-        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image");
+        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image","Program Name");
         await Future.delayed(Duration(milliseconds: 200));
 
         expect(view.viewState[0], equals(PodcastDetailState.playerStatus));
@@ -231,7 +231,7 @@ void main() {
         when(mockPlayer.stopAndPlay()).thenAnswer((_) => Future.value(false));
         mockPlayer.episode = EpisodeInstrument.givenAnEpisode(audioUrl: "http://random");
 
-        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image");
+        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image","Program Name");
         await Future.delayed(Duration(milliseconds: 200));
 
         expect(view.viewState[0], equals(PodcastDetailState.playerStatus));
@@ -253,7 +253,7 @@ void main() {
         when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
         mockPlayer.episode = EpisodeInstrument.givenAnEpisode(audioUrl: "http://random");
 
-        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image");
+        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image","Program Name");
         await Future.delayed(Duration(milliseconds: 200));
 
         expect(view.viewState[0], equals(PodcastDetailState.playerStatus));
@@ -275,7 +275,7 @@ void main() {
         when(mockPlayer.play()).thenAnswer((_) => Future.value(false));
         mockPlayer.episode = EpisodeInstrument.givenAnEpisode(audioUrl: "http://random");
 
-        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image");
+        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image","Program Name");
         await Future.delayed(Duration(milliseconds: 200));
 
         expect(view.viewState[0], equals(PodcastDetailState.playerStatus));
@@ -297,7 +297,7 @@ void main() {
         when(mockPlayer.resume()).thenAnswer((_) => Future.value());
 
 
-        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image");
+        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image","Program Name");
         await Future.delayed(Duration(milliseconds: 200));
 
         expect(router.viewState.length, equals(0));

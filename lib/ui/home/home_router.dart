@@ -8,6 +8,7 @@ import 'package:cuacfm/ui/podcast/controls/podcast_controls.dart';
 import 'package:cuacfm/ui/podcast/detail_podcast_view.dart';
 import 'package:cuacfm/ui/settings/settings.dart';
 import 'package:cuacfm/ui/timetable/time_table_view.dart';
+import 'package:cuacfm/utils/bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:injector/injector.dart';
 
@@ -15,69 +16,91 @@ abstract class HomeRouterContract {
   goToTimeTable(List<TimeTable> timeTables);
   goToAllPodcast(List<Program> podcasts, {String? category});
   goToNewDetail(New itemNew);
-  goToSettings(VoidCallback invokeResult);
-  goToPodcastDetail(Program podcast);
-  goToPodcastControls(Episode episode);
+  goToSettings(Function(BottomBarOption) invokeResult);
+  goToPodcastDetail(Program podcast, {VoidCallback? onReturn, Function(BottomBarOption)? onTabSelected});
+  goToPodcastControls(Episode? episode, {TimeTable? liveProgram});
 }
 
 class HomeRouter implements HomeRouterContract {
+  static PageRouteBuilder _fadeRoute({
+    required String name,
+    required Widget Function(BuildContext) builder,
+  }) {
+    return PageRouteBuilder(
+      settings: RouteSettings(name: name),
+      pageBuilder: (context, _, __) => builder(context),
+      transitionsBuilder: (_, animation, __, child) =>
+          FadeTransition(opacity: animation, child: child),
+      transitionDuration: const Duration(milliseconds: 200),
+    );
+  }
+
   @override
   goToTimeTable(List<TimeTable> timeTables) {
     Navigator.of(Injector.appInstance.get<BuildContext>()).push(
-        MaterialPageRoute(
-            settings: RouteSettings(name: "schedules"),
-            builder: (BuildContext context) =>
-                Timetable(timeTables: timeTables),
-            fullscreenDialog: false));
+        _fadeRoute(
+            name: "schedules",
+            builder: (_) => Timetable(timeTables: timeTables)));
   }
 
   @override
   goToAllPodcast(List<Program> podcasts, {String? category}) {
     Navigator.of(Injector.appInstance.get<BuildContext>()).push(
-        MaterialPageRoute(
-            settings: RouteSettings(name: "allpodcast"),
-            builder: (BuildContext context) =>
-                AllPodcast(podcasts: podcasts, category: category),
-            fullscreenDialog: true));
+        _fadeRoute(
+            name: "allpodcast",
+            builder: (_) => AllPodcast(podcasts: podcasts, category: category)));
   }
 
   @override
   goToNewDetail(New itemNew) {
     Navigator.of(Injector.appInstance.get<BuildContext>()).push(
-        MaterialPageRoute(
-            settings: RouteSettings(name: "newdetail"),
-            builder: (BuildContext context) => NewDetail(newItem: itemNew),
-            fullscreenDialog: false));
+        _fadeRoute(
+            name: "newdetail",
+            builder: (_) => NewDetail(newItem: itemNew)));
   }
 
   @override
-  goToSettings(VoidCallback invokeResult) {
+  goToSettings(Function(BottomBarOption) invokeResult) {
     Navigator.of(Injector.appInstance.get<BuildContext>()).push(
-        MaterialPageRoute(
+        PageRouteBuilder(
             settings: RouteSettings(name: "settings"),
-            builder: (BuildContext context) => Settings(),
-            fullscreenDialog: false)).then((value) {
-            invokeResult.call();
+            pageBuilder: (_, __, ___) => Settings(),
+            transitionsBuilder: (_, animation, __, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 200))).then((value) {
+            invokeResult(value is BottomBarOption ? value : BottomBarOption.HOME);
     });
   }
 
   @override
-  goToPodcastDetail(Program podcast) {
+  goToPodcastDetail(Program podcast, {VoidCallback? onReturn, Function(BottomBarOption)? onTabSelected}) {
     Navigator.of(Injector.appInstance.get<BuildContext>()).push(
-        MaterialPageRoute(
-            settings: RouteSettings(name: "podcastdetail"),
-            builder: (BuildContext context) =>
-                DetailPodcastPage(program: podcast),
-            fullscreenDialog: false));
+        _fadeRoute(
+            name: "podcastdetail",
+            builder: (_) => DetailPodcastPage(program: podcast))).then((value) {
+              onReturn?.call();
+              if (value is BottomBarOption) {
+                onTabSelected?.call(value);
+              }
+            });
   }
 
   @override
-  goToPodcastControls(Episode episode) {
+  goToPodcastControls(Episode? episode, {TimeTable? liveProgram}) {
     Navigator.of(Injector.appInstance.get<BuildContext>()).push(
-        MaterialPageRoute(
-            settings: RouteSettings(name: "podcastcontrolshomne"),
-            builder: (BuildContext context) =>
-                PodcastControls(episode: episode),
-            fullscreenDialog: true));
+        PageRouteBuilder(
+            settings: RouteSettings(name: "podcastcontrolshome"),
+            pageBuilder: (_, __, ___) =>
+                PodcastControls(episode: episode, liveProgram: liveProgram),
+            transitionsBuilder: (_, animation, __, child) {
+              return SlideTransition(
+                position: Tween(begin: const Offset(0, 1), end: Offset.zero)
+                    .chain(CurveTween(curve: Curves.easeOutCubic))
+                    .animate(animation),
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 350)));
   }
 }

@@ -23,6 +23,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain/usecase/get_station_use_case.dart';
+import '../../utils/bottom_bar.dart';
 import '../../utils/notification_subscription_contract.dart';
 import 'home_router.dart';
 
@@ -52,11 +53,13 @@ abstract class HomeView {
 
   void onDarkModeStatus(bool status);
 
+  void onMenuReturn(BottomBarOption option);
+
   void onLoadOutstanding(Outstanding outstanding);
   void onLoadOutstandingError(dynamic error);
 }
 
-enum StatusPlayer { PLAYING, FAILED, STOP }
+enum StatusPlayer { PLAYING, FAILED, STOP, PAUSED }
 
 class HomePresenter {
   HomeView _homeView;
@@ -111,7 +114,7 @@ class HomePresenter {
   onHomeResumed() async {
     _homeView.onDarkModeStatus(await _getDarkModeStatus());
     if (await connection.isConnectionAvailable()) {
-      _getLiveProgram(false);
+      _getLiveProgram(true);
     }
   }
 
@@ -132,13 +135,20 @@ class HomePresenter {
   }
 
   onMenuClicked() {
-    router.goToSettings(() {
+    router.goToSettings((option) {
+      _homeView.onMenuReturn(option);
       onHomeResumed();
     });
   }
 
   onPodcastClicked(Program podcast) {
-    router.goToPodcastDetail(podcast);
+    router.goToPodcastDetail(podcast, onReturn: () {
+      if (currentPlayer.isPlaying()) {
+        _homeView.onNotifyUser(StatusPlayer.PLAYING);
+      }
+    }, onTabSelected: (option) {
+      _homeView.onMenuReturn(option);
+    });
   }
 
   onOutstandingClicked(Outstanding outstanding) {
@@ -150,10 +160,8 @@ class HomePresenter {
     }
   }
 
-  onPodcastControlsClicked(Episode? episode) {
-    if (episode != null) {
-      router.goToPodcastControls(episode);
-    }
+  onPodcastControlsClicked(Episode? episode, {TimeTable? liveProgram}) {
+    router.goToPodcastControls(episode, liveProgram: liveProgram);
   }
 
   onLiveSelected(Now now) async {
@@ -183,10 +191,15 @@ class HomePresenter {
   onPausePlayer() async {
     if (currentPlayer.isPodcast) {
       await currentPlayer.pause();
-      _homeView.onNotifyUser(StatusPlayer.STOP);
     } else {
-      _stop();
+      currentPlayer.stop();
     }
+    _homeView.onNotifyUser(StatusPlayer.PAUSED);
+  }
+
+  onStopPlayer() {
+    currentPlayer.stop();
+    _homeView.onNotifyUser(StatusPlayer.STOP);
   }
 
   onGetToken() {
@@ -350,7 +363,7 @@ class HomePresenter {
     var formatter = new DateFormat('dd/MM/yyyy');
     String now = formatter.format(nowDate);
     String yesterday =
-        formatter.format(nowDate.toUtc().subtract(new Duration(days: 1)));
+        formatter.format(nowDate.toUtc().subtract(new Duration(days: 7)));
     invoker
         .execute(getTimetableUseCase
             .withParams(GetTimetableUseCaseParams(yesterday, now)))
