@@ -1,10 +1,15 @@
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:cuacfm/domain/invoker/invoker.dart';
 import 'package:cuacfm/domain/result/result.dart';
 import 'package:cuacfm/domain/usecase/get_live_program_use_case.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/player/current_timer.dart';
+import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
+import 'package:cuacfm/utils/safe_map.dart';
 import 'package:injector/injector.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -74,12 +79,29 @@ class PodcastControlsPresenter {
     });
   }
 
-  onShareClicked() {
-    String link = "https://cuacfm.org";
+  onShareClicked() async {
+    final localization = Injector.appInstance.get<CuacLocalization>();
+    final imageUrl = currentPlayer.currentImage;
+    String text;
     if (currentPlayer.isPodcast) {
-      link = currentPlayer.episode?.link ?? "https://cuacfm.org";
+      final ep = currentPlayer.episode;
+      final template = SafeMap.safe(localization.translateMap("actions"), ["share_episode"]);
+      text = template
+          .replaceFirst("%s", currentPlayer.currentSong)
+          .replaceFirst("%s", ep?.title ?? "") + (ep?.link ?? "https://cuacfm.org");
+    } else {
+      final template = SafeMap.safe(localization.translateMap("actions"), ["share_program"]);
+      text = template.replaceFirst("%s", currentPlayer.currentSong) + "https://cuacfm.org";
     }
-    Share.share(currentPlayer.currentSong + " via " + link);
+    try {
+      final response = await http.get(Uri.parse(imageUrl));
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/share_image.jpg');
+      await file.writeAsBytes(response.bodyBytes);
+      await Share.shareXFiles([XFile(file.path)], text: text);
+    } catch (_) {
+      Share.share(text);
+    }
   }
 
   onPlayPause() async {

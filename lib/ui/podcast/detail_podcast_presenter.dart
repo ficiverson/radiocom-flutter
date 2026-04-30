@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 import 'package:cuacfm/domain/invoker/invoker.dart';
 import 'package:cuacfm/domain/result/result.dart';
@@ -8,9 +11,12 @@ import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/program.dart';
+import 'package:cuacfm/services/playlist_service.dart';
 import 'package:cuacfm/ui/home/home_presenter.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
+import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
+import 'package:cuacfm/utils/safe_map.dart';
 import 'package:injector/injector.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:uuid/uuid.dart';
@@ -110,11 +116,27 @@ class DetailPodcastPresenter {
     await currentPlayer.pause();
   }
 
-  onSelectedEpisode(Episode episode, String image) async {
+  onSelectedEpisode(Episode episode, String image, String programName) async {
     bool isSameEpisode = isSamePodcast(episode);
+
+    // Se hai un episodio podcast reproducíndose e se selecciona outro distinto,
+    // garda o actual ao inicio da playlist antes de cambiar
+    if (currentPlayer.isPlaying() &&
+        currentPlayer.isPodcast &&
+        !isSameEpisode &&
+        currentPlayer.episode != null) {
+      final playlist = PlaylistService();
+      final current = currentPlayer.episode!;
+      final currentName = currentPlayer.currentSong;
+      final currentImage = currentPlayer.currentImage;
+      if (!playlist.isInPlaylist(current.audio)) {
+        playlist.addEpisodeAtStart(current, currentName, currentImage);
+      }
+    }
+
     currentPlayer.isPodcast = true;
     currentPlayer.episode = episode;
-    currentPlayer.currentSong = episode.title;
+    currentPlayer.currentSong = programName;
     currentPlayer.currentImage = image;
     if (currentPlayer.isPlaying()) {
       _onPlayEpisode(episode);
@@ -125,16 +147,28 @@ class DetailPodcastPresenter {
     }
   }
 
-  onShareClicked(Program podcast) {
-    Share.share(podcast.name + " en CUAC FM:  " + podcast.rssUrl);
+  onShareClicked(Program podcast) async {
+    final localization = Injector.appInstance.get<CuacLocalization>();
+    final template = SafeMap.safe(localization.translateMap("actions"), ["share_program"]);
+    final webUrl = podcast.rssUrl.replaceAll(RegExp(r'/rss/?$'), '');
+    final text = template.replaceFirst("%s", podcast.name) + webUrl;
+    try {
+      final response = await http.get(Uri.parse(podcast.logoUrl));
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/share_image.jpg');
+      await file.writeAsBytes(response.bodyBytes);
+      await Share.shareXFiles([XFile(file.path)], text: text);
+    } catch (_) {
+      Share.share(text);
+    }
   }
 
   onDetailPodcast(String title, String subtitle, String content, String link) {
     router.goToNewDetail(New.fromPodcast(title, subtitle, content, link));
   }
 
-  onDetailEpisode(String title, String subtitle, String content, String link) {
-    router.goToNewDetail(New.fromPodcast(title, subtitle, content, link));
+  onDetailEpisode(Episode episode, String programName, String logoUrl) {
+    router.goToEpisodeDetail(episode, programName, logoUrl);
   }
 
   onPodcastControlsClicked(Episode? episode) {
