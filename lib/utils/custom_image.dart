@@ -11,6 +11,7 @@ class CustomImage extends StatefulWidget {
       this.fit,
       this.width, this.height,
       required this.radius, this.background = true,
+      this.backgroundColor,
       this.alignment = Alignment.center});
 
   final String? resPath;
@@ -19,6 +20,7 @@ class CustomImage extends StatefulWidget {
   final double? height;
   final double radius;
   final bool background;
+  final Color? backgroundColor;
   final Alignment alignment;
   @override
   State<StatefulWidget> createState() => CustomImageState();
@@ -30,8 +32,18 @@ class CustomImageState extends State<CustomImage> {
   Widget build(BuildContext context) {
     _colors = Injector.appInstance.get<RadiocomColorsConract>();
     var customImage;
+    final isDefaultRadioco = widget.resPath != null &&
+        widget.resPath!.contains("default-programme-photo");
     if (widget.resPath == null) {
       customImage = new Icon(Icons.warning);
+    } else if (isDefaultRadioco) {
+      customImage = Image.asset(
+        "assets/graphics/default_programme_cover.png",
+        fit: widget.fit,
+        width: widget.width,
+        height: widget.height,
+        alignment: widget.alignment,
+      );
     } else if (widget.resPath!.contains("http")) {
       customImage = new CachedNetworkImage(
           fit: widget.fit,
@@ -60,7 +72,7 @@ class CustomImageState extends State<CustomImage> {
     return Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(widget.radius),
-            color: widget.background?_colors.blackgradient65:_colors.transparent),
+            color: widget.backgroundColor ?? (widget.background?_colors.blackgradient65:_colors.transparent)),
         child: ClipRRect(
             borderRadius: BorderRadius.circular(widget.radius),
             child: customImage));
