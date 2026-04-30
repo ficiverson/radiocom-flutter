@@ -7,6 +7,9 @@ import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:injector/injector.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -79,8 +82,17 @@ class NewDetailPresenter {
     await currentPlayer.pause();
   }
 
-  onShareClicked(New item) {
-    Share.share(item.title + " via " + item.link);
+  onShareClicked(New item) async {
+    final text = item.title + " via " + item.link;
+    try {
+      final response = await http.get(Uri.parse(item.image));
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/share_image.jpg');
+      await file.writeAsBytes(response.bodyBytes);
+      await Share.shareXFiles([XFile(file.path)], text: text);
+    } catch (_) {
+      Share.share(text);
+    }
   }
 
   onLinkClicked(String? url) {
