@@ -15,19 +15,27 @@ class AllPodcastRouter implements AllPodcastRouterContract {
   @override
   goToPodcastDetail(Program podcast) {
     Navigator.of(Injector.appInstance.get<BuildContext>()).push(
-        MaterialPageRoute(
+        PageRouteBuilder(
             settings: RouteSettings(name: "podcastdetail"),
-            builder: (BuildContext context) =>
-                DetailPodcastPage(program: podcast),
-            fullscreenDialog: false));
+            pageBuilder: (_, __, ___) => DetailPodcastPage(program: podcast),
+            transitionsBuilder: (_, animation, __, child) =>
+                FadeTransition(opacity: animation, child: child),
+            transitionDuration: const Duration(milliseconds: 200)));
   }
 
   goToPodcastControls(Episode episode) {
     Navigator.of(Injector.appInstance.get<BuildContext>()).push(
-        MaterialPageRoute(
-            settings: RouteSettings(name: "podcastcontrolspodcastdetail"),
-            builder: (BuildContext context) =>
-                PodcastControls(episode: episode),
-            fullscreenDialog: true));
+        PageRouteBuilder(
+            settings: RouteSettings(name: "podcastcontrolsallpodcast"),
+            pageBuilder: (_, __, ___) => PodcastControls(episode: episode),
+            transitionsBuilder: (_, animation, __, child) {
+              return SlideTransition(
+                position: Tween(begin: const Offset(0, 1), end: Offset.zero)
+                    .chain(CurveTween(curve: Curves.easeOutCubic))
+                    .animate(animation),
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 350)));
   }
 }
