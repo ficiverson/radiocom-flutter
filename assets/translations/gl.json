@@ -3,17 +3,26 @@
     "welcome_msg_1" : "Bo día",
     "welcome_msg_2" : "Boa tarde",
     "welcome_msg_3" : "Boa noite",
-    "outstanding_msg" : "Novas",
+    "outstanding_msg" : "Actualidade",
     "live_msg" : "Escoitar en directo",
-    "recent_msg" : "Podcasts recentes",
-    "now_msg" : "Agora soa",
+    "recent_msg" : "Novo esta semana",
+    "podcast_recent_msg" : "Podcasts recentes",
+    "now_msg" : "Programación",
+    "schedule_now" : "Agora",
+    "schedule_next" : "Deseguido",
+    "tab_home" : "Inicio",
+    "tab_podcasts" : "Podcasts",
+    "tab_news" : "Novas",
+    "tab_favourites" : "Favoritos",
+    "tab_menu" : "Menú",
+    "favourites_empty" : "Aínda non tes favoritos.",
     "join_msg" : "Únete",
     "join_msg_detail" : "Queres facer radio?",
-    "podcast_of_day_msg" : "Un novo podcast para descubrir cada día",
+    "podcast_of_day_msg" : "Descubre podcasts",
     "empty_podcast" : "Non hai podcasts recentes agora mesmo.",
     "news" : "Novas",
     "news_error" : "Non podemos cargar a novas agora mesmo.",
-    "podcast" : "Podcast",
+    "podcast" : "Podcasts",
     "podcast_error" : "Non podemos cargar os podcasts neste momento.",
     "categories" : "Categorías",
     "see_all" : "Ver todos"
@@ -33,10 +42,15 @@
     "search" : "Procurar podcast"
   },
   "podcast_detail" : {
-    "empty_msg" : "<p> Ainda non hai descripción :(</p> <br/><br/><img src=\"https://cuacfm.org/wp-content/uploads/2025/05/cuacfm-banner-top-2.png\">",
-    "empty_episodes_msg" : "Non hai episodios neste momento :("
+    "empty_msg" : "<p> Ainda non hai descripción.</p> <br/><br/><img src=\"https://cuacfm.org/wp-content/uploads/2025/05/cuacfm-banner-top-2.png\">",
+    "empty_episodes_msg" : "Non hai episodios neste momento.",
+    "no_description" : "Aínda non hai descrición para este episodio.",
+    "no_news_description" : "Aínda non hai contido para esta nova.",
+    "alerts" : "Alertas"
   },
   "settings" : {
+    "rating_title" : "Estás a gozar da app e das nosas emisións?",
+    "rating_body" : "Por favor, considera valorarnos na tenda de aplicacións para que máis xente descubra CUAC",
     "station_section" : {
       "name" : "EMISORA",
       "item1" : "Historia",
@@ -44,18 +58,26 @@
     },
     "config_section" : {
       "name" : "CONFIGURACIÓN",
-      "item1" : "Forzar modo oscuro",
-      "item2" : "Información de grella"
+      "item1" : "Tema",
+      "item1_light" : "Claro",
+      "item1_dark" : "Escuro",
+      "item1_system" : "Sistema",
+      "item2" : "Información de grella",
+      "item3" : "Idioma",
+      "item3_system" : "Sistema"
     },
     "social_section" : {
       "name" : "REDES SOCIAIS",
       "item1" : "Facebook",
-      "item2" : "Bluesky"
+      "item2" : "Bluesky",
+      "item3" : "Instagram",
+      "item4" : "TikTok"
     },
     "more_info_section" : {
       "name" : "MÁIS INFORMACIÓN",
       "item1" : "Páxina web",
-      "item2" : "Localización"
+      "item2" : "Localización",
+      "item3" : "Contactar"
     },
     "legal_info_section" : {
       "name" : "LEGAL",
@@ -71,7 +93,14 @@
     "connection_error" : "Non podemos conectar co servidor neste momento"
   },
   "actions" : {
-    "close" : "Fechar"
+    "close" : "Fechar",
+    "see_more" : "Ver máis",
+    "see_less" : "Ver menos",
+    "add_favourite" : "Favorito",
+    "share" : "Compartir",
+    "last_episode" : "Último ep.:",
+    "share_episode" : "🎙 Programa: %s\n📻 Escoita o episodio: %s\n🔗 ",
+    "share_program" : "🎙 %s en CUAC FM\n🔗 "
   },
   "general" : {
     "minutes" : " minutos.",
@@ -90,7 +119,7 @@
     "music" : "Música",
     "science" : "Ciencia",
     "art" : "Arte",
-    "goverment" : "Eleccións",
+    "goverment" : "Goberno e Org.",
     "health" : "Saúde",
     "tech" : "Tecnoloxía"
   },

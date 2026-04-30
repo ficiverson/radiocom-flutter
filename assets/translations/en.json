@@ -3,17 +3,26 @@
     "welcome_msg_1" : "Good morning",
     "welcome_msg_2" : "Good afternoon",
     "welcome_msg_3" : "Good evening",
-    "outstanding_msg" : "Check it out",
+    "outstanding_msg" : "Latest news",
     "live_msg" : "Live broadcast",
-    "recent_msg" : "Recent Podcasts",
+    "recent_msg" : "New this week",
+    "podcast_recent_msg" : "Recent podcasts",
     "join_msg" : "Join us",
-    "join_msg_detail" : "Do you want to have a radio show?",
-    "podcast_of_day_msg" : "Every day a new podcast to discover",
-    "now_msg" : "Now",
+    "join_msg_detail" : "Want your own radio show?",
+    "podcast_of_day_msg" : "Discover podcasts",
+    "now_msg" : "Schedule",
+    "schedule_now" : "Now",
+    "schedule_next" : "Next",
+    "tab_home" : "Home",
+    "tab_podcasts" : "Podcasts",
+    "tab_news" : "News",
+    "tab_favourites" : "Favourites",
+    "tab_menu" : "Menu",
+    "favourites_empty" : "You haven't added any favourites yet.",
     "empty_podcast" : "There is no podcast at this moment.",
     "news" : "News",
     "news_error" : "There is no news at this moment.",
-    "podcast" : "Podcast",
+    "podcast" : "Podcasts",
     "podcast_error" : "There is no podcast at this moment.",
     "categories" : "Categories",
     "see_all" : "See all"
@@ -33,10 +42,15 @@
     "search" : "Search podcast"
   },
   "podcast_detail" : {
-    "empty_msg" : "<p> There is not description yet :(</p> <br/><br/><img src=\"https://cuacfm.org/wp-content/uploads/2025/05/cuacfm-banner-top-2.png\">",
-    "empty_episodes_msg" : "There is no episodes at this moment :("
+    "empty_msg" : "",
+    "empty_episodes_msg" : "There are no episodes at this moment.",
+    "no_description" : "There is no description for this episode yet.",
+    "no_news_description" : "There is no content for this news yet.",
+    "alerts" : "Alerts"
   },
   "settings" : {
+    "rating_title" : "Are you enjoying the app and our broadcasts?",
+    "rating_body" : "Please consider rating us on the app store so more people can discover CUAC.",
     "station_section" : {
       "name" : "STATION",
       "item1" : "History",
@@ -44,18 +58,26 @@
     },
     "config_section" : {
       "name" : "CONFIGURATION",
-      "item1" : "Force dark mode",
-      "item2" : "Schedule info"
+      "item1" : "Theme",
+      "item1_light" : "Light",
+      "item1_dark" : "Dark",
+      "item1_system" : "System",
+      "item2" : "Schedule info",
+      "item3" : "Language",
+      "item3_system" : "System"
     },
     "social_section" : {
       "name" : "SOCIAL NETWORK",
       "item1" : "Facebook",
-      "item2" : "Bluesky"
+      "item2" : "Bluesky",
+      "item3" : "Instagram",
+      "item4" : "TikTok"
     },
     "more_info_section" : {
       "name" : "MORE INFO",
       "item1" : "Web page",
-      "item2" : "Localization"
+      "item2" : "Localization",
+      "item3" : "Contact"
     },
     "legal_info_section" : {
       "name" : "LEGAL",
@@ -71,7 +93,14 @@
     "connection_error" : "We cannot contact our servers"
   },
   "actions" : {
-    "close" : "Close"
+    "close" : "Close",
+    "see_more" : "See more",
+    "see_less" : "See less",
+    "add_favourite" : "Favourite",
+    "share" : "Share",
+    "last_episode" : "Latest ep.:",
+    "share_episode" : "🎙 Programme: %s\n📻 Listen to the episode: %s\n🔗 ",
+    "share_program" : "🎙 %s on CUAC FM\n🔗 "
   },
   "general" : {
     "minutes" : " minutes.",
@@ -90,7 +119,7 @@
     "music" : "Music",
     "science" : "Science",
     "art" : "Arts",
-    "goverment" : "Elections",
+    "goverment" : "Gov. & Org.",
     "health" : "Health",
     "tech" : "Technology"
   },
