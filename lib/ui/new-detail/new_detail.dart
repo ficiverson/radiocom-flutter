@@ -1,14 +1,18 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:cuacfm/main.dart' show appThemeModeNotifier;
+import 'package:cuacfm/translations/localizations.dart';
+import 'package:cuacfm/utils/safe_map.dart';
 
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/new.dart';
+import 'package:cuacfm/utils/custom_image.dart';
 import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
-import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:injector/injector.dart';
 import 'new_detail_presenter.dart';
 
@@ -38,44 +42,51 @@ class NewDetailState extends State<NewDetail>
   Widget build(BuildContext context) {
     _queryData = MediaQuery.of(context);
     _colors = Injector.appInstance.get<RadiocomColorsConract>();
-    return Scaffold(
+    final themeMode = appThemeModeNotifier.value;
+    final isDark = themeMode == ThemeMode.dark || (themeMode == ThemeMode.system && _queryData.platformBrightness == Brightness.dark);
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        systemNavigationBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+        systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      ),
+      child: Scaffold(
         key: scaffoldKey,
-        appBar: TopBar("new_detail",
-            title: "",
-            topBarOption: TopBarOption.NORMAL,
-            rightIcon: Icons.share, onRightClicked: () {
-          _presenter.onShareClicked(widget.newItem);
-        }),
         backgroundColor: _colors.palidwhite,
         body: _getBodyLayout(),
         bottomNavigationBar: Container(
-            height: Platform.isAndroid
-                ? 0
-                : shouldShowPlayer
-                    ? 60
-                    : 0,
-            color: _colors.palidwhite),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: PlayerView(
-            isMini: false,
-            isAtBottom: true,
-            shouldShow: shouldShowPlayer,
-            isPlayingAudio: _presenter.currentPlayer.isPlaying(),
-            isExpanded: true,
-            onDetailClicked: () {
-              _presenter
-                  .onPodcastControlsClicked(_presenter.currentPlayer.episode);
-            },
-            onMultimediaClicked: (isPlaying) {
-              if (!mounted) return;
-              setState(() {
-                if (isPlaying) {
-                  _presenter.onPause();
-                } else {
-                  _presenter.onResume();
-                }
-              });
-            }));
+          color: _colors.palidwhite,
+          child: shouldShowPlayer
+              ? MediaQuery.removePadding(
+                  context: context,
+                  removeBottom: true,
+                  child: PlayerView(
+                      shouldShow: shouldShowPlayer,
+                      isPlayingAudio: _presenter.currentPlayer.isPlaying(),
+                      onDetailClicked: () {
+                        _presenter.onPodcastControlsClicked(
+                            _presenter.currentPlayer.episode);
+                      },
+                      onCloseClicked: () {
+                        _presenter.currentPlayer.stop();
+                        if (mounted) setState(() { shouldShowPlayer = false; });
+                      },
+                      onMultimediaClicked: (isPlaying) {
+                        if (!mounted) return;
+                        setState(() {
+                          if (isPlaying) {
+                            _presenter.onPause();
+                          } else {
+                            _presenter.onResume();
+                          }
+                        });
+                      }),
+                )
+              : SizedBox(height: MediaQuery.of(context).padding.bottom),
+        ),
+      ),
+    );
   }
 
   @override
@@ -145,82 +156,246 @@ class NewDetailState extends State<NewDetail>
     setState(() {});
   }
 
-  //layout
-
   Widget _getBodyLayout() {
-    return new Container(
-        color: _colors.palidwhitedark,
-        height: _queryData.size.height,
-        child: SingleChildScrollView(
-            key: PageStorageKey<String>("news_detail_container"),
-            scrollDirection: Axis.vertical,
-            physics: BouncingScrollPhysics(),
-            child: Container(
-                child: Column(children: <Widget>[
-              SizedBox(height: 20),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(20.0, 00.0, 20.0, 0.0),
-                  child: Stack(children: <Widget>[
-                    Container(
-                        color: _colors.blackgradient65,
-                        width: _queryData.size.width,
-                        padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(widget.newItem.title.toUpperCase(),
-                                  maxLines: 4,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    fontSize: 22.0,
-                                    letterSpacing: 2.0,
-                                    color: _colors.fontWhite,
-                                  )),
-                              SizedBox(height: 5),
-                              Text(widget.newItem.pubDate.toString(),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    letterSpacing: 2.0,
-                                    color: _colors.fontWhite,
-                                  )),
-                            ]))
-                  ])),
-              SizedBox(height: 20),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
-                  child: ListTile(
-                      title: HtmlWidget(
-                          widget.newItem.description
-                              .replaceAll("\\r", "")
-                              .replaceAll("\\n", "")
-                              .replaceAll("\\", ""),
-                          onTapUrl: _presenter.onLinkClicked(null),
-                          textStyle: TextStyle(
-                              color: _colors.font,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18), customStylesBuilder: (element) {
-                    if (element.localName == 'a') {
-                      return {'color': '${_colors.grey.toHTMLHex()}'};
-                    } else if (element.localName == 'body') {
-                      return {
-                        'text-align': 'justify',
-                        'text-justify': 'inter-word'
-                      };
-                    }
-                    return null;
-                  }))),
-              SizedBox(height: 70),
-            ]))));
+    return SingleChildScrollView(
+      key: PageStorageKey<String>("news_detail_container"),
+      physics: BouncingScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Imaxe con botóns flotantes
+          Stack(
+            children: [
+              // Imaxe
+              SizedBox(
+                width: double.infinity,
+                height: _queryData.size.height * 0.40,
+                child: CustomImage(
+                  resPath: widget.newItem.image,
+                  fit: BoxFit.cover,
+                  radius: 0,
+                ),
+              ),
+              // Degradado superior para os botóns
+              Positioned(
+                top: 0, left: 0, right: 0,
+                height: _queryData.padding.top + 70,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withOpacity(0.45),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // Degradado inferior con titular
+              Positioned(
+                bottom: 0, left: 0, right: 0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        Colors.black.withOpacity(0.75),
+                        Colors.transparent,
+                      ],
+                      stops: [0.0, 1.0],
+                    ),
+                  ),
+                  padding: const EdgeInsets.fromLTRB(16, 40, 16, 16),
+                  child: Text(
+                    widget.newItem.title,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0,
+                      height: 1.3,
+                    ),
+                  ),
+                ),
+              ),
+              // Botón retroceso
+              Positioned(
+                top: _queryData.padding.top + 8,
+                left: 12,
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.4),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+              // Botón abrir na web
+              Positioned(
+                top: _queryData.padding.top + 8,
+                right: 60,
+                child: GestureDetector(
+                  onTap: () => _presenter.onLinkClicked(widget.newItem.link),
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.4),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.open_in_browser,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+              // Botón compartir
+              Positioned(
+                top: _queryData.padding.top + 8,
+                right: 12,
+                child: GestureDetector(
+                  onTap: () => _presenter.onShareClicked(widget.newItem),
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.4),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.share,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // Data e categoría
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+            child: Text(
+              widget.newItem.category.isNotEmpty
+                  ? "${widget.newItem.pubDate} · ${widget.newItem.category.toUpperCase()}"
+                  : widget.newItem.pubDate,
+              style: TextStyle(
+                color: _colors.fontGrey,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 0,
+              ),
+            ),
+          ),
+
+          // Contido HTML ou estado baleiro
+          widget.newItem.description.trim().isEmpty
+              ? SizedBox(
+                  height: _queryData.size.height * 0.4,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        FaIcon(
+                          FontAwesomeIcons.heartCrack,
+                          color: _colors.fontGrey,
+                          size: 56,
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          SafeMap.safe(Injector.appInstance.get<CuacLocalization>().translateMap("podcast_detail"), ["no_news_description"]),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: _colors.fontGrey,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            letterSpacing: 0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 40),
+                  child: HtmlWidget(
+                    widget.newItem.description
+                        .replaceAll("\\r", "")
+                        .replaceAll("\\n", "")
+                        .replaceAll("\\", ""),
+                    onTapUrl: _presenter.onLinkClicked(null),
+                    textStyle: TextStyle(
+                      color: _colors.font,
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                      height: 1.6,
+                      letterSpacing: 0,
+                    ),
+                    customWidgetBuilder: (element) {
+                      if (element.localName == 'hr') {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Center(
+                            child: Text(
+                              '· · ·',
+                              style: TextStyle(
+                                color: _colors.fontGrey,
+                                fontSize: 20,
+                                letterSpacing: 8,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                      return null;
+                    },
+                    customStylesBuilder: (element) {
+                      switch (element.localName) {
+                        case 'a':
+                          return {'color': '#FDCC03', 'font-weight': '600', 'text-decoration': 'none'};
+                        case 'img':
+                          return {'width': '100%', 'height': 'auto'};
+                        case 'h1':
+                          return {'font-size': '28px', 'font-weight': '800', 'margin-bottom': '12px'};
+                        case 'h2':
+                          return {'font-size': '24px', 'font-weight': '700', 'margin-bottom': '10px'};
+                        case 'h3':
+                          return {'font-size': '21px', 'font-weight': '700', 'margin-bottom': '8px'};
+                        case 'h4':
+                          return {'font-size': '18px', 'font-weight': '600', 'margin-bottom': '8px'};
+                        case 'h5':
+                          return {'font-size': '17px', 'font-weight': '600', 'margin-bottom': '6px'};
+                        case 'h6':
+                          return {'font-size': '14px', 'font-weight': '600', 'margin-bottom': '6px'};
+                        default:
+                          return null;
+                      }
+                    },
+                  ),
+                ),
+        ],
+      ),
+    );
   }
 }
 
 extension HexColor on Color {
-  /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
   String toHTMLHex({bool leadingHashSign = true}) =>
       '${leadingHashSign ? '#' : ''}'
       '${red.toRadixString(16).padLeft(2, '0')}'

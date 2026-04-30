@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:cuacfm/main.dart' show appThemeModeNotifier;
 
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/time_table.dart';
@@ -9,6 +10,7 @@ import 'package:cuacfm/utils/custom_image.dart';
 import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
+import 'package:cuacfm/utils/bottom_bar.dart';
 import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -36,6 +38,7 @@ class TimetableState extends State<Timetable>
   bool isContentUpdated = true;
   SnackBar? snackBarConnection;
   late CuacLocalization _localization;
+  List<TimeTable> _timetable = [];
 
   TimetableState() {
     DependencyInjector().injectByView(this);
@@ -45,7 +48,16 @@ class TimetableState extends State<Timetable>
   Widget build(BuildContext context) {
     queryData = MediaQuery.of(context);
     _colors = Injector.appInstance.get<RadiocomColorsConract>();
-    return Scaffold(
+    final themeMode = appThemeModeNotifier.value;
+    final isDark = themeMode == ThemeMode.dark || (themeMode == ThemeMode.system && queryData.platformBrightness == Brightness.dark);
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        systemNavigationBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+        systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      ),
+      child: Scaffold(
         key: scaffoldKey,
         appBar: TopBar("timetable",
             title: SafeMap.safe(
@@ -53,45 +65,58 @@ class TimetableState extends State<Timetable>
             topBarOption: TopBarOption.NORMAL),
         backgroundColor: _colors.palidwhite,
         body: _getBodyLayout(),
-        bottomNavigationBar: Container(
-            height: Platform.isAndroid
-                ? 0
-                : shouldShowPlayer
-                    ? 60
-                    : 0,
-            color: _colors.palidwhite),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: PlayerView(
-            isMini: false,
-            isAtBottom: true,
-            shouldShow: shouldShowPlayer,
-            isPlayingAudio: _presenter.currentPlayer.isPlaying(),
-            isExpanded: true,
-            onDetailClicked: () {
-              _presenter
-                  .onPodcastControlsClicked(_presenter.currentPlayer.episode);
-            },
-            onMultimediaClicked: (isPlaying) {
-              if (!mounted) return;
-              setState(() {
-                if (isPlaying) {
-                  _presenter.onPause();
-                } else {
-                  _presenter.onResume();
-                }
-              });
-            }));
+        bottomNavigationBar: Material(
+          color: _colors.palidwhite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              PlayerView(
+                shouldShow: shouldShowPlayer,
+                isPlayingAudio: _presenter.currentPlayer.isPlaying(),
+                onDetailClicked: () {
+                  _presenter.onPodcastControlsClicked(_presenter.currentPlayer.episode);
+                },
+                onCloseClicked: () {
+                  _presenter.currentPlayer.stop();
+                  if (mounted) setState(() { shouldShowPlayer = false; });
+                },
+                onMultimediaClicked: (isPlaying) {
+                  if (!mounted) return;
+                  setState(() {
+                    if (isPlaying) {
+                      _presenter.onPause();
+                    } else {
+                      _presenter.onResume();
+                    }
+                  });
+                },
+              ),
+              BottomBar(
+                selectedOption: BottomBarOption.HOME,
+                onOptionSelected: (option, isMenu) {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
-  getTime(DateTime? start, DateTime? end) {
+  String getTime(DateTime? start, DateTime? end) {
+    String fmt(DateTime? dt) => dt == null
+        ? ""
+        : "${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}";
     return SafeMap.safe(_localization.translateMap("general"), ["from"]) +
-        (start?.hour.toString() ?? "") +
+        fmt(start) +
         SafeMap.safe(_localization.translateMap("general"), ["to"]) +
-        (end?.hour.toString() ?? "");
+        fmt(end);
   }
 
-  getCurrentTime() {
-    return TimeOfDay.now().hour;
+  bool isOnAir(TimeTable item) {
+    final now = DateTime.now();
+    return now.isAfter(item.start) && now.isBefore(item.end);
   }
 
   @override
@@ -104,11 +129,13 @@ class TimetableState extends State<Timetable>
     _localization = Injector.appInstance.get<CuacLocalization>();
     _presenter = Injector.appInstance.get<TimeTablePresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
+    _timetable = widget.timeTables ?? [];
+    _presenter.getTimetable();
     int currentIndex = 0;
     int jumpIndex = 0;
-    widget.timeTables?.forEach((element) {
-      if (getCurrentTime() >= element.start.hour &&
-          getCurrentTime() < element.end.hour) {
+    final now = DateTime.now();
+    _timetable.forEach((element) {
+      if (now.isAfter(element.start) && now.isBefore(element.end)) {
         jumpIndex = currentIndex;
         return;
       }
@@ -180,6 +207,14 @@ class TimetableState extends State<Timetable>
     setState(() {});
   }
 
+  @override
+  void onLoadTimetable(List<TimeTable> timetable) {
+    if (!mounted) return;
+    setState(() {
+      _timetable = timetable;
+    });
+  }
+
   //build layout
 
   Widget _getBodyLayout() {
@@ -192,46 +227,61 @@ class TimetableState extends State<Timetable>
             controller: _scrollController,
             physics: BouncingScrollPhysics(),
             scrollDirection: Axis.vertical,
-            itemCount: widget.timeTables?.length ?? 0 + 1,
+            padding: EdgeInsets.only(bottom: shouldShowPlayer ? 80.0 : 0.0),
+            itemCount: _timetable.length + 1,
             itemBuilder: (_, int index) {
-              return (index < (widget.timeTables?.length ?? 0))
-                  ? Container(
-                      color: _colors.palidwhite,
-                      child: ListTile(
-                          leading: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 1),
-                              width: 50.0,
-                              height: 50.0,
-                              child: CustomImage(
-                                  resPath: widget.timeTables?[index].logoUrl,
-                                  fit: BoxFit.fitHeight,
-                                  radius: 5.0)),
-                          title: Text(
-                            widget.timeTables?[index].name ?? "",
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: (getCurrentTime() >=
-                                            widget.timeTables?[index].start
-                                                .hour &&
-                                        getCurrentTime() <
-                                            widget.timeTables?[index].end.hour)
-                                    ? _colors.yellow
-                                    : _colors.font,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16),
+              if (index >= _timetable.length) {
+                return SizedBox(height: 80.0);
+              }
+              final item = _timetable[index];
+              final onAir = isOnAir(item);
+              return Padding(
+                padding: EdgeInsets.fromLTRB(12, onAir ? 6 : 0, 12, onAir ? 6 : 0),
+                child: Container(
+                  decoration: onAir
+                      ? BoxDecoration(
+                          color: _colors.palidwhitedark,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: _colors.yellow.withOpacity(0.5),
+                            width: 1.5,
                           ),
-                          subtitle: Text(
-                            getTime(widget.timeTables?[index].start,
-                                widget.timeTables?[index].end),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: _colors.font,
-                                fontWeight: FontWeight.w200,
-                                fontSize: 13),
-                          )))
-                  : SizedBox(height: 80.0);
+                        )
+                      : null,
+                  child: ListTile(
+                    leading: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 1),
+                      width: 50.0,
+                      height: 50.0,
+                      child: CustomImage(
+                        resPath: item.logoUrl,
+                        fit: BoxFit.fitHeight,
+                        radius: 5.0,
+                      ),
+                    ),
+                    title: Text(
+                      item.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: onAir ? _colors.yellow : _colors.font,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    subtitle: Text(
+                      getTime(item.start, item.end),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: _colors.font,
+                        fontWeight: FontWeight.w200,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ),
+              );
             }));
   }
 }

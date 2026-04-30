@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:cuacfm/main.dart' show appThemeModeNotifier;
 
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/translations/localizations.dart';
-import 'package:cuacfm/utils/neumorfism.dart';
+import 'package:cuacfm/utils/custom_image.dart';
 import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
@@ -12,8 +13,6 @@ import 'package:cuacfm/utils/top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:injector/injector.dart';
-import 'package:intl/intl.dart';
-
 import 'all_podcast_presenter.dart';
 
 class AllPodcast extends StatefulWidget {
@@ -32,7 +31,7 @@ class AllPodcastState extends State<AllPodcast>
     implements AllPodcastView {
   late AllPodcastPresenter _presenter;
   late MediaQueryData queryData;
-  bool _isSearching = false;
+  bool _isSearching = true;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   List<Program> _podcasts = [];
   List<Program> _podcastWithFilter = [];
@@ -53,7 +52,16 @@ class AllPodcastState extends State<AllPodcast>
     if (_presenter.currentPlayer.isPodcast) {
       shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     }
-    return Scaffold(
+    final themeMode = appThemeModeNotifier.value;
+    final isDark = themeMode == ThemeMode.dark || (themeMode == ThemeMode.system && MediaQuery.of(context).platformBrightness == Brightness.dark);
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        systemNavigationBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+        systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      ),
+      child: Scaffold(
         key: scaffoldKey,
         appBar: TopBar("all_podcast",
             isSearch: _isSearching,
@@ -62,25 +70,7 @@ class AllPodcastState extends State<AllPodcast>
                 : SafeMap.safe(
                     _localization.translateMap("all_podcast"), ["title"]),
             topBarOption: TopBarOption.MODAL,
-            rightIcon: Icons.search, onRightClicked: () {
-          if (Platform.isAndroid) {
-            MethodChannel('cuacfm.flutter.io/changeScreen').invokeMethod(
-                'changeScreen',
-                {"currentScreen": "all_podcast_search", "close": false});
-          }
-          ModalRoute.of(context)?.addLocalHistoryEntry(new LocalHistoryEntry(
-            onRemove: () {
-              if (!mounted) return;
-              setState(() {
-                _isSearching = false;
-              });
-            },
-          ));
-          if (!mounted) return;
-          setState(() {
-            _isSearching = true;
-          });
-        }, onQueryCallback: (query) {
+            onQueryCallback: (query) {
           if (query.length > 2) {
             if (!mounted) return;
             setState(() {
@@ -128,6 +118,10 @@ class AllPodcastState extends State<AllPodcast>
               _presenter
                   .onPodcastControlsClicked(_presenter.currentPlayer.episode);
             },
+            onCloseClicked: () {
+              _presenter.currentPlayer.stop();
+              if (mounted) setState(() { shouldShowPlayer = false; });
+            },
             onMultimediaClicked: (isPlaying) {
               if (!mounted) return;
               setState(() {
@@ -137,7 +131,9 @@ class AllPodcastState extends State<AllPodcast>
                   _presenter.onResume();
                 }
               });
-            }));
+            }),
+      ),
+    );
   }
 
   @override
@@ -223,32 +219,50 @@ class AllPodcastState extends State<AllPodcast>
         height: queryData.size.height,
         child: GridView.builder(
             physics: BouncingScrollPhysics(),
+            padding: EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 16.0),
             itemCount: _podcastWithFilter.length,
-            gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-                mainAxisSpacing: 1.0,
-                crossAxisSpacing: 1.0,
-                childAspectRatio: 0.82,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                mainAxisSpacing: 16.0,
+                crossAxisSpacing: 12.0,
+                childAspectRatio: 0.78,
                 crossAxisCount: 2),
             itemBuilder: (BuildContext context, int index) {
-              return Padding(
-                  padding: EdgeInsets.fromLTRB(20.0, 10.0, 30.0, 0.0),
-                  child: GestureDetector(
-                      onTap: () {
-                        _presenter.onPodcastClicked(_podcastWithFilter[index]);
-                      },
-                      child: NeumorphicCardVertical(
-                        active: false,
-                        image: _podcastWithFilter[index].logoUrl,
-                        label: _podcastWithFilter[index].name,
-                        subtitle: (DateFormat("hh:mm:ss")
-                                        .parse(
-                                            _podcastWithFilter[index].duration)
-                                        .hour *
-                                    60)
-                                .toString() +
-                            SafeMap.safe(_localization.translateMap("general"),
-                                ["minutes"]),
-                      )));
+              final podcast = _podcastWithFilter[index];
+              return GestureDetector(
+                onTap: () => _presenter.onPodcastClicked(podcast),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: CustomImage(
+                          resPath: podcast.logoUrl,
+                          fit: BoxFit.cover,
+                          radius: 12,
+                          backgroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    SizedBox(
+                      height: 40,
+                      child: Text(
+                        podcast.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: _colors.font,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          letterSpacing: 0,
+                          height: 1.3,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
             }));
   }
 
