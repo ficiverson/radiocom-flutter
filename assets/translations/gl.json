@@ -106,7 +106,9 @@
     "minutes" : " minutos.",
     "seconds" : " segundos.",
     "from" : "De ",
-    "to" : " a "
+    "to" : " a ",
+    "season" : "Temporada",
+    "episode" : "Episodio"
   },
   "categories" : {
     "others" : "Outros",

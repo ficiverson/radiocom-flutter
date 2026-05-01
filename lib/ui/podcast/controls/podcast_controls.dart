@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/services/playlist_service.dart';
@@ -51,9 +52,11 @@ class PodcastControlsState extends State<PodcastControls>
 
   Future<void> _loadPaletteColor() async {
     try {
-      final img = currentPlayer.currentImage.contains('default-programme-photo')
-          ? 'assets/graphics/default_programme_cover.png'
-          : currentPlayer.currentImage;
+      final img = currentPlayer.isPodcast
+          ? (currentPlayer.currentImage.contains('default-programme-photo')
+              ? 'assets/graphics/default_programme_cover.png'
+              : currentPlayer.currentImage)
+          : _getLiveImageUrl();
       final isAsset = !img.contains('http');
       final imageProvider = isAsset
           ? AssetImage(img) as ImageProvider
@@ -284,19 +287,21 @@ class PodcastControlsState extends State<PodcastControls>
           aspectRatio: 1,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: currentPlayer.currentImage.contains('default-programme-photo')
-                ? Image.asset('assets/graphics/default_programme_cover.png', fit: BoxFit.cover)
-                : currentPlayer.currentImage.contains('http')
+            child: () {
+                final img = currentPlayer.isPodcast
+                    ? (currentPlayer.currentImage.contains('default-programme-photo')
+                        ? 'assets/graphics/default_programme_cover.png'
+                        : currentPlayer.currentImage)
+                    : _getLiveImageUrl();
+                return img.contains('http')
                     ? CachedNetworkImage(
-                        imageUrl: currentPlayer.currentImage,
+                        imageUrl: img,
                         fit: BoxFit.cover,
                         errorWidget: (_, __, ___) =>
                             Icon(Icons.music_note, size: 60, color: _colors.grey),
                       )
-                    : Image.asset(
-                        currentPlayer.currentImage,
-                        fit: BoxFit.cover,
-                      ),
+                    : Image.asset(img, fit: BoxFit.cover);
+              }(),
           ),
         ),
       ),
@@ -404,7 +409,7 @@ class PodcastControlsState extends State<PodcastControls>
           ],
           const SizedBox(height: 8),
           Text(
-            currentPlayer.currentSong,
+            _getLiveName(),
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -416,6 +421,31 @@ class PodcastControlsState extends State<PodcastControls>
               height: 1.2,
             ),
           ),
+          if (live != null && live.rssUrl.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            FutureBuilder<List<Episode>>(
+              future: Injector.appInstance
+                  .get<CuacRepositoryContract>()
+                  .getEpisodes(live.rssUrl)
+                  .then((result) => result.data ?? <Episode>[]),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData || snapshot.data!.isEmpty) return const SizedBox.shrink();
+                final label = _parseEpisodeLabel(snapshot.data!.first.title);
+                return Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: _colors.fontGrey,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 0,
+                  ),
+                );
+              },
+            ),
+          ],
         ],
       );
     }
@@ -828,6 +858,33 @@ class PodcastControlsState extends State<PodcastControls>
   }
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
+
+  String _getLiveImageUrl() {
+    final live = widget.liveProgram;
+    if (live == null) return "https://cuacfm.org/wp-content/uploads/2026/04/cuac_music_cover.png";
+    if (live.logoUrl.isEmpty || live.logoUrl.contains('default-programme-photo')) {
+      return 'assets/graphics/default_programme_cover.png';
+    }
+    return live.logoUrl;
+  }
+
+  String _getLiveName() {
+    final live = widget.liveProgram;
+    if (live == null) return currentPlayer.currentSong;
+    return live.name;
+  }
+
+  String _parseEpisodeLabel(String title) {
+    final match = RegExp(r'^(\d+)x(\d+)').firstMatch(title);
+    if (match != null) {
+      final season = match.group(1);
+      final ep = match.group(2);
+      final seasonLabel = SafeMap.safe(_localization.translateMap("general"), ["season"]);
+      final episodeLabel = SafeMap.safe(_localization.translateMap("general"), ["episode"]);
+      return "$seasonLabel $season, $episodeLabel $ep";
+    }
+    return title;
+  }
 
   String _monthAbbr(int month) {
     const months = [
