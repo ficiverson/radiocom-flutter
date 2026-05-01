@@ -91,11 +91,6 @@ flutter:
       - assets/translations/pt.json
 
   fonts:
-    - family: Figtree
-      fonts:
-        - asset: assets/fonts/Figtree-VariableFont_wght.ttf
-        - asset: assets/fonts/Figtree-Italic-VariableFont_wght.ttf
-          style: italic
     - family: PublicSans
       fonts:
         - asset: assets/fonts/PublicSans-Thin.ttf
