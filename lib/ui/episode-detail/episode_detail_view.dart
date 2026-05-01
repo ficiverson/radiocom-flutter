@@ -86,10 +86,14 @@ class _EpisodeDetailState extends State<EpisodeDetail>
     if (_isCurrentEpisodePlaying()) {
       _currentPlayer.pause();
     } else {
+      _currentPlayer.stop();
       _currentPlayer.isPodcast = true;
       _currentPlayer.episode = widget.episode;
       _currentPlayer.currentSong = widget.programName;
       _currentPlayer.currentImage = widget.logoUrl;
+      _currentPlayer.playerState = AudioPlayerState.stop;
+      _currentPlayer.position = Duration.zero;
+      _currentPlayer.duration = Duration.zero;
       _currentPlayer.play();
     }
     if (mounted) setState(() {});
