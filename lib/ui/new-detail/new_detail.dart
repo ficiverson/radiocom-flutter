@@ -288,20 +288,21 @@ class NewDetailState extends State<NewDetail>
           ),
 
           // Data e categoría
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
-            child: Text(
-              widget.newItem.category.isNotEmpty
-                  ? "${widget.newItem.pubDate} · ${widget.newItem.category.toUpperCase()}"
-                  : widget.newItem.pubDate,
-              style: TextStyle(
-                color: _colors.fontGrey,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0,
+          if (widget.newItem.pubDate.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+              child: Text(
+                widget.newItem.category.isNotEmpty
+                    ? "${widget.newItem.pubDate} · ${widget.newItem.category.toUpperCase()}"
+                    : widget.newItem.pubDate,
+                style: TextStyle(
+                  color: _colors.fontGrey,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0,
+                ),
               ),
             ),
-          ),
 
           // Contido HTML ou estado baleiro
           widget.newItem.description.trim().isEmpty

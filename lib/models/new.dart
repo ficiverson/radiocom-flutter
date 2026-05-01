@@ -155,7 +155,7 @@ class New {
         "https://cuacfm.org/avisos-movil/",
         outstanding.description,
         outstanding.logoUrl,
-        DateFormat("dd MMM yyyy").format(DateTime.now()));
+        "");
   }
 
   static New fromPodcast(
