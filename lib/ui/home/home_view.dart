@@ -118,13 +118,6 @@ class MyHomePageState extends State<MyHomePage>
           padding: EdgeInsets.fromLTRB(0.0, queryData.padding.top + 12.0, 0.0, 12.0),
           decoration: BoxDecoration(
             color: _colors.palidwhite,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.06),
-                offset: Offset(0, 2),
-                blurRadius: 6,
-              ),
-            ],
           ),
           child: Center(
             child: SizedBox(

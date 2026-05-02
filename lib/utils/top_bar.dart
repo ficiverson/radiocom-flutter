@@ -69,14 +69,7 @@ class TopBarState extends State<TopBar> {
         width: MediaQuery.of(context).size.width,
         height: queryData.padding.top + 70,
         decoration: BoxDecoration(
-            color: _colors.palidwhite,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.06),
-                offset: Offset(0, 2),
-                blurRadius: 6,
-              ),
-            ]),
+            color: _colors.palidwhite),
         child: Container(
           margin: EdgeInsets.fromLTRB(0, queryData.padding.top + 12, 0, 12),
           child: Row(

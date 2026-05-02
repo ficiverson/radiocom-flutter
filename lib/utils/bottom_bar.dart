@@ -35,13 +35,6 @@ class BottomBar extends StatelessWidget {
         key: Key("bottom_bar"),
         decoration: BoxDecoration(
           shape: BoxShape.rectangle,
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 8.0,
-              offset: Offset(0.0, -2.0),
-            )
-          ],
           color: _colors.palidwhite,
         ),
         width: queryData.size.width,
