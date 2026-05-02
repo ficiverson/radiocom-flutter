@@ -180,7 +180,7 @@ class MockHomeRouter implements HomeRouterContract {
   }
 
   @override
-  goToPodcastDetail(Program podcast, {VoidCallback? onReturn}) {
+  goToPodcastDetail(Program podcast, {VoidCallback? onReturn, Function(BottomBarOption)? onTabSelected}) {
     viewState.add(HomeState.goToPodcast);
     data.add(podcast);
   }

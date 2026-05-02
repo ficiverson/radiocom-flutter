@@ -71,7 +71,7 @@ class New {
   }
 
   static String getDate(String content) {
-    if (content == null || content.isEmpty) return "";
+    if (content.isEmpty) return "";
     try {
       final date = DateFormat("EEE, dd MMM yyyy HH:mm:ss Z", "en_US").parse(content);
       const months = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];

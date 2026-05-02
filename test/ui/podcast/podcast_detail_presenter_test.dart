@@ -345,10 +345,11 @@ void main() {
             .thenAnswer((_) => Future.value(true));
         mockPlayer.isPodcast = true;
 
-        presenter.onDetailEpisode("title","subtile","content","http://url");
+        final episode = Episode.fromMap({'title': 'title', 'link': 'http://url', 'audio': 'http://url', 'description': 'content', 'duration': '00:00:00'});
+        presenter.onDetailEpisode(episode, "subtile", "http://logo");
         await Future.delayed(Duration(milliseconds: 200));
 
         expect(router.viewState[0], equals(PodcastDetailState.goToEpisodeDetail));
-        expect((router.data[0] as New).title, equals("title"));
+        expect((router.data[0] as Episode).title, equals("title"));
       });
 }

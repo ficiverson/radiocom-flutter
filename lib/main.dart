@@ -73,7 +73,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   late Brightness _brightness;
-  ThemeMode _themeMode = ThemeMode.system;
   Locale? _locale;
   bool _showOnboarding = false;
 
@@ -121,7 +120,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     );
     _applySystemChrome(isDark ? Brightness.dark : Brightness.light);
     appThemeModeNotifier.value = mode;
-    setState(() => _themeMode = mode);
+    setState(() {});
   }
 
   void _setLocale(Locale? locale) {
@@ -142,9 +141,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     );
     if (mounted) {
       appThemeModeNotifier.value = mode;
-      setState(() {
-        _themeMode = mode;
-      });
+      setState(() {});
     }
   }
 

@@ -8,7 +8,6 @@ import 'package:cuacfm/utils/notification_subscription_contract.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:firebase_core_mocks/firebase_core_mocks.dart';
 import 'package:injector/injector.dart';
 import 'package:mockito/mockito.dart';
 
@@ -207,6 +206,4 @@ typedef Callback(MethodCall call);
 
 setupCloudFirestoreMocks([Callback? customHandlers]) {
   TestWidgetsFlutterBinding.ensureInitialized();
-
-  setupFirebaseCoreMocks();
 }

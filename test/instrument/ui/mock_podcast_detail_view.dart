@@ -61,4 +61,10 @@ class MockPodcastDetailRouter implements DetailPodcastRouter {
     viewState.add(PodcastDetailState.goToEpisodeDetail);
     data.add(itemNew);
   }
+
+  @override
+  goToEpisodeDetail(Episode episode, String programName, String logoUrl) {
+    viewState.add(PodcastDetailState.goToEpisodeDetail);
+    data.add(episode);
+  }
 }

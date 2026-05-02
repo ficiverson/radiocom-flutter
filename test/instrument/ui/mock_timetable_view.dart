@@ -21,6 +21,12 @@ class MockTimetableView implements TimeTableView{
   onNewData() {
     viewState.add(TimeTableState.onNewData);
   }
+
+  @override
+  void onLoadTimetable(List timetable) {
+    viewState.add(TimeTableState.onNewData);
+    data.add(timetable);
+  }
 }
 
 class MockTimeTableRouter implements TimeTableRouterContract {

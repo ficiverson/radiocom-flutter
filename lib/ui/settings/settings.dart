@@ -302,7 +302,7 @@ class SettingsState extends State<Settings>
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: options.map((opt) {
-            final value = opt[0] as String?;
+            final value = opt[0];
             final label = opt[1] as String;
             final selected = _localeValue == value;
             return InkWell(
