@@ -56,6 +56,8 @@ class DetailPodcastState extends State<DetailPodcastPage>
   Color _paletteColor = Colors.transparent;
   SnackBar? snackBarConnection;
   late CuacLocalization _localization;
+  final ScrollController _scrollController = ScrollController();
+  bool _isScrolled = false;
   final FavoritesService _favoritesService = FavoritesService();
   final NotificationSubscription _notificationService = NotificationSubscription();
 
@@ -138,9 +140,13 @@ class DetailPodcastState extends State<DetailPodcastPage>
     final statusBarNeedsDarkIcons = _paletteColor.computeLuminance() > 0.179;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
+        statusBarColor: _isScrolled
+            ? (isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6))
+            : Colors.transparent,
         systemStatusBarContrastEnforced: false,
-        statusBarIconBrightness: statusBarNeedsDarkIcons ? Brightness.dark : Brightness.light,
+        statusBarIconBrightness: _isScrolled
+            ? (isDark ? Brightness.light : Brightness.dark)
+            : (statusBarNeedsDarkIcons ? Brightness.dark : Brightness.light),
         systemNavigationBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
         systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
       ),
@@ -165,6 +171,12 @@ class DetailPodcastState extends State<DetailPodcastPage>
     });
     _presenter.loadEpisodes(_program.rssUrl);
     _loadPaletteColor();
+    _scrollController.addListener(() {
+      final scrolled = _scrollController.offset > 50;
+      if (scrolled != _isScrolled && mounted) {
+        setState(() => _isScrolled = scrolled);
+      }
+    });
 
     _presenter.currentPlayer.onConnection = (isError) {
       if (mounted) {
@@ -199,6 +211,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
 
   @override
   void dispose() {
+    _scrollController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<DetailPodcastView>();
     super.dispose();
@@ -564,6 +577,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
         width: queryData.size.width,
         height: queryData.size.height,
         child: ListView.builder(
+            controller: _scrollController,
             padding: EdgeInsets.zero,
             physics: BouncingScrollPhysics(),
             scrollDirection: Axis.vertical,
