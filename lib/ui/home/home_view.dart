@@ -1560,7 +1560,10 @@ Builder(builder: (context) {
   }
 
   Widget _buildRecentRow(TimeTable item) {
-    final String dateLabel = DateFormat("d MMM · HH:mm").format(item.start);
+    final monthKeys = ["jan","feb","mar","apr","may","jun","jul","ago","sep","oct","nov","dec"];
+    final monthKey = monthKeys[item.start.month - 1];
+    final monthStr = SafeMap.safe(_localization.translateMap("months"), [monthKey]).toUpperCase();
+    final String dateLabel = "${item.start.day} $monthStr · ${DateFormat('HH:mm').format(item.start)}";
     return Expanded(
       child: GestureDetector(
         onTap: () async {
