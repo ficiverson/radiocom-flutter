@@ -340,7 +340,10 @@ class NewDetailState extends State<NewDetail>
                         .replaceAll("\\r", "")
                         .replaceAll("\\n", "")
                         .replaceAll("\\", ""),
-                    onTapUrl: _presenter.onLinkClicked(null),
+                    onTapUrl: (url) async {
+                      await _presenter.onLinkClicked(url);
+                      return true;
+                    },
                     textStyle: TextStyle(
                       color: _colors.font,
                       fontWeight: FontWeight.w400,
