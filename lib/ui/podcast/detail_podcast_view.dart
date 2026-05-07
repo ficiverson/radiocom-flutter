@@ -72,7 +72,9 @@ class DetailPodcastState extends State<DetailPodcastPage>
 
   Future<void> _loadPaletteColor() async {
     try {
-      final imageProvider = NetworkImage(widget.program.logoUrl);
+      final ImageProvider imageProvider = widget.program.logoUrl.contains('default-programme-photo')
+          ? AssetImage('assets/graphics/default_programme_cover.png') as ImageProvider
+          : NetworkImage(widget.program.logoUrl);
       final palette = await PaletteGenerator.fromImageProvider(
         imageProvider,
         size: Size(200, 200),
