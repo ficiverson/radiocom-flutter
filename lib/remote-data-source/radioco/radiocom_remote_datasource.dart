@@ -126,4 +126,28 @@ class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
       return null;
     }
   }
+
+  @override
+  Future<Outstanding?> getOutstanding2() async {
+    try {
+      dynamic res = await this.client.get(
+        Uri.parse(radiocoAPI.outstandingUrl2),
+        responseType: HTTPResponseType.JSON,
+      );
+      if (res["status"] == publishState) {
+        Outstanding outstandingTemp = Outstanding.fromInstance(res);
+        dynamic resPicture = await this.client.get(
+          Uri.parse(outstandingTemp.logoUrl),
+          responseType: HTTPResponseType.JSON,
+        );
+        outstandingTemp.updatePicture(resPicture["source_url"]);
+        return outstandingTemp;
+      } else {
+        return null;
+      }
+    } catch (err) {
+      print(err);
+      return null;
+    }
+  }
 }

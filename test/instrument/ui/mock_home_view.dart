@@ -151,6 +151,12 @@ class MockHomeView implements HomeView {
   }
 
   @override
+  void onLoadOutstanding2(Outstanding outstanding) {
+    viewState.add(HomeState.onOutstanding);
+    data.add(outstanding);
+  }
+
+  @override
   void onLoadOutstandingError(error) {
     viewState.add(HomeState.onOutstandingError);
     data.add(error);

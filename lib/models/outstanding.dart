@@ -30,10 +30,7 @@ class Outstanding {
    }
 
    static _cleanTitle(String remoteTitle) {
-     if(remoteTitle.contains("[avisos-movil]")){
-       remoteTitle = remoteTitle.replaceAll("[avisos-movil]", "");
-     }
-     return remoteTitle;
+     return remoteTitle.replaceAll(RegExp(r'\[avisos-mo[bv]il[^\]]*\]'), '').trim();
    }
 
    static String getTitle() {

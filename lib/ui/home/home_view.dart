@@ -55,6 +55,9 @@ class MyHomePageState extends State<MyHomePage>
   int _currentNewsPage = 0;
   Now _nowProgram = Now.mock();
   Outstanding? _outstanding;
+  Outstanding? _outstanding2;
+  final PageController _outstandingPageController = PageController(viewportFraction: 0.92);
+  int _currentOutstandingPage = 0;
   List<Program> _podcast = [];
   final Map<String, bool> _podcastHasEpisodes = {};
   bool _episodesChecked = false;
@@ -236,6 +239,7 @@ class MyHomePageState extends State<MyHomePage>
     _liveRefreshTimer?.cancel();
     connectionSubscription.cancel();
     _presenter.currentPlayer.onUpdate = null;
+    _outstandingPageController.dispose();
     Injector.appInstance.removeByKey<HomeView>();
     WidgetsBinding.instance.removeObserver(this);
     appThemeModeNotifier.removeListener(_onAppSettingsChanged);
@@ -533,6 +537,14 @@ class MyHomePageState extends State<MyHomePage>
   @override
   void onLoadOutstandingError(error) {
     _outstanding = null;
+  }
+
+  @override
+  void onLoadOutstanding2(Outstanding outstanding) {
+    if (!mounted) return;
+    setState(() {
+      _outstanding2 = outstanding;
+    });
   }
 
   @override
@@ -1101,12 +1113,56 @@ Builder(builder: (context) {
                         ),
                       ),
                     ),
-              _outstanding == null
-                  ? Container()
-                  : Container(
-                        color: _colors.palidwhite,
-                        child: _getHomeOutstandingInfo(_outstanding!),
-                    ),
+              if (_outstanding != null) ...[
+                Builder(builder: (context) {
+                  final items = [
+                    _outstanding!,
+                    if (_outstanding2 != null) _outstanding2!,
+                  ];
+                  if (items.length == 1) {
+                    return Container(
+                      color: _colors.palidwhite,
+                      child: _getHomeOutstandingInfo(items[0]),
+                    );
+                  }
+                  return Column(
+                    children: [
+                      SizedBox(
+                        height: 320,
+                        child: PageView.builder(
+                          controller: _outstandingPageController,
+                          onPageChanged: (i) => setState(() => _currentOutstandingPage = i),
+                          itemCount: items.length,
+                          padEnds: false,
+                          clipBehavior: Clip.none,
+                          itemBuilder: (_, i) => Padding(
+                            padding: EdgeInsets.only(left: i == 0 ? 20 : 8, right: i == items.length - 1 ? 20 : 8),
+                            child: _getHomeOutstandingInfoRaw(items[i]),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(items.length, (i) {
+                          final active = i == _currentOutstandingPage;
+                          return AnimatedContainer(
+                            duration: Duration(milliseconds: 250),
+                            margin: const EdgeInsets.symmetric(horizontal: 3),
+                            width: active ? 16 : 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              color: active ? _colors.yellow : _colors.fontGrey.withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          );
+                        }),
+                      ),
+                      SizedBox(height: 4),
+                    ],
+                  );
+                }),
+              ],
 
 
 
@@ -1555,6 +1611,63 @@ Builder(builder: (context) {
             SizedBox(height: 5),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _getHomeOutstandingInfoRaw(Outstanding outstanding) {
+    return GestureDetector(
+      onTap: () => _presenter.onOutstandingClicked(outstanding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 20),
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Color(0xFF6C5A13) : Color(0xFFF3E29C),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 0.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 200.0,
+                      child: CustomImage(
+                        radius: 0,
+                        background: false,
+                        fit: BoxFit.cover,
+                        resPath: outstanding.logoUrl,
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 10.0, 16.0, 14.0),
+                  child: Text(
+                    outstanding.title,
+                    textAlign: TextAlign.left,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      letterSpacing: 0,
+                      height: 1.2,
+                      color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Color(0xFF1A1A1A),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 5),
+        ],
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cuacfm/domain/invoker/invoker.dart';
+import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/domain/result/result.dart';
 import 'package:cuacfm/domain/usecase/get_all_podcast_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_live_program_use_case.dart';
@@ -56,6 +57,7 @@ abstract class HomeView {
   void onMenuReturn(BottomBarOption option);
 
   void onLoadOutstanding(Outstanding outstanding);
+  void onLoadOutstanding2(Outstanding outstanding);
   void onLoadOutstandingError(dynamic error);
 }
 
@@ -337,8 +339,19 @@ class HomePresenter {
       } else {
         _homeView.onLoadOutstandingError((result as Error).status);
       }
+      _getOutstanding2();
       _getTimetable();
     });
+  }
+
+  _getOutstanding2() async {
+    try {
+      final repo = Injector.appInstance.get<CuacRepositoryContract>();
+      final result = await repo.getOutStanding2();
+      if (result is Success && result.data != null) {
+        _homeView.onLoadOutstanding2(result.data!);
+      }
+    } catch (_) {}
   }
 
   _getTimetable() {

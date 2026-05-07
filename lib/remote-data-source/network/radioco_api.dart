@@ -8,6 +8,7 @@ abstract class RadiocoAPIContract {
   String live = "";
   String feedUrl = "";
   String outstandingUrl = "";
+  String outstandingUrl2 = "";
 }
 
 class RadiocoAPI implements RadiocoAPIContract {
@@ -29,4 +30,6 @@ class RadiocoAPI implements RadiocoAPIContract {
   String feedUrl = "https://cuacfm.org/feed/";
   @override
   String outstandingUrl = "https://cuacfm.org/wp-json/wp/v2/pages/3952";
+  @override
+  String outstandingUrl2 = "https://cuacfm.org/wp-json/wp/v2/pages/6406";
 }
