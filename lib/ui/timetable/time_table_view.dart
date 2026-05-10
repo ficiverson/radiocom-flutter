@@ -234,8 +234,14 @@ class TimetableState extends State<Timetable>
   @override
   void onLoadTimetable(List<TimeTable> timetable) {
     if (!mounted) return;
+    final now = DateTime.now();
+    final monday = DateTime(now.year, now.month, now.day).subtract(Duration(days: now.weekday - 1));
+    final nextMonday = monday.add(const Duration(days: 7));
     setState(() {
-      _timetable = timetable;
+      _timetable = timetable
+          .where((t) => !t.start.isBefore(monday) && t.start.isBefore(nextMonday))
+          .toList()
+          ..sort((a, b) => a.start.compareTo(b.start));
     });
   }
 

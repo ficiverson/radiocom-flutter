@@ -104,7 +104,7 @@ class SettingsState extends State<Settings>
                 isPlayingAudio: _presenter.currentPlayer.isPlaying(),
                 title: _presenter.currentPlayer.isPodcast
                     ? _presenter.currentPlayer.currentSong
-                    : "On Air: ${_presenter.currentPlayer.currentSong}",
+                    : null,
                 onDetailClicked: () {
                   _presenter.onPodcastControlsClicked(_presenter.currentPlayer.episode);
                 },

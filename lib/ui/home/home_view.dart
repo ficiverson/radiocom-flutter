@@ -355,7 +355,9 @@ class MyHomePageState extends State<MyHomePage>
     });
 
     _presenter.currentPlayer.onUpdate = () {
-      if (mounted) setState(() {});
+      if (mounted) setState(() {
+        shouldShowPlayer = _presenter.currentPlayer.isPlaying() || _presenter.currentPlayer.isPaused();
+      });
     };
 
     WidgetsBinding.instance.addObserver(this);
@@ -522,9 +524,15 @@ class MyHomePageState extends State<MyHomePage>
   @override
   void onLoadTimetable(List<TimeTable> programsTimeTable) {
     if (!mounted) return;
+    final now = DateTime.now();
+    final monday = DateTime(now.year, now.month, now.day).subtract(Duration(days: now.weekday - 1));
+    final nextMonday = monday.add(const Duration(days: 7));
     setState(() {
       isTimeTableEmpty = programsTimeTable.isEmpty;
-      _timeTable = programsTimeTable;
+      _timeTable = programsTimeTable
+          .where((t) => !t.start.isBefore(monday) && t.start.isBefore(nextMonday))
+          .toList()
+          ..sort((a, b) => a.start.compareTo(b.start));
       _syncLivePlayerInfo();
     });
   }
@@ -736,7 +744,7 @@ class MyHomePageState extends State<MyHomePage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 10.0),
+            padding: const EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 16.0),
             child: Text(
               SafeMap.safe(_localization.translateMap("home"), ["categories"]),
               textAlign: TextAlign.left,
@@ -1083,7 +1091,7 @@ Builder(builder: (context) {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(20.0, 14.0, 20.0, 0.0),
+                padding: EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 0.0),
                 child: Builder(builder: (context) {
                   final nowDate = DateTime.now();
                   final next = _timeTable.isNotEmpty
@@ -1232,7 +1240,7 @@ Builder(builder: (context) {
                               key: PageStorageKey<String>("home_last_episodes"),
                               physics: BouncingScrollPhysics(),
                               scrollDirection: Axis.horizontal,
-                              padding: EdgeInsets.fromLTRB(20.0, 8.0, 8.0, 8.0),
+                              padding: EdgeInsets.fromLTRB(20.0, 10.0, 8.0, 8.0),
                               itemCount: (_recentPodcast.length / 2).ceil(),
                               itemBuilder: (_, int colIndex) {
                                 final int i1 = colIndex * 2;
@@ -1579,7 +1587,7 @@ Builder(builder: (context) {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            SizedBox(height: 20),
+            SizedBox(height: 16),
             Container(
               width: queryData.size.width,
               decoration: BoxDecoration(
@@ -1840,7 +1848,7 @@ Builder(builder: (context) {
             key: PageStorageKey<String>("weekly_episodes"),
             physics: BouncingScrollPhysics(),
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.fromLTRB(20.0, 8.0, 8.0, 0.0),
+            padding: EdgeInsets.fromLTRB(20.0, 10.0, 8.0, 0.0),
             itemCount: (_weeklyPodcast.length / 3).ceil(),
             itemBuilder: (_, int colIndex) {
               final int i1 = colIndex * 3;

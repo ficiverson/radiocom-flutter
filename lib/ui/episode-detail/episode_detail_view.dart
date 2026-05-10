@@ -294,7 +294,7 @@ class _EpisodeDetailState extends State<EpisodeDetail>
                   label: "Play",
                   active: _isCurrentEpisodePlaying(),
                   onTap: _onPlayEpisode,
-                  size: 30,
+                  size: 32,
                 )),
                 Container(width: 1, height: 40, color: _colors.fontGrey.withOpacity(0.15)),
                 Expanded(child: _actionButton(
@@ -302,7 +302,7 @@ class _EpisodeDetailState extends State<EpisodeDetail>
                   label: "Playlist",
                   active: _inPlaylist,
                   onTap: _togglePlaylist,
-                  size: 30,
+                  size: 32,
                 )),
                 Container(width: 1, height: 40, color: _colors.fontGrey.withOpacity(0.15)),
                 Expanded(child: _actionButton(
@@ -435,11 +435,13 @@ class _EpisodeDetailState extends State<EpisodeDetail>
     required VoidCallback onTap,
     double size = 28,
   }) {
-    final color = active ? _colors.yellow : _colors.fontGrey;
-    return GestureDetector(
+    return _ActionButton(
+      icon: icon,
+      active: active,
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Center(child: Icon(icon, color: color, size: size)),
+      size: size,
+      activeColor: _colors.yellow,
+      inactiveColor: _colors.fontGrey,
     );
   }
 
@@ -449,5 +451,56 @@ class _EpisodeDetailState extends State<EpisodeDetail>
       "xul", "ago", "set", "out", "nov", "dec"
     ];
     return months[month - 1];
+  }
+}
+
+class _ActionButton extends StatefulWidget {
+  final IconData icon;
+  final bool active;
+  final VoidCallback onTap;
+  final double size;
+  final Color activeColor;
+  final Color inactiveColor;
+
+  const _ActionButton({
+    required this.icon,
+    required this.active,
+    required this.onTap,
+    required this.activeColor,
+    required this.inactiveColor,
+    this.size = 28,
+  });
+
+  @override
+  State<_ActionButton> createState() => _ActionButtonState();
+}
+
+class _ActionButtonState extends State<_ActionButton> {
+  double _scale = 1.0;
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = (_pressed || widget.active) ? widget.activeColor : widget.inactiveColor;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapDown: (_) => setState(() { _scale = 0.85; _pressed = true; }),
+      onTapUp: (_) {
+        setState(() { _scale = 1.0; _pressed = false; });
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() { _scale = 1.0; _pressed = false; }),
+      child: Center(
+        child: AnimatedScale(
+          scale: _scale,
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeInOut,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 120),
+            child: Icon(widget.icon, color: color, size: widget.size, key: ValueKey(color)),
+          ),
+        ),
+      ),
+    );
   }
 }

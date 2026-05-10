@@ -48,9 +48,9 @@ class TimeTablePresenter {
     final formatter = DateFormat('dd/MM/yyyy');
     final now = DateTime.now();
     final monday = now.subtract(Duration(days: now.weekday - 1));
-    final sunday = monday.add(const Duration(days: 6));
+    final nextMonday = monday.add(const Duration(days: 7));
     final after = formatter.format(monday);
-    final before = formatter.format(sunday);
+    final before = formatter.format(nextMonday);
     invoker.execute(getTimetableUseCase.withParams(GetTimetableUseCaseParams(after, before)))
         .listen((result) {
       if (result is Success) {

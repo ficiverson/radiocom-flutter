@@ -129,7 +129,7 @@ class PlayerViewState extends State<PlayerView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      widget.title ?? player.currentSong,
+                      widget.title ?? (player.isPodcast ? player.currentSong : "On Air: ${player.currentSong}"),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
