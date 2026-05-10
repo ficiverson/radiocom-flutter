@@ -32,7 +32,13 @@ class NewDetailState extends State<NewDetail>
   late RadiocomColorsConract _colors;
   bool shouldShowPlayer = false;
   bool isContentUpdated = true;
+  bool _isLoadingEpisode = false;
   SnackBar? snackBarConnection;
+
+  @override
+  void onLoadingEpisode(bool loading) {
+    if (mounted) setState(() => _isLoadingEpisode = loading);
+  }
 
   NewDetailState() {
     DependencyInjector().injectByView(this);
@@ -51,7 +57,9 @@ class NewDetailState extends State<NewDetail>
         systemNavigationBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
         systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
       ),
-      child: Scaffold(
+      child: Stack(
+        children: [
+          Scaffold(
         key: scaffoldKey,
         backgroundColor: _colors.palidwhite,
         body: _getBodyLayout(),
@@ -85,6 +93,17 @@ class NewDetailState extends State<NewDetail>
                 )
               : SizedBox(height: MediaQuery.of(context).padding.bottom),
         ),
+          ),
+          if (_isLoadingEpisode)
+            Container(
+              color: Colors.black.withOpacity(0.4),
+              child: const Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xFFFDCC03),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

@@ -72,6 +72,16 @@ class CurrentPlayer implements CurrentPlayerContract {
   @override
   String currentImage =
       "https://cuacfm.org/wp-content/uploads/2026/04/cuac_music_cover.png";
+
+  static const _fallbackArtUrl = "https://cuacfm.org/wp-content/uploads/2026/04/cuac_music_cover.png";
+  Uri get _artUri {
+    final img = currentImage;
+    if (img.startsWith('assets/') || img.contains('default-programme-photo') || img.isEmpty) {
+      return Uri.parse(_fallbackArtUrl);
+    }
+    return Uri.parse(img);
+  }
+
   @override
   bool isPodcast = false;
   @override
@@ -199,6 +209,11 @@ class CurrentPlayer implements CurrentPlayerContract {
           _playNextInPlaylist().then((_) {
             if (onUpdate != null) onUpdate!();
           });
+        } else if (event.processingState == ProcessingState.idle &&
+            playerState != AudioPlayerState.stop) {
+          playerState = AudioPlayerState.stop;
+          isPodcast = false;
+          if (onUpdate != null) onUpdate!();
         } else if (event.playing && playerState == AudioPlayerState.pause) {
           playerState = AudioPlayerState.play;
           if (onUpdate != null) onUpdate!();
@@ -254,7 +269,7 @@ class CurrentPlayer implements CurrentPlayerContract {
               album: isPodcast ? "Podcast CUAC FM" : "Directo CUAC FM",
               title: isPodcast ? episode?.title ?? "" : "Streaming en directo",
               artist: "CUAC FM",
-              artUri: Uri.parse(currentImage),
+              artUri: _artUri,
               extras: {
                 'androidCompactActionIndices': [0, 1, 2],
               },

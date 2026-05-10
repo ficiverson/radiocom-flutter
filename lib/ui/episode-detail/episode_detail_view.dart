@@ -16,6 +16,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
+import 'package:cuacfm/models/program.dart';
+import 'package:cuacfm/ui/podcast/detail_podcast_view.dart';
 import 'package:injector/injector.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -275,6 +278,7 @@ class _EpisodeDetailState extends State<EpisodeDetail>
           ),
 
           // ── Divisor ───────────────────────────────────────────────────
+          SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
             child: Container(height: 1, color: _colors.fontGrey.withOpacity(0.15)),
@@ -284,23 +288,50 @@ class _EpisodeDetailState extends State<EpisodeDetail>
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _actionButton(
+                Expanded(child: _actionButton(
                   icon: _isCurrentEpisodePlaying() ? Icons.pause : Icons.play_arrow,
                   label: "Play",
                   active: _isCurrentEpisodePlaying(),
                   onTap: _onPlayEpisode,
-                ),
+                  size: 30,
+                )),
                 Container(width: 1, height: 40, color: _colors.fontGrey.withOpacity(0.15)),
-                _actionButton(
+                Expanded(child: _actionButton(
                   icon: Icons.playlist_add,
                   label: "Playlist",
                   active: _inPlaylist,
                   onTap: _togglePlaylist,
-                ),
+                  size: 30,
+                )),
                 Container(width: 1, height: 40, color: _colors.fontGrey.withOpacity(0.15)),
-                _actionButton(
+                Expanded(child: _actionButton(
+                  icon: Icons.podcasts,
+                  label: SafeMap.safe(_localization.translateMap("actions"), ["program"]),
+                  active: false,
+                  onTap: () async {
+                    try {
+                      final repo = Injector.appInstance.get<CuacRepositoryContract>();
+                      final result = await repo.getAllPodcasts();
+                      if (result.data == null || result.data!.isEmpty) return;
+                      final nameLower = widget.programName.toLowerCase();
+                      Program? program;
+                      for (final p in result.data!) {
+                        if (p.name.toLowerCase() == nameLower) { program = p; break; }
+                      }
+                      program ??= result.data!.firstWhere(
+                        (p) => p.name.toLowerCase().contains(nameLower) || nameLower.contains(p.name.toLowerCase()),
+                        orElse: () => result.data!.first,
+                      );
+                      if (!mounted) return;
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => DetailPodcastPage(program: program!),
+                      ));
+                    } catch (_) {}
+                  },
+                )),
+                Container(width: 1, height: 40, color: _colors.fontGrey.withOpacity(0.15)),
+                Expanded(child: _actionButton(
                   icon: Icons.share,
                   label: SafeMap.safe(_localization.translateMap("actions"), ["share"]),
                   active: false,
@@ -319,10 +350,10 @@ class _EpisodeDetailState extends State<EpisodeDetail>
                       Share.share(text);
                     }
                   },
-                ),
+                )),
                 if (ep.link.isNotEmpty) ...[
                   Container(width: 1, height: 40, color: _colors.fontGrey.withOpacity(0.15)),
-                  _actionButton(
+                  Expanded(child: _actionButton(
                     icon: Icons.open_in_new,
                     label: "Web",
                     active: false,
@@ -332,7 +363,7 @@ class _EpisodeDetailState extends State<EpisodeDetail>
                         launchUrl(uri, mode: LaunchMode.externalApplication);
                       }
                     },
-                  ),
+                  )),
                 ],
               ],
             ),
@@ -402,25 +433,13 @@ class _EpisodeDetailState extends State<EpisodeDetail>
     required String label,
     required bool active,
     required VoidCallback onTap,
+    double size = 28,
   }) {
     final color = active ? _colors.yellow : _colors.fontGrey;
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 28),
-          SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              letterSpacing: 0,
-            ),
-          ),
-        ],
-      ),
+      behavior: HitTestBehavior.opaque,
+      child: Center(child: Icon(icon, color: color, size: size)),
     );
   }
 

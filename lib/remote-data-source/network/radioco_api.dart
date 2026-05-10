@@ -19,13 +19,13 @@ class RadiocoAPI implements RadiocoAPIContract {
   @override
   String podcast = "programmes?format=json&ordering=name";
   @override
-  String timetable = "radiocom/transmissions?format=json";
+  String timetable = "radiocom/transmissions?format=json&timezone=Europe/Madrid";
   @override
   String timetableAfter = "&after=";
   @override
   String timetableBefore = "&before=";
   @override
-  String live = "radiocom/transmissions/now?format=json";
+  String live = "radiocom/transmissions/now?format=json&timezone=Europe/Madrid";
   @override
   String feedUrl = "https://cuacfm.org/feed/";
   @override

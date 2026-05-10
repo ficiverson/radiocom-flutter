@@ -33,12 +33,14 @@ class TimetableState extends State<Timetable>
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   late MediaQueryData queryData;
   ScrollController _scrollController = ScrollController();
+  final ScrollController _chipsScrollController = ScrollController();
   late RadiocomColorsConract _colors;
   bool shouldShowPlayer = false;
   bool isContentUpdated = true;
   SnackBar? snackBarConnection;
   late CuacLocalization _localization;
   List<TimeTable> _timetable = [];
+  late int _selectedDay;
 
   TimetableState() {
     DependencyInjector().injectByView(this);
@@ -130,7 +132,12 @@ class TimetableState extends State<Timetable>
     _presenter = Injector.appInstance.get<TimeTablePresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     _timetable = widget.timeTables ?? [];
+    _selectedDay = DateTime.now().weekday;
     _presenter.getTimetable();
+    appThemeModeNotifier.addListener(_onThemeChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollChipsToDay(_selectedDay);
+    });
     int currentIndex = 0;
     int jumpIndex = 0;
     final now = DateTime.now();
@@ -179,8 +186,25 @@ class TimetableState extends State<Timetable>
     }
   }
 
+  void _onThemeChanged() {
+    if (mounted) setState(() {});
+  }
+
+  void _scrollChipsToDay(int day) {
+    const chipWidth = 80.0;
+    const spacing = 8.0;
+    final offset = (day - 1) * (chipWidth + spacing);
+    _chipsScrollController.animateTo(
+      offset,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   void dispose() {
+    appThemeModeNotifier.removeListener(_onThemeChanged);
+    _chipsScrollController.dispose();
     _scrollController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<TimeTableView>();
@@ -215,25 +239,80 @@ class TimetableState extends State<Timetable>
     });
   }
 
+  String _dayLabel(int weekday) {
+    final keys = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+    return SafeMap.safe(_localization.translateMap("timetable"), [keys[weekday - 1]]);
+  }
+
+  int _dayNumber(int weekday) {
+    final now = DateTime.now();
+    final monday = now.subtract(Duration(days: now.weekday - 1));
+    return monday.add(Duration(days: weekday - 1)).day;
+  }
+
   //build layout
 
   Widget _getBodyLayout() {
-    return Container(
-        key: PageStorageKey<String>("timeTableList"),
-        color: _colors.transparent,
-        width: queryData.size.width,
-        height: queryData.size.height,
-        child: ListView.builder(
-            controller: _scrollController,
-            physics: BouncingScrollPhysics(),
-            scrollDirection: Axis.vertical,
-            padding: EdgeInsets.only(bottom: shouldShowPlayer ? 80.0 : 0.0),
-            itemCount: _timetable.length + 1,
-            itemBuilder: (_, int index) {
-              if (index >= _timetable.length) {
-                return SizedBox(height: 80.0);
-              }
-              final item = _timetable[index];
+    final filtered = _timetable.where((t) => t.start.weekday == _selectedDay).toList();
+    return Column(
+      children: [
+        // Chips de días
+        SizedBox(
+          height: 48,
+          child: ListView.builder(
+            controller: _chipsScrollController,
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            itemCount: 7,
+            itemBuilder: (_, i) {
+              final day = i + 1;
+              final selected = day == _selectedDay;
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedDay = day;
+                    _scrollController.jumpTo(0);
+                  });
+                  _scrollChipsToDay(day);
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4).copyWith(left: 0),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: selected ? _colors.yellow : _colors.palidwhitedark,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    "${_dayLabel(day)} ${_dayNumber(day)}",
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
+                      color: selected ? Colors.black : _colors.font,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        Expanded(
+          child: Container(
+            key: PageStorageKey<String>("timeTableList"),
+            color: _colors.transparent,
+            child: ListView.builder(
+                controller: _scrollController,
+                physics: BouncingScrollPhysics(),
+                scrollDirection: Axis.vertical,
+                padding: EdgeInsets.only(bottom: shouldShowPlayer ? 80.0 : 0.0),
+                itemCount: filtered.length + 1,
+                itemBuilder: (_, int index) {
+                  if (index >= filtered.length) {
+                    return SizedBox(height: 80.0);
+                  }
+                  final item = filtered[index];
               final onAir = isOnAir(item);
               return Padding(
                 padding: EdgeInsets.fromLTRB(12, onAir ? 6 : 0, 12, onAir ? 6 : 0),
@@ -282,6 +361,10 @@ class TimetableState extends State<Timetable>
                   ),
                 ),
               );
-            }));
+            }),
+          ),
+        ),
+      ],
+    );
   }
 }

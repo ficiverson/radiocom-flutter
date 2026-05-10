@@ -35,7 +35,9 @@
     "faster_active" : "Faster: "
   },
   "timetable" : {
-    "title" : "Programas de hoy"
+    "title" : "Programación",
+    "mon" : "Lun", "tue" : "Mar", "wed" : "Mie",
+    "thu" : "Jue", "fri" : "Vie", "sat" : "Sáb", "sun" : "Dom"
   },
   "all_podcast" : {
     "title" :  "Todos los podcasts",
@@ -98,6 +100,7 @@
     "see_less" : "Ver menos",
     "add_favourite" : "Favorito",
     "share" : "Compartir",
+    "program" : "Programa",
     "last_episode" : "Último ep.:",
     "share_episode" : "🎙 Programa: %s\n📻 Escucha el episodio: %s\n🔗 ",
     "share_program" : "🎙 %s en CUAC FM\n🔗 "

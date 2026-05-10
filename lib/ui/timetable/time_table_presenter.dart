@@ -46,8 +46,12 @@ class TimeTablePresenter {
 
   getTimetable() {
     final formatter = DateFormat('dd/MM/yyyy');
-    final now = formatter.format(DateTime.now());
-    invoker.execute(getTimetableUseCase.withParams(GetTimetableUseCaseParams(now, now)))
+    final now = DateTime.now();
+    final monday = now.subtract(Duration(days: now.weekday - 1));
+    final sunday = monday.add(const Duration(days: 6));
+    final after = formatter.format(monday);
+    final before = formatter.format(sunday);
+    invoker.execute(getTimetableUseCase.withParams(GetTimetableUseCaseParams(after, before)))
         .listen((result) {
       if (result is Success) {
         view.onLoadTimetable(result.data);

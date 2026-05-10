@@ -102,8 +102,9 @@ class NeumorphicButton extends StatelessWidget {
   final bool down;
   final IconData icon;
   final String? label;
+  final double iconScale;
 
-  NeumorphicButton({this.down = false, required this.icon, this.label});
+  NeumorphicButton({this.down = false, required this.icon, this.label, this.iconScale = 1.0});
 
   @override
   Widget build(BuildContext context) {
@@ -118,16 +119,21 @@ class NeumorphicButton extends StatelessWidget {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 52,
-            height: 30,
-            decoration: down
-                ? BoxDecoration(
-                    color: _colors.yellow.withOpacity(0.18),
-                    borderRadius: BorderRadius.circular(50),
-                  )
-                : null,
-            child: Center(child: iconWidget),
+          AnimatedScale(
+            scale: iconScale,
+            duration: const Duration(milliseconds: 150),
+            curve: Curves.easeInOut,
+            child: Container(
+              width: 52,
+              height: 30,
+              decoration: down
+                  ? BoxDecoration(
+                      color: _colors.yellow.withOpacity(0.18),
+                      borderRadius: BorderRadius.circular(50),
+                    )
+                  : null,
+              child: Center(child: iconWidget),
+            ),
           ),
           SizedBox(height: 4),
           Text(

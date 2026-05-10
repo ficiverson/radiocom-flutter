@@ -12,6 +12,36 @@ import 'neumorfism.dart';
 
 typedef void MenuOptionCallback(BottomBarOption option, bool isMenu);
 
+class _AnimatedBarItem extends StatefulWidget {
+  final Widget Function(double scale) child;
+  final VoidCallback onTap;
+  final String behaviorKey;
+
+  const _AnimatedBarItem({required this.child, required this.onTap, required this.behaviorKey});
+
+  @override
+  State<_AnimatedBarItem> createState() => _AnimatedBarItemState();
+}
+
+class _AnimatedBarItemState extends State<_AnimatedBarItem> {
+  double _scale = 1.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      key: Key(widget.behaviorKey),
+      onTapDown: (_) => setState(() => _scale = 1.15),
+      onTapUp: (_) {
+        setState(() => _scale = 1.0);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _scale = 1.0),
+      child: widget.child(_scale),
+    );
+  }
+}
+
 enum BottomBarOption { HOME, SEARCH, NEWS, FAVOURITES, NONE, MENU }
 
 class BottomBar extends StatelessWidget {
@@ -46,50 +76,50 @@ class BottomBar extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
-                  GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      key: Key("bottom_bar_item1"),
+                  _AnimatedBarItem(
+                      behaviorKey: "bottom_bar_item1",
                       onTap: () => onOptionSelected(BottomBarOption.HOME, false),
-                      child: NeumorphicButton(
+                      child: (scale) => NeumorphicButton(
                         down: selectedOption == BottomBarOption.HOME,
                         icon: Icons.home,
                         label: tabHome,
+                        iconScale: scale,
                       )),
-                  GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      key: Key("bottom_bar_item2"),
+                  _AnimatedBarItem(
+                      behaviorKey: "bottom_bar_item2",
                       onTap: () => onOptionSelected(BottomBarOption.SEARCH, false),
-                      child: NeumorphicButton(
+                      child: (scale) => NeumorphicButton(
                         down: selectedOption == BottomBarOption.SEARCH,
                         icon: Icons.headset,
                         label: tabPodcasts,
+                        iconScale: scale,
                       )),
-                  GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      key: Key("bottom_bar_item3"),
+                  _AnimatedBarItem(
+                      behaviorKey: "bottom_bar_item3",
                       onTap: () => onOptionSelected(BottomBarOption.NEWS, false),
-                      child: NeumorphicButton(
+                      child: (scale) => NeumorphicButton(
                         down: selectedOption == BottomBarOption.NEWS,
                         icon: FontAwesomeIcons.newspaper,
                         label: tabNews,
+                        iconScale: scale,
                       )),
-                  GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      key: Key("bottom_bar_item4"),
+                  _AnimatedBarItem(
+                      behaviorKey: "bottom_bar_item4",
                       onTap: () => onOptionSelected(BottomBarOption.FAVOURITES, false),
-                      child: NeumorphicButton(
+                      child: (scale) => NeumorphicButton(
                         down: selectedOption == BottomBarOption.FAVOURITES,
                         icon: Icons.favorite,
                         label: tabFavourites,
+                        iconScale: scale,
                       )),
-                  GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      key: Key("bottom_bar_item5"),
+                  _AnimatedBarItem(
+                      behaviorKey: "bottom_bar_item5",
                       onTap: () => onOptionSelected(BottomBarOption.HOME, true),
-                      child: NeumorphicButton(
+                      child: (scale) => NeumorphicButton(
                         down: selectedOption == BottomBarOption.MENU,
                         icon: Icons.menu,
                         label: tabMenu,
+                        iconScale: scale,
                       )),
                 ],
               ))

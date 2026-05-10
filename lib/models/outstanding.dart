@@ -7,11 +7,13 @@ class Outstanding {
    String description;
    String logoUrl;
    bool isJoinForm = false;
+   DateTime modified = DateTime(0);
 
   Outstanding.fromInstance(Map<String, dynamic> map)
       : title = _cleanTitle(map["title"]["rendered"]),
         description = map["content"]["rendered"],
-        logoUrl = map["_links"]["wp:featuredmedia"][0]["href"];
+        logoUrl = map["_links"]["wp:featuredmedia"][0]["href"],
+        modified = DateTime.tryParse(map["modified"] ?? "") ?? DateTime(0);
 
   Outstanding.mock()
       : title = "Documental \"Nada que ver\"",

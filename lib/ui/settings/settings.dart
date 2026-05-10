@@ -41,6 +41,7 @@ class SettingsState extends State<Settings>
   String? _localeValue;
   late CuacLocalization _localization;
   bool _showRatingCard = false;
+  double _ratingCardScale = 1.0;
 
   SettingsState() {
     DependencyInjector().injectByView(this);
@@ -334,8 +335,17 @@ class SettingsState extends State<Settings>
     return Stack(
       children: [
         GestureDetector(
-          onTap: _requestReview,
-          child: Container(
+          onTapDown: (_) => setState(() => _ratingCardScale = 0.97),
+          onTapUp: (_) {
+            setState(() => _ratingCardScale = 1.0);
+            _requestReview();
+          },
+          onTapCancel: () => setState(() => _ratingCardScale = 1.0),
+          child: AnimatedScale(
+            scale: _ratingCardScale,
+            duration: const Duration(milliseconds: 120),
+            curve: Curves.easeInOut,
+            child: Container(
             width: double.infinity,
             decoration: BoxDecoration(
               color: isDark ? Color(0xFF6C5A13) : Color(0xFFF3E29C),
@@ -378,6 +388,7 @@ class SettingsState extends State<Settings>
                 Icon(Icons.chevron_right, color: isDark ? Color(0xFFFDCC03) : Color(0xFF1A1A1A), size: 32),
               ],
             ),
+          ),
           ),
         ),
         Positioned(
@@ -551,9 +562,7 @@ class SettingsState extends State<Settings>
                     child: Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: MediaQuery.of(context).platformBrightness == Brightness.dark
-                            ? Color(0xFF6C5A13)
-                            : Color(0xFFF3E29C),
+                        color: _isDark ? Color(0xFF6C5A13) : Color(0xFFF3E29C),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(

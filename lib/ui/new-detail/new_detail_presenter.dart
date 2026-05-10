@@ -20,6 +20,7 @@ import 'new_detail_router.dart';
 abstract class NewDetailView {
   onNewData();
   onConnectionError();
+  onLoadingEpisode(bool loading);
 }
 
 class NewDetailPresenter {
@@ -111,6 +112,7 @@ class NewDetailPresenter {
   }
 
   Future<void> _openRadiocoEpisode(String slug, String episodeCode, String fallbackUrl) async {
+    view.onLoadingEpisode(true);
     try {
       final repo = Injector.appInstance.get<CuacRepositoryContract>();
       final programsResult = await repo.getAllPodcasts();
@@ -144,8 +146,10 @@ class NewDetailPresenter {
       currentPlayer.playerState = AudioPlayerState.stop;
       currentPlayer.position = Duration.zero;
       currentPlayer.duration = Duration.zero;
+      view.onLoadingEpisode(false);
       router.goToPodcastControls(episode);
     } catch (_) {
+      view.onLoadingEpisode(false);
       _launchURL(fallbackUrl);
     }
   }

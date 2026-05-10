@@ -51,6 +51,8 @@ class MyHomePageState extends State<MyHomePage>
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   BottomBarOption bottomBarOption = BottomBarOption.HOME;
   bool shouldShowPlayer = false;
+  final ScrollController _homeScrollController = ScrollController();
+  double _homeScrollOffset = 0.0;
   final PageController _newsPageController = PageController();
   int _currentNewsPage = 0;
   Now _nowProgram = Now.mock();
@@ -205,9 +207,19 @@ class MyHomePageState extends State<MyHomePage>
                 _presenter.onMenuClicked();
               } else {
                 if (!mounted) return;
+                if (bottomBarOption == BottomBarOption.HOME && _homeScrollController.hasClients) {
+                  _homeScrollOffset = _homeScrollController.offset;
+                }
                 setState(() {
                   bottomBarOption = option;
                 });
+                if (option == BottomBarOption.HOME) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (_homeScrollController.hasClients) {
+                      _homeScrollController.jumpTo(_homeScrollOffset);
+                    }
+                  });
+                }
               }
             },
           ),
@@ -240,6 +252,7 @@ class MyHomePageState extends State<MyHomePage>
     connectionSubscription.cancel();
     _presenter.currentPlayer.onUpdate = null;
     _outstandingPageController.dispose();
+    _homeScrollController.dispose();
     Injector.appInstance.removeByKey<HomeView>();
     WidgetsBinding.instance.removeObserver(this);
     appThemeModeNotifier.removeListener(_onAppSettingsChanged);
@@ -521,7 +534,10 @@ class MyHomePageState extends State<MyHomePage>
     final current = _getCurrentTimeTable();
     const continuityName = "Continuidade CUAC FM";
     final name = current?.name ?? (_timeTable.isNotEmpty ? continuityName : _nowProgram.name);
-    final image = current?.logoUrl ?? _nowProgram.logoUrl;
+    final rawImage = current?.logoUrl ?? _nowProgram.logoUrl;
+    final image = (rawImage.startsWith('assets/') || rawImage.contains('default-programme-photo'))
+        ? "https://cuacfm.org/wp-content/uploads/2026/04/cuac_music_cover.png"
+        : rawImage;
     _presenter.currentPlayer.currentSong = name;
     _presenter.currentPlayer.currentImage = image;
   }
@@ -544,6 +560,11 @@ class MyHomePageState extends State<MyHomePage>
     if (!mounted) return;
     setState(() {
       _outstanding2 = outstanding;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_outstandingPageController.hasClients) {
+        _outstandingPageController.jumpToPage(0);
+      }
     });
   }
 
@@ -823,6 +844,7 @@ class MyHomePageState extends State<MyHomePage>
       height: queryData.size.height,
       child: SingleChildScrollView(
         key: PageStorageKey<String>(BottomBarOption.HOME.toString()),
+        controller: _homeScrollController,
         physics: BouncingScrollPhysics(),
         child: Container(
           color: _colors.palidwhite,
@@ -1061,7 +1083,7 @@ Builder(builder: (context) {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(20.0, 14.0, 20.0, 20.0),
+                padding: EdgeInsets.fromLTRB(20.0, 14.0, 20.0, 0.0),
                 child: Builder(builder: (context) {
                   final nowDate = DateTime.now();
                   final next = _timeTable.isNotEmpty
@@ -1118,7 +1140,7 @@ Builder(builder: (context) {
                   final items = [
                     _outstanding!,
                     if (_outstanding2 != null) _outstanding2!,
-                  ];
+                  ]..sort((a, b) => b.modified.compareTo(a.modified));
                   if (items.length == 1) {
                     return Container(
                       color: _colors.palidwhite,
@@ -1128,7 +1150,7 @@ Builder(builder: (context) {
                   return Column(
                     children: [
                       SizedBox(
-                        height: 320,
+                        height: 308,
                         child: PageView.builder(
                           controller: _outstandingPageController,
                           onPageChanged: (i) => setState(() => _currentOutstandingPage = i),
@@ -1164,16 +1186,10 @@ Builder(builder: (context) {
                 }),
               ],
 
-
-
-
-              
-              
-              
               // 4. PODCASTS RECENTES
 
               Padding(
-                padding: const EdgeInsets.fromLTRB(25.0, 12.0, 25.0, 0.0),
+                padding: const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
                 child: GestureDetector(
                   onTap: () {
                     if (!mounted) return;
@@ -1567,7 +1583,7 @@ Builder(builder: (context) {
             Container(
               width: queryData.size.width,
               decoration: BoxDecoration(
-                color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Color(0xFF6C5A13) : Color(0xFFF3E29C),
+                color: appThemeModeNotifier.value == ThemeMode.dark || (appThemeModeNotifier.value == ThemeMode.system && MediaQuery.of(context).platformBrightness == Brightness.dark) ? Color(0xFF6C5A13) : Color(0xFFF3E29C),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -1599,7 +1615,7 @@ Builder(builder: (context) {
                       style: TextStyle(
                         letterSpacing: 0,
                         height: 1.2,
-                        color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Color(0xFF1A1A1A),
+                        color: appThemeModeNotifier.value == ThemeMode.dark || (appThemeModeNotifier.value == ThemeMode.system && MediaQuery.of(context).platformBrightness == Brightness.dark) ? Colors.white : Color(0xFF1A1A1A),
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                       ),
@@ -1625,7 +1641,7 @@ Builder(builder: (context) {
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Color(0xFF6C5A13) : Color(0xFFF3E29C),
+              color: appThemeModeNotifier.value == ThemeMode.dark || (appThemeModeNotifier.value == ThemeMode.system && MediaQuery.of(context).platformBrightness == Brightness.dark) ? Color(0xFF6C5A13) : Color(0xFFF3E29C),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
@@ -1657,7 +1673,7 @@ Builder(builder: (context) {
                     style: TextStyle(
                       letterSpacing: 0,
                       height: 1.2,
-                      color: MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.white : Color(0xFF1A1A1A),
+                      color: appThemeModeNotifier.value == ThemeMode.dark || (appThemeModeNotifier.value == ThemeMode.system && MediaQuery.of(context).platformBrightness == Brightness.dark) ? Colors.white : Color(0xFF1A1A1A),
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                     ),
@@ -1666,7 +1682,6 @@ Builder(builder: (context) {
               ],
             ),
           ),
-          SizedBox(height: 5),
         ],
       ),
     );
@@ -1808,7 +1823,7 @@ Builder(builder: (context) {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(20.0, 28.0, 20.0, 0.0),
+          padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
           child: Text(
             SafeMap.safe(_localization.translateMap("home"), ["recent_msg"]),
             style: TextStyle(
@@ -1825,7 +1840,7 @@ Builder(builder: (context) {
             key: PageStorageKey<String>("weekly_episodes"),
             physics: BouncingScrollPhysics(),
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.fromLTRB(20.0, 8.0, 8.0, 8.0),
+            padding: EdgeInsets.fromLTRB(20.0, 8.0, 8.0, 0.0),
             itemCount: (_weeklyPodcast.length / 3).ceil(),
             itemBuilder: (_, int colIndex) {
               final int i1 = colIndex * 3;
@@ -1890,7 +1905,7 @@ Builder(builder: (context) {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(20.0, 24.0, 20.0, 16.0),
+          padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 16.0),
           child: GestureDetector(
             onTap: () => _presenter.onSeeAllPodcast(_podcast),
             child: Row(
@@ -1975,7 +1990,6 @@ Builder(builder: (context) {
             }).toList(),
           ),
         ),
-        SizedBox(height: 10),
       ],
     );
   }
@@ -2046,7 +2060,7 @@ Builder(builder: (context) {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.fromLTRB(20.0, 14.0, 20.0, 0.0),
+                    padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
                     child: GestureDetector(
                       onTap: () {
                         _presenter.onSeeAllPodcast(_podcast);
