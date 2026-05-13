@@ -6,10 +6,9 @@ import 'package:cuacfm/ui/onboarding/onboarding_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:firebase_analytics/firebase_analytics.dart';
 // import 'package:firebase_core/firebase_core.dart';
-// import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-// import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
+// import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/services.dart';
@@ -28,9 +27,9 @@ void main() async {
   ErrorWidget.builder =
       (FlutterErrorDetails details) => errorScreen(details.exception);
   DependencyInjector().loadModules();
- // await Firebase.initializeApp();
-  // await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-  // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  // await Firebase.initializeApp();
+  // OneSignal.initialize("39d915ad-62e2-40a9-9a4d-93631e17fc5e");
+  // await OneSignal.Notifications.requestPermission(true);
   //Setting SystmeUIMode
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
       overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
@@ -74,7 +73,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   late Brightness _brightness;
   Locale? _locale;
-  bool _showOnboarding = false;
+  bool _showOnboarding = true;
 
   @override
   void initState() {
@@ -91,7 +90,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Future<void> _loadOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
     final completed = prefs.getBool('onboarding_completed') ?? false;
-    if (mounted) setState(() => _showOnboarding = !completed);
+    if (!completed) return;
+    final info = await PackageInfo.fromPlatform();
+    final currentBuild = int.tryParse(info.buildNumber) ?? 0;
+    final lastBuild = prefs.getInt('onboarding_version') ?? 0;
+    if (mounted && currentBuild <= lastBuild) setState(() => _showOnboarding = false);
   }
 
   Future<void> _loadLocale() async {

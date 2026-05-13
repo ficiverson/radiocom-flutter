@@ -167,8 +167,8 @@ class DetailPodcastPresenter {
     router.goToNewDetail(New.fromPodcast(title, subtitle, content, link));
   }
 
-  onDetailEpisode(Episode episode, String programName, String logoUrl) {
-    router.goToEpisodeDetail(episode, programName, logoUrl);
+  onDetailEpisode(Episode episode, String programName, String logoUrl, {Program? program}) {
+    router.goToEpisodeDetail(episode, programName, logoUrl, program: program);
   }
 
   onPodcastControlsClicked(Episode? episode) {

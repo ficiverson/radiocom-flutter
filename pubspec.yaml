@@ -39,17 +39,19 @@ dependencies:
   connectivity_plus: ^4.0.0
   uuid: ^4.5.1
   provider: ^6.1.5
-  firebase_core: ^2.24.0
-  firebase_messaging: ^14.7.10
-  firebase_performance: ^0.9.3+4
-  firebase_crashlytics: ^3.4.4
-  firebase_analytics: ^10.8.6
-  firebase_in_app_messaging: ^0.7.4+1
-  fake_cloud_firestore: ^2.4.2
+  # firebase_core: ^2.24.0
+  # firebase_messaging: ^14.7.10
+  # firebase_performance: ^0.9.3+4
+  # firebase_crashlytics: ^3.4.4
+  # firebase_analytics: ^10.8.6
+  # firebase_in_app_messaging: ^0.7.4+1
+  # fake_cloud_firestore: ^2.4.2
   mock_web_server: ^5.0.0-nullsafety.1
   mockito: ^5.4.4
   path_provider: ^2.1.2
   palette_generator: ^0.3.3
+  package_info_plus: ^4.2.0
+  # onesignal_flutter: ^5.3.4
 
 dev_dependencies:
   flutter_test:

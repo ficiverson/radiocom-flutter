@@ -1,5 +1,6 @@
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
+import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/ui/episode-detail/episode_detail_view.dart';
 import 'package:cuacfm/ui/new-detail/new_detail.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,7 @@ import 'controls/podcast_controls.dart';
 
 abstract class DetailPodcastRouterContract {
   goToNewDetail(New itemNew);
-  goToEpisodeDetail(Episode episode, String programName, String logoUrl);
+  goToEpisodeDetail(Episode episode, String programName, String logoUrl, {Program? program});
   goToPodcastControls(Episode episode);
 }
 
@@ -26,7 +27,7 @@ class DetailPodcastRouter implements DetailPodcastRouterContract {
   }
 
   @override
-  goToEpisodeDetail(Episode episode, String programName, String logoUrl) {
+  goToEpisodeDetail(Episode episode, String programName, String logoUrl, {Program? program}) {
     Navigator.of(Injector.appInstance.get<BuildContext>()).push(
         PageRouteBuilder(
             settings: RouteSettings(name: "episodedetail"),
@@ -34,6 +35,7 @@ class DetailPodcastRouter implements DetailPodcastRouterContract {
                   episode: episode,
                   programName: programName,
                   logoUrl: logoUrl,
+                  program: program,
                 ),
             transitionsBuilder: (_, animation, __, child) =>
                 FadeTransition(opacity: animation, child: child),

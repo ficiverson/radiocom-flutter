@@ -1094,14 +1094,15 @@ Builder(builder: (context) {
                 padding: EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 0.0),
                 child: Builder(builder: (context) {
                   final nowDate = DateTime.now();
-                  final next = _timeTable.isNotEmpty
-                      ? _timeTable.firstWhere(
-                          (t) => t.start.isAfter(nowDate),
-                          orElse: () => _timeTable.last,
-                        )
-                      : null;
+                  if (_timeTable.isEmpty) {
+                    return _buildScheduleCardSkeleton();
+                  }
+                  final next = _timeTable.firstWhere(
+                      (t) => t.start.isAfter(nowDate),
+                      orElse: () => _timeTable.last,
+                    );
                   Program? nextProgram;
-                  try { nextProgram = next != null ? findPodcastByName(next.rssUrl) : null; } catch (_) {}
+                  try { nextProgram = findPodcastByName(next.rssUrl); } catch (_) {}
                   final nextLabel = SafeMap.safe(_localization.translateMap("home"), ["schedule_next"]).isNotEmpty
                       ? SafeMap.safe(_localization.translateMap("home"), ["schedule_next"])
                       : "Next";
@@ -1109,10 +1110,10 @@ Builder(builder: (context) {
                     onTap: nextProgram != null ? () => _presenter.onPodcastClicked(nextProgram!) : null,
                     child: _buildScheduleCard(
                       label: nextLabel,
-                      logoUrl: next?.logoUrl ?? _nowProgram.logoUrl,
-                      name: next?.name ?? "-",
-                      start: next?.start,
-                      end: next?.end,
+                      logoUrl: next.logoUrl,
+                      name: next.name,
+                      start: next.start,
+                      end: next.end,
                     ),
                   );
                 }),
@@ -1240,7 +1241,7 @@ Builder(builder: (context) {
                               key: PageStorageKey<String>("home_last_episodes"),
                               physics: BouncingScrollPhysics(),
                               scrollDirection: Axis.horizontal,
-                              padding: EdgeInsets.fromLTRB(20.0, 10.0, 8.0, 8.0),
+                              padding: EdgeInsets.fromLTRB(20.0, 0.0, 8.0, 8.0),
                               itemCount: (_recentPodcast.length / 2).ceil(),
                               itemBuilder: (_, int colIndex) {
                                 final int i1 = colIndex * 2;
@@ -1494,6 +1495,42 @@ Builder(builder: (context) {
     );
   }
 
+  Widget _buildScheduleCardSkeleton() {
+    return Container(
+      height: 90,
+      decoration: BoxDecoration(
+        color: _colors.palidwhitedark,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.all(12.0),
+      child: Row(
+        children: [
+          Container(
+            width: 60, height: 60,
+            decoration: BoxDecoration(
+              color: _colors.fontGrey.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(height: 10, width: 60, decoration: BoxDecoration(color: _colors.fontGrey.withOpacity(0.15), borderRadius: BorderRadius.circular(5))),
+                const SizedBox(height: 8),
+                Container(height: 14, width: 140, decoration: BoxDecoration(color: _colors.fontGrey.withOpacity(0.15), borderRadius: BorderRadius.circular(5))),
+                const SizedBox(height: 6),
+                Container(height: 10, width: 80, decoration: BoxDecoration(color: _colors.fontGrey.withOpacity(0.15), borderRadius: BorderRadius.circular(5))),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildScheduleCard({
     required String label,
     required String logoUrl,
@@ -1734,7 +1771,7 @@ Builder(builder: (context) {
           ));
         },
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6.0),
+          padding: const EdgeInsets.only(top: 0, bottom: 6.0),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -1848,7 +1885,7 @@ Builder(builder: (context) {
             key: PageStorageKey<String>("weekly_episodes"),
             physics: BouncingScrollPhysics(),
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.fromLTRB(20.0, 10.0, 8.0, 0.0),
+            padding: EdgeInsets.fromLTRB(20.0, 0.0, 8.0, 0.0),
             itemCount: (_weeklyPodcast.length / 3).ceil(),
             itemBuilder: (_, int colIndex) {
               final int i1 = colIndex * 3;

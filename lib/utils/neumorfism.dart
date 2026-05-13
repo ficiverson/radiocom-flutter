@@ -103,8 +103,9 @@ class NeumorphicButton extends StatelessWidget {
   final IconData icon;
   final String? label;
   final double iconScale;
+  final double iconSize;
 
-  NeumorphicButton({this.down = false, required this.icon, this.label, this.iconScale = 1.0});
+  NeumorphicButton({this.down = false, required this.icon, this.label, this.iconScale = 1.0, this.iconSize = 22});
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +114,7 @@ class NeumorphicButton extends StatelessWidget {
     final iconWidget = Icon(
       icon,
       color: down ? _colors.yellow : _colors.grey,
-      size: 22,
+      size: iconSize,
     );
     if (label != null) {
       return Column(

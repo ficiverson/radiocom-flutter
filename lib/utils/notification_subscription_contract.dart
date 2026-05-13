@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart' as Foundation;
+// import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class NotificationSubscriptionContract {
@@ -23,6 +24,7 @@ class NotificationSubscription implements NotificationSubscriptionContract {
     final tag = _sanitizeTag(channelName);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('notif_$tag', true);
+    // OneSignal.User.addTagWithKey(tag, "1");
   }
 
   @override
@@ -30,6 +32,7 @@ class NotificationSubscription implements NotificationSubscriptionContract {
     final tag = _sanitizeTag(channelName);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('notif_$tag', false);
+    // OneSignal.User.removeTag(tag);
   }
 
   @override

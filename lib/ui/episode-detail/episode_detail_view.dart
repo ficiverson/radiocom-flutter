@@ -29,11 +29,13 @@ class EpisodeDetail extends StatefulWidget {
     required this.episode,
     required this.programName,
     required this.logoUrl,
+    this.program,
   }) : super(key: key);
 
   final Episode episode;
   final String programName;
   final String logoUrl;
+  final Program? program;
 
   @override
   State<EpisodeDetail> createState() => _EpisodeDetailState();
@@ -310,6 +312,10 @@ class _EpisodeDetailState extends State<EpisodeDetail>
                   label: SafeMap.safe(_localization.translateMap("actions"), ["program"]),
                   active: false,
                   onTap: () async {
+                    if (widget.program != null) {
+                      Navigator.of(context).pop();
+                      return;
+                    }
                     try {
                       final repo = Injector.appInstance.get<CuacRepositoryContract>();
                       final result = await repo.getAllPodcasts();

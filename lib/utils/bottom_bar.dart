@@ -84,6 +84,7 @@ class BottomBar extends StatelessWidget {
                         icon: Icons.home,
                         label: tabHome,
                         iconScale: scale,
+                        iconSize: 23,
                       )),
                   _AnimatedBarItem(
                       behaviorKey: "bottom_bar_item2",
@@ -102,6 +103,7 @@ class BottomBar extends StatelessWidget {
                         icon: FontAwesomeIcons.newspaper,
                         label: tabNews,
                         iconScale: scale,
+                        iconSize: 20,
                       )),
                   _AnimatedBarItem(
                       behaviorKey: "bottom_bar_item4",
@@ -120,6 +122,7 @@ class BottomBar extends StatelessWidget {
                         icon: Icons.menu,
                         label: tabMenu,
                         iconScale: scale,
+                        iconSize: 25,
                       )),
                 ],
               ))

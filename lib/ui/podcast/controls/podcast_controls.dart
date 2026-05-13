@@ -208,16 +208,24 @@ class PodcastControlsState extends State<PodcastControls>
         Positioned(
           top: 0, left: 0, right: 0,
           height: mediaQuery.size.height * 0.8,
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  _paletteColor.withOpacity(0.65),
-                  _paletteColor.withOpacity(0.0),
-                ],
-                stops: const [0.0, 1.0],
+          child: TweenAnimationBuilder<Color?>(
+            tween: ColorTween(
+              begin: Colors.transparent,
+              end: _paletteColor == Colors.transparent ? Colors.transparent : _paletteColor,
+            ),
+            duration: const Duration(milliseconds: 600),
+            curve: Curves.easeIn,
+            builder: (_, color, __) => Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    (color ?? Colors.transparent).withOpacity(0.65),
+                    (color ?? Colors.transparent).withOpacity(0.0),
+                  ],
+                  stops: const [0.0, 1.0],
+                ),
               ),
             ),
           ),

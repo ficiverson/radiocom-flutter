@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:cuacfm/main.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/program.dart';
@@ -226,6 +227,10 @@ void _toggleFavorite(Program program) {
       MyApp.setLocale(MyApp.parseLocale(_selectedLocale));
     }
     await prefs.setBool('onboarding_completed', true);
+    try {
+      final info = await PackageInfo.fromPlatform();
+      await prefs.setInt('onboarding_version', int.tryParse(info.buildNumber) ?? 0);
+    } catch (_) {}
     widget.onFinished();
   }
 

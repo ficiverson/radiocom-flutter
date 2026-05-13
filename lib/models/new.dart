@@ -152,7 +152,7 @@ class New {
   static New fromOutstanding(Outstanding outstanding) {
     return New(
         outstanding.title,
-        "https://cuacfm.org/avisos-movil/",
+        "https://cuacfm.org/novas/",
         outstanding.description,
         outstanding.logoUrl,
         "");

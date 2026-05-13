@@ -306,30 +306,38 @@ class DetailPodcastState extends State<DetailPodcastPage>
         // Fondo con cor da paleta + imaxe centrada (chega ata a status bar)
         Stack(
           children: [
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    _paletteColor.withOpacity(0.85),
-                    _paletteColor.withOpacity(0.3),
-                    _colors.palidwhite,
-                  ],
-                  stops: [0.0, 0.6, 1.0],
-                ),
+            TweenAnimationBuilder<Color?>(
+              tween: ColorTween(
+                begin: _colors.palidwhite,
+                end: _paletteColor == Colors.transparent ? _colors.palidwhite : _paletteColor,
               ),
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(40.0, topPad + 16.0, 40.0, 24.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: CustomImage(
-                      resPath: widget.program.logoUrl,
-                      fit: BoxFit.cover,
-                      radius: 16,
+              duration: const Duration(milliseconds: 600),
+              curve: Curves.easeIn,
+              builder: (_, color, __) => Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      (color ?? _colors.palidwhite).withOpacity(0.85),
+                      (color ?? _colors.palidwhite).withOpacity(0.3),
+                      _colors.palidwhite,
+                    ],
+                    stops: [0.0, 0.6, 1.0],
+                  ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(40.0, topPad + 16.0, 40.0, 24.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: CustomImage(
+                        resPath: widget.program.logoUrl,
+                        fit: BoxFit.cover,
+                        radius: 16,
+                      ),
                     ),
                   ),
                 ),
@@ -620,7 +628,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
                         child: InkWell(
                           onTap: () {
                             _presenter.onDetailEpisode(
-                                ep, widget.program.name, widget.program.logoUrl);
+                                ep, widget.program.name, widget.program.logoUrl, program: widget.program);
                           },
                           child: Padding(
                             padding: EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 12.0),
