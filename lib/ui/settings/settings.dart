@@ -16,6 +16,7 @@ import 'package:injector/injector.dart';
 import 'settings_presenter.dart';
 import 'package:cuacfm/main.dart' show appThemeModeNotifier;
 import 'package:in_app_review/in_app_review.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings extends StatefulWidget {
@@ -42,6 +43,7 @@ class SettingsState extends State<Settings>
   late CuacLocalization _localization;
   bool _showRatingCard = false;
   double _ratingCardScale = 1.0;
+  bool _notificationsPaused = false;
 
   SettingsState() {
     DependencyInjector().injectByView(this);
@@ -164,6 +166,30 @@ class SettingsState extends State<Settings>
     WidgetsBinding.instance.addObserver(this);
     appThemeModeNotifier.addListener(_onAppSettingsChanged);
     _loadRatingCardState();
+    _loadNotificationsPausedState();
+  }
+
+  Future<void> _loadNotificationsPausedState() async {
+    final prefs = await SharedPreferences.getInstance();
+    final paused = prefs.getBool('notifications_paused') ?? false;
+    if (mounted) setState(() => _notificationsPaused = paused);
+  }
+
+  Future<void> _toggleNotificationsPaused(bool paused) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('notifications_paused', paused);
+    final keys = prefs.getKeys().where((k) => k.startsWith('notif_'));
+    for (final key in keys) {
+      final subscribed = prefs.getBool(key) ?? false;
+      if (!subscribed) continue;
+      final topic = key.replaceFirst('notif_', '');
+      if (paused) {
+        await FirebaseMessaging.instance.unsubscribeFromTopic(topic);
+      } else {
+        await FirebaseMessaging.instance.subscribeToTopic(topic);
+      }
+    }
+    if (mounted) setState(() => _notificationsPaused = paused);
   }
 
   Future<void> _loadRatingCardState() async {
@@ -546,6 +572,26 @@ class SettingsState extends State<Settings>
                                 _presenter.onLiveNotificationStatus(value);
                                 setState(() => isLiveNotificationEnabled = value);
                               },
+                              activeTrackColor: _colors.yellow,
+                              activeColor: Color(0xFF1A1A1A),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Divider(height: 1, color: _colors.grey.withOpacity(0.2)),
+                        ),
+                        // Pausar alertas
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              SafeMap.safe(_localization.translateMap("settings"), ["config_section", "item4"]),
+                              style: TextStyle(letterSpacing: 0, color: _colors.font, fontWeight: FontWeight.w400, fontSize: 16),
+                            ),
+                            Switch(
+                              value: _notificationsPaused,
+                              onChanged: _toggleNotificationsPaused,
                               activeTrackColor: _colors.yellow,
                               activeColor: Color(0xFF1A1A1A),
                             ),

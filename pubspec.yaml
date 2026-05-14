@@ -51,7 +51,6 @@ dependencies:
   path_provider: ^2.1.2
   palette_generator: ^0.3.3
   package_info_plus: ^4.2.0
-  onesignal_flutter: ^5.3.4
 
 dev_dependencies:
   flutter_test:

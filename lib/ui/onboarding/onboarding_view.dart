@@ -27,8 +27,8 @@ class _OnboardingViewState extends State<OnboardingView>
     with TickerProviderStateMixin {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  // Páxinas: 0=benvida, 1=play, 2=favoritos, 3=playlist, 4=categorías, 5=idioma
-  static const _totalPages = 5;
+  // Páxinas: 0=benvida, 1=play, 2=favoritos, 3=playlist, 4=alertas, 5=categorías, 6=idioma
+  static const _totalPages = 6;
 
   // Paso 5: categorías e programas
   final Set<ProgramCategories> _selectedCategories = {};
@@ -277,6 +277,12 @@ void _toggleFavorite(Program program) {
                     _buildInfoPage(
                       icon: Icons.playlist_play,
                       text: "Crea a túa playlist.",
+                      subtitle: "Desliza un episodio cara á dereita para engadilo á playlist.",
+                    ),
+                    _buildInfoPage(
+                      icon: Icons.notifications_active,
+                      text: "Activa alertas dos teus programas favoritos e recibe unha notificación cada vez que publiquen un novo episodio.",
+                      subtitle: "Podes pausar todas as alertas en calquera momento desde a configuración.",
                     ),
                     _buildCategoryPage(),
                     _buildLocalePage(),
@@ -337,7 +343,7 @@ void _toggleFavorite(Program program) {
 
   // ── Pantallas 2-4: Información ────────────────────────────────────────────
 
-  Widget _buildInfoPage({required IconData icon, required String text}) {
+  Widget _buildInfoPage({required IconData icon, required String text, String? subtitle}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Column(
@@ -364,6 +370,20 @@ void _toggleFavorite(Program program) {
               letterSpacing: 0,
             ),
           ),
+          if (subtitle != null) ...[
+            const SizedBox(height: 16),
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: _dark.withOpacity(0.55),
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                height: 1.5,
+                letterSpacing: 0,
+              ),
+            ),
+          ],
         ],
       ),
     );

@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart' as Foundation;
-import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class NotificationSubscriptionContract {
@@ -16,7 +16,9 @@ class NotificationSubscription implements NotificationSubscriptionContract {
 
   @override
   void getToken() {
-    // TODO: integrate push notification provider
+    FirebaseMessaging.instance.getToken().then((token) {
+      if (Foundation.kDebugMode) print('FCM token: $token');
+    });
   }
 
   @override
@@ -24,7 +26,7 @@ class NotificationSubscription implements NotificationSubscriptionContract {
     final tag = _sanitizeTag(channelName);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('notif_$tag', true);
-    OneSignal.User.addTagWithKey(tag, "1");
+    await FirebaseMessaging.instance.subscribeToTopic(tag);
   }
 
   @override
@@ -32,7 +34,7 @@ class NotificationSubscription implements NotificationSubscriptionContract {
     final tag = _sanitizeTag(channelName);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('notif_$tag', false);
-    OneSignal.User.removeTag(tag);
+    await FirebaseMessaging.instance.unsubscribeFromTopic(tag);
   }
 
   @override

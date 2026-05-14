@@ -21,6 +21,7 @@ import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/ui/podcast/detail_podcast_view.dart';
 import 'package:injector/injector.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class EpisodeDetail extends StatefulWidget {
@@ -58,6 +59,10 @@ class _EpisodeDetailState extends State<EpisodeDetail>
           'changeScreen', {"currentScreen": "episode_detail", "close": false});
     }
     _localization = Injector.appInstance.get<CuacLocalization>();
+    FirebaseAnalytics.instance.logEvent(
+      name: 'episode_view',
+      parameters: {'episode_title': widget.episode.title},
+    );
     _currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
     _playlistService = PlaylistService();
     _inPlaylist = _playlistService.isInPlaylist(widget.episode.audio);

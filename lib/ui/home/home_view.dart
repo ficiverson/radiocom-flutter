@@ -32,6 +32,7 @@ import 'package:intl/intl.dart';
 import 'package:cuacfm/ui/episode-detail/episode_detail_view.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:cuacfm/main.dart' show appThemeModeNotifier, appLocaleNotifier;
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 class MyHomePage extends StatefulWidget {
   final String title;
@@ -213,6 +214,7 @@ class MyHomePageState extends State<MyHomePage>
                 setState(() {
                   bottomBarOption = option;
                 });
+                _logTabScreen(option);
                 if (option == BottomBarOption.HOME) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     if (_homeScrollController.hasClients) {
@@ -394,12 +396,26 @@ class MyHomePageState extends State<MyHomePage>
     });
   }
 
+  void _logTabScreen(BottomBarOption option) {
+    const names = {
+      BottomBarOption.HOME: 'home',
+      BottomBarOption.SEARCH: 'podcasts',
+      BottomBarOption.NEWS: 'news',
+      BottomBarOption.FAVOURITES: 'favourites',
+    };
+    final name = names[option];
+    if (name != null) {
+      FirebaseAnalytics.instance.logScreenView(screenName: name);
+    }
+  }
+
   @override
   void onMenuReturn(BottomBarOption option) {
     if (!mounted) return;
     setState(() {
       bottomBarOption = option;
     });
+    _logTabScreen(option);
   }
 
   @override
@@ -862,7 +878,7 @@ class MyHomePageState extends State<MyHomePage>
             children: <Widget>[
               Padding(
                 key: Key("welcome_message_home"),
-                padding: EdgeInsets.fromLTRB(22.0, 10.0, 25.0, 16.0),
+                padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 16.0),
                 child: Text(
                   _getWelcomeText(),
                   style: TextStyle(
@@ -1059,7 +1075,7 @@ Builder(builder: (context) {
 
               // 2. PROGRAMACIÓN
               Padding(
-                padding: EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
+                padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
                 child: GestureDetector(
                   onTap: () {
                     if (isTimeTableEmpty) {
@@ -1125,11 +1141,12 @@ Builder(builder: (context) {
               _outstanding == null
                   ? Container()
                   : Padding(
-                      padding: const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
+                      padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
                       child: GestureDetector(
                         onTap: () {
                           if (!mounted) return;
                           setState(() { bottomBarOption = BottomBarOption.NEWS; });
+                          _logTabScreen(BottomBarOption.NEWS);
                         },
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -1198,11 +1215,12 @@ Builder(builder: (context) {
               // 4. PODCASTS RECENTES
 
               Padding(
-                padding: const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
+                padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
                 child: GestureDetector(
                   onTap: () {
                     if (!mounted) return;
                     setState(() { bottomBarOption = BottomBarOption.SEARCH; });
+                    _logTabScreen(BottomBarOption.SEARCH);
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,

@@ -25,6 +25,7 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:injector/injector.dart';
 import 'package:intl/intl.dart';
 import 'package:palette_generator/palette_generator.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:progress_indicators/progress_indicators.dart';
 
 class DetailPodcastPage extends StatefulWidget {
@@ -165,6 +166,10 @@ class DetailPodcastState extends State<DetailPodcastPage>
     }
     _localization = Injector.appInstance.get<CuacLocalization>();
     _program = widget.program;
+    FirebaseAnalytics.instance.logEvent(
+      name: 'program_view',
+      parameters: {'program_name': _program.name},
+    );
     _presenter = Injector.appInstance.get<DetailPodcastPresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
     _isFavorite = _favoritesService.isFavorite(_program.rssUrl);

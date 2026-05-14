@@ -6,8 +6,9 @@ import 'package:cuacfm/ui/onboarding/onboarding_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as Foundation;
@@ -28,8 +29,7 @@ void main() async {
       (FlutterErrorDetails details) => errorScreen(details.exception);
   DependencyInjector().loadModules();
   await Firebase.initializeApp();
-  OneSignal.initialize("39d915ad-62e2-40a9-9a4d-93631e17fc5e");
-  await OneSignal.Notifications.requestPermission(true);
+  await FirebaseMessaging.instance.requestPermission();
   //Setting SystmeUIMode
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
       overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
@@ -219,7 +219,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       },
       title: 'CUAC FM',
       navigatorObservers: [
-      //  FirebaseAnalyticsObserver(analytics: analytics),
+        FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
       ],
       theme: ThemeData(
     canvasColor: Colors.transparent,
