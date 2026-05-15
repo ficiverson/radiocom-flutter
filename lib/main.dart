@@ -30,6 +30,19 @@ void main() async {
   DependencyInjector().loadModules();
   await Firebase.initializeApp();
   await FirebaseMessaging.instance.requestPermission();
+
+  // Notificación cando a app estaba pechada
+  final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+  if (initialMessage != null) {
+    final rssUrl = initialMessage.data['rss_url'] as String?;
+    if (rssUrl != null) pendingNotificationRssUrl.value = rssUrl;
+  }
+
+  // Notificación cando a app estaba en segundo plano
+  FirebaseMessaging.onMessageOpenedApp.listen((message) {
+    final rssUrl = message.data['rss_url'] as String?;
+    if (rssUrl != null) pendingNotificationRssUrl.value = rssUrl;
+  });
   //Setting SystmeUIMode
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
       overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
@@ -49,6 +62,7 @@ void main() async {
 // Notifiers globais para tema e locale — as pantallas subscribense a estes
 final ValueNotifier<ThemeMode> appThemeModeNotifier = ValueNotifier(ThemeMode.system);
 final ValueNotifier<Locale?> appLocaleNotifier = ValueNotifier(null);
+final ValueNotifier<String?> pendingNotificationRssUrl = ValueNotifier(null);
 
 // Callback global para cambiar o tema desde calquera parte da app
 _MyAppState? _myAppState;

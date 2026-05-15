@@ -31,7 +31,7 @@ import 'package:injector/injector.dart';
 import 'package:intl/intl.dart';
 import 'package:cuacfm/ui/episode-detail/episode_detail_view.dart';
 import 'package:html/parser.dart' as html_parser;
-import 'package:cuacfm/main.dart' show appThemeModeNotifier, appLocaleNotifier;
+import 'package:cuacfm/main.dart' show appThemeModeNotifier, appLocaleNotifier, pendingNotificationRssUrl;
 import 'package:firebase_analytics/firebase_analytics.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -75,6 +75,7 @@ class MyHomePageState extends State<MyHomePage>
       Injector.appInstance.get<RadiocomColorsConract>();
   bool isLoadingHome = true;
   bool isLoadingPodcast = true;
+  bool _navigatingFromNotification = false;
   bool isLoadingNews = true;
   bool isEmptyHome = false;
   bool isEmptyPodcast = false;
@@ -113,7 +114,9 @@ class MyHomePageState extends State<MyHomePage>
         systemNavigationBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
         systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
       ),
-      child: Scaffold(
+      child: Stack(
+        children: [
+          Scaffold(
       key: scaffoldKey,
       backgroundColor: _colors.palidwhite,
       appBar: PreferredSize(
@@ -228,6 +231,18 @@ class MyHomePageState extends State<MyHomePage>
         ],
       ),
     ),
+          if (_navigatingFromNotification)
+            Container(
+              color: _colors.palidwhite.withOpacity(0.85),
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: const Color(0xFF1A1A1A),
+                  strokeWidth: 2.5,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -259,6 +274,7 @@ class MyHomePageState extends State<MyHomePage>
     WidgetsBinding.instance.removeObserver(this);
     appThemeModeNotifier.removeListener(_onAppSettingsChanged);
     appLocaleNotifier.removeListener(_onAppSettingsChanged);
+    pendingNotificationRssUrl.removeListener(_onPendingNotification);
     super.dispose();
   }
 
@@ -365,6 +381,36 @@ class MyHomePageState extends State<MyHomePage>
     WidgetsBinding.instance.addObserver(this);
     appThemeModeNotifier.addListener(_onAppSettingsChanged);
     appLocaleNotifier.addListener(_onAppSettingsChanged);
+    pendingNotificationRssUrl.addListener(_onPendingNotification);
+    if (pendingNotificationRssUrl.value != null) {
+      setState(() => _navigatingFromNotification = true);
+    }
+  }
+
+  void _onPendingNotification() {
+    if (pendingNotificationRssUrl.value != null && mounted) {
+      setState(() => _navigatingFromNotification = true);
+      _tryNavigateToNotificationProgram();
+    }
+  }
+
+  void _tryNavigateToNotificationProgram() {
+    final rssUrl = pendingNotificationRssUrl.value;
+    if (rssUrl == null || isLoadingPodcast || _podcast.isEmpty) return;
+    Program? program;
+    try {
+      program = _podcast.firstWhere((p) => p.rssUrl == rssUrl);
+    } catch (_) {
+      try {
+        final sanitized = rssUrl.replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '_');
+        program = _podcast.firstWhere((p) =>
+            p.rssUrl.replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '_').startsWith(sanitized) ||
+            sanitized.startsWith(p.rssUrl.replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '_')));
+      } catch (_) {}
+    }
+    pendingNotificationRssUrl.value = null;
+    if (mounted) setState(() => _navigatingFromNotification = false);
+    if (program != null) _presenter.onPodcastClicked(program);
   }
 
   @override
@@ -450,6 +496,7 @@ class MyHomePageState extends State<MyHomePage>
   void onLoadPodcasts(List<Program> podcasts) {
     isLoadingPodcast = false;
     isEmptyPodcast = podcasts.isEmpty;
+    _tryNavigateToNotificationProgram();
     if (bottomBarOption == BottomBarOption.SEARCH) {
       if (!mounted) return;
       setState(() {
