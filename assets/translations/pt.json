@@ -58,6 +58,10 @@
       "item1" : "História",
       "item2" : "Galeria"
     },
+    "alerts_section" : {
+      "name" : "Alertas",
+      "empty" : "Não há alertas este mês."
+    },
     "config_section" : {
       "name" : "CONFIGURAÇÃO",
       "item1" : "Tema",

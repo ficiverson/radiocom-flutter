@@ -34,6 +34,7 @@ import 'package:cuacfm/ui/settings/settings-detail/settings_detail_router.dart';
 import 'package:cuacfm/ui/settings/settings-detail/settings_presenter_detail.dart';
 import 'package:cuacfm/ui/settings/settings.dart';
 import 'package:cuacfm/ui/settings/settings_presenter.dart';
+import 'package:cuacfm/ui/alerts/alerts_router.dart';
 import 'package:cuacfm/ui/settings/settings_router.dart';
 import 'package:cuacfm/ui/timetable/time_table_presenter.dart';
 import 'package:cuacfm/ui/timetable/time_table_router.dart';
@@ -132,6 +133,10 @@ class DependencyInjector {
 
     injector.registerDependency<SettingsDetailRouterContract>(() {
       return SettingsDetailRouter();
+    });
+
+    injector.registerDependency<AlertsRouterContract>(() {
+      return AlertsRouter();
     });
 
     injector.registerDependency<TimeTableRouterContract>(() {

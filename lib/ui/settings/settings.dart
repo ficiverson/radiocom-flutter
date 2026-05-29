@@ -16,6 +16,7 @@ import 'package:injector/injector.dart';
 import 'settings_presenter.dart';
 import 'package:cuacfm/main.dart' show appThemeModeNotifier;
 import 'package:in_app_review/in_app_review.dart';
+import 'package:cuacfm/services/alerts_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -44,6 +45,7 @@ class SettingsState extends State<Settings>
   bool _showRatingCard = false;
   double _ratingCardScale = 1.0;
   bool _notificationsPaused = false;
+  int _alertsUnread = 0;
 
   SettingsState() {
     DependencyInjector().injectByView(this);
@@ -167,6 +169,12 @@ class SettingsState extends State<Settings>
     appThemeModeNotifier.addListener(_onAppSettingsChanged);
     _loadRatingCardState();
     _loadNotificationsPausedState();
+    _loadAlertsUnread();
+  }
+
+  Future<void> _loadAlertsUnread() async {
+    final count = await AlertsService().getUnreadCount();
+    if (mounted) setState(() => _alertsUnread = count);
   }
 
   Future<void> _loadNotificationsPausedState() async {
@@ -485,6 +493,53 @@ class SettingsState extends State<Settings>
                     _buildRatingCard(),
                     SizedBox(height: 16),
                   ],
+                  // ── ALERTAS ──────────────────────────────────────────────
+                  Material(
+                    color: _colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        setState(() => _alertsUnread = 0);
+                        _presenter.onAlertsClicked();
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: _colors.palidwhitedark,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              SafeMap.safe(_localization.translateMap("settings"), ["alerts_section", "name"]),
+                              style: TextStyle(letterSpacing: 0, color: _colors.font, fontWeight: FontWeight.w600, fontSize: 18),
+                            ),
+                            Row(
+                              children: [
+                                if (_alertsUnread > 0)
+                                  Container(
+                                    width: 20,
+                                    height: 20,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      '$_alertsUnread',
+                                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
+                                    ),
+                                  ),
+                                if (_alertsUnread > 0) const SizedBox(width: 8),
+                                Icon(Icons.chevron_right, color: _colors.grey, size: 22),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
                   // ── CONFIGURATION ────────────────────────────────────────
                   Container(
                     decoration: BoxDecoration(

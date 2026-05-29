@@ -1,4 +1,5 @@
 import 'package:cuacfm/injector/dependency_injector.dart';
+import 'package:cuacfm/services/alerts_service.dart';
 import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/translations/localizations_delegate.dart';
 import 'package:cuacfm/ui/home/home_view.dart';
@@ -18,30 +19,75 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:injector/injector.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  if (message.data['type'] == 'new_episode') {
+    await AlertsService.saveFromBackground({
+      'programName': message.notification?.title ?? '',
+      'programLogoUrl': message.data['logo_url'] ?? '',
+      'rssUrl': message.data['rss_url'] ?? '',
+      'episodeTitle': message.notification?.body ?? '',
+      'episodeId': message.data['episode_id'] ?? '',
+      'receivedAt': DateTime.now().toIso8601String(),
+    });
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   await Hive.openBox('playlist');
   await Hive.openBox('favourites');
   await Hive.openBox('episodes_cache');
+  await Hive.openBox('alerts');
 
   ErrorWidget.builder =
       (FlutterErrorDetails details) => errorScreen(details.exception);
   DependencyInjector().loadModules();
   await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await FirebaseMessaging.instance.requestPermission();
+  await AlertsService().migratePending();
 
   // Notificación cando a app estaba pechada
   final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
   if (initialMessage != null) {
     final rssUrl = initialMessage.data['rss_url'] as String?;
+    final episodeId = initialMessage.data['episode_id'] as String?;
     if (rssUrl != null) pendingNotificationRssUrl.value = rssUrl;
+    if (episodeId != null) pendingNotificationEpisodeId.value = episodeId;
   }
+
+  // Notificación en primeiro plano — gardar no historial
+  FirebaseMessaging.onMessage.listen((message) {
+    if (message.data['type'] == 'new_episode') {
+      AlertsService().saveFromForeground({
+        'programName': message.notification?.title ?? '',
+        'programLogoUrl': message.data['logo_url'] ?? '',
+        'rssUrl': message.data['rss_url'] ?? '',
+        'episodeTitle': message.notification?.body ?? '',
+        'episodeId': message.data['episode_id'] ?? '',
+        'receivedAt': DateTime.now().toIso8601String(),
+      });
+    }
+  });
 
   // Notificación cando a app estaba en segundo plano
   FirebaseMessaging.onMessageOpenedApp.listen((message) {
+    if (message.data['type'] == 'new_episode') {
+      AlertsService().saveFromForeground({
+        'programName': message.notification?.title ?? '',
+        'programLogoUrl': message.data['logo_url'] ?? '',
+        'rssUrl': message.data['rss_url'] ?? '',
+        'episodeTitle': message.notification?.body ?? '',
+        'episodeId': message.data['episode_id'] ?? '',
+        'receivedAt': DateTime.now().toIso8601String(),
+      });
+    }
     final rssUrl = message.data['rss_url'] as String?;
+    final episodeId = message.data['episode_id'] as String?;
     if (rssUrl != null) pendingNotificationRssUrl.value = rssUrl;
+    if (episodeId != null) pendingNotificationEpisodeId.value = episodeId;
   });
   //Setting SystmeUIMode
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
@@ -63,6 +109,7 @@ void main() async {
 final ValueNotifier<ThemeMode> appThemeModeNotifier = ValueNotifier(ThemeMode.system);
 final ValueNotifier<Locale?> appLocaleNotifier = ValueNotifier(null);
 final ValueNotifier<String?> pendingNotificationRssUrl = ValueNotifier(null);
+final ValueNotifier<String?> pendingNotificationEpisodeId = ValueNotifier(null);
 
 // Callback global para cambiar o tema desde calquera parte da app
 _MyAppState? _myAppState;

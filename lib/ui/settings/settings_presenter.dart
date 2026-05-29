@@ -98,6 +98,10 @@ class SettingsPresenter {
     router.goToHistory(New.fromHistory(content));
   }
 
+  onAlertsClicked(){
+    router.goToAlerts();
+  }
+
   onGalleryClicked(){
     router.goToLegal(LegalType.NONE);
   }

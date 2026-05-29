@@ -266,10 +266,22 @@ class AllPodcastState extends State<AllPodcast>
             }));
   }
 
+  String _normalize(String text) {
+    return text
+        .toLowerCase()
+        .replaceAll(RegExp(r'[áàäâã]'), 'a')
+        .replaceAll(RegExp(r'[éèëê]'), 'e')
+        .replaceAll(RegExp(r'[íìïî]'), 'i')
+        .replaceAll(RegExp(r'[óòöôõ]'), 'o')
+        .replaceAll(RegExp(r'[úùüû]'), 'u')
+        .replaceAll(RegExp(r'[ñ]'), 'n');
+  }
+
   Iterable<Program> _filterBySearchQuery(
       String query, Iterable<Program> podcasts) {
     if (query.isEmpty) return podcasts;
-    final RegExp regexp = new RegExp(query, caseSensitive: false);
-    return podcasts.where((Program program) => program.name.contains(regexp));
+    final normalizedQuery = _normalize(query);
+    return podcasts.where((Program program) =>
+        _normalize(program.name).contains(normalizedQuery));
   }
 }

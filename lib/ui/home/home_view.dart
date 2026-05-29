@@ -31,7 +31,8 @@ import 'package:injector/injector.dart';
 import 'package:intl/intl.dart';
 import 'package:cuacfm/ui/episode-detail/episode_detail_view.dart';
 import 'package:html/parser.dart' as html_parser;
-import 'package:cuacfm/main.dart' show appThemeModeNotifier, appLocaleNotifier, pendingNotificationRssUrl;
+import 'dart:convert';
+import 'package:cuacfm/main.dart' show appThemeModeNotifier, appLocaleNotifier, pendingNotificationRssUrl, pendingNotificationEpisodeId;
 import 'package:firebase_analytics/firebase_analytics.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -319,6 +320,7 @@ class MyHomePageState extends State<MyHomePage>
   ).invokeMethod('changeScreen', {"currentScreen": "main", "close": false});
 }
     _presenter = Injector.appInstance.get<HomePresenter>();
+    _loadCachedPrograms();
     _presenter.init();
     _presenter.onSetScreen();
     _nowProgram = new Now.mock();
@@ -408,9 +410,46 @@ class MyHomePageState extends State<MyHomePage>
             sanitized.startsWith(p.rssUrl.replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '_')));
       } catch (_) {}
     }
+    if (program == null) {
+      pendingNotificationRssUrl.value = null;
+      pendingNotificationEpisodeId.value = null;
+      if (mounted) setState(() => _navigatingFromNotification = false);
+      return;
+    }
+    final episodeId = pendingNotificationEpisodeId.value;
     pendingNotificationRssUrl.value = null;
-    if (mounted) setState(() => _navigatingFromNotification = false);
-    if (program != null) _presenter.onPodcastClicked(program);
+    pendingNotificationEpisodeId.value = null;
+    _navigateToEpisode(program, episodeId);
+  }
+
+  Future<void> _navigateToEpisode(Program program, String? episodeId) async {
+    try {
+      final repo = Injector.appInstance.get<CuacRepositoryContract>();
+      final result = await repo.getEpisodes(program.rssUrl);
+      final episodes = result.data ?? [];
+      if (episodes.isEmpty) {
+        if (mounted) {
+          setState(() => _navigatingFromNotification = false);
+          _presenter.onPodcastClicked(program);
+        }
+        return;
+      }
+      Episode episode = episodes.first;
+      if (episodeId != null) {
+        try {
+          episode = episodes.firstWhere((e) => e.link.contains(episodeId));
+        } catch (_) {}
+      }
+      if (mounted) {
+        setState(() => _navigatingFromNotification = false);
+        _presenter.router.goToEpisodeDetail(episode, program);
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() => _navigatingFromNotification = false);
+        _presenter.onPodcastClicked(program);
+      }
+    }
   }
 
   @override
@@ -426,6 +465,26 @@ class MyHomePageState extends State<MyHomePage>
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBarConnection!);
     }
+  }
+
+  void _loadCachedPrograms() {
+    try {
+      final box = Hive.box('episodes_cache');
+      final cached = box.get('programmes_list') as String?;
+      if (cached != null) {
+        final list = (jsonDecode(cached) as List)
+            .map((m) => Program.fromFavorite(m as Map))
+            .toList();
+        if (list.isNotEmpty && mounted) {
+          setState(() {
+            _podcast = list;
+            isLoadingPodcast = false;
+          });
+          generatePodcast();
+          _tryNavigateToNotificationProgram();
+        }
+      }
+    } catch (_) {}
   }
 
   @override
@@ -497,6 +556,10 @@ class MyHomePageState extends State<MyHomePage>
     isLoadingPodcast = false;
     isEmptyPodcast = podcasts.isEmpty;
     _tryNavigateToNotificationProgram();
+    try {
+      final box = Hive.box('episodes_cache');
+      box.put('programmes_list', jsonEncode(podcasts.map((p) => p.toMap()).toList()));
+    } catch (_) {}
     if (bottomBarOption == BottomBarOption.SEARCH) {
       if (!mounted) return;
       setState(() {

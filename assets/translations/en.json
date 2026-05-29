@@ -58,6 +58,10 @@
       "item1" : "History",
       "item2" : "Gallery"
     },
+    "alerts_section" : {
+      "name" : "Alerts",
+      "empty" : "No alerts this month."
+    },
     "config_section" : {
       "name" : "CONFIGURATION",
       "item1" : "Theme",

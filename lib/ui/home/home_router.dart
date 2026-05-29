@@ -5,6 +5,7 @@ import 'package:cuacfm/models/time_table.dart';
 import 'package:cuacfm/ui/new-detail/new_detail.dart';
 import 'package:cuacfm/ui/podcast/all_podcast/all_podcast_view.dart';
 import 'package:cuacfm/ui/podcast/controls/podcast_controls.dart';
+import 'package:cuacfm/ui/episode-detail/episode_detail_view.dart';
 import 'package:cuacfm/ui/podcast/detail_podcast_view.dart';
 import 'package:cuacfm/ui/settings/settings.dart';
 import 'package:cuacfm/ui/timetable/time_table_view.dart';
@@ -19,6 +20,7 @@ abstract class HomeRouterContract {
   goToSettings(Function(BottomBarOption) invokeResult);
   goToPodcastDetail(Program podcast, {VoidCallback? onReturn, Function(BottomBarOption)? onTabSelected});
   goToPodcastControls(Episode? episode, {TimeTable? liveProgram});
+  goToEpisodeDetail(Episode episode, Program program);
 }
 
 class HomeRouter implements HomeRouterContract {
@@ -84,6 +86,19 @@ class HomeRouter implements HomeRouterContract {
                 onTabSelected?.call(value);
               }
             });
+  }
+
+  @override
+  goToEpisodeDetail(Episode episode, Program program) {
+    Navigator.of(Injector.appInstance.get<BuildContext>()).push(
+        _fadeRoute(
+            name: "episodedetail",
+            builder: (_) => EpisodeDetail(
+                  episode: episode,
+                  programName: program.name,
+                  logoUrl: program.logoUrl,
+                  program: program,
+                )));
   }
 
   @override

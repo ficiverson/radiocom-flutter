@@ -1,5 +1,6 @@
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
+import 'package:cuacfm/ui/alerts/alerts_view.dart';
 import 'package:cuacfm/ui/new-detail/new_detail.dart';
 import 'package:cuacfm/ui/podcast/controls/podcast_controls.dart';
 import 'package:cuacfm/ui/settings/settings-detail/settings_detail.dart';
@@ -10,6 +11,7 @@ abstract class SettingsRouterContract{
   goToLegal(LegalType legalType);
   goToHistory(New newItem);
   goToPodcastControls(Episode episode);
+  goToAlerts();
 }
 
 class SettingsRouter extends SettingsRouterContract {
@@ -52,4 +54,14 @@ class SettingsRouter extends SettingsRouterContract {
             transitionDuration: const Duration(milliseconds: 350)));
   }
 
+  @override
+  goToAlerts() {
+    Navigator.of(Injector.appInstance.get<BuildContext>()).push(
+        PageRouteBuilder(
+            settings: RouteSettings(name: "alerts"),
+            pageBuilder: (_, __, ___) => const AlertsPage(),
+            transitionsBuilder: (_, animation, __, child) =>
+                FadeTransition(opacity: animation, child: child),
+            transitionDuration: const Duration(milliseconds: 200)));
+  }
 }

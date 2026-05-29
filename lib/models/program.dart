@@ -48,6 +48,16 @@ class Program {
         categoryType = ProgramCategories.TV,
         category = map["category"] ?? "";
 
+  Map<String, dynamic> toMap() => {
+    'name': name,
+    'description': description,
+    'logoUrl': logoUrl,
+    'rssUrl': rssUrl,
+    'duration': duration,
+    'language': language,
+    'category': category,
+  };
+
   static String getLanguage(String language) {
     if (language == "gl") {
       return "Galego";
