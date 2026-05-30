@@ -24,7 +24,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (message.data['type'] == 'new_episode') {
     await AlertsService.saveFromBackground({
       'programName': message.notification?.title ?? '',
-      'programLogoUrl': message.data['logo_url'] ?? '',
+      'programLogoUrl': message.notification?.android?.imageUrl ?? message.data['logo_url'] ?? '',
       'rssUrl': message.data['rss_url'] ?? '',
       'episodeTitle': message.notification?.body ?? '',
       'episodeId': message.data['episode_id'] ?? '',
@@ -63,7 +63,7 @@ void main() async {
     if (message.data['type'] == 'new_episode') {
       AlertsService().saveFromForeground({
         'programName': message.notification?.title ?? '',
-        'programLogoUrl': message.data['logo_url'] ?? '',
+        'programLogoUrl': message.notification?.android?.imageUrl ?? message.data['logo_url'] ?? '',
         'rssUrl': message.data['rss_url'] ?? '',
         'episodeTitle': message.notification?.body ?? '',
         'episodeId': message.data['episode_id'] ?? '',
@@ -77,7 +77,7 @@ void main() async {
     if (message.data['type'] == 'new_episode') {
       AlertsService().saveFromForeground({
         'programName': message.notification?.title ?? '',
-        'programLogoUrl': message.data['logo_url'] ?? '',
+        'programLogoUrl': message.notification?.android?.imageUrl ?? message.data['logo_url'] ?? '',
         'rssUrl': message.data['rss_url'] ?? '',
         'episodeTitle': message.notification?.body ?? '',
         'episodeId': message.data['episode_id'] ?? '',
@@ -236,6 +236,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
       statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
     ));
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      AlertsService().migratePending();
+    }
   }
 
   @override

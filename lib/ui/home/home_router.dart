@@ -90,15 +90,23 @@ class HomeRouter implements HomeRouterContract {
 
   @override
   goToEpisodeDetail(Episode episode, Program program) {
-    Navigator.of(Injector.appInstance.get<BuildContext>()).push(
-        _fadeRoute(
-            name: "episodedetail",
-            builder: (_) => EpisodeDetail(
-                  episode: episode,
-                  programName: program.name,
-                  logoUrl: program.logoUrl,
-                  program: program,
-                )));
+    final navigator = Navigator.of(Injector.appInstance.get<BuildContext>());
+    navigator.push(PageRouteBuilder(
+      settings: RouteSettings(name: "podcastdetail"),
+      pageBuilder: (_, __, ___) => DetailPodcastPage(program: program),
+      transitionDuration: Duration.zero,
+      reverseTransitionDuration: Duration.zero,
+      transitionsBuilder: (_, __, ___, child) => child,
+    ));
+    navigator.push(_fadeRoute(
+      name: "episodedetail",
+      builder: (_) => EpisodeDetail(
+        episode: episode,
+        programName: program.name,
+        logoUrl: program.logoUrl,
+        program: program,
+      ),
+    ));
   }
 
   @override
