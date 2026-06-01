@@ -74,16 +74,6 @@ void main() async {
 
   // Notificación cando a app estaba en segundo plano
   FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    if (message.data['type'] == 'new_episode') {
-      AlertsService().saveFromForeground({
-        'programName': message.notification?.title ?? '',
-        'programLogoUrl': message.notification?.android?.imageUrl ?? message.data['logo_url'] ?? '',
-        'rssUrl': message.data['rss_url'] ?? '',
-        'episodeTitle': message.notification?.body ?? '',
-        'episodeId': message.data['episode_id'] ?? '',
-        'receivedAt': DateTime.now().toIso8601String(),
-      });
-    }
     final rssUrl = message.data['rss_url'] as String?;
     final episodeId = message.data['episode_id'] as String?;
     if (rssUrl != null) pendingNotificationRssUrl.value = rssUrl;
