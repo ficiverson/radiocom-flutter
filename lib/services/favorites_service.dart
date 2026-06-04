@@ -1,3 +1,4 @@
+import 'package:cuacfm/services/wrapped_service.dart';
 import 'package:hive/hive.dart';
 
 class FavoritesService {
@@ -6,10 +7,15 @@ class FavoritesService {
 
   void addProgram(Map program) {
     box.put(program['rssUrl'], program);
+    WrappedService().recordFavoriteChange(program['name'] ?? '', true);
   }
 
   void removeProgram(String rssUrl) {
+    final program = box.get(rssUrl);
     box.delete(rssUrl);
+    if (program != null) {
+      WrappedService().recordFavoriteChange(program['name'] ?? '', false);
+    }
   }
 
   List getFavorites() {

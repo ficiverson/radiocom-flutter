@@ -7,6 +7,7 @@ import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/services/playlist_service.dart';
 import 'package:flutter/services.dart';
+import 'package:cuacfm/services/wrapped_service.dart';
 import 'package:injector/injector.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'dart:convert';
@@ -277,7 +278,16 @@ class CurrentPlayer implements CurrentPlayerContract {
         audioPlayer.setAudioSource(audioSource);
         await audioPlayer.play();
         await audioPlayer.seek(position);
-        if (audioPlayer.playing) playerState = AudioPlayerState.play;
+        if (audioPlayer.playing) {
+          playerState = AudioPlayerState.play;
+          WrappedService().startSession(
+            isPodcast: isPodcast,
+            programName: isPodcast ? (currentSong.isNotEmpty ? currentSong : episode?.title ?? '') : '',
+            category: '',
+            episodeTitle: isPodcast ? episode?.title ?? '' : '',
+            episodeId: isPodcast ? episode?.audio ?? '' : '',
+          );
+        }
         if (restorePosition != Duration(seconds: 0) &&
             restoreDuration != Duration(seconds: 0) &&
             isPodcast &&
@@ -342,6 +352,7 @@ class CurrentPlayer implements CurrentPlayerContract {
   void stop() async {
     if (playerState == AudioPlayerState.play ||
         playerState == AudioPlayerState.pause) {
+      WrappedService().endSession();
       playerState = AudioPlayerState.stop;
       if (isPodcast) {
         tempEpisode = episode;

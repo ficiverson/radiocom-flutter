@@ -1,5 +1,6 @@
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/services/alerts_service.dart';
+import 'package:cuacfm/services/wrapped_service.dart';
 import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/translations/localizations_delegate.dart';
 import 'package:cuacfm/ui/home/home_view.dart';
@@ -40,6 +41,8 @@ void main() async {
   await Hive.openBox('favourites');
   await Hive.openBox('episodes_cache');
   await Hive.openBox('alerts');
+  await Hive.openBox('wrapped_${DateTime.now().year}');
+  if (DateTime.now().month == 2) await WrappedService.cleanOldData();
 
   ErrorWidget.builder =
       (FlutterErrorDetails details) => errorScreen(details.exception);
