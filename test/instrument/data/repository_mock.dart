@@ -43,12 +43,8 @@ class MockRadiocoRepository extends Mock implements CuacRepositoryContract {
       super.noSuchMethod(Invocation.method(#getEpisodes, [feedUrl]),
           returnValue: episodes());
   @override
-  Future<Result<Outstanding>> getOutStanding() =>
-      super.noSuchMethod(Invocation.method(#getOutStanding, []),
-          returnValue: outstanding());
-  @override
-  Future<Result<Outstanding>> getOutStanding2() =>
-      super.noSuchMethod(Invocation.method(#getOutStanding2, []),
+  Future<Result<Outstanding>> getOutStanding(String url) =>
+      super.noSuchMethod(Invocation.method(#getOutStanding, [url]),
           returnValue: outstanding());
 
   static Future<Result<RadioStation>> radioStation({bool isEmpty = false}) {

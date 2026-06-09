@@ -37,8 +37,8 @@ class MockRemoteDataSource extends Mock
   @override Future<List<Episode>> getEpisodes(String feedUrl) =>
       super.noSuchMethod(Invocation.method(#getNews, []),returnValue: episodes(true));
 
-  @override Future<Outstanding?> getOutstanding() =>
-      super.noSuchMethod(Invocation.method(#getOutstanding, []),returnValue: outstanding(true));
+  @override Future<Outstanding?> getOutstanding(String url) =>
+      super.noSuchMethod(Invocation.method(#getOutstanding, [url]),returnValue: outstanding(true));
 
 
   static Future<RadioStation> radioStation(bool isEmpty) {

@@ -114,18 +114,18 @@ void main() {
   });
 
   test('that can fetch outstanding from network', () async {
-    when(mockRemoteDataSource.getOutstanding())
+    when(mockRemoteDataSource.getOutstanding(argThat(isA<String>())))
         .thenAnswer((_) => MockRemoteDataSource.outstanding(false));
-    Result<Outstanding> result = await repository.getOutStanding();
+    Result<Outstanding> result = await repository.getOutStanding("https://example.com/outstanding");
 
     expect(result.status, equals(Status.ok));
     expect(result.data?.title, contains("Nada"));
   });
 
   test('that can fetch empty outstanding when data from network fail', () async {
-    when(mockRemoteDataSource.getOutstanding())
+    when(mockRemoteDataSource.getOutstanding(argThat(isA<String>())))
         .thenAnswer((_) => MockRemoteDataSource.outstanding(true));
-    Result<Outstanding> result = await repository.getOutStanding();
+    Result<Outstanding> result = await repository.getOutStanding("https://example.com/outstanding");
 
     expect(result.status, equals(Status.fail));
   });

@@ -19,6 +19,5 @@ abstract class RadiocoRemoteDataSourceContract {
 
   Future<List<Episode>> getEpisodes(String feedUrl);
 
-  Future<Outstanding?> getOutstanding();
-  Future<Outstanding?> getOutstanding2();
+  Future<Outstanding?> getOutstanding(String url);
 }

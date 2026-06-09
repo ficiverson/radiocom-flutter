@@ -52,12 +52,12 @@ void main() {
   testWidgets('that can init the home screen', (WidgetTester tester) async{
         when(mockRepository.getLiveBroadcast())
             .thenAnswer((_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
-        when(mockRepository.getEpisodes(any)).thenAnswer((_) => MockRadiocoRepository.episodes());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getEpisodes(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.episodes());
         when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
         when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
         when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
-        when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+        when(mockRepository.getOutStanding(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.outstanding());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.isPlaying()).thenReturn(true);
@@ -81,12 +81,12 @@ void main() {
   testWidgets('that can list the podcasts', (WidgetTester tester) async{
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
-    when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
-    when(mockRepository.getEpisodes(any)).thenAnswer((_) => MockRadiocoRepository.episodes());
+    when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
+    when(mockRepository.getEpisodes(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.episodes());
     when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
     when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
     when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
-    when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+    when(mockRepository.getOutStanding(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.outstanding());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
     when(mockPlayer.isPlaying()).thenReturn(false);
@@ -109,12 +109,12 @@ void main() {
   testWidgets('that can list the news', (WidgetTester tester) async{
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
-    when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
-    when(mockRepository.getEpisodes(any)).thenAnswer((_) => MockRadiocoRepository.episodes());
+    when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
+    when(mockRepository.getEpisodes(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.episodes());
     when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
     when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
     when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
-    when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+    when(mockRepository.getOutStanding(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.outstanding());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
     when(mockPlayer.isPlaying()).thenReturn(false);
@@ -137,12 +137,12 @@ void main() {
   testWidgets('that in home screen can handle error on connection while playing', (WidgetTester tester) async{
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
-    when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
-    when(mockRepository.getEpisodes(any)).thenAnswer((_) => MockRadiocoRepository.episodes());
+    when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
+    when(mockRepository.getEpisodes(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.episodes());
     when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
     when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
     when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
-    when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+    when(mockRepository.getOutStanding(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.outstanding());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
     when(mockPlayer.isPlaying()).thenReturn(true);

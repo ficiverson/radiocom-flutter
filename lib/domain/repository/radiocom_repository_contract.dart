@@ -14,6 +14,5 @@ abstract class CuacRepositoryContract {
   Future<Result<List<Program>>> getAllPodcasts();
   Future<Result<List<New>>> getNews();
   Future<Result<List<Episode>>> getEpisodes(String feedUrl);
-  Future<Result<Outstanding>> getOutStanding();
-  Future<Result<Outstanding>> getOutStanding2();
+  Future<Result<Outstanding>> getOutStanding(String url);
 }

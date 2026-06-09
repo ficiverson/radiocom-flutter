@@ -24,7 +24,6 @@ import 'package:cuacfm/domain/usecase/get_episodes_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_favorites_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_live_program_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_news_use_case.dart';
-import 'package:cuacfm/domain/usecase/get_outstanding2_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_outstanding_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_playlist_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_station_use_case.dart';
@@ -211,7 +210,6 @@ class DependencyInjector {
           getTimetableUseCase: injector.get<GetTimetableUseCase>(),
           getNewsUseCase: injector.get<GetNewsUseCase>(),
           getOutstandingUseCase: injector.get<GetOutstandingUseCase>(),
-          getOutstanding2UseCase: injector.get<GetOutstanding2UseCase>(),
           getFavoritesUseCase: injector.get<GetFavoritesUseCase>(),
           removeFavoriteUseCase: injector.get<RemoveFavoriteUseCase>());
     });
@@ -306,9 +304,6 @@ class DependencyInjector {
     });
     injector.registerDependency<GetOutstandingUseCase>(() {
       return GetOutstandingUseCase(radiocoRepository: injector.get<CuacRepositoryContract>());
-    });
-    injector.registerDependency<GetOutstanding2UseCase>(() {
-      return GetOutstanding2UseCase(radiocoRepository: injector.get<CuacRepositoryContract>());
     });
     injector.registerDependency<GetStationUseCase>(() {
       return GetStationUseCase(radiocoRepository: injector.get<CuacRepositoryContract>());

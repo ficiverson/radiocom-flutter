@@ -20,7 +20,8 @@ void main() {
   tearDownAll(() async {});
 
   test('that can fetch outstanding info from network', () {
-    when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+    when(mockRepository.getOutStanding(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.outstanding());
+    useCase.withParams("https://example.com/outstanding");
 
     invoker.execute(useCase).listen(expectAsync1((result) {
       expect(result.status, equals(Status.ok));
@@ -30,7 +31,8 @@ void main() {
   });
 
   test('that can fetch outstanding data when error in network', () {
-    when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding(isEmpty: true));
+    when(mockRepository.getOutStanding(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.outstanding(isEmpty: true));
+    useCase.withParams("https://example.com/outstanding");
 
     invoker.execute(useCase).listen(expectAsync1((result) {
       expect(result.status, equals(Status.fail));

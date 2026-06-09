@@ -6,7 +6,6 @@ import 'package:cuacfm/domain/usecase/get_all_podcast_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_favorites_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_live_program_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_news_use_case.dart';
-import 'package:cuacfm/domain/usecase/get_outstanding2_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_outstanding_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_timetable_use_case.dart';
 import 'package:cuacfm/domain/usecase/remove_favorite_use_case.dart';
@@ -19,6 +18,7 @@ import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/models/time_table.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/player/current_timer.dart';
+import 'package:cuacfm/remote-data-source/network/radioco_api.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:injector/injector.dart';
 import 'package:intl/intl.dart';
@@ -76,7 +76,6 @@ class HomePresenter {
   GetTimetableUseCase getTimetableUseCase;
   GetNewsUseCase getNewsUseCase;
   GetOutstandingUseCase getOutstandingUseCase;
-  GetOutstanding2UseCase getOutstanding2UseCase;
   GetFavoritesUseCase getFavoritesUseCase;
   RemoveFavoriteUseCase removeFavoriteUseCase;
   HomeRouterContract router;
@@ -84,6 +83,7 @@ class HomePresenter {
   late CurrentPlayerContract currentPlayer;
   late CurrentTimerContract currentTimer;
   late NotificationSubscriptionContract notificationSubscription;
+  late RadiocoAPIContract radiocoAPI;
   Timer? _timer;
   bool isLoading = false;
 
@@ -96,7 +96,6 @@ class HomePresenter {
       required this.getTimetableUseCase,
       required this.getNewsUseCase,
       required this.getOutstandingUseCase,
-      required this.getOutstanding2UseCase,
       required this.getFavoritesUseCase,
       required this.removeFavoriteUseCase}) {
     currentTimer = Injector.appInstance.get<CurrentTimerContract>();
@@ -104,6 +103,7 @@ class HomePresenter {
     currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
     notificationSubscription =
         Injector.appInstance.get<NotificationSubscriptionContract>();
+    radiocoAPI = Injector.appInstance.get<RadiocoAPIContract>();
   }
 
   init() async {
@@ -343,7 +343,7 @@ class HomePresenter {
   }
 
   _getOutstanding() {
-    invoker.execute(getOutstandingUseCase).listen((result) {
+    invoker.execute(getOutstandingUseCase.withParams(radiocoAPI.outstandingUrl)).listen((result) {
       if (result is Success) {
         _homeView.onLoadOutstanding(result.data);
       } else {
@@ -372,9 +372,9 @@ class HomePresenter {
   }
 
   _getOutstanding2() {
-    invoker.execute(getOutstanding2UseCase).listen((result) {
+    invoker.execute(getOutstandingUseCase.withParams(radiocoAPI.outstandingUrl2)).listen((result) {
       if (result is Success) {
-        _homeView.onLoadOutstanding2(result.data!);
+        _homeView.onLoadOutstanding2(result.data);
       }
     });
   }

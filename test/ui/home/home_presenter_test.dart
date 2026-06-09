@@ -81,13 +81,12 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast())
             .thenAnswer((_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
-        when(mockRepository.getEpisodes(any)).thenAnswer((_) => MockRadiocoRepository.episodes());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getEpisodes(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.episodes());
         when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
         when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
         when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
-        when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
-        when(mockRepository.getOutStanding2()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+        when(mockRepository.getOutStanding(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.outstanding());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.isPlaying()).thenReturn(true);
@@ -114,8 +113,8 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast())
             .thenAnswer((_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
-        when(mockRepository.getEpisodes(any)).thenAnswer((_) => MockRadiocoRepository.episodes());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getEpisodes(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.episodes());
         when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
         when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
         when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
@@ -141,13 +140,12 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast())
             .thenAnswer((_) => MockRadiocoRepository.now(isEmpty: true));
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables(isEmpty: true));
-        when(mockRepository.getEpisodes(any)).thenAnswer((_) => MockRadiocoRepository.episodes(isEmpty: true));
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables(isEmpty: true));
+        when(mockRepository.getEpisodes(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.episodes(isEmpty: true));
         when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts(isEmpty: true));
         when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation(isEmpty: true));
         when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news(isEmpty: true));
-        when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
-        when(mockRepository.getOutStanding2()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+        when(mockRepository.getOutStanding(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.outstanding());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.isPlaying()).thenReturn(true);
@@ -174,9 +172,8 @@ void main() {
       () async {
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
-    when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
-    when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
-    when(mockRepository.getOutStanding2()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+    when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
+    when(mockRepository.getOutStanding(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.outstanding());
     when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
     when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
     when(mockConnection.isConnectionAvailable())
@@ -200,9 +197,8 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast())
             .thenAnswer((_) => MockRadiocoRepository.now(isEmpty: true));
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables(isEmpty: true));
-        when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
-        when(mockRepository.getOutStanding2()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables(isEmpty: true));
+        when(mockRepository.getOutStanding(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.outstanding());
         when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
         when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
         when(mockConnection.isConnectionAvailable())
@@ -244,7 +240,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         mockPlayer.isPodcast = true;
@@ -261,7 +257,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         mockPlayer.isPodcast = true;
@@ -278,7 +274,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         mockPlayer.isPodcast = true;
@@ -295,7 +291,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         mockPlayer.isPodcast = true;
@@ -312,7 +308,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         mockPlayer.isPodcast = true;
@@ -329,7 +325,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         mockPlayer.isPodcast = true;
@@ -345,7 +341,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         mockPlayer.isPodcast = true;
@@ -362,7 +358,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         mockPlayer.isPodcast = true;
@@ -378,7 +374,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.play())
@@ -398,7 +394,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.play())
@@ -417,7 +413,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         mockPlayer.isPodcast = false;
@@ -436,7 +432,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         mockPlayer.isPodcast = true;
@@ -455,7 +451,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         mockPlayer.isPodcast = false;
@@ -478,7 +474,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         mockPlayer.isPodcast = false;
@@ -502,7 +498,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         mockPlayer.isPodcast = false;
@@ -523,7 +519,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
-        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+        when(mockRepository.getTimetableData(argThat(isA<String>()), argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         mockPlayer.isPodcast = false;
