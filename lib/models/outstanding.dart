@@ -10,10 +10,16 @@ class Outstanding {
    DateTime modified = DateTime(0);
 
   Outstanding.fromInstance(Map<String, dynamic> map)
-      : title = _cleanTitle(map["title"]["rendered"]),
-        description = map["content"]["rendered"],
-        logoUrl = map["_links"]["wp:featuredmedia"][0]["href"],
+      : title = _cleanTitle((map["title"] as Map?)?["rendered"] ?? ""),
+        description = (map["content"] as Map?)?["rendered"] ?? "",
+        logoUrl = _extractLogoUrl(map),
         modified = DateTime.tryParse(map["modified"] ?? "") ?? DateTime(0);
+
+  static String _extractLogoUrl(Map<String, dynamic> map) {
+    final featuredMedia = (map["_links"] as Map?)?["wp:featuredmedia"] as List?;
+    if (featuredMedia == null || featuredMedia.isEmpty) return "";
+    return (featuredMedia[0] as Map?)?["href"] ?? "";
+  }
 
   Outstanding.mock()
       : title = "Documental \"Nada que ver\"",
