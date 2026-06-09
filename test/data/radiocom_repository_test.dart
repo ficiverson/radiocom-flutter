@@ -1,5 +1,6 @@
 import 'package:cuacfm/data/radiocom-repository.dart';
 import 'package:cuacfm/domain/result/result.dart';
+import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/outstanding.dart';
@@ -128,6 +129,24 @@ void main() {
     Result<Outstanding> result = await repository.getOutStanding("https://example.com/outstanding");
 
     expect(result.status, equals(Status.fail));
+  });
+
+  test('that can fetch episodes from network', () async {
+    when(mockRemoteDataSource.getEpisodes(any))
+        .thenAnswer((_) => MockRemoteDataSource.episodes(false));
+    Result<List<Episode>> result = await repository.getEpisodes("http://feed.rss");
+
+    expect(result.status, equals(Status.ok));
+    expect(result.getData()?.length, equals(1));
+  });
+
+  test('that can fetch empty episodes when network fails', () async {
+    when(mockRemoteDataSource.getEpisodes(any))
+        .thenAnswer((_) => MockRemoteDataSource.episodes(true));
+    Result<List<Episode>> result = await repository.getEpisodes("http://feed.rss");
+
+    expect(result.status, equals(Status.fail));
+    expect(result.getData()?.length, equals(0));
   });
 
   test('that forwards the outstanding url to the remote source', () async {

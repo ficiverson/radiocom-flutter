@@ -28,8 +28,8 @@ void main() {
     await tempDir.delete(recursive: true);
   });
 
-  setUp(() {
-    Hive.box('favourites').clear();
+  setUp(() async {
+    await Hive.box('favourites').clear();
   });
 
   test('that addProgram stores the program in hive', () {

@@ -4,9 +4,14 @@ import 'package:cuacfm/data/datasource/wrapped_local_datasource_contract.dart';
 import 'package:hive/hive.dart';
 
 const _sessionsKey = 'sessions';
-const _minSessionSeconds = 30;
+const _defaultMinSessionSeconds = 30;
 
 class WrappedLocalDataSource implements WrappedLocalDataSourceContract {
+  final int _minSessionSeconds;
+
+  WrappedLocalDataSource({int minSessionSeconds = _defaultMinSessionSeconds})
+      : _minSessionSeconds = minSessionSeconds;
+
   DateTime? _sessionStart;
   bool _isPodcast = false;
   String _programName = '';

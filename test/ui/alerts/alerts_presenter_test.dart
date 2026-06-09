@@ -1,6 +1,4 @@
 import 'package:cuacfm/domain/repository/alerts_repository_contract.dart';
-import 'package:cuacfm/domain/usecase/get_alerts_use_case.dart';
-import 'package:cuacfm/domain/usecase/mark_alerts_read_use_case.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/alert_record.dart';
 import 'package:cuacfm/ui/alerts/alerts_presenter.dart';

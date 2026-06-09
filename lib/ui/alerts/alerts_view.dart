@@ -1,11 +1,9 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/alert_record.dart';
 import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/utils/custom_image.dart';
-import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
 import 'package:cuacfm/ui/alerts/alerts_presenter.dart';

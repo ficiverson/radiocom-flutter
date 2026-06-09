@@ -183,12 +183,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     }
   }
 
+  // ignore: unused_element
   void _setThemeMode(ThemeMode mode) {
     _applyThemeModeToApp(mode);
     appThemeModeNotifier.value = mode;
     if (mounted) setState(() {});
   }
 
+  // ignore: unused_element
   void _setLocale(Locale? locale) {
     appLocaleNotifier.value = locale;
     if (mounted) setState(() {});

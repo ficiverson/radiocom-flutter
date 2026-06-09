@@ -71,7 +71,6 @@ import 'package:cuacfm/ui/settings/settings-detail/settings_presenter_detail.dar
 import 'package:cuacfm/ui/settings/settings.dart';
 import 'package:cuacfm/ui/settings/settings_presenter.dart';
 import 'package:cuacfm/ui/alerts/alerts_router.dart';
-import 'package:cuacfm/ui/alerts/alerts_view.dart';
 import 'package:cuacfm/ui/settings/settings_router.dart';
 import 'package:cuacfm/ui/timetable/time_table_presenter.dart';
 import 'package:cuacfm/ui/timetable/time_table_router.dart';

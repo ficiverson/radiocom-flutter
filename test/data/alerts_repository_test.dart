@@ -1,5 +1,4 @@
 import 'package:cuacfm/data/alerts_repository.dart';
-import 'package:cuacfm/models/alert_record.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 

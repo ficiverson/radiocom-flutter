@@ -225,8 +225,6 @@ class Program {
         content =
             SafeMap.safe(_localization.translateMap("categories"), ["tech"]);
         break;
-      default:
-        break;
     }
     return content;
   }
@@ -269,8 +267,6 @@ class Program {
         break;
       case ProgramCategories.TECH:
         content = "assets/graphics/categories/tech.jpeg";
-        break;
-      default:
         break;
     }
     return content;

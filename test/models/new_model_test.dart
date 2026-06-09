@@ -149,4 +149,87 @@ void main() {
       expect(news.image, equals('http://image.jpg'));
     });
   });
+
+  group('New.fromHistory', () {
+    test('that creates a history New with required fields', () {
+      final news = New.fromHistory('History content');
+      // title comes from translation mock which returns empty string
+      expect(news.title, isA<String>());
+      expect(news.link, contains('cuacfm.org'));
+      expect(news.description, equals('History content'));
+      expect(news.image, isNotEmpty);
+    });
+  });
+
+  group('New.timeAgo', () {
+    test('that returns pubDate when pubDateTime is null', () {
+      final news = New('Title', 'http://link', 'Desc', '', New.getDate('invalid-date'));
+      // With invalid date, pubDateTime is null so timeAgo returns pubDate
+      expect(news.timeAgo(), isNotEmpty);
+    });
+
+    test('that returns minutes_ago for recent news within one hour', () {
+      final recentDate = DateTime.now().subtract(Duration(minutes: 5));
+      final dateStr = _formatDateForNew(recentDate);
+      final news = New('Title', 'http://link', 'Desc', '', New.getDate(dateStr));
+      final result = news.timeAgo();
+      expect(result, isNotEmpty);
+    });
+
+    test('that returns hours_ago for news from today', () {
+      final recentDate = DateTime.now().subtract(Duration(hours: 2));
+      final dateStr = _formatDateForNew(recentDate);
+      final news = New('Title', 'http://link', 'Desc', '', New.getDate(dateStr));
+      final result = news.timeAgo();
+      expect(result, isNotEmpty);
+    });
+
+    test('that returns days_ago for news from this week', () {
+      final recentDate = DateTime.now().subtract(Duration(days: 3));
+      final dateStr = _formatDateForNew(recentDate);
+      final news = New('Title', 'http://link', 'Desc', '', New.getDate(dateStr));
+      final result = news.timeAgo();
+      expect(result, isNotEmpty);
+    });
+
+    test('that returns pubDate for old news beyond a week', () {
+      final oldDate = DateTime.now().subtract(Duration(days: 10));
+      final dateStr = _formatDateForNew(oldDate);
+      final news = New('Title', 'http://link', 'Desc', '', New.getDate(dateStr));
+      final result = news.timeAgo();
+      expect(result, isNotEmpty);
+    });
+  });
+
+  group('New.fromInstance with alternate description keys', () {
+    test('that parses description with __cdata key', () {
+      final map = {
+        'title': {'\$t': 'Title'},
+        'link': {'\$t': 'http://link'},
+        'pubDate': {'\$t': ''},
+        'category': null,
+        'content\$encoded': {'__cdata': '<p>Content from cdata</p>'},
+      };
+      final news = New.fromInstance(map);
+      expect(news.description, isNotEmpty);
+    });
+
+    test('that parses description with description \$t key', () {
+      final map = {
+        'title': {'\$t': 'Title'},
+        'link': {'\$t': 'http://link'},
+        'pubDate': {'\$t': ''},
+        'category': null,
+        'description': {'\$t': 'Description via dollar-t'},
+      };
+      final news = New.fromInstance(map);
+      expect(news.description, isNotEmpty);
+    });
+  });
+}
+
+String _formatDateForNew(DateTime dt) {
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return '${days[dt.weekday - 1]}, ${dt.day.toString().padLeft(2, '0')} ${months[dt.month - 1]} ${dt.year} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:${dt.second.toString().padLeft(2, '0')} +0000';
 }

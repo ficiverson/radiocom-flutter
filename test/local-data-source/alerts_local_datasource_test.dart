@@ -24,7 +24,7 @@ void main() {
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
-    Hive.box('alerts').clear();
+    await Hive.box('alerts').clear();
   });
 
   test('that saveFromForeground persists a record in hive', () {

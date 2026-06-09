@@ -1,7 +1,4 @@
 import 'package:cuacfm/domain/repository/playlist_repository_contract.dart';
-import 'package:cuacfm/domain/usecase/add_to_playlist_use_case.dart';
-import 'package:cuacfm/domain/usecase/is_in_playlist_use_case.dart';
-import 'package:cuacfm/domain/usecase/remove_from_playlist_use_case.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/ui/episode-detail/episode_detail_presenter.dart';
 import 'package:flutter/cupertino.dart';

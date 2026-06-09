@@ -37,6 +37,7 @@ class PodcastControlsPresenter {
   late ClearPlaylistUseCase _clearPlaylistUseCase;
   late RemoveFromPlaylistUseCase _removeFromPlaylistUseCase;
   late ReorderPlaylistUseCase _reorderPlaylistUseCase;
+  // ignore: unused_field
   late IsInPlaylistUseCase _isInPlaylistUseCase;
   late AddToPlaylistStartUseCase _addToPlaylistStartUseCase;
   GetLiveProgramUseCase getLiveDataUseCase;

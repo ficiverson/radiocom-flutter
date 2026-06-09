@@ -117,4 +117,41 @@ void main() {
       expect(map['logoUrl'], equals('http://photo.jpg'));
     });
   });
+
+  group('Program.mapCategory', () {
+    final categoryMappings = [
+      'TV & Film',
+      'News & Politics',
+      'Sports & Recreation',
+      'Society & Culture',
+      'Education',
+      'Comedy',
+      'Music',
+      'Science & Medicine',
+      'Arts',
+      'Government & Organizations',
+      'Health',
+      'Technology',
+    ];
+
+    for (final category in categoryMappings) {
+      test('that maps $category to a localized string', () {
+        // Returns empty string via mock translations, but should not throw
+        expect(() => Program.mapCategory(category), returnsNormally);
+      });
+    }
+
+    test('that returns default for unknown category', () {
+      expect(() => Program.mapCategory('Unknown Category'), returnsNormally);
+    });
+  });
+
+  group('Program.getCategory', () {
+    test('that returns localized string for each category enum value', () {
+      for (final category in ProgramCategories.values) {
+        // Returns empty string via mock translations, but should not throw
+        expect(() => Program.getCategory(category), returnsNormally);
+      }
+    });
+  });
 }

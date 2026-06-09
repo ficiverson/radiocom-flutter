@@ -35,7 +35,7 @@ class MockRemoteDataSource extends Mock
       super.noSuchMethod(Invocation.method(#getNews, []),returnValue: news(true));
 
   @override Future<List<Episode>> getEpisodes(dynamic feedUrl) =>
-      super.noSuchMethod(Invocation.method(#getNews, []),returnValue: episodes(true));
+      super.noSuchMethod(Invocation.method(#getEpisodes, [feedUrl]),returnValue: episodes(true));
 
   @override Future<Outstanding?> getOutstanding(dynamic url) =>
       super.noSuchMethod(Invocation.method(#getOutstanding, [url]),returnValue: outstanding(true));

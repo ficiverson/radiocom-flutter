@@ -296,6 +296,7 @@ class HomePresenter {
     }
   }
 
+  // ignore: unused_element
   _stop() {
     currentPlayer.stop();
     _homeView.onNotifyUser(StatusPlayer.STOP);
