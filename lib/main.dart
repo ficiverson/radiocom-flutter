@@ -87,7 +87,7 @@ void main() async {
     if (episodeId != null) pendingNotificationEpisodeId.value = episodeId;
   });
   //Setting SystmeUIMode
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
       overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
 
   await JustAudioBackground.init(
@@ -117,8 +117,8 @@ void _applyThemeModeToApp(ThemeMode mode) {
     override: true,
   );
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
-    systemNavigationBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+    statusBarColor: Colors.transparent,
+    systemNavigationBarColor: Colors.transparent,
     systemNavigationBarDividerColor: Colors.transparent,
     systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
     statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
@@ -225,9 +225,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void _applySystemChrome(Brightness brightness) {
     final isDark = brightness == Brightness.dark;
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      systemStatusBarContrastEnforced: true,
-      statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
-      systemNavigationBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+      systemStatusBarContrastEnforced: false,
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
       systemNavigationBarDividerColor: Colors.transparent,
       systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
       statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,

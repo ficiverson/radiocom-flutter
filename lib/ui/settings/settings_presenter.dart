@@ -141,8 +141,14 @@ class SettingsPresenter {
     _launchURL(stationWeb);
   }
 
-  onMapsClicked(double lat, double long) {
-    _launchURL("geo:$lat,$long?q=$lat,$long(CUAC FM)");
+  onMapsClicked(double lat, double long) async {
+    final geoUri = Uri.parse("geo:$lat,$long?q=$lat,$long(CUAC FM)");
+    if (await canLaunchUrl(geoUri)) {
+      await launchUrl(geoUri, mode: LaunchMode.platformDefault);
+    } else {
+      final fallback = Uri.parse("https://www.google.com/maps/search/?api=1&query=$lat,$long");
+      await launchUrl(fallback, mode: LaunchMode.externalApplication);
+    }
   }
 
   onTermsClicked(){
