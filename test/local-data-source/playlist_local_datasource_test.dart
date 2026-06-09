@@ -22,8 +22,8 @@ void main() {
     await tempDir.delete(recursive: true);
   });
 
-  setUp(() {
-    Hive.box('playlist').clear();
+  setUp(() async {
+    await Hive.box('playlist').clear();
   });
 
   test('that addEpisode stores the episode in hive', () {
