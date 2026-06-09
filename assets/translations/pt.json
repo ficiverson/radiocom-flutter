@@ -50,6 +50,13 @@
     "no_news_description" : "Ainda não há conteúdo para esta notícia.",
     "alerts" : "Alertas"
   },
+  "new" : {
+    "history_title" : "História da CUAC FM",
+    "minutes_ago" : "Há %s min",
+    "hours_ago" : "Há %s h",
+    "yesterday" : "Ontem",
+    "days_ago" : "Há %s dias"
+  },
   "settings" : {
     "rating_title" : "Estás a gostar da app e das nossas emissões?",
     "rating_body" : "Por favor, considera avaliar-nos na loja de aplicações para que mais pessoas descubram a CUAC.",

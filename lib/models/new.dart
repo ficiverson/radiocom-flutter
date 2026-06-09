@@ -1,6 +1,9 @@
 import 'dart:math';
 
 import 'package:cuacfm/models/outstanding.dart';
+import 'package:cuacfm/translations/localizations.dart';
+import 'package:cuacfm/utils/safe_map.dart';
+import 'package:injector/injector.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:intl/intl.dart';
 
@@ -82,16 +85,20 @@ class New {
   }
 
   String timeAgo() {
+    final localization = Injector.appInstance.get<CuacLocalization>();
     if (pubDateTime == null) return pubDate;
     final diff = DateTime.now().difference(pubDateTime!);
     if (diff.inMinutes < 60) {
-      return "Hai ${diff.inMinutes} min";
+      return SafeMap.safe(localization.translateMap("new"), ["minutes_ago"])
+          .replaceAll("%s", diff.inMinutes.toString());
     } else if (diff.inHours < 24) {
-      return "Hai ${diff.inHours} h";
+      return SafeMap.safe(localization.translateMap("new"), ["hours_ago"])
+          .replaceAll("%s", diff.inHours.toString());
     } else if (diff.inDays == 1) {
-      return "Onte";
+      return SafeMap.safe(localization.translateMap("new"), ["yesterday"]);
     } else if (diff.inDays < 7) {
-      return "Hai ${diff.inDays} días";
+      return SafeMap.safe(localization.translateMap("new"), ["days_ago"])
+          .replaceAll("%s", diff.inDays.toString());
     } else {
       return pubDate;
     }
@@ -141,8 +148,9 @@ class New {
   }
 
   static New fromHistory(String content) {
+    final localization = Injector.appInstance.get<CuacLocalization>();
     return New(
-        "Historia de CUAC FM",
+        SafeMap.safe(localization.translateMap("new"), ["history_title"]),
         "https://cuacfm.org/asociacion-cuac/cuacfm/",
         content,
         "https://cuacfm.org/wp-content/uploads/2015/04/cousomicros1.jpg",
