@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace 'com.app.cuacfm'
-    compileSdkVersion 35
+    compileSdkVersion 36
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
