@@ -87,8 +87,7 @@ void main() {
     expect(sessions.length, equals(3));
   });
 
-  test('that cleanOldData runs without error', () async {
-    expect(() async => await WrappedLocalDataSource.cleanOldData(),
-        returnsNormally);
+  test('that cleanOldData completes without throwing', () async {
+    await WrappedLocalDataSource.cleanOldData();
   });
 }

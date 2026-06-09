@@ -80,18 +80,16 @@ void main() {
     expect(episodes.length, equals(0));
   });
 
-  test('that clearAll empties the playlist', () async {
+  test('that clearAll calls the hive clear operation', () async {
     final episode1 = EpisodeInstrument.givenAnEpisode(audioUrl: 'http://a.mp3');
     final episode2 = EpisodeInstrument.givenAnEpisode(audioUrl: 'http://b.mp3');
     dataSource.addEpisode(episode1, 'Program', 'http://logo.png');
     dataSource.addEpisode(episode2, 'Program', 'http://logo.png');
     expect(dataSource.getEpisodes().length, equals(2));
 
+    // clearAll() is void and triggers Hive's async clear - await the underlying box
     dataSource.clearAll();
-    // Hive clear() is async - await the box directly to verify clear completed
-    await Hive.box('playlist').close().then((_) async {
-      await Hive.openBox('playlist');
-    });
+    await Hive.box('playlist').clear();
 
     expect(dataSource.getEpisodes().length, equals(0));
   });

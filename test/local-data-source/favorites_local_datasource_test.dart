@@ -1,9 +1,12 @@
 import 'dart:io';
 
+import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/local-data-source/favorites_local_datasource.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 
+import '../instrument/helper/helper-instrument.dart';
 import '../instrument/model/program_instrument.dart';
 
 void main() {
@@ -11,6 +14,9 @@ void main() {
   late Directory tempDir;
 
   setUpAll(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    DependencyInjector().loadModules();
+    getTranslations();
     tempDir = await Directory.systemTemp.createTemp('hive_favorites_test');
     Hive.init(tempDir.path);
     await Hive.openBox('favourites');

@@ -4,7 +4,7 @@ description: A radio station with radioco integration.
 version: 3.1.0+1
 
 environment:
-  sdk: ">=3.2.3 <4.0.0"
+  sdk: ">=3.6.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -44,13 +44,12 @@ dependencies:
   firebase_performance: ^0.11.4+2
   firebase_crashlytics: ^5.2.3
   firebase_analytics: ^12.4.2
-  firebase_in_app_messaging: ^0.9.2+3
   fake_cloud_firestore: ^4.1.1
   mock_web_server: ^5.0.0-nullsafety.1
   mockito: ^5.4.4
   path_provider: ^2.1.2
   palette_generator: ^0.3.3
-  package_info_plus: ^9.0.1
+  package_info_plus: ^10.1.0
 
 dev_dependencies:
   flutter_test:
