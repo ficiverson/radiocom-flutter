@@ -107,11 +107,29 @@ final ValueNotifier<Locale?> appLocaleNotifier = ValueNotifier(null);
 final ValueNotifier<String?> pendingNotificationRssUrl = ValueNotifier(null);
 final ValueNotifier<String?> pendingNotificationEpisodeId = ValueNotifier(null);
 
+void _applyThemeModeToApp(ThemeMode mode) {
+  final isDark = mode == ThemeMode.dark ||
+      (mode == ThemeMode.system &&
+          WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark);
+  Injector.appInstance.registerSingleton<RadiocomColorsConract>(
+    () => isDark ? RadiocomColorsDark() : RadiocomColorsLight(),
+    override: true,
+  );
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+    systemNavigationBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+    systemNavigationBarDividerColor: Colors.transparent,
+    systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+    statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+  ));
+}
+
 class MyApp extends StatefulWidget {
   @override
   State<MyApp> createState() => _MyAppState();
 
   static void setThemeMode(ThemeMode mode) {
+    _applyThemeModeToApp(mode);
     appThemeModeNotifier.value = mode;
   }
 
@@ -166,14 +184,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   void _setThemeMode(ThemeMode mode) {
-    final isDark = mode == ThemeMode.dark ||
-        (mode == ThemeMode.system &&
-            WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark);
-    Injector.appInstance.registerSingleton<RadiocomColorsConract>(
-      () => isDark ? RadiocomColorsDark() : RadiocomColorsLight(),
-      override: true,
-    );
-    _applySystemChrome(isDark ? Brightness.dark : Brightness.light);
+    _applyThemeModeToApp(mode);
     appThemeModeNotifier.value = mode;
     if (mounted) setState(() {});
   }
@@ -187,13 +198,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     final prefs = await SharedPreferences.getInstance();
     final value = prefs.getString('theme_mode') ?? 'system';
     final mode = _parseThemeMode(value);
-    final isDark = mode == ThemeMode.dark ||
-        (mode == ThemeMode.system &&
-            WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark);
-    Injector.appInstance.registerSingleton<RadiocomColorsConract>(
-      () => isDark ? RadiocomColorsDark() : RadiocomColorsLight(),
-      override: true,
-    );
+    _applyThemeModeToApp(mode);
     appThemeModeNotifier.value = mode;
   }
 
@@ -246,8 +251,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       builder: (context, themeMode, _) => ValueListenableBuilder<Locale?>(
         valueListenable: appLocaleNotifier,
         builder: (context, locale, __) => MaterialApp(
-          key: ValueKey(
-              '${themeMode.index}_${locale?.languageCode ?? "system"}_${_showOnboarding ? 1 : 0}'),
           debugShowCheckedModeBanner: false,
           showPerformanceOverlay: false,
           showSemanticsDebugger: false,
