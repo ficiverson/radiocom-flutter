@@ -87,9 +87,9 @@ class RadiocomColorsLight implements RadiocomColorsConract {
   @override
   Color neuPalidGrey = Colors.grey.shade100;
   @override
-  Color neuWhite = Colors.white.withOpacity(0.075);
+  Color neuWhite = Colors.white.withValues(alpha: 0.075);
   @override
-  Color neuBlackOpacity = Colors.black.withOpacity(0.075);
+  Color neuBlackOpacity = Colors.black.withValues(alpha: 0.075);
 }
 
 class RadiocomColorsDark implements RadiocomColorsConract {
@@ -145,7 +145,7 @@ class RadiocomColorsDark implements RadiocomColorsConract {
   @override
   Color neuPalidGrey = Colors.grey.shade700;
   @override
-  Color neuWhite = Colors.black.withOpacity(0.075);
+  Color neuWhite = Colors.black.withValues(alpha: 0.075);
   @override
   Color neuBlackOpacity = Colors.grey.shade900;
 }

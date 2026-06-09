@@ -122,7 +122,7 @@ class _AlertsPageState extends State<AlertsPage>
                 child: Text(
                   SafeMap.safe(_localization.translateMap("settings"), ["alerts_section", "empty"]),
                   style: TextStyle(
-                    color: _colors.font.withOpacity(0.5),
+                    color: _colors.font.withValues(alpha: 0.5),
                     fontSize: 15,
                     letterSpacing: 0,
                   ),
@@ -134,7 +134,7 @@ class _AlertsPageState extends State<AlertsPage>
                 separatorBuilder: (_, __) => Divider(
                   height: 1,
                   indent: 76,
-                  color: _colors.grey.withOpacity(0.15),
+                  color: _colors.grey.withValues(alpha: 0.15),
                 ),
                 itemBuilder: (_, i) {
                   final alert = _alerts[i];
@@ -179,7 +179,7 @@ class _AlertsPageState extends State<AlertsPage>
                                 Text(
                                   alert.episodeTitle,
                                   style: TextStyle(
-                                    color: _colors.font.withOpacity(0.7),
+                                    color: _colors.font.withValues(alpha: 0.7),
                                     fontSize: 13,
                                     fontWeight: FontWeight.w400,
                                     letterSpacing: 0,
@@ -191,7 +191,7 @@ class _AlertsPageState extends State<AlertsPage>
                                 Text(
                                   _formatDate(alert.receivedAt),
                                   style: TextStyle(
-                                    color: _colors.font.withOpacity(0.4),
+                                    color: _colors.font.withValues(alpha: 0.4),
                                     fontSize: 11,
                                     letterSpacing: 0,
                                   ),

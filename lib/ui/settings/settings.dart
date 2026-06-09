@@ -432,7 +432,7 @@ class SettingsState extends State<Settings>
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.15),
+                color: Colors.black.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.close, size: 14, color: _colors.font),
@@ -579,7 +579,7 @@ class SettingsState extends State<Settings>
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Divider(height: 1, color: _colors.grey.withOpacity(0.2)),
+                          child: Divider(height: 1, color: _colors.grey.withValues(alpha: 0.2)),
                         ),
                         // Idioma
                         GestureDetector(
@@ -609,7 +609,7 @@ class SettingsState extends State<Settings>
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Divider(height: 1, color: _colors.grey.withOpacity(0.2)),
+                          child: Divider(height: 1, color: _colors.grey.withValues(alpha: 0.2)),
                         ),
                         // Schedule info
                         Row(
@@ -626,13 +626,13 @@ class SettingsState extends State<Settings>
                                 setState(() => isLiveNotificationEnabled = value);
                               },
                               activeTrackColor: _colors.yellow,
-                              activeColor: Color(0xFF1A1A1A),
+                              activeThumbColor: Color(0xFF1A1A1A),
                             ),
                           ],
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Divider(height: 1, color: _colors.grey.withOpacity(0.2)),
+                          child: Divider(height: 1, color: _colors.grey.withValues(alpha: 0.2)),
                         ),
                         // Pausar alertas
                         Row(
@@ -646,7 +646,7 @@ class SettingsState extends State<Settings>
                               value: _notificationsPaused,
                               onChanged: _toggleNotificationsPaused,
                               activeTrackColor: _colors.yellow,
-                              activeColor: Color(0xFF1A1A1A),
+                              activeThumbColor: Color(0xFF1A1A1A),
                             ),
                           ],
                         ),

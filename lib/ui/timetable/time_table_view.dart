@@ -328,7 +328,7 @@ class TimetableState extends State<Timetable>
                           color: _colors.palidwhitedark,
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: _colors.yellow.withOpacity(0.5),
+                            color: _colors.yellow.withValues(alpha: 0.5),
                             width: 1.5,
                           ),
                         )

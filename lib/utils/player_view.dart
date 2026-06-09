@@ -154,7 +154,7 @@ class PlayerViewState extends State<PlayerView> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.5),
+                              color: Colors.white.withValues(alpha: 0.5),
                               fontSize: 11,
                               fontWeight: FontWeight.w400,
                               letterSpacing: 0,
@@ -178,7 +178,7 @@ class PlayerViewState extends State<PlayerView> {
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                     child: Icon(
                       Icons.close,
-                      color: Colors.white.withOpacity(0.6),
+                      color: Colors.white.withValues(alpha: 0.6),
                       size: 22,
                     ),
                   ),

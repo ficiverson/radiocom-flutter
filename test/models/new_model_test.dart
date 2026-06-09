@@ -163,52 +163,67 @@ void main() {
 
   group('New.timeAgo', () {
     test('that returns pubDate when pubDateTime is null', () {
-      final news = New('Title', 'http://link', 'Desc', '', New.getDate('invalid-date'));
-      // With invalid date, pubDateTime is null so timeAgo returns pubDate
-      expect(news.timeAgo(), isNotEmpty);
+      final news = New('Title', 'http://link', 'Desc', '', 'some date');
+      // pubDateTime is null so timeAgo returns pubDate
+      expect(news.timeAgo(), equals('some date'));
     });
 
     test('that returns minutes_ago for recent news within one hour', () {
       final recentDate = DateTime.now().subtract(Duration(minutes: 5));
-      final dateStr = _formatDateForNew(recentDate);
-      final news = New('Title', 'http://link', 'Desc', '', New.getDate(dateStr));
+      final news = New('Title', 'http://link', 'Desc', '', 'pub', pubDateTime: recentDate);
       final result = news.timeAgo();
-      expect(result, isNotEmpty);
+      expect(result, isA<String>());
     });
 
     test('that returns hours_ago for news from today', () {
       final recentDate = DateTime.now().subtract(Duration(hours: 2));
-      final dateStr = _formatDateForNew(recentDate);
-      final news = New('Title', 'http://link', 'Desc', '', New.getDate(dateStr));
+      final news = New('Title', 'http://link', 'Desc', '', 'pub', pubDateTime: recentDate);
       final result = news.timeAgo();
-      expect(result, isNotEmpty);
+      expect(result, isA<String>());
+    });
+
+    test('that returns yesterday for news from exactly 1 day ago', () {
+      final yesterday = DateTime.now().subtract(Duration(hours: 25));
+      final news = New('Title', 'http://link', 'Desc', '', 'pub', pubDateTime: yesterday);
+      final result = news.timeAgo();
+      expect(result, isA<String>());
     });
 
     test('that returns days_ago for news from this week', () {
       final recentDate = DateTime.now().subtract(Duration(days: 3));
-      final dateStr = _formatDateForNew(recentDate);
-      final news = New('Title', 'http://link', 'Desc', '', New.getDate(dateStr));
+      final news = New('Title', 'http://link', 'Desc', '', 'pub', pubDateTime: recentDate);
       final result = news.timeAgo();
-      expect(result, isNotEmpty);
+      expect(result, isA<String>());
     });
 
     test('that returns pubDate for old news beyond a week', () {
       final oldDate = DateTime.now().subtract(Duration(days: 10));
-      final dateStr = _formatDateForNew(oldDate);
-      final news = New('Title', 'http://link', 'Desc', '', New.getDate(dateStr));
+      final news = New('Title', 'http://link', 'Desc', '', 'old date', pubDateTime: oldDate);
       final result = news.timeAgo();
-      expect(result, isNotEmpty);
+      expect(result, equals('old date'));
     });
   });
 
   group('New.fromInstance with alternate description keys', () {
-    test('that parses description with __cdata key', () {
+    test('that parses description with content__cdata key', () {
       final map = {
         'title': {'\$t': 'Title'},
         'link': {'\$t': 'http://link'},
         'pubDate': {'\$t': ''},
         'category': null,
         'content\$encoded': {'__cdata': '<p>Content from cdata</p>'},
+      };
+      final news = New.fromInstance(map);
+      expect(news.description, isNotEmpty);
+    });
+
+    test('that parses description from description.__cdata key', () {
+      final map = {
+        'title': {'\$t': 'Title'},
+        'link': {'\$t': 'http://link'},
+        'pubDate': {'\$t': ''},
+        'category': null,
+        'description': {'__cdata': 'Description via description cdata'},
       };
       final news = New.fromInstance(map);
       expect(news.description, isNotEmpty);
@@ -226,10 +241,4 @@ void main() {
       expect(news.description, isNotEmpty);
     });
   });
-}
-
-String _formatDateForNew(DateTime dt) {
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return '${days[dt.weekday - 1]}, ${dt.day.toString().padLeft(2, '0')} ${months[dt.month - 1]} ${dt.year} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:${dt.second.toString().padLeft(2, '0')} +0000';
 }

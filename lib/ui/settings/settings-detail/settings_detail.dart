@@ -298,7 +298,7 @@ class SettingsDetailState extends State<SettingsDetail>
                   width: active ? 20 : 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color: active ? _colors.yellow : _colors.grey.withOpacity(0.4),
+                    color: active ? _colors.yellow : _colors.grey.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 );

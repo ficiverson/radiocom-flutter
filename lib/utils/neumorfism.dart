@@ -128,7 +128,7 @@ class NeumorphicButton extends StatelessWidget {
               height: 30,
               decoration: down
                   ? BoxDecoration(
-                      color: _colors.yellow.withOpacity(0.18),
+                      color: _colors.yellow.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(50),
                     )
                   : null,

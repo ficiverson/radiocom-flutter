@@ -221,7 +221,7 @@ class MyHomePageState extends State<MyHomePage>
     ),
           if (_navigatingFromNotification)
             Container(
-              color: _colors.palidwhite.withOpacity(0.85),
+              color: _colors.palidwhite.withValues(alpha: 0.85),
               child: Center(
                 child: CircularProgressIndicator(
                   color: const Color(0xFF1A1A1A),
@@ -927,7 +927,7 @@ class MyHomePageState extends State<MyHomePage>
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            color: color.withOpacity(0.55),
+                            color: color.withValues(alpha: 0.55),
                           ),
                         ),
                         Center(
@@ -946,7 +946,7 @@ class MyHomePageState extends State<MyHomePage>
                                 height: 1.2,
                                 shadows: [
                                   Shadow(
-                                    color: Colors.black.withOpacity(0.4),
+                                    color: Colors.black.withValues(alpha: 0.4),
                                     blurRadius: 4,
                                     offset: Offset(0, 1),
                                   ),
@@ -1029,7 +1029,7 @@ Builder(builder: (context) {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.12),
+                        color: Colors.black.withValues(alpha: 0.12),
                         offset: Offset(0, 6),
                         blurRadius: 16,
                       ),
@@ -1108,7 +1108,7 @@ Builder(builder: (context) {
                                     Text(
                                       "CUAC FM 103.4",
                                       style: TextStyle(
-                                        color: Color(0xFF1A1A1A).withOpacity(0.6),
+                                        color: Color(0xFF1A1A1A).withValues(alpha: 0.6),
                                         fontSize: 13,
                                         fontWeight: FontWeight.w400,
                                         letterSpacing: 0,
@@ -1307,7 +1307,7 @@ Builder(builder: (context) {
                             width: active ? 16 : 6,
                             height: 6,
                             decoration: BoxDecoration(
-                              color: active ? _colors.yellow : _colors.fontGrey.withOpacity(0.3),
+                              color: active ? _colors.yellow : _colors.fontGrey.withValues(alpha: 0.3),
                               borderRadius: BorderRadius.circular(3),
                             ),
                           );
@@ -1380,7 +1380,7 @@ Builder(builder: (context) {
                                     children: [
                                       _buildRecentRow(_recentPodcast[i1]),
                                       if (hasPair) ...[
-                                        Container(height: 1, color: _colors.fontGrey.withOpacity(0.2)),
+                                        Container(height: 1, color: _colors.fontGrey.withValues(alpha: 0.2)),
                                         _buildRecentRow(_recentPodcast[i2]),
                                       ] else
                                         Spacer(),
@@ -1435,7 +1435,7 @@ Builder(builder: (context) {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          Colors.black.withOpacity(0.75),
+                          Colors.black.withValues(alpha: 0.75),
                         ],
                         stops: [0.4, 1.0],
                       ),
@@ -1452,7 +1452,7 @@ Builder(builder: (context) {
                       Text(
                         news.timeAgo(),
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
                           letterSpacing: 0,
@@ -1506,7 +1506,7 @@ Builder(builder: (context) {
                 width: active ? 16 : 6,
                 height: 6,
                 decoration: BoxDecoration(
-                  color: active ? _colors.yellow : _colors.fontGrey.withOpacity(0.4),
+                  color: active ? _colors.yellow : _colors.fontGrey.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(3),
                 ),
               );
@@ -1609,7 +1609,7 @@ Builder(builder: (context) {
               if (!isLast)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Container(height: 1, color: _colors.fontGrey.withOpacity(0.15)),
+                  child: Container(height: 1, color: _colors.fontGrey.withValues(alpha: 0.15)),
                 ),
               if (isLast)
                 SizedBox(height: shouldShowPlayer ? 60.0 : 10.0),
@@ -1633,7 +1633,7 @@ Builder(builder: (context) {
           Container(
             width: 60, height: 60,
             decoration: BoxDecoration(
-              color: _colors.fontGrey.withOpacity(0.15),
+              color: _colors.fontGrey.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -1643,11 +1643,11 @@ Builder(builder: (context) {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(height: 10, width: 60, decoration: BoxDecoration(color: _colors.fontGrey.withOpacity(0.15), borderRadius: BorderRadius.circular(5))),
+                Container(height: 10, width: 60, decoration: BoxDecoration(color: _colors.fontGrey.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(5))),
                 const SizedBox(height: 8),
-                Container(height: 14, width: 140, decoration: BoxDecoration(color: _colors.fontGrey.withOpacity(0.15), borderRadius: BorderRadius.circular(5))),
+                Container(height: 14, width: 140, decoration: BoxDecoration(color: _colors.fontGrey.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(5))),
                 const SizedBox(height: 6),
-                Container(height: 10, width: 80, decoration: BoxDecoration(color: _colors.fontGrey.withOpacity(0.15), borderRadius: BorderRadius.circular(5))),
+                Container(height: 10, width: 80, decoration: BoxDecoration(color: _colors.fontGrey.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(5))),
               ],
             ),
           ),
@@ -1918,7 +1918,7 @@ Builder(builder: (context) {
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.45),
+                          color: Colors.black.withValues(alpha: 0.45),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Center(
@@ -2026,11 +2026,11 @@ Builder(builder: (context) {
                   children: [
                     _buildRecentRow(_weeklyPodcast[i1]),
                     if (has2) ...[
-                      Container(height: 1, color: _colors.fontGrey.withOpacity(0.2)),
+                      Container(height: 1, color: _colors.fontGrey.withValues(alpha: 0.2)),
                       _buildRecentRow(_weeklyPodcast[i2]),
                     ],
                     if (has3) ...[
-                      Container(height: 1, color: _colors.fontGrey.withOpacity(0.2)),
+                      Container(height: 1, color: _colors.fontGrey.withValues(alpha: 0.2)),
                       _buildRecentRow(_weeklyPodcast[i3]),
                     ],
                     if (!has2 || !has3) Spacer(),
@@ -2419,7 +2419,7 @@ Builder(builder: (context) {
                     itemCount: favourites.length,
                     separatorBuilder: (_, __) => Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: Container(height: 1, color: _colors.fontGrey.withOpacity(0.12)),
+                      child: Container(height: 1, color: _colors.fontGrey.withValues(alpha: 0.12)),
                     ),
                     itemBuilder: (context, index) {
                       final program = favourites[index];
@@ -2592,7 +2592,7 @@ class _DiscoverSkeletonLoadingState extends State<_DiscoverSkeletonLoading>
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: widget.colors.fontGrey.withOpacity(0.18),
+          color: widget.colors.fontGrey.withValues(alpha: 0.18),
           borderRadius: BorderRadius.circular(radius),
         ),
       ),
@@ -2684,7 +2684,7 @@ class _SkeletonLoadingState extends State<_SkeletonLoading>
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: widget.colors.fontGrey.withOpacity(0.18),
+          color: widget.colors.fontGrey.withValues(alpha: 0.18),
           borderRadius: BorderRadius.circular(radius),
         ),
       ),

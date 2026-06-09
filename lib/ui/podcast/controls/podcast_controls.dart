@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
@@ -220,8 +218,8 @@ class PodcastControlsState extends State<PodcastControls>
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    (color ?? Colors.transparent).withOpacity(0.65),
-                    (color ?? Colors.transparent).withOpacity(0.0),
+                    (color ?? Colors.transparent).withValues(alpha: 0.65),
+                    (color ?? Colors.transparent).withValues(alpha: 0.0),
                   ],
                   stops: const [0.0, 1.0],
                 ),
@@ -468,7 +466,7 @@ class PodcastControlsState extends State<PodcastControls>
           data: SliderTheme.of(context).copyWith(
             activeTrackColor: _colors.yellow,
             thumbColor: _colors.yellow,
-            inactiveTrackColor: _colors.fontGrey.withOpacity(0.2),
+            inactiveTrackColor: _colors.fontGrey.withValues(alpha: 0.2),
           ),
           child: Slider(
             min: 0,
@@ -663,8 +661,7 @@ class PodcastControlsState extends State<PodcastControls>
               child: ReorderableListView.builder(
                 shrinkWrap: true,
                 itemCount: items.length,
-                onReorder: (oldIndex, newIndex) {
-                  if (newIndex > oldIndex) newIndex--;
+                onReorderItem: (oldIndex, newIndex) {
                   final moved = items.removeAt(oldIndex);
                   items.insert(newIndex, moved);
                   _presenter.reorderPlaylist(items, () => setSheetState(() {}));
@@ -768,7 +765,7 @@ class PodcastControlsState extends State<PodcastControls>
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: _colors.fontGrey.withOpacity(0.3),
+                    color: _colors.fontGrey.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -1023,7 +1020,7 @@ class _ActionChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: active
-              ? colors.fontGrey.withOpacity(0.15)
+              ? colors.fontGrey.withValues(alpha: 0.15)
               : colors.palidwhitedark,
           borderRadius: BorderRadius.circular(20),
         ),

@@ -127,9 +127,9 @@ class DetailPodcastPresenter {
   bool isSamePodcast(Episode episode) {
     var uuid = Uuid();
     return currentPlayer.episode != null &&
-        uuid.v5(Uuid.NAMESPACE_URL, episode.audio) ==
+        uuid.v5(Namespace.url.value, episode.audio) ==
             uuid.v5(
-              Uuid.NAMESPACE_URL,
+              Namespace.url.value,
               currentPlayer.episode?.audio ?? "no_audio",
             ) &&
         currentPlayer.isPodcast;
@@ -194,9 +194,9 @@ class DetailPodcastPresenter {
       final dir = await getTemporaryDirectory();
       final file = File('${dir.path}/share_image.jpg');
       await file.writeAsBytes(response.bodyBytes);
-      await Share.shareXFiles([XFile(file.path)], text: text);
+      await SharePlus.instance.share(ShareParams(files: [XFile(file.path)], text: text));
     } catch (_) {
-      Share.share(text);
+      SharePlus.instance.share(ShareParams(text: text));
     }
   }
 

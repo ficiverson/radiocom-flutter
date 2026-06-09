@@ -96,7 +96,7 @@ class NewDetailState extends State<NewDetail>
           ),
           if (_isLoadingEpisode)
             Container(
-              color: Colors.black.withOpacity(0.4),
+              color: Colors.black.withValues(alpha: 0.4),
               child: const Center(
                 child: CircularProgressIndicator(
                   color: Color(0xFFFDCC03),
@@ -205,7 +205,7 @@ class NewDetailState extends State<NewDetail>
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withOpacity(0.45),
+                        Colors.black.withValues(alpha: 0.45),
                         Colors.transparent,
                       ],
                     ),
@@ -221,7 +221,7 @@ class NewDetailState extends State<NewDetail>
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
                       colors: [
-                        Colors.black.withOpacity(0.75),
+                        Colors.black.withValues(alpha: 0.75),
                         Colors.transparent,
                       ],
                       stops: [0.0, 1.0],
@@ -250,7 +250,7 @@ class NewDetailState extends State<NewDetail>
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.4),
+                      color: Colors.black.withValues(alpha: 0.4),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -271,7 +271,7 @@ class NewDetailState extends State<NewDetail>
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.4),
+                      color: Colors.black.withValues(alpha: 0.4),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -292,7 +292,7 @@ class NewDetailState extends State<NewDetail>
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.4),
+                      color: Colors.black.withValues(alpha: 0.4),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -421,7 +421,7 @@ class NewDetailState extends State<NewDetail>
 extension HexColor on Color {
   String toHTMLHex({bool leadingHashSign = true}) =>
       '${leadingHashSign ? '#' : ''}'
-      '${red.toRadixString(16).padLeft(2, '0')}'
-      '${green.toRadixString(16).padLeft(2, '0')}'
-      '${blue.toRadixString(16).padLeft(2, '0')}';
+      '${((r * 255.0).round().clamp(0, 255)).toRadixString(16).padLeft(2, '0')}'
+      '${((g * 255.0).round().clamp(0, 255)).toRadixString(16).padLeft(2, '0')}'
+      '${((b * 255.0).round().clamp(0, 255)).toRadixString(16).padLeft(2, '0')}';
 }

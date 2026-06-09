@@ -92,9 +92,9 @@ class NewDetailPresenter {
       final dir = await getTemporaryDirectory();
       final file = File('${dir.path}/share_image.jpg');
       await file.writeAsBytes(response.bodyBytes);
-      await Share.shareXFiles([XFile(file.path)], text: text);
+      await SharePlus.instance.share(ShareParams(files: [XFile(file.path)], text: text));
     } catch (_) {
-      Share.share(text);
+      SharePlus.instance.share(ShareParams(text: text));
     }
   }
 

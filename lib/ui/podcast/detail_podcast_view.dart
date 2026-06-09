@@ -324,8 +324,8 @@ class DetailPodcastState extends State<DetailPodcastPage>
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      (color ?? _colors.palidwhite).withOpacity(0.85),
-                      (color ?? _colors.palidwhite).withOpacity(0.3),
+                      (color ?? _colors.palidwhite).withValues(alpha: 0.85),
+                      (color ?? _colors.palidwhite).withValues(alpha: 0.3),
                       _colors.palidwhite,
                     ],
                     stops: [0.0, 0.6, 1.0],
@@ -357,7 +357,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
@@ -453,7 +453,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
           padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
           child: Container(
             height: 1,
-            color: _colors.fontGrey.withOpacity(0.15),
+            color: _colors.fontGrey.withValues(alpha: 0.15),
           ),
         ),
 
@@ -509,7 +509,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
               Container(
                 width: 1,
                 height: 40,
-                color: _colors.fontGrey.withOpacity(0.15),
+                color: _colors.fontGrey.withValues(alpha: 0.15),
               ),
 
               // Botón notificacións
@@ -543,7 +543,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
                 ),
               ),
 
-              Container(width: 1, height: 40, color: _colors.fontGrey.withOpacity(0.15)),
+              Container(width: 1, height: 40, color: _colors.fontGrey.withValues(alpha: 0.15)),
 
               // Botón compartir
               GestureDetector(
@@ -577,7 +577,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
           padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
           child: Container(
             height: 1,
-            color: _colors.fontGrey.withOpacity(0.15),
+            color: _colors.fontGrey.withValues(alpha: 0.15),
           ),
         ),
       ],
@@ -717,7 +717,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
                       padding: EdgeInsets.symmetric(horizontal: 20.0),
                       child: Container(
                         height: 1,
-                        color: _colors.fontGrey.withOpacity(0.15),
+                        color: _colors.fontGrey.withValues(alpha: 0.15),
                       ),
                     ),
                   ],

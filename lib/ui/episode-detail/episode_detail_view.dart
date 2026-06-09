@@ -207,7 +207,7 @@ class _EpisodeDetailState extends State<EpisodeDetail>
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withOpacity(0.45),
+                        Colors.black.withValues(alpha: 0.45),
                         Colors.transparent,
                       ],
                     ),
@@ -223,7 +223,7 @@ class _EpisodeDetailState extends State<EpisodeDetail>
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.4),
+                      color: Colors.black.withValues(alpha: 0.4),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(Icons.arrow_back, color: Colors.white, size: 20),
@@ -291,7 +291,7 @@ class _EpisodeDetailState extends State<EpisodeDetail>
           SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-            child: Container(height: 1, color: _colors.fontGrey.withOpacity(0.15)),
+            child: Container(height: 1, color: _colors.fontGrey.withValues(alpha: 0.15)),
           ),
 
           // ── Botóns de acción centrados con divisores ──────────────────
@@ -306,7 +306,7 @@ class _EpisodeDetailState extends State<EpisodeDetail>
                   onTap: _onPlayEpisode,
                   size: 32,
                 )),
-                Container(width: 1, height: 40, color: _colors.fontGrey.withOpacity(0.15)),
+                Container(width: 1, height: 40, color: _colors.fontGrey.withValues(alpha: 0.15)),
                 Expanded(child: _actionButton(
                   icon: Icons.playlist_add,
                   label: "Playlist",
@@ -314,7 +314,7 @@ class _EpisodeDetailState extends State<EpisodeDetail>
                   onTap: _togglePlaylist,
                   size: 32,
                 )),
-                Container(width: 1, height: 40, color: _colors.fontGrey.withOpacity(0.15)),
+                Container(width: 1, height: 40, color: _colors.fontGrey.withValues(alpha: 0.15)),
                 Expanded(child: _actionButton(
                   icon: Icons.podcasts,
                   label: SafeMap.safe(_localization.translateMap("actions"), ["program"]),
@@ -344,7 +344,7 @@ class _EpisodeDetailState extends State<EpisodeDetail>
                     } catch (_) {}
                   },
                 )),
-                Container(width: 1, height: 40, color: _colors.fontGrey.withOpacity(0.15)),
+                Container(width: 1, height: 40, color: _colors.fontGrey.withValues(alpha: 0.15)),
                 Expanded(child: _actionButton(
                   icon: Icons.share,
                   label: SafeMap.safe(_localization.translateMap("actions"), ["share"]),
@@ -359,14 +359,14 @@ class _EpisodeDetailState extends State<EpisodeDetail>
                       final dir = await getTemporaryDirectory();
                       final file = File('${dir.path}/share_image.jpg');
                       await file.writeAsBytes(response.bodyBytes);
-                      await Share.shareXFiles([XFile(file.path)], text: text);
+                      await SharePlus.instance.share(ShareParams(files: [XFile(file.path)], text: text));
                     } catch (_) {
-                      Share.share(text);
+                      SharePlus.instance.share(ShareParams(text: text));
                     }
                   },
                 )),
                 if (ep.link.isNotEmpty) ...[
-                  Container(width: 1, height: 40, color: _colors.fontGrey.withOpacity(0.15)),
+                  Container(width: 1, height: 40, color: _colors.fontGrey.withValues(alpha: 0.15)),
                   Expanded(child: _actionButton(
                     icon: Icons.open_in_new,
                     label: "Web",
@@ -386,7 +386,7 @@ class _EpisodeDetailState extends State<EpisodeDetail>
           // ── Divisor ───────────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-            child: Container(height: 1, color: _colors.fontGrey.withOpacity(0.15)),
+            child: Container(height: 1, color: _colors.fontGrey.withValues(alpha: 0.15)),
           ),
 
           // ── Descrición ────────────────────────────────────────────────

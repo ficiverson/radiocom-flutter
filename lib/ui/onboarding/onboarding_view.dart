@@ -375,7 +375,7 @@ void _toggleFavorite(Program program) {
               subtitle,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: _dark.withOpacity(0.55),
+                color: _dark.withValues(alpha: 0.55),
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 height: 1.5,
@@ -541,8 +541,8 @@ void _toggleFavorite(Program program) {
                 color: isSelected
                     ? _dark
                     : count > 0
-                        ? _dark.withOpacity(0.15)
-                        : _dark.withOpacity(0.08),
+                        ? _dark.withValues(alpha: 0.15)
+                        : _dark.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
                 border: isSelected
                     ? Border.all(color: _dark, width: 2)
@@ -566,7 +566,7 @@ void _toggleFavorite(Program program) {
                                 ? _yellow
                                 : count > 0
                                     ? _dark
-                                    : _dark.withOpacity(0.4),
+                                    : _dark.withValues(alpha: 0.4),
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0,
@@ -577,10 +577,10 @@ void _toggleFavorite(Program program) {
                           "$count programas",
                           style: TextStyle(
                             color: isSelected
-                                ? Colors.white.withOpacity(0.6)
+                                ? Colors.white.withValues(alpha: 0.6)
                                 : count > 0
-                                    ? _dark.withOpacity(0.5)
-                                    : _dark.withOpacity(0.3),
+                                    ? _dark.withValues(alpha: 0.5)
+                                    : _dark.withValues(alpha: 0.3),
                             fontSize: 12,
                             fontWeight: FontWeight.w400,
                             letterSpacing: 0,
@@ -612,12 +612,12 @@ void _toggleFavorite(Program program) {
             }),
             child: Row(
               children: [
-                Icon(Icons.arrow_back, color: _dark.withOpacity(0.7), size: 18),
+                Icon(Icons.arrow_back, color: _dark.withValues(alpha: 0.7), size: 18),
                 const SizedBox(width: 6),
                 Text(
                   "Cambiar categorías",
                   style: TextStyle(
-                    color: _dark.withOpacity(0.7),
+                    color: _dark.withValues(alpha: 0.7),
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0,
@@ -691,7 +691,7 @@ void _toggleFavorite(Program program) {
                               color: isFav ? _dark : Colors.transparent,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: _dark.withOpacity(0.3),
+                                color: _dark.withValues(alpha: 0.3),
                                 width: isFav ? 0 : 1.5,
                               ),
                             ),
@@ -716,8 +716,8 @@ void _toggleFavorite(Program program) {
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: hasEpisodes
-                                    ? _dark.withOpacity(0.3)
-                                    : _dark.withOpacity(0.1),
+                                    ? _dark.withValues(alpha: 0.3)
+                                    : _dark.withValues(alpha: 0.1),
                                 width: isPlaylist ? 0 : 1.5,
                               ),
                             ),
@@ -729,7 +729,7 @@ void _toggleFavorite(Program program) {
                                   ? _yellow
                                   : hasEpisodes
                                       ? _dark
-                                      : _dark.withOpacity(0.3),
+                                      : _dark.withValues(alpha: 0.3),
                               size: 17,
                             ),
                           ),
@@ -759,7 +759,7 @@ void _toggleFavorite(Program program) {
           width: 140,
           height: 52,
           decoration: BoxDecoration(
-            color: isSelected ? _dark : _dark.withOpacity(0.12),
+            color: isSelected ? _dark : _dark.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(14),
           ),
           alignment: Alignment.center,
@@ -832,7 +832,7 @@ void _toggleFavorite(Program program) {
                 : "",
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: _dark.withOpacity(0.45),
+              color: _dark.withValues(alpha: 0.45),
               fontSize: 13,
               fontWeight: FontWeight.w400,
               letterSpacing: 0,
@@ -862,7 +862,7 @@ void _toggleFavorite(Program program) {
                 width: active ? 20 : 7,
                 height: 7,
                 decoration: BoxDecoration(
-                  color: active ? _dark : _dark.withOpacity(0.25),
+                  color: active ? _dark : _dark.withValues(alpha: 0.25),
                   borderRadius: BorderRadius.circular(4),
                 ),
               );
@@ -904,7 +904,7 @@ void _toggleFavorite(Program program) {
               child: Text(
                 "Saltar",
                 style: TextStyle(
-                  color: _dark.withOpacity(0.5),
+                  color: _dark.withValues(alpha: 0.5),
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 0,
