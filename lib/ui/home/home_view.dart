@@ -2717,23 +2717,26 @@ class _SkeletonLoadingState extends State<_SkeletonLoading>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(height: 20),
-        // Header bone
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: _bone(width: 160, height: 22, radius: 8),
+    return SingleChildScrollView(
+      physics: const NeverScrollableScrollPhysics(),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: _bone(width: 160, height: 22, radius: 8),
+            ),
           ),
-        ),
-        const SizedBox(height: 16),
-        _skeletonRow(),
-        _skeletonRow(),
-        _skeletonRow(),
-        _skeletonRow(),
-      ],
+          const SizedBox(height: 16),
+          _skeletonRow(),
+          _skeletonRow(),
+          _skeletonRow(),
+          _skeletonRow(),
+        ],
+      ),
     );
   }
 }

@@ -11,6 +11,7 @@ import 'package:cuacfm/utils/safe_map.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter/material.dart';
@@ -49,6 +50,7 @@ void main() async {
       (FlutterErrorDetails details) => errorScreen(details.exception);
   DependencyInjector().loadModules();
   await Firebase.initializeApp();
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await FirebaseMessaging.instance.requestPermission();
   await Injector.appInstance.get<AlertsRepositoryContract>().migratePending();
@@ -105,19 +107,16 @@ final ValueNotifier<Locale?> appLocaleNotifier = ValueNotifier(null);
 final ValueNotifier<String?> pendingNotificationRssUrl = ValueNotifier(null);
 final ValueNotifier<String?> pendingNotificationEpisodeId = ValueNotifier(null);
 
-// Callback global para cambiar o tema desde calquera parte da app
-_MyAppState? _myAppState;
-
 class MyApp extends StatefulWidget {
   @override
   State<MyApp> createState() => _MyAppState();
 
   static void setThemeMode(ThemeMode mode) {
-    _myAppState?._setThemeMode(mode);
+    appThemeModeNotifier.value = mode;
   }
 
   static void setLocale(Locale? locale) {
-    _myAppState?._setLocale(locale);
+    appLocaleNotifier.value = locale;
   }
 
   static Locale? parseLocale(String? value) {
@@ -127,13 +126,11 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   late Brightness _brightness;
-  Locale? _locale;
   bool _showOnboarding = true;
 
   @override
   void initState() {
     super.initState();
-    _myAppState = this;
     WidgetsBinding.instance.addObserver(this);
     _brightness = WidgetsBinding.instance.platformDispatcher.platformBrightness;
     _applySystemChrome(_brightness);
@@ -149,13 +146,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     final info = await PackageInfo.fromPlatform();
     final currentBuild = int.tryParse(info.buildNumber) ?? 0;
     final lastBuild = prefs.getInt('onboarding_version') ?? 0;
-    if (mounted && currentBuild <= lastBuild) setState(() => _showOnboarding = false);
+    if (mounted && currentBuild >= lastBuild) setState(() => _showOnboarding = false);
   }
 
   Future<void> _loadLocale() async {
     final prefs = await SharedPreferences.getInstance();
     final value = prefs.getString('app_locale');
-    if (mounted) setState(() => _locale = _parseLocale(value));
+    appLocaleNotifier.value = _parseLocale(value);
   }
 
   static Locale? _parseLocale(String? value) {
@@ -178,12 +175,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     );
     _applySystemChrome(isDark ? Brightness.dark : Brightness.light);
     appThemeModeNotifier.value = mode;
-    setState(() {});
+    if (mounted) setState(() {});
   }
 
   void _setLocale(Locale? locale) {
     appLocaleNotifier.value = locale;
-    setState(() => _locale = locale);
+    if (mounted) setState(() {});
   }
 
   Future<void> _loadThemeMode() async {
@@ -197,10 +194,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       () => isDark ? RadiocomColorsDark() : RadiocomColorsLight(),
       override: true,
     );
-    if (mounted) {
-      appThemeModeNotifier.value = mode;
-      setState(() {});
-    }
+    appThemeModeNotifier.value = mode;
   }
 
   static ThemeMode _parseThemeMode(String value) {
@@ -249,74 +243,83 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: appThemeModeNotifier,
-      builder: (context, themeMode, _) => MaterialApp(
-      debugShowCheckedModeBanner: false,
-      showPerformanceOverlay: false,
-      showSemanticsDebugger: false,
-      checkerboardOffscreenLayers: false,
-      themeMode: themeMode,
-      locale: _locale,
-      supportedLocales: [
-        const Locale('gl', 'ES'),
-        const Locale('es', 'ES'),
-        const Locale('en', 'US'),
-        const Locale('pt', 'PT')
-      ],
-      localizationsDelegates: [
-        LocalizationDelegate(),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate
-      ],
-      localeResolutionCallback:
-          (Locale? locale, Iterable<Locale> supportedLocales) {
-        if (locale != null) {
-          for (Locale supportedLocale in supportedLocales) {
-            if (supportedLocale.languageCode == locale.languageCode) {
-              return supportedLocale;
+      builder: (context, themeMode, _) => ValueListenableBuilder<Locale?>(
+        valueListenable: appLocaleNotifier,
+        builder: (context, locale, __) => MaterialApp(
+          key: ValueKey(
+              '${themeMode.index}_${locale?.languageCode ?? "system"}_${_showOnboarding ? 1 : 0}'),
+          debugShowCheckedModeBanner: false,
+          showPerformanceOverlay: false,
+          showSemanticsDebugger: false,
+          checkerboardOffscreenLayers: false,
+          themeMode: themeMode,
+          locale: locale,
+          supportedLocales: [
+            const Locale('gl', 'ES'),
+            const Locale('es', 'ES'),
+            const Locale('en', 'US'),
+            const Locale('pt', 'PT')
+          ],
+          localizationsDelegates: [
+            LocalizationDelegate(),
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate
+          ],
+          localeResolutionCallback:
+              (Locale? locale, Iterable<Locale> supportedLocales) {
+            if (locale != null) {
+              for (Locale supportedLocale in supportedLocales) {
+                if (supportedLocale.languageCode == locale.languageCode) {
+                  return supportedLocale;
+                }
+              }
             }
-          }
-        }
-        return supportedLocales.first;
-      },
-      title: 'CUAC FM',
-      navigatorObservers: [
-        FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
-      ],
-      theme: ThemeData(
-    canvasColor: Colors.transparent,
-    primarySwatch: Colors.grey,
-    brightness: Brightness.light,
-    fontFamily: 'PublicSans',
-    typography: Typography.material2021(
-      platform: TargetPlatform.android,
-      englishLike: Typography.englishLike2021.apply(fontFamily: 'PublicSans'),
-      dense: Typography.dense2021.apply(fontFamily: 'PublicSans'),
-      tall: Typography.tall2021.apply(fontFamily: 'PublicSans'),
-    ),
-),
-darkTheme: ThemeData(
-  brightness: Brightness.dark,
-  canvasColor: Colors.black,
-  primarySwatch: Colors.blue,
-  fontFamily: 'PublicSans',
-  typography: Typography.material2021(
-    platform: TargetPlatform.android,
-    englishLike: Typography.englishLike2021.apply(fontFamily: 'PublicSans'),
-    dense: Typography.dense2021.apply(fontFamily: 'PublicSans'),
-    tall: Typography.tall2021.apply(fontFamily: 'PublicSans'),
-  ),
-),
-      builder: (context, child) => DefaultTextStyle(
-        style: const TextStyle(fontFamily: 'PublicSans', decoration: TextDecoration.none),
-        child: child!,
+            return supportedLocales.first;
+          },
+          title: 'CUAC FM',
+          navigatorObservers: [
+            FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+          ],
+          theme: ThemeData(
+            canvasColor: Colors.transparent,
+            primarySwatch: Colors.grey,
+            brightness: Brightness.light,
+            fontFamily: 'PublicSans',
+            typography: Typography.material2021(
+              platform: TargetPlatform.android,
+              englishLike:
+                  Typography.englishLike2021.apply(fontFamily: 'PublicSans'),
+              dense: Typography.dense2021.apply(fontFamily: 'PublicSans'),
+              tall: Typography.tall2021.apply(fontFamily: 'PublicSans'),
+            ),
+          ),
+          darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            canvasColor: Colors.black,
+            primarySwatch: Colors.blue,
+            fontFamily: 'PublicSans',
+            typography: Typography.material2021(
+              platform: TargetPlatform.android,
+              englishLike:
+                  Typography.englishLike2021.apply(fontFamily: 'PublicSans'),
+              dense: Typography.dense2021.apply(fontFamily: 'PublicSans'),
+              tall: Typography.tall2021.apply(fontFamily: 'PublicSans'),
+            ),
+          ),
+          builder: (context, child) => DefaultTextStyle(
+            style: const TextStyle(
+                fontFamily: 'PublicSans', decoration: TextDecoration.none),
+            child: child!,
+          ),
+          home: _showOnboarding
+              ? OnboardingView(onFinished: () {
+                  setState(() => _showOnboarding = false);
+                })
+              : MyHomePage(title: 'Benvida a CUAC FM'),
+        ),
       ),
-      home: _showOnboarding
-          ? OnboardingView(onFinished: () {
-              setState(() => _showOnboarding = false);
-            })
-          : MyHomePage(title: 'Benvida a CUAC FM'),
-    ));
+    );
   }
 }
 

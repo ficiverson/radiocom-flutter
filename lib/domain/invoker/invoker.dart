@@ -4,11 +4,11 @@ import 'base_use_case.dart';
 class Invoker {
   Stream<Result> execute(BaseUseCase useCase) async*  {
     useCase.invoke();
-    for (var task in useCase.callback.getTasks()) {
+    final tasks = List<Future<Result>>.from(useCase.callback.getTasks());
+    useCase.callback.clearTasks();
+    for (var task in tasks) {
       var result = await task;
       yield result;
     }
-    useCase.callback.clearTasks();
   }
 }
-
