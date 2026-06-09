@@ -110,6 +110,7 @@ class MyHomePageState extends State<MyHomePage>
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
         statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
         systemNavigationBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
         systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
@@ -317,10 +318,11 @@ class MyHomePageState extends State<MyHomePage>
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       systemStatusBarContrastEnforced: true,
       statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+      statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+      statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
       systemNavigationBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
       systemNavigationBarDividerColor: Colors.transparent,
       systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-      statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
     ));
 
     connectionSubscription = Connectivity().onConnectivityChanged.listen((
@@ -772,10 +774,11 @@ class MyHomePageState extends State<MyHomePage>
       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
           systemStatusBarContrastEnforced: true,
           statusBarColor: Color(0xFFFAF9F6),
+          statusBarBrightness: Brightness.light,
+          statusBarIconBrightness: Brightness.dark,
           systemNavigationBarColor: Color(0xFFFAF9F6),
           systemNavigationBarDividerColor: Colors.transparent,
-          systemNavigationBarIconBrightness: Brightness.dark,
-          statusBarIconBrightness: Brightness.dark));
+          systemNavigationBarIconBrightness: Brightness.dark));
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
           overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
     } else {
@@ -786,10 +789,11 @@ class MyHomePageState extends State<MyHomePage>
       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
           systemStatusBarContrastEnforced: true,
           statusBarColor: Color(0xFF1A1A1A),
+          statusBarBrightness: Brightness.dark,
+          statusBarIconBrightness: Brightness.light,
           systemNavigationBarColor: Color(0xFF1A1A1A),
           systemNavigationBarDividerColor: Colors.transparent,
-          systemNavigationBarIconBrightness: Brightness.light,
-          statusBarIconBrightness: Brightness.light));
+          systemNavigationBarIconBrightness: Brightness.light));
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
           overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
     }
