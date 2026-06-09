@@ -18,7 +18,7 @@ android {
 
     defaultConfig {
         applicationId "com.app.cuacfm.radio.coruna"
-        minSdkVersion 23
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion 35
         versionCode 28
         versionName "3.5.0"

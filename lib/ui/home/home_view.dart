@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'dart:ui';
 
 import 'package:flutter/foundation.dart' as Foundation;
 import 'package:animations/animations.dart';
@@ -152,23 +151,7 @@ class MyHomePageState extends State<MyHomePage>
             child: child,
           );
         },
-        child: (!Foundation.kIsWeb && Platform.isIOS)
-    ? Stack(
-                children: [
-                  _getBodyLayout(),
-                  ClipRect(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).padding.top,
-                        color: _colors.palidwhitegradient,
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            : _getBodyLayout(),
+        child: _getBodyLayout(),
       ),
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
@@ -340,14 +323,15 @@ class MyHomePageState extends State<MyHomePage>
       statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
     ));
 
-    // ── CORRIXIDO: connectivity_plus 4.x devolve ConnectivityResult (non List)
     connectionSubscription = Connectivity().onConnectivityChanged.listen((
-      ConnectivityResult connection,
+      List<ConnectivityResult> connections,
     ) {
-      if (connection == ConnectivityResult.none) {
+      final connection = connections.isNotEmpty ? connections.first : ConnectivityResult.none;
+      if (connections.isEmpty || connections.contains(ConnectivityResult.none) && connections.length == 1) {
         new Timer(new Duration(milliseconds: 1200), () {
-          Connectivity().checkConnectivity().then((ConnectivityResult currentValue) {
-            if (currentValue == ConnectivityResult.none) {
+          Connectivity().checkConnectivity().then((List<ConnectivityResult> results) {
+            final currentValue = results.isNotEmpty ? results.first : ConnectivityResult.none;
+            if (results.isEmpty || (results.contains(ConnectivityResult.none) && results.length == 1)) {
               _presenter.currentPlayer.restorePlayer(currentValue);
               if (!mounted) return;
               setState(() {});

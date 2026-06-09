@@ -100,7 +100,7 @@ class NeumorphicEmptyView extends StatelessWidget {
 
 class NeumorphicButton extends StatelessWidget {
   final bool down;
-  final IconData icon;
+  final Object icon;
   final String? label;
   final double iconScale;
   final double iconSize;
@@ -111,11 +111,10 @@ class NeumorphicButton extends StatelessWidget {
   Widget build(BuildContext context) {
     RadiocomColorsConract _colors =
         Injector.appInstance.get<RadiocomColorsConract>();
-    final iconWidget = Icon(
-      icon,
-      color: down ? _colors.yellow : _colors.grey,
-      size: iconSize,
-    );
+    final color = down ? _colors.yellow : _colors.grey;
+    final iconWidget = icon is FaIconData
+        ? FaIcon(icon as FaIconData, color: color, size: iconSize)
+        : Icon(icon as IconData, color: color, size: iconSize);
     if (label != null) {
       return Column(
         mainAxisSize: MainAxisSize.min,
