@@ -50,7 +50,7 @@ dependencies:
   mockito: ^5.4.4
   path_provider: ^2.1.2
   palette_generator: ^0.3.3
-  package_info_plus: ^10.1.0
+  package_info_plus: ^9.0.1
 
 dev_dependencies:
   flutter_test:

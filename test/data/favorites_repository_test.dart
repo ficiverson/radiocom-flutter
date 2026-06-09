@@ -1,8 +1,11 @@
 import 'package:cuacfm/data/favorites_repository.dart';
+import 'package:cuacfm/injector/dependency_injector.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
 import '../instrument/data/local_datasource_mock.dart';
+import '../instrument/helper/helper-instrument.dart';
 import '../instrument/model/program_instrument.dart';
 
 void main() {
@@ -13,6 +16,9 @@ void main() {
       MockWrappedLocalDataSource();
 
   setUpAll(() {
+    WidgetsFlutterBinding.ensureInitialized();
+    DependencyInjector().loadModules();
+    getTranslations();
     repository = FavoritesRepository(
       localDataSource: mockFavoritesLocalDataSource,
       wrappedDataSource: mockWrappedLocalDataSource,
@@ -49,13 +55,13 @@ void main() {
   test('that removeProgram does not record wrapped event when program not found',
       () {
     when(mockFavoritesLocalDataSource.getFavorites()).thenReturn([]);
+    clearInteractions(mockWrappedLocalDataSource);
 
     repository.removeProgram('http://unknown.rss');
 
     verify(mockFavoritesLocalDataSource.removeProgram('http://unknown.rss'))
         .called(1);
-    verifyNever(
-        mockWrappedLocalDataSource.recordFavoriteChange(any, any));
+    verifyZeroInteractions(mockWrappedLocalDataSource);
   });
 
   test('that getFavorites returns list from local data source', () {
