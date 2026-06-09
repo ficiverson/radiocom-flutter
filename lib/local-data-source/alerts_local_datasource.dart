@@ -51,11 +51,20 @@ class AlertsLocalDataSource implements AlertsLocalDataSourceContract {
   List<AlertRecord> getAlerts() {
     final raw = _box.get(_hivePendingKey) as String? ?? '[]';
     final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
-    final now = DateTime.now();
-    return list
+    return list.map((m) => AlertRecord.fromMap(m)).toList();
+  }
+
+  @override
+  void cleanOldAlerts({int keepDays = 90}) {
+    final raw = _box.get(_hivePendingKey) as String? ?? '[]';
+    final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
+    final cutoff = DateTime.now().subtract(Duration(days: keepDays));
+    final filtered = list
         .map((m) => AlertRecord.fromMap(m))
-        .where((r) => r.receivedAt.year == now.year && r.receivedAt.month == now.month)
+        .where((r) => r.receivedAt.isAfter(cutoff))
+        .map((r) => r.toMap())
         .toList();
+    _box.put(_hivePendingKey, jsonEncode(filtered));
   }
 
   @override

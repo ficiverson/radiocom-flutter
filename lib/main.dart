@@ -54,6 +54,7 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await FirebaseMessaging.instance.requestPermission();
   await Injector.appInstance.get<AlertsRepositoryContract>().migratePending();
+  Injector.appInstance.get<AlertsRepositoryContract>().cleanOldAlerts();
 
   // Notificación cando a app estaba pechada
   final initialMessage = await FirebaseMessaging.instance.getInitialMessage();

@@ -19,6 +19,10 @@ class AlertsRepository implements AlertsRepositoryContract {
   List<AlertRecord> getAlerts() => _localDataSource.getAlerts();
 
   @override
+  void cleanOldAlerts({int keepDays = 90}) =>
+      _localDataSource.cleanOldAlerts(keepDays: keepDays);
+
+  @override
   Future<int> getUnreadCount() => _localDataSource.getUnreadCount();
 
   @override
