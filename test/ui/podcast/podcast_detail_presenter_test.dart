@@ -1,3 +1,5 @@
+import 'package:cuacfm/domain/repository/favorites_repository_contract.dart';
+import 'package:cuacfm/domain/repository/playlist_repository_contract.dart';
 import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/domain/result/result.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
@@ -13,6 +15,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:injector/injector.dart';
 import 'package:mockito/mockito.dart';
 
+import '../../instrument/data/local_repository_mock.dart';
 import '../../instrument/data/repository_mock.dart';
 import '../../instrument/helper/helper-instrument.dart';
 import '../../instrument/model/episode_instrument.dart';
@@ -20,6 +23,8 @@ import '../../instrument/ui/mock_podcast_detail_view.dart';
 
 void main() {
   MockRadiocoRepository mockRepository = MockRadiocoRepository();
+  MockFavoritesRepository mockFavoritesRepository = MockFavoritesRepository();
+  MockPlaylistRepository mockPlaylistRepository = MockPlaylistRepository();
   MockPodcastDetailView view = MockPodcastDetailView();
   MockPodcastDetailRouter router = MockPodcastDetailRouter();
   MockConnection mockConnection = MockConnection();
@@ -31,6 +36,12 @@ void main() {
     DependencyInjector().loadModules();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
         () => mockRepository,
+        override: true);
+    Injector.appInstance.registerDependency<FavoritesRepositoryContract>(
+        () => mockFavoritesRepository,
+        override: true);
+    Injector.appInstance.registerDependency<PlaylistRepositoryContract>(
+        () => mockPlaylistRepository,
         override: true);
     Injector.appInstance
         .registerDependency<DetailPodcastView>(() => view, override: true);

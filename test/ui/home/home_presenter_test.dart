@@ -1,3 +1,4 @@
+import 'package:cuacfm/domain/repository/favorites_repository_contract.dart';
 import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/episode.dart';
@@ -16,6 +17,7 @@ import 'package:injector/injector.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../instrument/data/local_repository_mock.dart';
 import '../../instrument/data/repository_mock.dart';
 import '../../instrument/helper/helper-instrument.dart';
 import '../../instrument/model/episode_instrument.dart';
@@ -27,6 +29,7 @@ import '../../instrument/ui/mock_home_view.dart';
 
 void main() {
   MockRadiocoRepository mockRepository = MockRadiocoRepository();
+  MockFavoritesRepository mockFavoritesRepository = MockFavoritesRepository();
   MockHomeView view = MockHomeView();
   MockHomeRouter router = MockHomeRouter();
   MockConnection mockConnection = MockConnection();
@@ -41,6 +44,9 @@ void main() {
     getTranslations();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
         () => mockRepository,
+        override: true);
+    Injector.appInstance.registerDependency<FavoritesRepositoryContract>(
+        () => mockFavoritesRepository,
         override: true);
     Injector.appInstance
         .registerDependency<HomeView>(() => view, override: true);
@@ -81,6 +87,7 @@ void main() {
         when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
         when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
         when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+        when(mockRepository.getOutStanding2()).thenAnswer((_) => MockRadiocoRepository.outstanding());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.isPlaying()).thenReturn(true);
@@ -97,9 +104,10 @@ void main() {
         expect(view.viewState[3], equals(HomeState.liveDataLoaded));
         expect(view.viewState[4], equals(HomeState.loadRecent));
         expect(view.viewState[5], equals(HomeState.onOutstanding));
-        expect(view.viewState[6], equals(HomeState.loadTimetable));
-        expect(view.viewState[7], equals(HomeState.loadPodcast));
-        expect(view.viewState[8], equals(HomeState.loadNews));
+        expect(view.viewState[6], equals(HomeState.onOutstanding));
+        expect(view.viewState[7], equals(HomeState.loadTimetable));
+        expect(view.viewState[8], equals(HomeState.loadPodcast));
+        expect(view.viewState[9], equals(HomeState.loadNews));
       });
 
   test('that can init the presenter without connection',
@@ -139,6 +147,7 @@ void main() {
         when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation(isEmpty: true));
         when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news(isEmpty: true));
         when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+        when(mockRepository.getOutStanding2()).thenAnswer((_) => MockRadiocoRepository.outstanding());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.isPlaying()).thenReturn(true);
@@ -155,9 +164,10 @@ void main() {
         expect(view.viewState[3], equals(HomeState.liveDataError));
         expect(view.viewState[4], equals(HomeState.recenterror));
         expect(view.viewState[5], equals(HomeState.onOutstanding));
-        expect(view.viewState[6], equals(HomeState.timetableError));
-        expect(view.viewState[7], equals(HomeState.podcastError));
-        expect(view.viewState[8], equals(HomeState.newsError));
+        expect(view.viewState[6], equals(HomeState.onOutstanding));
+        expect(view.viewState[7], equals(HomeState.timetableError));
+        expect(view.viewState[8], equals(HomeState.podcastError));
+        expect(view.viewState[9], equals(HomeState.newsError));
       });
 
   test('that can resume the view and realod the data',
@@ -165,6 +175,10 @@ void main() {
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+    when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+    when(mockRepository.getOutStanding2()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+    when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
+    when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
     when(mockPlayer.isPlaying()).thenReturn(true);
@@ -187,6 +201,10 @@ void main() {
         when(mockRepository.getLiveBroadcast())
             .thenAnswer((_) => MockRadiocoRepository.now(isEmpty: true));
         when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables(isEmpty: true));
+        when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+        when(mockRepository.getOutStanding2()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+        when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
+        when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.isPlaying()).thenReturn(true);
