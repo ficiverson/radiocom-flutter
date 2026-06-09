@@ -56,7 +56,7 @@ void main() {
     Result<Now> result = await repository.getLiveBroadcast();
 
     expect(result.status, equals(Status.fail));
-    expect(result.getData()?.name, equals("Continuidad CUAC FM"));
+    expect(result.getData()?.name, equals("Continuidade CUAC FM"));
   });
 
   test('that can fetch timetable from network', () async {
@@ -134,6 +134,7 @@ void main() {
     when(mockRemoteDataSource.getOutstanding("https://example.com/outstanding"))
         .thenAnswer((_) => MockRemoteDataSource.outstanding(false));
 
+    clearInteractions(mockRemoteDataSource);
     await repository.getOutStanding("https://example.com/outstanding");
 
     verify(mockRemoteDataSource.getOutstanding("https://example.com/outstanding")).called(1);

@@ -44,6 +44,7 @@ void main() {
     when(mockRepository.getOutStanding("https://example.com/outstanding"))
         .thenAnswer((_) => MockRadiocoRepository.outstanding());
 
+    clearInteractions(mockRepository);
     useCase.withParams("https://example.com/outstanding");
     await invoker.execute(useCase).first;
 
