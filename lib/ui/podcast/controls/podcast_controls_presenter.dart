@@ -3,7 +3,16 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:cuacfm/domain/invoker/invoker.dart';
 import 'package:cuacfm/domain/result/result.dart';
+import 'package:flutter/foundation.dart';
+import 'package:cuacfm/domain/usecase/add_to_playlist_start_use_case.dart';
+import 'package:cuacfm/domain/usecase/add_to_playlist_use_case.dart';
+import 'package:cuacfm/domain/usecase/clear_playlist_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_live_program_use_case.dart';
+import 'package:cuacfm/domain/usecase/get_playlist_use_case.dart';
+import 'package:cuacfm/domain/usecase/is_in_playlist_use_case.dart';
+import 'package:cuacfm/domain/usecase/remove_from_playlist_use_case.dart';
+import 'package:cuacfm/domain/usecase/reorder_playlist_use_case.dart';
+import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/player/current_timer.dart';
@@ -24,7 +33,16 @@ class PodcastControlsPresenter {
   late CurrentTimerContract currentTimer;
   late CurrentPlayerContract currentPlayer;
   late ConnectionContract connection;
+  late GetPlaylistUseCase _getPlaylistUseCase;
+  late ClearPlaylistUseCase _clearPlaylistUseCase;
+  late RemoveFromPlaylistUseCase _removeFromPlaylistUseCase;
+  late ReorderPlaylistUseCase _reorderPlaylistUseCase;
+  late IsInPlaylistUseCase _isInPlaylistUseCase;
+  late AddToPlaylistStartUseCase _addToPlaylistStartUseCase;
   GetLiveProgramUseCase getLiveDataUseCase;
+
+  List<Map<String, dynamic>> _playlist = [];
+  List<Map<String, dynamic>> get playlist => List.from(_playlist);
 
   PodcastControlsPresenter(
     this._view, {
@@ -34,7 +52,52 @@ class PodcastControlsPresenter {
     currentTimer = Injector.appInstance.get<CurrentTimerContract>();
     connection = Injector.appInstance.get<ConnectionContract>();
     currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
+    _getPlaylistUseCase = Injector.appInstance.get<GetPlaylistUseCase>();
+    _clearPlaylistUseCase = Injector.appInstance.get<ClearPlaylistUseCase>();
+    _removeFromPlaylistUseCase = Injector.appInstance.get<RemoveFromPlaylistUseCase>();
+    _reorderPlaylistUseCase = Injector.appInstance.get<ReorderPlaylistUseCase>();
+    _isInPlaylistUseCase = Injector.appInstance.get<IsInPlaylistUseCase>();
+    _addToPlaylistStartUseCase = Injector.appInstance.get<AddToPlaylistStartUseCase>();
     _view.setupInitialRate(_getRateIndex(currentPlayer.getPlaybackRate()));
+  }
+
+  void loadPlaylist(VoidCallback onLoaded) {
+    invoker.execute(_getPlaylistUseCase).listen((result) {
+      if (result is Success) {
+        _playlist = List<Map<String, dynamic>>.from(result.data ?? []);
+        onLoaded();
+      }
+    });
+  }
+
+  void clearPlaylist(VoidCallback onDone) {
+    invoker.execute(_clearPlaylistUseCase).listen((_) {
+      _playlist.clear();
+      onDone();
+    });
+  }
+
+  void removeFromPlaylist(String audioUrl, VoidCallback onDone) {
+    invoker.execute(_removeFromPlaylistUseCase.withParams(audioUrl)).listen((_) {
+      _playlist.removeWhere((m) => m['audio'] == audioUrl);
+      onDone();
+    });
+  }
+
+  void reorderPlaylist(List<Map<String, dynamic>> items, VoidCallback onDone) {
+    invoker.execute(_reorderPlaylistUseCase.withParams(items)).listen((_) {
+      _playlist = List<Map<String, dynamic>>.from(items);
+      onDone();
+    });
+  }
+
+  bool isInPlaylist(String audioUrl) =>
+      _playlist.any((m) => m['audio'] == audioUrl);
+
+  void addEpisodeAtStartOfPlaylist(Episode episode, String song, String image, VoidCallback onDone) {
+    invoker.execute(_addToPlaylistStartUseCase.withParams(AddToPlaylistParams(episode, song, image))).listen((_) {
+      loadPlaylist(onDone);
+    });
   }
 
   onViewResumed() async {

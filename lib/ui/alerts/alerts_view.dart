@@ -2,12 +2,13 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cuacfm/injector/dependency_injector.dart';
-import 'package:cuacfm/services/alerts_service.dart';
+import 'package:cuacfm/models/alert_record.dart';
 import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/utils/custom_image.dart';
 import 'package:cuacfm/utils/player_view.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
+import 'package:cuacfm/ui/alerts/alerts_presenter.dart';
 import 'package:cuacfm/ui/alerts/alerts_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,11 +23,13 @@ class AlertsPage extends StatefulWidget {
   State<AlertsPage> createState() => _AlertsPageState();
 }
 
-class _AlertsPageState extends State<AlertsPage> with WidgetsBindingObserver {
+class _AlertsPageState extends State<AlertsPage>
+    with WidgetsBindingObserver
+    implements AlertsView {
   late RadiocomColorsConract _colors;
   late CuacLocalization _localization;
   late AlertsRouterContract _router;
-  late AlertsService _service;
+  late AlertsPresenter _presenter;
   List<AlertRecord> _alerts = [];
   bool _isDark = false;
 
@@ -51,8 +54,8 @@ class _AlertsPageState extends State<AlertsPage> with WidgetsBindingObserver {
     _colors = Injector.appInstance.get<RadiocomColorsConract>();
     _localization = Injector.appInstance.get<CuacLocalization>();
     _router = Injector.appInstance.get<AlertsRouterContract>();
-    _service = AlertsService();
-    _loadAlerts();
+    _presenter = Injector.appInstance.get<AlertsPresenter>();
+    _presenter.loadAlerts();
     appThemeModeNotifier.addListener(_onThemeChanged);
   }
 
@@ -66,11 +69,13 @@ class _AlertsPageState extends State<AlertsPage> with WidgetsBindingObserver {
     if (mounted) setState(() {});
   }
 
-  Future<void> _loadAlerts() async {
-    await _service.markAllRead();
-    final alerts = _service.getAlerts();
+  @override
+  void onLoadAlerts(List<AlertRecord> alerts) {
     if (mounted) setState(() => _alerts = alerts);
   }
+
+  @override
+  void onAlertsError(dynamic error) {}
 
   String _formatDate(DateTime date) {
     return DateFormat('dd/MM/yyyy HH:mm').format(date);

@@ -1,6 +1,7 @@
+import 'package:cuacfm/domain/repository/alerts_repository_contract.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
-import 'package:cuacfm/services/alerts_service.dart';
-import 'package:cuacfm/services/wrapped_service.dart';
+import 'package:cuacfm/local-data-source/alerts_local_datasource.dart';
+import 'package:cuacfm/local-data-source/wrapped_local_datasource.dart';
 import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/translations/localizations_delegate.dart';
 import 'package:cuacfm/ui/home/home_view.dart';
@@ -23,7 +24,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (message.data['type'] == 'new_episode') {
-    await AlertsService.saveFromBackground({
+    await AlertsLocalDataSource.saveFromBackground({
       'programName': message.notification?.title ?? '',
       'programLogoUrl': message.notification?.android?.imageUrl ?? message.data['logo_url'] ?? '',
       'rssUrl': message.data['rss_url'] ?? '',
@@ -42,7 +43,7 @@ void main() async {
   await Hive.openBox('episodes_cache');
   await Hive.openBox('alerts');
   await Hive.openBox('wrapped_${DateTime.now().year}');
-  if (DateTime.now().month == 2) await WrappedService.cleanOldData();
+  if (DateTime.now().month == 2) await WrappedLocalDataSource.cleanOldData();
 
   ErrorWidget.builder =
       (FlutterErrorDetails details) => errorScreen(details.exception);
@@ -50,7 +51,7 @@ void main() async {
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await FirebaseMessaging.instance.requestPermission();
-  await AlertsService().migratePending();
+  await Injector.appInstance.get<AlertsRepositoryContract>().migratePending();
 
   // Notificación cando a app estaba pechada
   final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
@@ -64,7 +65,7 @@ void main() async {
   // Notificación en primeiro plano — gardar no historial
   FirebaseMessaging.onMessage.listen((message) {
     if (message.data['type'] == 'new_episode') {
-      AlertsService().saveFromForeground({
+      Injector.appInstance.get<AlertsRepositoryContract>().saveFromForeground({
         'programName': message.notification?.title ?? '',
         'programLogoUrl': message.notification?.android?.imageUrl ?? message.data['logo_url'] ?? '',
         'rssUrl': message.data['rss_url'] ?? '',
@@ -234,7 +235,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      AlertsService().migratePending();
+      Injector.appInstance.get<AlertsRepositoryContract>().migratePending();
     }
   }
 

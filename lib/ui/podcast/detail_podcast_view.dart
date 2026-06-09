@@ -5,8 +5,6 @@ import 'package:cuacfm/main.dart' show appThemeModeNotifier;
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/program.dart';
-import 'package:cuacfm/services/favorites_service.dart';
-import 'package:cuacfm/services/playlist_service.dart';
 import 'package:cuacfm/utils/notification_subscription_contract.dart';
 import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/ui/home/home_presenter.dart';
@@ -59,7 +57,6 @@ class DetailPodcastState extends State<DetailPodcastPage>
   late CuacLocalization _localization;
   final ScrollController _scrollController = ScrollController();
   bool _isScrolled = false;
-  final FavoritesService _favoritesService = FavoritesService();
   final NotificationSubscription _notificationService = NotificationSubscription();
 
   DetailPodcastState() {
@@ -172,7 +169,9 @@ class DetailPodcastState extends State<DetailPodcastPage>
     );
     _presenter = Injector.appInstance.get<DetailPodcastPresenter>();
     shouldShowPlayer = _presenter.currentPlayer.isPlaying();
-    _isFavorite = _favoritesService.isFavorite(_program.rssUrl);
+    _presenter.checkIsFavorite(_program.rssUrl, (isFav) {
+      if (mounted) setState(() => _isFavorite = isFav);
+    });
     _notificationService.isSubscribed(_program.rssUrl).then((value) {
       if (mounted) setState(() { _isNotificationEnabled = value; });
     });
@@ -469,10 +468,10 @@ class DetailPodcastState extends State<DetailPodcastPage>
                 onTap: () {
                   setState(() {
                     if (_isFavorite) {
-                      _favoritesService.removeProgram(widget.program.rssUrl);
+                      _presenter.removeFavorite(widget.program.rssUrl);
                       _isFavorite = false;
                     } else {
-                      _favoritesService.addProgram({
+                      _presenter.addFavorite({
                         'name': widget.program.name,
                         'description': widget.program.description,
                         'logoUrl': widget.program.logoUrl,
@@ -613,14 +612,12 @@ class DetailPodcastState extends State<DetailPodcastPage>
                       key: Key('swipe_${ep.audio}'),
                       direction: DismissDirection.startToEnd,
                       confirmDismiss: (_) async {
-                        final svc = PlaylistService();
-                        if (!svc.isInPlaylist(ep.audio)) {
-                          svc.addEpisode(ep, widget.program.name, widget.program.logoUrl);
-                          CuacToast.show(context, "Engadido á Playlist");
-                        } else {
-                          CuacToast.show(context, "Xa está na Playlist");
-                        }
-                        return false;
+                        final completer = Completer<bool>();
+                        _presenter.addToPlaylistIfNew(ep, widget.program.name, widget.program.logoUrl, (added) {
+                          CuacToast.show(context, added ? "Engadido á Playlist" : "Xa está na Playlist");
+                          completer.complete(false);
+                        });
+                        return completer.future;
                       },
                       background: Container(
                         color: Colors.green,

@@ -10,7 +10,6 @@ import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
-import 'package:cuacfm/services/favorites_service.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/outstanding.dart';
 import 'package:cuacfm/models/program.dart';
@@ -62,6 +61,7 @@ class MyHomePageState extends State<MyHomePage>
   final PageController _outstandingPageController = PageController(viewportFraction: 0.92);
   int _currentOutstandingPage = 0;
   List<Program> _podcast = [];
+  List<Program> _favorites = [];
   final Map<String, bool> _podcastHasEpisodes = {};
   bool _episodesChecked = false;
   String? _loadingRssUrl;
@@ -203,6 +203,9 @@ class MyHomePageState extends State<MyHomePage>
                   bottomBarOption = option;
                 });
                 _logTabScreen(option);
+                if (option == BottomBarOption.FAVOURITES) {
+                  _presenter.loadFavorites();
+                }
                 if (option == BottomBarOption.HOME) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     if (_homeScrollController.hasClients) {
@@ -538,6 +541,12 @@ class MyHomePageState extends State<MyHomePage>
   }
 
   @override
+  @override
+  void onLoadFavorites(List<Program> favorites) {
+    if (!mounted) return;
+    setState(() => _favorites = favorites);
+  }
+
   void onLoadPodcasts(List<Program> podcasts) {
     isLoadingPodcast = false;
     isEmptyPodcast = podcasts.isEmpty;
@@ -2350,11 +2359,7 @@ Builder(builder: (context) {
   }
 
   Widget _getFavouritesLayout() {
-    final _favService = FavoritesService();
-    final favourites = _favService
-        .getFavorites()
-        .map((e) => Program.fromFavorite(e))
-        .toList();
+    final favourites = _favorites;
     final isEmpty = favourites.isEmpty;
 
     return Container(
@@ -2428,8 +2433,7 @@ Builder(builder: (context) {
                           child: Icon(Icons.delete, color: Colors.white, size: 24),
                         ),
                         onDismissed: (_) {
-                          _favService.removeProgram(program.rssUrl);
-                          if (mounted) setState(() {});
+                          _presenter.removeFavorite(program.rssUrl);
                         },
                         child: GestureDetector(
                           onTap: () => _presenter.onPodcastClicked(program),

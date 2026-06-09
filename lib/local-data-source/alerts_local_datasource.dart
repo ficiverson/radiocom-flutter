@@ -1,4 +1,7 @@
 import 'dart:convert';
+
+import 'package:cuacfm/data/datasource/alerts_local_datasource_contract.dart';
+import 'package:cuacfm/models/alert_record.dart';
 import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -6,46 +9,10 @@ const _hivePendingKey = 'alerts_list';
 const _prefsPendingKey = 'pending_alerts';
 const _prefsUnreadKey = 'alerts_unread_count';
 
-class AlertRecord {
-  final String programName;
-  final String programLogoUrl;
-  final String rssUrl;
-  final String episodeTitle;
-  final String episodeId;
-  final DateTime receivedAt;
-
-  AlertRecord({
-    required this.programName,
-    required this.programLogoUrl,
-    required this.rssUrl,
-    required this.episodeTitle,
-    required this.episodeId,
-    required this.receivedAt,
-  });
-
-  Map<String, dynamic> toMap() => {
-    'programName': programName,
-    'programLogoUrl': programLogoUrl,
-    'rssUrl': rssUrl,
-    'episodeTitle': episodeTitle,
-    'episodeId': episodeId,
-    'receivedAt': receivedAt.toIso8601String(),
-  };
-
-  factory AlertRecord.fromMap(Map<String, dynamic> m) => AlertRecord(
-    programName: m['programName'] ?? '',
-    programLogoUrl: m['programLogoUrl'] ?? '',
-    rssUrl: m['rssUrl'] ?? '',
-    episodeTitle: m['episodeTitle'] ?? '',
-    episodeId: m['episodeId'] ?? '',
-    receivedAt: DateTime.tryParse(m['receivedAt'] ?? '') ?? DateTime.now(),
-  );
-}
-
-class AlertsService {
+class AlertsLocalDataSource implements AlertsLocalDataSourceContract {
   Box get _box => Hive.box('alerts');
 
-  // Garda dende background (SharedPreferences, sen Hive)
+  // Garda dende background (SharedPreferences, sen Hive). Static: chamado pre-DI.
   static Future<void> saveFromBackground(Map<String, dynamic> data) async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_prefsPendingKey) ?? '[]';
@@ -56,20 +23,19 @@ class AlertsService {
     await prefs.setInt(_prefsUnreadKey, unread + 1);
   }
 
-  // Migra pendentes de SharedPreferences a Hive ao arrancar a app
+  @override
   Future<void> migratePending() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_prefsPendingKey);
     if (raw == null) return;
     final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
     for (final m in list) {
-      final record = AlertRecord.fromMap(m);
-      _saveToHive(record);
+      _saveToHive(AlertRecord.fromMap(m));
     }
     await prefs.remove(_prefsPendingKey);
   }
 
-  // Garda dende foreground directamente en Hive
+  @override
   void saveFromForeground(Map<String, dynamic> data) {
     _saveToHive(AlertRecord.fromMap(data));
   }
@@ -81,7 +47,7 @@ class AlertsService {
     _box.put(_hivePendingKey, jsonEncode(list));
   }
 
-  // Devolve só alertas do mes actual
+  @override
   List<AlertRecord> getAlerts() {
     final raw = _box.get(_hivePendingKey) as String? ?? '[]';
     final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
@@ -92,11 +58,13 @@ class AlertsService {
         .toList();
   }
 
+  @override
   Future<int> getUnreadCount() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt(_prefsUnreadKey) ?? 0;
   }
 
+  @override
   Future<void> markAllRead() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_prefsUnreadKey, 0);

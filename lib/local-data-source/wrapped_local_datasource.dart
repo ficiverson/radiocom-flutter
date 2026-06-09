@@ -1,14 +1,12 @@
 import 'dart:convert';
+
+import 'package:cuacfm/data/datasource/wrapped_local_datasource_contract.dart';
 import 'package:hive/hive.dart';
 
 const _sessionsKey = 'sessions';
 const _minSessionSeconds = 30;
 
-class WrappedService {
-  static final WrappedService _instance = WrappedService._internal();
-  factory WrappedService() => _instance;
-  WrappedService._internal();
-
+class WrappedLocalDataSource implements WrappedLocalDataSourceContract {
   DateTime? _sessionStart;
   bool _isPodcast = false;
   String _programName = '';
@@ -26,7 +24,7 @@ class WrappedService {
     }
   }
 
-  // Chamado ao iniciar reprodución
+  @override
   void startSession({
     required bool isPodcast,
     String programName = '',
@@ -42,7 +40,7 @@ class WrappedService {
     _episodeId = episodeId;
   }
 
-  // Chamado ao deter a reprodución
+  @override
   void endSession() {
     final start = _sessionStart;
     if (start == null) return;
@@ -79,7 +77,7 @@ class WrappedService {
     box.put(_sessionsKey, jsonEncode(list));
   }
 
-  // Chamado ao engadir ou eliminar favorito
+  @override
   void recordFavoriteChange(String programName, bool added) {
     final box = _box;
     if (box == null) return;
@@ -97,7 +95,6 @@ class WrappedService {
     box.put(_sessionsKey, jsonEncode(list));
   }
 
-  // Limpa datos de anos anteriores (chamar en febreiro)
   static Future<void> cleanOldData() async {
     final currentYear = DateTime.now().year;
     for (final year in [currentYear - 2, currentYear - 3]) {
@@ -113,6 +110,7 @@ class WrappedService {
     }
   }
 
+  @override
   List<Map<String, dynamic>> getSessions() {
     final box = _box;
     if (box == null) return [];

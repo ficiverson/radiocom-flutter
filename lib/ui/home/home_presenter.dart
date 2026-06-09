@@ -1,13 +1,15 @@
 import 'dart:async';
 
 import 'package:cuacfm/domain/invoker/invoker.dart';
-import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/domain/result/result.dart';
 import 'package:cuacfm/domain/usecase/get_all_podcast_use_case.dart';
+import 'package:cuacfm/domain/usecase/get_favorites_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_live_program_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_news_use_case.dart';
+import 'package:cuacfm/domain/usecase/get_outstanding2_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_outstanding_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_timetable_use_case.dart';
+import 'package:cuacfm/domain/usecase/remove_favorite_use_case.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/outstanding.dart';
@@ -41,6 +43,8 @@ abstract class HomeView {
   void onLoadPodcasts(List<Program> podcasts);
   void onPodcastError(dynamic error);
 
+  void onLoadFavorites(List<Program> favorites);
+
   void onLoadTimetable(List<TimeTable> programsTimeTable);
   void onTimetableError(dynamic error);
 
@@ -72,6 +76,9 @@ class HomePresenter {
   GetTimetableUseCase getTimetableUseCase;
   GetNewsUseCase getNewsUseCase;
   GetOutstandingUseCase getOutstandingUseCase;
+  GetOutstanding2UseCase getOutstanding2UseCase;
+  GetFavoritesUseCase getFavoritesUseCase;
+  RemoveFavoriteUseCase removeFavoriteUseCase;
   HomeRouterContract router;
   late ConnectionContract connection;
   late CurrentPlayerContract currentPlayer;
@@ -88,7 +95,10 @@ class HomePresenter {
       required this.getLiveDataUseCase,
       required this.getTimetableUseCase,
       required this.getNewsUseCase,
-      required this.getOutstandingUseCase}) {
+      required this.getOutstandingUseCase,
+      required this.getOutstanding2UseCase,
+      required this.getFavoritesUseCase,
+      required this.removeFavoriteUseCase}) {
     currentTimer = Injector.appInstance.get<CurrentTimerContract>();
     connection = Injector.appInstance.get<ConnectionContract>();
     currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
@@ -344,14 +354,29 @@ class HomePresenter {
     });
   }
 
-  _getOutstanding2() async {
-    try {
-      final repo = Injector.appInstance.get<CuacRepositoryContract>();
-      final result = await repo.getOutStanding2();
-      if (result is Success && result.data != null) {
+  loadFavorites() {
+    invoker.execute(getFavoritesUseCase).listen((result) {
+      if (result is Success) {
+        _homeView.onLoadFavorites((result.data ?? [])
+            .map((e) => Program.fromFavorite(e))
+            .toList()
+            .cast<Program>());
+      }
+    });
+  }
+
+  removeFavorite(String rssUrl) {
+    invoker.execute(removeFavoriteUseCase.withParams(rssUrl)).listen((_) {
+      loadFavorites();
+    });
+  }
+
+  _getOutstanding2() {
+    invoker.execute(getOutstanding2UseCase).listen((result) {
+      if (result is Success) {
         _homeView.onLoadOutstanding2(result.data!);
       }
-    } catch (_) {}
+    });
   }
 
   _getTimetable() {

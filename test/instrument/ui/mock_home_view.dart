@@ -161,6 +161,11 @@ class MockHomeView implements HomeView {
     viewState.add(HomeState.onOutstandingError);
     data.add(error);
   }
+
+  @override
+  void onLoadFavorites(List<Program> favorites) {
+    data.add(favorites);
+  }
 }
 
 class MockHomeRouter implements HomeRouterContract {
@@ -200,5 +205,11 @@ class MockHomeRouter implements HomeRouterContract {
   goToTimeTable(List<TimeTable> timeTables) {
     viewState.add(HomeState.goToTimeTable);
     data.add(timeTables);
+  }
+
+  @override
+  goToEpisodeDetail(Episode episode, Program program) {
+    viewState.add(HomeState.goToEpisode);
+    data.add(episode);
   }
 }

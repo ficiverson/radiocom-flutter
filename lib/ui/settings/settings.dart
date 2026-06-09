@@ -16,7 +16,6 @@ import 'package:injector/injector.dart';
 import 'settings_presenter.dart';
 import 'package:cuacfm/main.dart' show appThemeModeNotifier;
 import 'package:in_app_review/in_app_review.dart';
-import 'package:cuacfm/services/alerts_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -169,11 +168,10 @@ class SettingsState extends State<Settings>
     appThemeModeNotifier.addListener(_onAppSettingsChanged);
     _loadRatingCardState();
     _loadNotificationsPausedState();
-    _loadAlertsUnread();
   }
 
-  Future<void> _loadAlertsUnread() async {
-    final count = await AlertsService().getUnreadCount();
+  @override
+  void onAlertsUnreadCount(int count) {
     if (mounted) setState(() => _alertsUnread = count);
   }
 

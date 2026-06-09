@@ -4,8 +4,9 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 import 'package:cuacfm/models/episode.dart';
-import 'package:cuacfm/services/playlist_service.dart';
 import 'package:cuacfm/translations/localizations.dart';
+import 'package:cuacfm/injector/dependency_injector.dart';
+import 'package:cuacfm/ui/episode-detail/episode_detail_presenter.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/podcast/controls/podcast_controls.dart';
 import 'package:cuacfm/utils/custom_image.dart';
@@ -43,13 +44,23 @@ class EpisodeDetail extends StatefulWidget {
 }
 
 class _EpisodeDetailState extends State<EpisodeDetail>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver
+    implements EpisodeDetailView {
   late MediaQueryData _queryData;
   late RadiocomColorsConract _colors;
   late CuacLocalization _localization;
   late CurrentPlayerContract _currentPlayer;
-  late PlaylistService _playlistService;
+  late EpisodeDetailPresenter _presenter;
   bool _inPlaylist = false;
+
+  _EpisodeDetailState() {
+    DependencyInjector().injectByView(this);
+  }
+
+  @override
+  void onPlaylistStatusChanged(bool inPlaylist) {
+    if (mounted) setState(() => _inPlaylist = inPlaylist);
+  }
 
   @override
   void initState() {
@@ -64,8 +75,8 @@ class _EpisodeDetailState extends State<EpisodeDetail>
       parameters: {'episode_title': widget.episode.title},
     );
     _currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
-    _playlistService = PlaylistService();
-    _inPlaylist = _playlistService.isInPlaylist(widget.episode.audio);
+    _presenter = Injector.appInstance.get<EpisodeDetailPresenter>();
+    _presenter.checkPlaylistStatus(widget.episode.audio);
 
     _currentPlayer.onConnection = (isError) {
       if (mounted) setState(() {});
@@ -110,16 +121,8 @@ class _EpisodeDetailState extends State<EpisodeDetail>
   }
 
   void _togglePlaylist() {
-    setState(() {
-      if (_inPlaylist) {
-        _playlistService.removeEpisode(widget.episode.audio);
-        _inPlaylist = false;
-      } else {
-        _playlistService.addEpisode(
-            widget.episode, widget.programName, widget.logoUrl);
-        _inPlaylist = true;
-      }
-    });
+    _presenter.togglePlaylist(
+        widget.episode, widget.programName, widget.logoUrl, _inPlaylist);
   }
 
   @override

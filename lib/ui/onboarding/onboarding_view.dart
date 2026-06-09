@@ -4,8 +4,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:cuacfm/main.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/program.dart';
-import 'package:cuacfm/services/favorites_service.dart';
-import 'package:cuacfm/services/playlist_service.dart';
+import 'package:cuacfm/ui/onboarding/onboarding_presenter.dart';
 import 'package:cuacfm/utils/custom_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -51,8 +50,7 @@ class _OnboardingViewState extends State<OnboardingView>
   final Set<String> _favoritedRssUrls = {};
   final Set<String> _playlistedRssUrls = {};
 
-  final FavoritesService _favoritesService = FavoritesService();
-  final PlaylistService _playlistService = PlaylistService();
+  late final OnboardingPresenter _presenter;
 
   String? _feedbackMessage;
 
@@ -77,6 +75,7 @@ class _OnboardingViewState extends State<OnboardingView>
   @override
   void initState() {
     super.initState();
+    _presenter = Injector.appInstance.get<OnboardingPresenter>();
     _dotsController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -176,11 +175,11 @@ class _OnboardingViewState extends State<OnboardingView>
 void _toggleFavorite(Program program) {
     setState(() {
       if (_favoritedRssUrls.contains(program.rssUrl)) {
-        _favoritesService.removeProgram(program.rssUrl);
+        _presenter.removeFavorite(program.rssUrl);
         _favoritedRssUrls.remove(program.rssUrl);
         _showFeedback("${program.name} eliminado de favoritos");
       } else {
-        _favoritesService.addProgram({
+        _presenter.addFavorite({
           'name': program.name,
           'description': program.description,
           'logoUrl': program.logoUrl,
@@ -201,11 +200,11 @@ void _toggleFavorite(Program program) {
     final lastEpisode = episodes.first;
     setState(() {
       if (_playlistedRssUrls.contains(program.rssUrl)) {
-        _playlistService.removeEpisode(lastEpisode.audio);
+        _presenter.removeFromPlaylist(lastEpisode.audio);
         _playlistedRssUrls.remove(program.rssUrl);
         _showFeedback("\"${lastEpisode.title}\" eliminado da playlist");
       } else {
-        _playlistService.addEpisode(lastEpisode, program.name, program.logoUrl);
+        _presenter.addToPlaylist(lastEpisode, program.name, program.logoUrl);
         _playlistedRssUrls.add(program.rssUrl);
         _showFeedback("\"${lastEpisode.title}\" engadido a playlist");
       }

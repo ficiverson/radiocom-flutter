@@ -39,6 +39,11 @@ class MockSettingsView implements SettingsView {
     viewState.add(SettingsState.onLiveNotification);
     data.add(status);
   }
+
+  @override
+  void onAlertsUnreadCount(int count) {
+    data.add(count);
+  }
 }
 
 class MockSettingsRouter implements SettingsRouterContract {
@@ -60,5 +65,10 @@ class MockSettingsRouter implements SettingsRouterContract {
   goToLegal(LegalType legalType) {
     viewState.add(SettingsState.goToLegal);
     data.add(legalType);
+  }
+
+  @override
+  goToAlerts() {
+    viewState.add(SettingsState.goToHistory);
   }
 }

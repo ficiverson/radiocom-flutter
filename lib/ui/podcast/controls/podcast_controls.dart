@@ -6,7 +6,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/episode.dart';
-import 'package:cuacfm/services/playlist_service.dart';
 import 'package:cuacfm/models/time_table.dart';
 import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
@@ -576,7 +575,9 @@ class PodcastControlsState extends State<PodcastControls>
             active: false,
             colors: _colors,
             onTap: () {
-              _showBottomPanel((sheetContext) => _buildPlaylistPanel(sheetContext));
+              _presenter.loadPlaylist(() {
+                _showBottomPanel((sheetContext) => _buildPlaylistPanel(sheetContext));
+              });
             },
           ),
           const SizedBox(width: 10),
@@ -613,11 +614,9 @@ class PodcastControlsState extends State<PodcastControls>
   }
 
   Widget _buildPlaylistPanel(BuildContext sheetContext) {
-    final svc = PlaylistService();
-
     return StatefulBuilder(
       builder: (ctx, setSheetState) {
-        final items = svc.getRawItems();
+        final items = _presenter.playlist;
 
         if (items.isEmpty) {
           return SizedBox(
@@ -646,8 +645,7 @@ class PodcastControlsState extends State<PodcastControls>
                 Text("Playlist", style: TextStyle(color: _colors.font, fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: 0)),
                 GestureDetector(
                   onTap: () {
-                    svc.clearAll();
-                    setSheetState(() {});
+                    _presenter.clearPlaylist(() => setSheetState(() {}));
                   },
                   child: Row(
                     children: [
@@ -669,8 +667,7 @@ class PodcastControlsState extends State<PodcastControls>
                   if (newIndex > oldIndex) newIndex--;
                   final moved = items.removeAt(oldIndex);
                   items.insert(newIndex, moved);
-                  svc.reorderFromList(items);
-                  setSheetState(() {});
+                  _presenter.reorderPlaylist(items, () => setSheetState(() {}));
                 },
                 itemBuilder: (ctx, index) {
                   final item = items[index];
@@ -682,17 +679,18 @@ class PodcastControlsState extends State<PodcastControls>
                         // Gardar o episodio actual ao inicio da playlist antes de cambiar
                         if (currentPlayer.episode != null) {
                           final current = currentPlayer.episode!;
-                          if (!svc.isInPlaylist(current.audio)) {
-                            svc.addEpisodeAtStart(
+                          if (!_presenter.isInPlaylist(current.audio)) {
+                            _presenter.addEpisodeAtStartOfPlaylist(
                               current,
                               currentPlayer.currentSong,
                               currentPlayer.currentImage,
+                              () {},
                             );
                           }
                         }
                         // Reproducir o episodio seleccionado e eliminalo da playlist
                         final episode = Episode.fromMap(item);
-                        svc.removeEpisode(item['audio'] as String);
+                        _presenter.removeFromPlaylist(item['audio'] as String, () {});
                         currentPlayer.isPodcast = true;
                         currentPlayer.episode = episode;
                         currentPlayer.currentSong = item['programName'] ?? episode.title;
@@ -730,9 +728,7 @@ class PodcastControlsState extends State<PodcastControls>
                             ),
                             GestureDetector(
                               onTap: () {
-                                svc.removeEpisode(item['audio'] as String);
-                                items.removeAt(index);
-                                setSheetState(() {});
+                                _presenter.removeFromPlaylist(item['audio'] as String, () => setSheetState(() {}));
                               },
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(8, 0, 4, 0),

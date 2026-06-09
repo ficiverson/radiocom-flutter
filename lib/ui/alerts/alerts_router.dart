@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/program.dart';
-import 'package:cuacfm/services/alerts_service.dart';
+import 'package:cuacfm/models/alert_record.dart';
 import 'package:cuacfm/ui/episode-detail/episode_detail_view.dart';
 import 'package:cuacfm/ui/podcast/detail_podcast_view.dart';
 import 'package:flutter/material.dart';

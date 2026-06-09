@@ -2,12 +2,16 @@ import 'dart:async';
 
 import 'package:just_audio/just_audio.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:cuacfm/domain/invoker/invoker.dart';
+import 'package:cuacfm/domain/result/result.dart';
+import 'package:cuacfm/domain/usecase/end_session_use_case.dart';
+import 'package:cuacfm/domain/usecase/get_playlist_use_case.dart';
+import 'package:cuacfm/domain/usecase/remove_from_playlist_use_case.dart';
+import 'package:cuacfm/domain/usecase/start_session_use_case.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
-import 'package:cuacfm/services/playlist_service.dart';
 import 'package:flutter/services.dart';
-import 'package:cuacfm/services/wrapped_service.dart';
 import 'package:injector/injector.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'dart:convert';
@@ -170,12 +174,15 @@ class CurrentPlayer implements CurrentPlayerContract {
   }
 
   Future<void> _playNextInPlaylist() async {
-    final playlist = PlaylistService();
-    final items = playlist.getRawItems();
+    final invoker = Injector.appInstance.get<Invoker>();
+    List<Map<String, dynamic>> items = [];
+    await for (final result in invoker.execute(Injector.appInstance.get<GetPlaylistUseCase>())) {
+      if (result is Success) items = List<Map<String, dynamic>>.from(result.data ?? []);
+    }
     if (items.isEmpty) return;
 
     final next = items.first;
-    playlist.removeEpisode(next['audio'] as String);
+    invoker.execute(Injector.appInstance.get<RemoveFromPlaylistUseCase>().withParams(next['audio'] as String)).drain();
 
     final nextEpisode = Episode.fromMap(next);
     isPodcast = true;
@@ -280,13 +287,14 @@ class CurrentPlayer implements CurrentPlayerContract {
         await audioPlayer.seek(position);
         if (audioPlayer.playing) {
           playerState = AudioPlayerState.play;
-          WrappedService().startSession(
-            isPodcast: isPodcast,
-            programName: isPodcast ? (currentSong.isNotEmpty ? currentSong : episode?.title ?? '') : '',
-            category: '',
-            episodeTitle: isPodcast ? episode?.title ?? '' : '',
-            episodeId: isPodcast ? episode?.audio ?? '' : '',
-          );
+          Injector.appInstance.get<Invoker>().execute(
+            Injector.appInstance.get<StartSessionUseCase>().withParams(StartSessionParams(
+              isPodcast: isPodcast,
+              programName: isPodcast ? (currentSong.isNotEmpty ? currentSong : episode?.title ?? '') : '',
+              category: '',
+              episodeTitle: isPodcast ? episode?.title ?? '' : '',
+              episodeId: isPodcast ? episode?.audio ?? '' : '',
+            ))).drain();
         }
         if (restorePosition != Duration(seconds: 0) &&
             restoreDuration != Duration(seconds: 0) &&
@@ -352,7 +360,7 @@ class CurrentPlayer implements CurrentPlayerContract {
   void stop() async {
     if (playerState == AudioPlayerState.play ||
         playerState == AudioPlayerState.pause) {
-      WrappedService().endSession();
+      Injector.appInstance.get<Invoker>().execute(Injector.appInstance.get<EndSessionUseCase>()).drain();
       playerState = AudioPlayerState.stop;
       if (isPodcast) {
         tempEpisode = episode;
