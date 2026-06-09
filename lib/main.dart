@@ -164,7 +164,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     final info = await PackageInfo.fromPlatform();
     final currentBuild = int.tryParse(info.buildNumber) ?? 0;
     final lastBuild = prefs.getInt('onboarding_version') ?? 0;
-    if (mounted && currentBuild >= lastBuild) setState(() => _showOnboarding = false);
+    if (mounted && currentBuild <= lastBuild) setState(() => _showOnboarding = false);
   }
 
   Future<void> _loadLocale() async {

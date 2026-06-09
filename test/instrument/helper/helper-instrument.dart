@@ -120,6 +120,8 @@ class MockPlayer extends Mock implements CurrentPlayerContract {
   @override
   String currentSong = ":";
   @override
+  String currentSubtitle = "";
+  @override
   Episode? episode;
   @override
   Duration duration = Duration(seconds: 0);

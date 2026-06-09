@@ -75,6 +75,7 @@ void main() {
     view.data.clear();
     router.viewState.clear();
     router.data.clear();
+    clearInteractions(mockRepository);
   });
 
   test('that can init the presenter and load all data',
