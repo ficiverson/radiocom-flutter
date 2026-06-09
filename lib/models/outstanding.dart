@@ -7,11 +7,13 @@ class Outstanding {
    String description;
    String logoUrl;
    bool isJoinForm = false;
+   DateTime modified = DateTime(0);
 
   Outstanding.fromInstance(Map<String, dynamic> map)
       : title = _cleanTitle(map["title"]["rendered"]),
         description = map["content"]["rendered"],
-        logoUrl = map["_links"]["wp:featuredmedia"][0]["href"];
+        logoUrl = map["_links"]["wp:featuredmedia"][0]["href"],
+        modified = DateTime.tryParse(map["modified"] ?? "") ?? DateTime(0);
 
   Outstanding.mock()
       : title = "Documental \"Nada que ver\"",
@@ -30,10 +32,7 @@ class Outstanding {
    }
 
    static _cleanTitle(String remoteTitle) {
-     if(remoteTitle.contains("[avisos-movil]")){
-       remoteTitle = remoteTitle.replaceAll("[avisos-movil]", "");
-     }
-     return remoteTitle;
+     return remoteTitle.replaceAll(RegExp(r'\[avisos-mo[bv]il[^\]]*\]'), '').trim();
    }
 
    static String getTitle() {

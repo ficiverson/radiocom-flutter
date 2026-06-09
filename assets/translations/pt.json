@@ -1,120 +1,166 @@
 {
   "home" : {
-    "welcome_msg_1" : "Bo día",
+    "welcome_msg_1" : "Bom dia",
     "welcome_msg_2" : "Boa tarde",
     "welcome_msg_3" : "Boa noite",
-    "outstanding_msg" : "Novas",
-    "live_msg" : "Escoitar en directo",
-    "recent_msg" : "Podcasts recentes",
-    "now_msg" : "Agora soa",
-    "join_msg" : "Únete",
-    "join_msg_detail" : "Queres facer radio?",
-    "podcast_of_day_msg" : "Un novo podcast para descubrir cada día",
-    "empty_podcast" : "Non hai podcasts recentes agora mesmo.",
-    "news" : "Novas",
-    "news_error" : "Non podemos cargar a novas agora mesmo.",
-    "podcast" : "Podcast",
-    "podcast_error" : "Non podemos cargar os podcasts neste momento.",
-    "categories" : "Categorías",
+    "outstanding_msg" : "Atualidade",
+    "live_msg" : "Ouvir em direto",
+    "recent_msg" : "Novo esta semana",
+    "podcast_recent_msg" : "Podcasts recentes",
+    "now_msg" : "Programação",
+    "schedule_now" : "Agora",
+    "schedule_next" : "A seguir",
+    "tab_home" : "Início",
+    "tab_podcasts" : "Podcasts",
+    "tab_news" : "Notícias",
+    "tab_favourites" : "Favoritos",
+    "tab_menu" : "Menu",
+    "favourites_empty" : "Ainda não tens favoritos.",
+    "join_msg" : "Junta-te",
+    "join_msg_detail" : "Queres fazer rádio?",
+    "podcast_of_day_msg" : "Descobre podcasts",
+    "empty_podcast" : "Não há podcasts recentes neste momento.",
+    "news" : "Notícias",
+    "news_error" : "Não conseguimos carregar as notícias neste momento.",
+    "podcast" : "Podcasts",
+    "podcast_error" : "Não conseguimos carregar os podcasts neste momento.",
+    "categories" : "Categorias",
     "see_all" : "Ver todos"
   },
   "podcast_controls" : {
-    "msg" : "Streming en directo da radio comunitaria da Coruña. 103.4 FM. Para máis información visita: www.cuacfm.org",
-    "auto_off_active" : "Apagado: ",
-    "auto_off_inactive" : "Autoapagado",
+    "msg" : "Streaming em direto da rádio comunitária da Corunha. 103.4 FM. Para mais informação visita: www.cuacfm.org",
+    "auto_off_active" : "Desligar: ",
+    "auto_off_inactive" : "Desligar auto",
     "faster_inactive" : "Velocidade",
     "faster_active" : "Faster: "
   },
   "timetable" : {
-    "title" : "Programas de hoxe"
+    "title" : "Programação",
+    "mon" : "Seg", "tue" : "Ter", "wed" : "Qua",
+    "thu" : "Qui", "fri" : "Sex", "sat" : "Sáb", "sun" : "Dom"
   },
   "all_podcast" : {
     "title" :  "Todos os podcasts",
     "search" : "Procurar podcast"
   },
   "podcast_detail" : {
-    "empty_msg" : "<p> Ainda non hai descripción :(</p> <br/><br/><img src=\"https://cuacfm.org/wp-content/uploads/2025/05/cuacfm-banner-top-2.png\">",
-    "empty_episodes_msg" : "Non hai episodios neste momento :("
+    "empty_msg" : "<p> Ainda não há descrição.</p> <br/><br/><img src=\"https://cuacfm.org/wp-content/uploads/2025/05/cuacfm-banner-top-2.png\">",
+    "empty_episodes_msg" : "Não há episódios neste momento.",
+    "no_description" : "Ainda não há descrição para este episódio.",
+    "no_news_description" : "Ainda não há conteúdo para esta notícia.",
+    "alerts" : "Alertas"
+  },
+  "new" : {
+    "history_title" : "História da CUAC FM",
+    "minutes_ago" : "Há %s min",
+    "hours_ago" : "Há %s h",
+    "yesterday" : "Ontem",
+    "days_ago" : "Há %s dias"
   },
   "settings" : {
+    "rating_title" : "Estás a gostar da app e das nossas emissões?",
+    "rating_body" : "Por favor, considera avaliar-nos na loja de aplicações para que mais pessoas descubram a CUAC.",
     "station_section" : {
-      "name" : "EMISORA",
-      "item1" : "Historia",
-      "item2" : "Galería"
+      "name" : "EMISSORA",
+      "item1" : "História",
+      "item2" : "Galeria"
+    },
+    "alerts_section" : {
+      "name" : "Alertas",
+      "empty" : "Não há alertas este mês."
     },
     "config_section" : {
-      "name" : "CONFIGURACIÓN",
-      "item1" : "Forzar modo oscuro",
-      "item2" : "Información de grella"
+      "name" : "CONFIGURAÇÃO",
+      "item1" : "Tema",
+      "item1_light" : "Claro",
+      "item1_dark" : "Escuro",
+      "item1_system" : "Sistema",
+      "item2" : "Informação de grelha",
+      "item4" : "Pausar alertas",
+      "item3" : "Idioma",
+      "item3_system" : "Sistema"
     },
     "social_section" : {
       "name" : "REDES SOCIAIS",
       "item1" : "Facebook",
-      "item2" : "Bluesky"
+      "item2" : "Bluesky",
+      "item3" : "Instagram",
+      "item4" : "TikTok"
     },
     "more_info_section" : {
-      "name" : "MÁIS INFORMACIÓN",
-      "item1" : "Páxina web",
-      "item2" : "Localización"
+      "name" : "MAIS INFORMAÇÃO",
+      "item1" : "Página web",
+      "item2" : "Localização",
+      "item3" : "Contactar"
     },
     "legal_info_section" : {
       "name" : "LEGAL",
       "item1" : "Política de privacidade",
       "item2" : "Termos de uso",
-      "item3" : "Licenzas de software"
+      "item3" : "Licenças de software"
     }
   },
   "error" : {
     "title" : "Erro",
-    "message" : "Ups houbo un problema inesperado :(",
-    "internet_error" : "Non dispós de conexión a internet",
-    "connection_error" : "Non podemos conectar co servidor neste momento"
+    "message" : "Ups, ocorreu um problema inesperado :(",
+    "internet_error" : "Não tens ligação à internet",
+    "connection_error" : "Não conseguimos ligar ao servidor neste momento"
   },
   "actions" : {
-    "close" : "Fechar"
+    "close" : "Fechar",
+    "see_more" : "Ver mais",
+    "see_less" : "Ver menos",
+    "add_favourite" : "Favorito",
+    "share" : "Partilhar",
+    "program" : "Programa",
+    "last_episode" : "Último ep.:",
+    "share_episode" : "🎙 Programa: %s\n📻 Ouve o episódio: %s\n🔗 ",
+    "share_program" : "🎙 %s na CUAC FM\n🔗 "
   },
   "general" : {
     "minutes" : " minutos.",
     "seconds" : " segundos.",
     "from" : "De ",
-    "to" : " a "
+    "to" : " a ",
+    "season" : "Temporada",
+    "episode" : "Episódio"
   },
   "categories" : {
     "others" : "Outros",
-    "tv" : "Cine e series",
-    "news" : "Novas e política",
-    "sport" : "Deportes",
+    "tv" : "Cinema e séries",
+    "news" : "Notícias e política",
+    "sport" : "Desporto",
     "magazine" : "Magazine",
     "edu" : "Educativo",
     "comedy" : "Humor",
     "music" : "Música",
-    "science" : "Ciencia",
+    "science" : "Ciência",
     "art" : "Arte",
-    "goverment" : "Eleccións",
+    "goverment" : "Governo e Org.",
     "health" : "Saúde",
-    "tech" : "Tecnoloxía"
+    "tech" : "Tecnologia"
   },
   "days" : {
-    "mon": "Luns",
-    "tue": "Martes",
-    "wed": "Mércores",
-    "thu": "Xoves",
-    "fri": "Venres",
+    "mon": "Segunda",
+    "tue": "Terça",
+    "wed": "Quarta",
+    "thu": "Quinta",
+    "fri": "Sexta",
     "sat": "Sábado",
     "sun": "Domingo"
   },
   "months" : {
-    "jan" : "xan",
-    "feb" : "feb",
+    "jan" : "jan",
+    "feb" : "fev",
     "mar" : "mar",
     "apr" : "abr",
     "may" : "mai",
-    "jun" : "xuñ",
-    "jul" : "xul",
+    "jun" : "jun",
+    "jul" : "jul",
     "ago" : "ago",
     "sep" : "set",
     "oct" : "out",
     "nov" : "nov",
-    "dec" : "dec"
+    "dec" : "dez"
   }
 }

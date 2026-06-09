@@ -1,15 +1,19 @@
 import 'package:cuacfm/domain/invoker/invoker.dart';
 import 'package:cuacfm/domain/result/result.dart';
 import 'package:cuacfm/domain/usecase/get_live_program_use_case.dart';
+import 'package:cuacfm/domain/usecase/get_timetable_use_case.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/now.dart';
+import 'package:cuacfm/models/time_table.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/timetable/time_table_router.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:injector/injector.dart';
+import 'package:intl/intl.dart';
 
 abstract class TimeTableView {
   onNewData();
+  onLoadTimetable(List<TimeTable> timetable);
   onConnectionError();
 }
 
@@ -18,6 +22,7 @@ class TimeTablePresenter {
   Invoker invoker;
   TimeTableRouterContract router;
   GetLiveProgramUseCase getLiveDataUseCase;
+  GetTimetableUseCase getTimetableUseCase;
   late ConnectionContract connection;
   late CurrentPlayerContract currentPlayer;
 
@@ -26,6 +31,7 @@ class TimeTablePresenter {
     required this.invoker,
     required this.router,
     required this.getLiveDataUseCase,
+    required this.getTimetableUseCase,
   }) {
     connection = Injector.appInstance.get<ConnectionContract>();
     currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
@@ -33,8 +39,24 @@ class TimeTablePresenter {
 
   onViewResumed() async {
     if (await connection.isConnectionAvailable()) {
+      getTimetable();
       getLiveProgram();
     }
+  }
+
+  getTimetable() {
+    final formatter = DateFormat('dd/MM/yyyy');
+    final now = DateTime.now();
+    final monday = now.subtract(Duration(days: now.weekday - 1));
+    final nextMonday = monday.add(const Duration(days: 7));
+    final after = formatter.format(monday);
+    final before = formatter.format(nextMonday);
+    invoker.execute(getTimetableUseCase.withParams(GetTimetableUseCaseParams(after, before)))
+        .listen((result) {
+      if (result is Success) {
+        view.onLoadTimetable(result.data);
+      }
+    });
   }
 
   getLiveProgram() {

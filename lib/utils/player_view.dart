@@ -1,29 +1,34 @@
 import 'package:cuacfm/ui/player/current_player.dart';
-import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:injector/injector.dart';
-
-import 'custom_image.dart';
-import 'neumorfism.dart';
 
 typedef PalyerCallback(bool isPlaying);
 
 class PlayerView extends StatefulWidget {
   PlayerView(
-      {required this.isMini, required this.isExpanded,
+      {required this.shouldShow,
       this.onMultimediaClicked,
       this.onDetailClicked,
-      required this.shouldShow,
-      this.isAtBottom = false,
-      this.isPlayingAudio = false});
+      this.onCloseClicked,
+      this.isPlayingAudio = false,
+      this.title,
+      this.subtitle,
+      // kept for API compatibility with podcast screens
+      this.isMini = false,
+      this.isExpanded = true,
+      this.isAtBottom = false});
 
   final PalyerCallback? onMultimediaClicked;
   final VoidCallback? onDetailClicked;
-  final bool isMini;
+  final VoidCallback? onCloseClicked;
   final bool shouldShow;
+  final bool isPlayingAudio;
+  final String? title;
+  final String? subtitle;
+  // legacy params — ignored in new design
+  final bool isMini;
   final bool isExpanded;
   final bool isAtBottom;
-  final bool isPlayingAudio;
 
   @override
   State<StatefulWidget> createState() => PlayerViewState();
@@ -31,7 +36,6 @@ class PlayerView extends StatefulWidget {
 
 class PlayerViewState extends State<PlayerView> {
   bool showPlayButton = true;
-  late RadiocomColorsConract _colors;
 
   _onMultimediaClicked() {
     widget.onMultimediaClicked!(showPlayButton);
@@ -48,131 +52,143 @@ class PlayerViewState extends State<PlayerView> {
 
   @override
   Widget build(BuildContext context) {
-    _colors = Injector.appInstance.get<RadiocomColorsConract>();
+    final player = Injector.appInstance.get<CurrentPlayerContract>();
     var queryData = MediaQuery.of(context);
-    if (!widget.shouldShow) {
+
+    if (!widget.shouldShow) showPlayButton = true;
+    if (widget.isPlayingAudio && !showPlayButton) {
       showPlayButton = true;
-    }
-    if (widget.isPlayingAudio && showPlayButton == false) {
-      showPlayButton = true;
-    } else if (!widget.isPlayingAudio && showPlayButton == true) {
+    } else if (!widget.isPlayingAudio && showPlayButton) {
       showPlayButton = false;
     }
-    return widget.isExpanded
-        ? Opacity(
-            key: Key("player_view_container"),
-            opacity: widget.shouldShow ? 1 : 0,
-            child: Container(
-                decoration: BoxDecoration(
-                    color: _colors.palidwhiteverydark,
-                    boxShadow: [
-                      BoxShadow(
-                        color: widget.isAtBottom
-                            ? _colors.neuWhite
-                            : _colors.transparent,
-                        offset: Offset(-2, -2),
-                        blurRadius: 2,
-                      ),
-                      BoxShadow(
-                        color: widget.isAtBottom
-                            ? _colors.neuWhite
-                            : _colors.transparent,
-                        offset: Offset(2, 2),
-                        blurRadius: 2,
-                      ),
-                    ]),
-                margin: EdgeInsets.fromLTRB(
-                    0.0, 0.0, 0.0, widget.isAtBottom ? 0.0 : 60.0),
-                width: queryData.size.width,
-                height: widget.isAtBottom ? 70.0 : 60.0,
-                child: _getContentView(true)))
-        : Opacity(
-            opacity: widget.shouldShow ? 1 : 0,
-            child: Container(
-                margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 90.0),
-                width: widget.isMini
-                    ? queryData.size.width * 0.33
-                    : queryData.size.width * 0.66,
-                child: _getContentView(false)));
-  }
 
-  Widget _getContentView(bool isFullScreen) {
-    return NeumorphicView(
-        isFullScreen: isFullScreen,
-        child: GestureDetector(
-            onTap: () {
-              if (widget.shouldShow) {
-                _onDetailClicked();
-              }
-            },
-            child: getPlayerContent()));
-  }
+    if (!widget.shouldShow) return SizedBox.shrink();
 
-  Widget getPlayerContent() {
-    return widget.isAtBottom
-        ? Center(
-            child: ListTile(
-                leading: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 1),
-                    width: 40.0,
-                    height: 40.0,
-                    child: CustomImage(
-                        resPath: Injector.appInstance
-                            .get<CurrentPlayerContract>()
-                            .currentImage,
-                        fit: BoxFit.fitHeight,
-                        radius: 20.0)),
-                title: Text(
-                  Injector.appInstance
-                      .get<CurrentPlayerContract>()
-                      .currentSong,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      color: _colors.font,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 13),
-                ),
-                trailing: new GestureDetector(
-                  onTap: () {
-                    if (widget.shouldShow) {
-                      _onMultimediaClicked();
-                    }
-                  },
-                  child: showPlayButton ?
-                        Icon(Icons.pause, color: _colors.yellow, size: 40.0)
-                      : Icon(Icons.play_arrow, color: _colors.yellow, size: 40.0),
-                )))
-        : ListTile(
-            leading: Container(
-                padding: EdgeInsets.symmetric(horizontal: 1),
-                width: 40.0,
-                height: 40.0,
-                child: CustomImage(
-                    resPath: Injector.appInstance
-                        .get<CurrentPlayerContract>()
-                        .currentImage,
-                    fit: BoxFit.fitHeight,
-                    radius: 20.0)),
-            title: Text(
-              Injector.appInstance
-                  .get<CurrentPlayerContract>()
-                  .currentSong,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  color: _colors.font,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 13),
+    final bottomPadding = 0.0;
+    final showProgress = player.isPodcast && player.duration.inMilliseconds > 0;
+    final progress = showProgress
+        ? (player.position.inMilliseconds / player.duration.inMilliseconds).clamp(0.0, 1.0)
+        : 0.0;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (showProgress)
+          Container(
+            width: queryData.size.width,
+            height: 2.5,
+            color: Colors.black,
+            alignment: Alignment.centerLeft,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.linear,
+              width: queryData.size.width * progress,
+              height: 2.5,
+              color: const Color(0xFFFDCC03),
             ),
-            trailing: new GestureDetector(
-                onTap: () {
-                  if (widget.shouldShow) {
-                    _onMultimediaClicked();
-                  }
-                },
-                child: showPlayButton
-                    ?  Icon(Icons.pause, color: _colors.yellow, size: 40.0)
-                    : Icon(Icons.play_arrow, color: _colors.yellow, size: 40.0)));
+          ),
+        Container(
+      width: queryData.size.width,
+      height: 64 + bottomPadding,
+      color: Colors.black,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(16, 0, 0, bottomPadding),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Botón play/pause
+            GestureDetector(
+              onTap: () {
+                if (widget.shouldShow) _onMultimediaClicked();
+              },
+              child: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: const Color(0xFFFDCC03),
+                    width: 2,
+                  ),
+                ),
+                child: Icon(
+                  showPlayButton ? Icons.pause : Icons.play_arrow,
+                  color: const Color(0xFFFDCC03),
+                  size: 22,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            // Texto central — abre controis
+            Expanded(
+              child: GestureDetector(
+                onTap: _onDetailClicked,
+                behavior: HitTestBehavior.opaque,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      widget.title ?? (player.isPodcast ? player.currentSong : "On Air: ${player.currentSong}"),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                    Builder(builder: (_) {
+                      final subtitle = widget.subtitle ??
+                          (player.isPodcast
+                              ? (player.episode?.title ?? "")
+                              : player.currentSubtitle);
+                      if (subtitle.isEmpty) return const SizedBox.shrink();
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 2),
+                          Text(
+                            subtitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w400,
+                              letterSpacing: 0,
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
+                  ],
+                ),
+              ),
+            ),
+            // Zona de peche — X e todo o espazo á dereita
+            if (widget.onCloseClicked != null)
+              GestureDetector(
+                onTap: widget.onCloseClicked,
+                behavior: HitTestBehavior.opaque,
+                child: SizedBox(
+                  height: 64,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.white.withValues(alpha: 0.6),
+                      size: 22,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    ),
+      ],
+    );
   }
 }

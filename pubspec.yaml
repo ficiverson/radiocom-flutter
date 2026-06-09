@@ -1,50 +1,55 @@
 name: cuacfm
 description: A radio station with radioco integration.
 
-version: 3.0.0
+version: 3.1.0+1
 
 environment:
-  sdk: ">=3.2.3 <4.0.0"
+  sdk: ">=3.6.0 <4.0.0"
 
 dependencies:
   flutter:
       sdk: flutter
+
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
   flutter_localizations:
     sdk: flutter
 
   verbal_expressions: ^1.0.0
-  just_audio: ^0.9.46
+  just_audio: ^0.10.5
   just_audio_background: ^0.0.1-beta.16
-  intl: ^0.19.0
-  xml2json: ^6.2.7
+  intl: ^0.20.2
+  xml2json: ^6.2.3
   cupertino_icons: ^1.0.8
-  device_info_plus: ^11.4.0
-  http: ^1.3.0
+  device_info_plus: ^13.1.0
+  http: ^1.1.2
   html: ^0.15.4
-  share_plus: ^11.0.0
-  shared_preferences: ^2.5.3
+  share_plus: ^13.1.0
+  shared_preferences: ^2.2.3
   injector: ^4.0.0
   animations: ^2.0.11
-  cached_network_image: ^3.4.1
-  flutter_widget_from_html: ^0.15.3
-  url_launcher: ^6.3.1
-  font_awesome_flutter: ^10.8.0
-  maps_launcher: ^3.0.0+1
+  cached_network_image: ^3.2.3
+  flutter_widget_from_html: ^0.17.2
+  url_launcher: ^6.2.6
+  font_awesome_flutter: ^11.0.0
+  in_app_review: ^2.0.12
   photo_view: ^0.15.0
   progress_indicators: ^1.0.0
-  connectivity_plus: ^6.1.4
+  connectivity_plus: ^7.1.1
   uuid: ^4.5.1
   provider: ^6.1.5
-  firebase_core: ^3.13.0
-  firebase_messaging: ^15.2.5
-  firebase_performance: ^0.10.1+5
-  firebase_crashlytics: ^4.3.5
-  firebase_analytics: ^11.4.5
-  firebase_in_app_messaging: ^0.8.1+5
-  fake_cloud_firestore: ^3.1.0
+  firebase_core: ^4.10.0
+  firebase_messaging: ^16.3.0
+  firebase_performance: ^0.11.4+2
+  firebase_crashlytics: ^5.2.3
+  firebase_analytics: ^12.4.2
+  fake_cloud_firestore: ^4.1.1
   mock_web_server: ^5.0.0-nullsafety.1
-  mockito: ^5.4.6
-  path_provider: ^2.1.5
+  mockito: ^5.4.4
+  path_provider: ^2.1.2
+  palette_generator: ^0.3.3
+  package_info_plus: ^10.1.0
 
 dev_dependencies:
   flutter_test:
@@ -61,8 +66,13 @@ flutter:
       - assets/graphics/icon_info.png
       - assets/graphics/play_podcast.png
       - assets/graphics/cuac-logo.png
+      - assets/graphics/cuac-logo-v2.png
       - assets/graphics/empty-logo.png
       - assets/graphics/joinus.jpg
+      - assets/graphics/cuac-utilidade-publica.png
+      - assets/graphics/cuac-icon-app.png
+      - assets/graphics/cuac_music_cover.png
+      - assets/graphics/default_programme_cover.png
       - assets/graphics/categories/tv.jpeg
       - assets/graphics/categories/news.jpeg
       - assets/graphics/categories/sports.jpeg
@@ -81,6 +91,50 @@ flutter:
       - assets/translations/pt.json
 
   fonts:
-      - family: Montserrat
-        fonts:
-          - asset: assets/fonts/Montserrat-Light.ttf
+    - family: PublicSans
+      fonts:
+        - asset: assets/fonts/PublicSans-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/PublicSans-ThinItalic.ttf
+          weight: 100
+          style: italic
+        - asset: assets/fonts/PublicSans-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/PublicSans-ExtraLightItalic.ttf
+          weight: 200
+          style: italic
+        - asset: assets/fonts/PublicSans-Light.ttf
+          weight: 300
+        - asset: assets/fonts/PublicSans-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/PublicSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/PublicSans-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/PublicSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/PublicSans-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: assets/fonts/PublicSans-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/PublicSans-SemiBoldItalic.ttf
+          weight: 600
+          style: italic
+        - asset: assets/fonts/PublicSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/PublicSans-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/PublicSans-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/PublicSans-ExtraBoldItalic.ttf
+          weight: 800
+          style: italic
+        - asset: assets/fonts/PublicSans-Black.ttf
+          weight: 900
+        - asset: assets/fonts/PublicSans-BlackItalic.ttf
+          weight: 900
+          style: italic

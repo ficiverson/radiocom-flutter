@@ -11,10 +11,16 @@ class LocalizationDelegate extends LocalizationsDelegate<CuacLocalization> {
 
   @override
   Future<CuacLocalization> load(Locale locale) async {
+    // Se xa hai un CuacLocalization rexistrado co mesmo locale, reutilizámolo
+    try {
+      final existing = Injector.appInstance.get<CuacLocalization>();
+      if (existing.locale.languageCode == locale.languageCode) {
+        return existing;
+      }
+    } catch (_) {}
     CuacLocalization localizations = new CuacLocalization(locale);
-    Injector.appInstance.registerSingleton<CuacLocalization>(() => localizations, override : true);
     await localizations.load();
-   // localizations.loadRemote();
+    Injector.appInstance.registerSingleton<CuacLocalization>(() => localizations, override: true);
     return localizations;
   }
 

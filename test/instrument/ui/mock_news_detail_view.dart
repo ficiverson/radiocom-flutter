@@ -20,6 +20,9 @@ class MockNewsDetailView implements NewDetailView {
   onNewData() {
     viewState.add(NewsDetailState.onNewData);
   }
+
+  @override
+  void onLoadingEpisode(bool loading) {}
 }
 
 class MockNewsRouter implements NewDetailRouterContract {

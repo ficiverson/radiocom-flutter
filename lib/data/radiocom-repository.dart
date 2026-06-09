@@ -70,8 +70,8 @@ class CuacRepository implements CuacRepositoryContract {
   }
 
   @override
-  Future<Result<Outstanding>> getOutStanding() async {
-    Outstanding? outstanding = await remoteDataSource.getOutstanding();
+  Future<Result<Outstanding>> getOutStanding(String url) async {
+    Outstanding? outstanding = await remoteDataSource.getOutstanding(url);
     if (outstanding == null) {
       return Error(Outstanding.mock(), Status.fail, "cannot connect");
     } else {

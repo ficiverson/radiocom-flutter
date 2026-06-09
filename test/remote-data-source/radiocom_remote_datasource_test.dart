@@ -161,13 +161,14 @@ void main() {
   test('that can parse a response for outstanding data', () async {
     server.enqueue(body: Helper.readFile("test_mocks/get_outstanding.json"));
     server.enqueue(body: Helper.readFile("test_mocks/get_outstanding_image.json"));
-    Outstanding? result = await remoteDataSource.getOutstanding();
+    Outstanding? result = await remoteDataSource.getOutstanding(mockUrl);
     expect(result?.title, contains("mocked"));
   });
 
   test('that can handle errors in outstanding data', () async {
     server.enqueue(body: "",httpCode: 401);
-    Outstanding? result = await remoteDataSource.getOutstanding();
+    Outstanding? result = await remoteDataSource.getOutstanding(mockUrl);
     expect(result, isNull);
   });
+
 }

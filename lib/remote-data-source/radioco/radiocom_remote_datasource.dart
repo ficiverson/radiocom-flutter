@@ -104,10 +104,10 @@ class RadiocoRemoteDataSource implements RadiocoRemoteDataSourceContract {
   }
 
   @override
-  Future<Outstanding?> getOutstanding() async {
+  Future<Outstanding?> getOutstanding(String url) async {
     try {
       dynamic res = await this.client.get(
-        Uri.parse(radiocoAPI.outstandingUrl),
+        Uri.parse(url),
         responseType: HTTPResponseType.JSON,
       );
       if (res["status"] == publishState) {

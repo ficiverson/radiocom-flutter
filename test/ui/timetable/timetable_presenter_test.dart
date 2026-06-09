@@ -58,6 +58,7 @@ void main() {
       () async {
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
+    when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
     when(mockPlayer.isPlaying()).thenReturn(true);
@@ -75,6 +76,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast())
             .thenAnswer((_) => MockRadiocoRepository.now(isEmpty: true));
+        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables(isEmpty: true));
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.isPlaying()).thenReturn(true);
@@ -93,6 +95,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
+        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(false));
         when(mockPlayer.isPlaying()).thenReturn(true);
@@ -111,6 +114,7 @@ void main() {
           () async {
         when(mockRepository.getLiveBroadcast()).thenAnswer(
                 (_) => MockRadiocoRepository.now());
+        when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         mockPlayer.isPodcast = true;

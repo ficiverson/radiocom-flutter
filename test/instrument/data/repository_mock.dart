@@ -28,7 +28,7 @@ class MockRadiocoRepository extends Mock implements CuacRepositoryContract {
           returnValue: now());
   @override
   Future<Result<List<TimeTable>>> getTimetableData(
-          String? after, String? before) =>
+          dynamic after, dynamic before) =>
       super.noSuchMethod(Invocation.method(#getTimetableData, [after, before]),
           returnValue: timetables());
   @override
@@ -39,12 +39,12 @@ class MockRadiocoRepository extends Mock implements CuacRepositoryContract {
   Future<Result<List<New>>> getNews() =>
       super.noSuchMethod(Invocation.method(#getNews, []), returnValue: news());
   @override
-  Future<Result<List<Episode>>> getEpisodes(String? feedUrl) =>
+  Future<Result<List<Episode>>> getEpisodes(dynamic feedUrl) =>
       super.noSuchMethod(Invocation.method(#getEpisodes, [feedUrl]),
           returnValue: episodes());
   @override
-  Future<Result<Outstanding>> getOutStanding() =>
-      super.noSuchMethod(Invocation.method(#getOutStanding, []),
+  Future<Result<Outstanding>> getOutStanding(dynamic url) =>
+      super.noSuchMethod(Invocation.method(#getOutStanding, [url]),
           returnValue: outstanding());
 
   static Future<Result<RadioStation>> radioStation({bool isEmpty = false}) {

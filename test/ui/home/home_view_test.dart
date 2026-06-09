@@ -1,3 +1,4 @@
+import 'package:cuacfm/domain/repository/favorites_repository_contract.dart';
 import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/ui/home/home_presenter.dart';
@@ -11,11 +12,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:injector/injector.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../instrument/data/local_repository_mock.dart';
 import '../../instrument/data/repository_mock.dart';
 import '../../instrument/helper/helper-instrument.dart';
 
 void main() {
   MockRadiocoRepository mockRepository = MockRadiocoRepository();
+  MockFavoritesRepository mockFavoritesRepository = MockFavoritesRepository();
   MockConnection mockConnection = MockConnection();
   MockPlayer mockPlayer = MockPlayer();
   MockNotifcationSubscription notifcationSubscription = MockNotifcationSubscription();
@@ -29,6 +32,9 @@ void main() {
     mockTranslationsWithLocale();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
         () => mockRepository,
+        override: true);
+    Injector.appInstance.registerDependency<FavoritesRepositoryContract>(
+        () => mockFavoritesRepository,
         override: true);
     Injector.appInstance.registerDependency<ConnectionContract>(
         () => mockConnection,
@@ -57,7 +63,7 @@ void main() {
         when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
         when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
         when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
-        when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+        when(mockRepository.getOutStanding(any)).thenAnswer((_) => MockRadiocoRepository.outstanding());
         when(mockConnection.isConnectionAvailable())
             .thenAnswer((_) => Future.value(true));
         when(mockPlayer.isPlaying()).thenReturn(true);
@@ -86,7 +92,7 @@ void main() {
     when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
     when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
     when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
-    when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+    when(mockRepository.getOutStanding(any)).thenAnswer((_) => MockRadiocoRepository.outstanding());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
     when(mockPlayer.isPlaying()).thenReturn(false);
@@ -114,7 +120,7 @@ void main() {
     when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
     when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
     when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
-    when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+    when(mockRepository.getOutStanding(any)).thenAnswer((_) => MockRadiocoRepository.outstanding());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
     when(mockPlayer.isPlaying()).thenReturn(false);
@@ -142,7 +148,7 @@ void main() {
     when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
     when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
     when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
-    when(mockRepository.getOutStanding()).thenAnswer((_) => MockRadiocoRepository.outstanding());
+    when(mockRepository.getOutStanding(any)).thenAnswer((_) => MockRadiocoRepository.outstanding());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
     when(mockPlayer.isPlaying()).thenReturn(true);
@@ -166,5 +172,28 @@ void main() {
     expect(
         find.byKey(Key("connection_snackbar"),skipOffstage: true),
         findsOneWidget);
+  });
+
+  testWidgets('that keeps the home shell stable while outstanding data loads', (WidgetTester tester) async {
+    when(mockRepository.getLiveBroadcast())
+        .thenAnswer((_) => MockRadiocoRepository.now());
+    when(mockRepository.getTimetableData(any, any)).thenAnswer((_) => MockRadiocoRepository.timetables());
+    when(mockRepository.getEpisodes(any)).thenAnswer((_) => MockRadiocoRepository.episodes());
+    when(mockRepository.getAllPodcasts()).thenAnswer((_) => MockRadiocoRepository.podcasts());
+    when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
+    when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
+    when(mockRepository.getOutStanding("https://cuacfm.org/wp-json/wp/v2/pages/3952")).thenAnswer((_) => MockRadiocoRepository.outstanding());
+    when(mockConnection.isConnectionAvailable())
+        .thenAnswer((_) => Future.value(true));
+    when(mockPlayer.isPlaying()).thenReturn(true);
+    when(mockPlayer.stop()).thenReturn(true);
+    when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
+    mockPlayer.isPodcast = false;
+    mockPlayer.currentSong = "mocklive";
+
+    await tester.pumpWidget(startWidget(MyHomePage(title: "homi")));
+    await tester.pumpAndSettle(const Duration(milliseconds: 500));
+
+    expect(find.byKey(Key("bottom_bar"),skipOffstage: true), findsOneWidget);
   });
 }

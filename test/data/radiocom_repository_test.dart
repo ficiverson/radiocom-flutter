@@ -1,5 +1,6 @@
 import 'package:cuacfm/data/radiocom-repository.dart';
 import 'package:cuacfm/domain/result/result.dart';
+import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/outstanding.dart';
@@ -56,7 +57,7 @@ void main() {
     Result<Now> result = await repository.getLiveBroadcast();
 
     expect(result.status, equals(Status.fail));
-    expect(result.getData()?.name, equals("Continuidad CUAC FM"));
+    expect(result.getData()?.name, equals("Continuidade CUAC FM"));
   });
 
   test('that can fetch timetable from network', () async {
@@ -114,20 +115,48 @@ void main() {
   });
 
   test('that can fetch outstanding from network', () async {
-    when(mockRemoteDataSource.getOutstanding())
+    when(mockRemoteDataSource.getOutstanding(any))
         .thenAnswer((_) => MockRemoteDataSource.outstanding(false));
-    Result<Outstanding> result = await repository.getOutStanding();
+    Result<Outstanding> result = await repository.getOutStanding("https://example.com/outstanding");
 
     expect(result.status, equals(Status.ok));
     expect(result.data?.title, contains("Nada"));
   });
 
   test('that can fetch empty outstanding when data from network fail', () async {
-    when(mockRemoteDataSource.getOutstanding())
+    when(mockRemoteDataSource.getOutstanding(any))
         .thenAnswer((_) => MockRemoteDataSource.outstanding(true));
-    Result<Outstanding> result = await repository.getOutStanding();
+    Result<Outstanding> result = await repository.getOutStanding("https://example.com/outstanding");
 
     expect(result.status, equals(Status.fail));
+  });
+
+  test('that can fetch episodes from network', () async {
+    when(mockRemoteDataSource.getEpisodes(any))
+        .thenAnswer((_) => MockRemoteDataSource.episodes(false));
+    Result<List<Episode>> result = await repository.getEpisodes("http://feed.rss");
+
+    expect(result.status, equals(Status.ok));
+    expect(result.getData()?.length, equals(1));
+  });
+
+  test('that can fetch empty episodes when network fails', () async {
+    when(mockRemoteDataSource.getEpisodes(any))
+        .thenAnswer((_) => MockRemoteDataSource.episodes(true));
+    Result<List<Episode>> result = await repository.getEpisodes("http://feed.rss");
+
+    expect(result.status, equals(Status.fail));
+    expect(result.getData()?.length, equals(0));
+  });
+
+  test('that forwards the outstanding url to the remote source', () async {
+    when(mockRemoteDataSource.getOutstanding("https://example.com/outstanding"))
+        .thenAnswer((_) => MockRemoteDataSource.outstanding(false));
+
+    clearInteractions(mockRemoteDataSource);
+    await repository.getOutStanding("https://example.com/outstanding");
+
+    verify(mockRemoteDataSource.getOutstanding("https://example.com/outstanding")).called(1);
   });
 
 }

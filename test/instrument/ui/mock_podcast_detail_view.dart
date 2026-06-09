@@ -1,5 +1,6 @@
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
+import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/ui/home/home_presenter.dart';
 import 'package:cuacfm/ui/podcast/detail_podcast_presenter.dart';
 import 'package:cuacfm/ui/podcast/detail_podcast_router.dart';
@@ -60,5 +61,11 @@ class MockPodcastDetailRouter implements DetailPodcastRouter {
   goToNewDetail(New itemNew) {
     viewState.add(PodcastDetailState.goToEpisodeDetail);
     data.add(itemNew);
+  }
+
+  @override
+  goToEpisodeDetail(Episode episode, String programName, String logoUrl, {Program? program}) {
+    viewState.add(PodcastDetailState.goToEpisodeDetail);
+    data.add(episode);
   }
 }

@@ -9,6 +9,7 @@ import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/models/time_table.dart';
 import 'package:cuacfm/ui/home/home_presenter.dart';
 import 'package:cuacfm/ui/home/home_router.dart';
+import 'package:cuacfm/utils/bottom_bar.dart';
 
 enum HomeState {
   noConnection,
@@ -141,7 +142,16 @@ class MockHomeView implements HomeView {
   }
 
   @override
+  void onMenuReturn(BottomBarOption option) {}
+
+  @override
   void onLoadOutstanding(Outstanding outstanding) {
+    viewState.add(HomeState.onOutstanding);
+    data.add(outstanding);
+  }
+
+  @override
+  void onLoadOutstanding2(Outstanding outstanding) {
     viewState.add(HomeState.onOutstanding);
     data.add(outstanding);
   }
@@ -150,6 +160,11 @@ class MockHomeView implements HomeView {
   void onLoadOutstandingError(error) {
     viewState.add(HomeState.onOutstandingError);
     data.add(error);
+  }
+
+  @override
+  void onLoadFavorites(List<Program> favorites) {
+    data.add(favorites);
   }
 }
 
@@ -170,19 +185,19 @@ class MockHomeRouter implements HomeRouterContract {
   }
 
   @override
-  goToPodcastControls(Episode episode) {
+  goToPodcastControls(Episode? episode, {TimeTable? liveProgram}) {
     viewState.add(HomeState.goToEpisode);
     data.add(episode);
   }
 
   @override
-  goToPodcastDetail(Program podcast) {
+  goToPodcastDetail(Program podcast, {VoidCallback? onReturn, Function(BottomBarOption)? onTabSelected}) {
     viewState.add(HomeState.goToPodcast);
     data.add(podcast);
   }
 
   @override
-  goToSettings(VoidCallback invokeResult) {
+  goToSettings(Function(BottomBarOption) invokeResult) {
     viewState.add(HomeState.goToSettings);
   }
 
@@ -190,5 +205,11 @@ class MockHomeRouter implements HomeRouterContract {
   goToTimeTable(List<TimeTable> timeTables) {
     viewState.add(HomeState.goToTimeTable);
     data.add(timeTables);
+  }
+
+  @override
+  goToEpisodeDetail(Episode episode, Program program) {
+    viewState.add(HomeState.goToEpisode);
+    data.add(episode);
   }
 }

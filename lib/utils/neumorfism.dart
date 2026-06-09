@@ -1,5 +1,6 @@
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:injector/injector.dart';
 
 import 'custom_image.dart';
@@ -11,13 +12,8 @@ BoxDecoration neumorphicBox(RadiocomColorsConract _colors) {
       boxShadow: [
         BoxShadow(
           color: _colors.neuBlackOpacity,
-          offset: Offset(10, 10),
-          blurRadius: 10,
-        ),
-        BoxShadow(
-          color: _colors.neuWhite,
-          offset: Offset(-10, -10),
-          blurRadius: 10,
+          offset: Offset(2, 2),
+          blurRadius: 6,
         ),
       ]);
 }
@@ -76,46 +72,86 @@ class NeumorphicEmptyView extends StatelessWidget {
         width: width,
         height: height,
         decoration: neumorphicInverseBox(_colors),
-        child: Column(children: <Widget>[
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
           Padding(
-              padding: EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 0.0),
+            padding: EdgeInsets.only(bottom: 24.0),
+            child: FaIcon(
+              FontAwesomeIcons.heartCrack,
+              color: Color(0xFF85858b),
+              size: 80,
+            ),
+          ),
+          Padding(
+              padding: EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 0.0),
               child: Text(text,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.left,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                      wordSpacing: 3.0,
+                      wordSpacing: 0.5,
                       color: _colors.font,
                       fontWeight: FontWeight.w500,
                       fontSize: 20))),
-          CustomImage(
-              width: 200,
-              height: 200,
-              resPath: "assets/graphics/empty-logo.png",
-              radius: 0.0,
-              background: false),
         ]));
   }
 }
 
 class NeumorphicButton extends StatelessWidget {
   final bool down;
-  final IconData icon;
+  final Object icon;
+  final String? label;
+  final double iconScale;
+  final double iconSize;
 
-  NeumorphicButton({this.down = false, required this.icon});
+  NeumorphicButton({this.down = false, required this.icon, this.label, this.iconScale = 1.0, this.iconSize = 22});
 
   @override
   Widget build(BuildContext context) {
     RadiocomColorsConract _colors =
         Injector.appInstance.get<RadiocomColorsConract>();
+    final color = down ? _colors.yellow : _colors.grey;
+    final iconWidget = icon is FaIconData
+        ? FaIcon(icon as FaIconData, color: color, size: iconSize)
+        : Icon(icon as IconData, color: color, size: iconSize);
+    if (label != null) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedScale(
+            scale: iconScale,
+            duration: const Duration(milliseconds: 150),
+            curve: Curves.easeInOut,
+            child: Container(
+              width: 52,
+              height: 30,
+              decoration: down
+                  ? BoxDecoration(
+                      color: _colors.yellow.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(50),
+                    )
+                  : null,
+              child: Center(child: iconWidget),
+            ),
+          ),
+          SizedBox(height: 4),
+          Text(
+            label!,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: down ? FontWeight.w700 : FontWeight.w400,
+              color: down ? _colors.yellow : _colors.grey,
+            ),
+          ),
+        ],
+      );
+    }
     return Container(
       width: 55,
       height: 55,
       decoration: down ? neumorphicInverseBox(_colors) : neumorphicBox(_colors),
-      child: Icon(
-        icon,
-        color: down ? _colors.yellow : _colors.grey,
-      ),
+      child: iconWidget,
     );
   }
 }
@@ -144,11 +180,11 @@ class NeumorphicCardVertical extends StatelessWidget {
     var queryData = MediaQuery.of(context);
     List<Widget> elements = [];
     Widget imageContent =
-        CustomImage(resPath: image, fit: BoxFit.cover, radius: 15.0);
+        CustomImage(resPath: image, fit: BoxFit.cover, radius: 15.0, backgroundColor: Colors.white);
     if (imageOverLay) {
       imageContent = Stack(fit: StackFit.passthrough, children: <Widget>[
         removeShader
-            ? CustomImage(resPath: image, fit: BoxFit.cover, radius: 15.0)
+            ? CustomImage(resPath: image, fit: BoxFit.cover, radius: 15.0, backgroundColor: Colors.white)
             : ShaderMask(
                 shaderCallback: (Rect bounds) {
                   return RadialGradient(
@@ -168,7 +204,7 @@ class NeumorphicCardVertical extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
               color: _colors.fontWhite,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w700,
               fontSize: 24),
         )),
       ]);
@@ -245,7 +281,7 @@ class NeumorphicCardHorizontal extends StatelessWidget {
           width: 60.0,
           height: 60.0,
           child:
-              CustomImage(resPath: image, fit: BoxFit.fitHeight, radius: 15.0));
+              CustomImage(resPath: image, fit: BoxFit.fitHeight, radius: 15.0, backgroundColor: Colors.white));
     }
     return GestureDetector(
         child: Container(
@@ -272,7 +308,7 @@ class NeumorphicCardHorizontal extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                           fontSize: 16)
                       : TextStyle(
-                          wordSpacing: 3.0,
+                          wordSpacing: 0.5,
                           color: _colors.font,
                           fontWeight: FontWeight.w700,
                           fontSize: 20)),

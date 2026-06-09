@@ -1,5 +1,13 @@
+import 'dart:async';
+
 import 'package:just_audio/just_audio.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:cuacfm/domain/invoker/invoker.dart';
+import 'package:cuacfm/domain/result/result.dart';
+import 'package:cuacfm/domain/usecase/end_session_use_case.dart';
+import 'package:cuacfm/domain/usecase/get_playlist_use_case.dart';
+import 'package:cuacfm/domain/usecase/remove_from_playlist_use_case.dart';
+import 'package:cuacfm/domain/usecase/start_session_use_case.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
@@ -20,8 +28,9 @@ abstract class CurrentPlayerContract {
   AudioPlayerState playerState = AudioPlayerState.stop;
   AudioPlayer audioPlayer = Injector.appInstance.get<AudioPlayer>();
   String currentSong = ":";
+  String currentSubtitle = "";
   String currentImage =
-      "https://cuacfm.org/wp-content/uploads/2015/04/cousomicros1.jpg";
+      "https://cuacfm.org/wp-content/uploads/2026/04/cuac_music_cover.png";
   bool isPodcast = false;
   Duration duration = Duration(seconds: 0);
   Duration position = Duration(seconds: 0);
@@ -64,8 +73,20 @@ class CurrentPlayer implements CurrentPlayerContract {
   @override
   String currentSong = ":";
   @override
+  String currentSubtitle = "";
+  @override
   String currentImage =
-      "https://cuacfm.org/wp-content/uploads/2015/04/cousomicros1.jpg";
+      "https://cuacfm.org/wp-content/uploads/2026/04/cuac_music_cover.png";
+
+  static const _fallbackArtUrl = "https://cuacfm.org/wp-content/uploads/2026/04/cuac_music_cover.png";
+  Uri get _artUri {
+    final img = currentImage;
+    if (img.startsWith('assets/') || img.contains('default-programme-photo') || img.isEmpty) {
+      return Uri.parse(_fallbackArtUrl);
+    }
+    return Uri.parse(img);
+  }
+
   @override
   bool isPodcast = false;
   @override
@@ -88,6 +109,11 @@ class CurrentPlayer implements CurrentPlayerContract {
   ConnectionCallback? podcastConnectivityResult;
   @override
   ConnectivityResult? connectivityResult;
+
+  // Internal stream subscriptions — cancelled before re-registering
+  StreamSubscription? _stateSubscription;
+  StreamSubscription? _durationSubscription;
+  StreamSubscription? _positionSubscription;
 
   @override
   void restorePlayer(ConnectivityResult connection) async {
@@ -147,32 +173,77 @@ class CurrentPlayer implements CurrentPlayerContract {
     }
   }
 
+  Future<void> _playNextInPlaylist() async {
+    final invoker = Injector.appInstance.get<Invoker>();
+    List<Map<String, dynamic>> items = [];
+    await for (final result in invoker.execute(Injector.appInstance.get<GetPlaylistUseCase>())) {
+      if (result is Success) items = List<Map<String, dynamic>>.from(result.data ?? []);
+    }
+    if (items.isEmpty) return;
+
+    final next = items.first;
+    invoker.execute(Injector.appInstance.get<RemoveFromPlaylistUseCase>().withParams(next['audio'] as String)).drain();
+
+    final nextEpisode = Episode.fromMap(next);
+    isPodcast = true;
+    episode = nextEpisode;
+    currentSong = next['programName'] ?? nextEpisode.title;
+    currentSubtitle = nextEpisode.title;
+    currentImage = next['logoUrl'] ?? currentImage;
+    playerState = AudioPlayerState.stop;
+    position = Duration.zero;
+    duration = Duration.zero;
+
+    if (onUpdate != null) onUpdate!();
+    await play();
+    if (onUpdate != null) onUpdate!();
+  }
+
   @override
   Future<bool> play() async {
     if (playerState != AudioPlayerState.play) {
-      if (isPodcast) {
-        audioPlayer.playerStateStream.listen((event) {
-          if (event.processingState == ProcessingState.completed) {
-            stop();
-            position = Duration(seconds: 0);
-            restoreDuration = Duration(seconds: 0);
-            restorePosition = Duration(seconds: 0);
-            seek(position);
-            if (onUpdate != null) {
-              onUpdate!();
-            }
-          }
-        });
+      // Cancel previous subscriptions to avoid accumulation
+      await _stateSubscription?.cancel();
+      await _durationSubscription?.cancel();
+      await _positionSubscription?.cancel();
 
-        audioPlayer.durationStream.listen((Duration? d) {
-          print(d);
+      _stateSubscription = audioPlayer.playerStateStream.listen((event) {
+        if (isPodcast && event.processingState == ProcessingState.completed) {
+          stop();
+          position = Duration.zero;
+          restoreDuration = Duration.zero;
+          restorePosition = Duration.zero;
+          // Try to play next episode in playlist
+          _playNextInPlaylist().then((_) {
+            if (onUpdate != null) onUpdate!();
+          });
+        } else if (event.processingState == ProcessingState.idle &&
+            playerState != AudioPlayerState.stop) {
+          playerState = AudioPlayerState.stop;
+          isPodcast = false;
+          if (onUpdate != null) onUpdate!();
+        } else if (event.playing && playerState == AudioPlayerState.pause) {
+          playerState = AudioPlayerState.play;
+          if (onUpdate != null) onUpdate!();
+          if (onConnection != null) onConnection!(false);
+        } else if (!event.playing && playerState == AudioPlayerState.play &&
+            event.processingState != ProcessingState.completed) {
+          playerState = AudioPlayerState.pause;
+          if (onUpdate != null) onUpdate!();
+          if (onConnection != null) onConnection!(false);
+        }
+      });
+
+      if (isPodcast) {
+
+        _durationSubscription = audioPlayer.durationStream.listen((Duration? d) {
           duration = d ?? Duration(hours: 1);
-          if (onUpdate != null && duration > Duration(seconds: 0)) {
+          if (onUpdate != null && duration > Duration.zero) {
             onUpdate!();
           }
         });
       }
-      audioPlayer.positionStream.listen((Duration p) {
+      _positionSubscription = audioPlayer.positionStream.listen((Duration p) {
         if (isPodcast) {
           if (p.inSeconds.ceilToDouble() >= 0.0 &&
               p.inSeconds.ceilToDouble() <= duration.inSeconds.ceilToDouble()) {
@@ -206,12 +277,25 @@ class CurrentPlayer implements CurrentPlayerContract {
               album: isPodcast ? "Podcast CUAC FM" : "Directo CUAC FM",
               title: isPodcast ? episode?.title ?? "" : "Streaming en directo",
               artist: "CUAC FM",
-              artUri: Uri.parse(currentImage),
+              artUri: _artUri,
+              extras: {
+                'androidCompactActionIndices': [0, 1, 2],
+              },
             ));
         audioPlayer.setAudioSource(audioSource);
         await audioPlayer.play();
         await audioPlayer.seek(position);
-        if (audioPlayer.playing) playerState = AudioPlayerState.play;
+        if (audioPlayer.playing) {
+          playerState = AudioPlayerState.play;
+          Injector.appInstance.get<Invoker>().execute(
+            Injector.appInstance.get<StartSessionUseCase>().withParams(StartSessionParams(
+              isPodcast: isPodcast,
+              programName: isPodcast ? (currentSong.isNotEmpty ? currentSong : episode?.title ?? '') : '',
+              category: '',
+              episodeTitle: isPodcast ? episode?.title ?? '' : '',
+              episodeId: isPodcast ? episode?.audio ?? '' : '',
+            ))).drain();
+        }
         if (restorePosition != Duration(seconds: 0) &&
             restoreDuration != Duration(seconds: 0) &&
             isPodcast &&
@@ -258,6 +342,9 @@ class CurrentPlayer implements CurrentPlayerContract {
             title: isPodcast ? episode?.title ?? "" : "Streaming en directo",
             artist: "CUAC FM",
             artUri: Uri.parse(currentImage),
+            extras: {
+              'androidCompactActionIndices': [0, 1, 2],
+            },
           ));
       audioPlayer.setAudioSource(audioSource);
       await audioPlayer.play();
@@ -273,13 +360,20 @@ class CurrentPlayer implements CurrentPlayerContract {
   void stop() async {
     if (playerState == AudioPlayerState.play ||
         playerState == AudioPlayerState.pause) {
+      Injector.appInstance.get<Invoker>().execute(Injector.appInstance.get<EndSessionUseCase>()).drain();
       playerState = AudioPlayerState.stop;
       if (isPodcast) {
         tempEpisode = episode;
         restoreDuration = duration;
         restorePosition = position;
       }
-      position = Duration(seconds: 0);
+      position = Duration.zero;
+      await _stateSubscription?.cancel();
+      _stateSubscription = null;
+      await _durationSubscription?.cancel();
+      _durationSubscription = null;
+      await _positionSubscription?.cancel();
+      _positionSubscription = null;
       await audioPlayer.stop();
     }
   }

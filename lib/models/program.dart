@@ -38,14 +38,31 @@ class Program {
             map["category"] != null ? map["category"] : "Otros"),
         category = mapCategory(map["category"] != null ? map["category"] : "");
 
+  Program.fromFavorite(Map map)
+      : name = map["name"] ?? "",
+        description = map["description"] ?? "",
+        logoUrl = map["logoUrl"] ?? "",
+        duration = map["duration"] ?? "",
+        rssUrl = map["rssUrl"] ?? "",
+        language = map["language"] ?? "",
+        categoryType = ProgramCategories.TV,
+        category = map["category"] ?? "";
+
+  Map<String, dynamic> toMap() => {
+    'name': name,
+    'description': description,
+    'logoUrl': logoUrl,
+    'rssUrl': rssUrl,
+    'duration': duration,
+    'language': language,
+    'category': category,
+  };
+
   static String getLanguage(String language) {
-    var language = "Español";
-    if (language == "es") {
-      language = "Español";
-    } else if (language == "gl") {
-      language = "Galego";
+    if (language == "gl") {
+      return "Galego";
     }
-    return language;
+    return "Español";
   }
 
   static ProgramCategories mapCategoryType(String content) {
@@ -208,8 +225,6 @@ class Program {
         content =
             SafeMap.safe(_localization.translateMap("categories"), ["tech"]);
         break;
-      default:
-        break;
     }
     return content;
   }
@@ -252,8 +267,6 @@ class Program {
         break;
       case ProgramCategories.TECH:
         content = "assets/graphics/categories/tech.jpeg";
-        break;
-      default:
         break;
     }
     return content;

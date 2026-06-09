@@ -1,16 +1,27 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 import 'package:cuacfm/domain/invoker/invoker.dart';
 import 'package:cuacfm/domain/result/result.dart';
+import 'package:cuacfm/domain/usecase/add_favorite_use_case.dart';
+import 'package:cuacfm/domain/usecase/add_to_playlist_start_use_case.dart';
+import 'package:cuacfm/domain/usecase/add_to_playlist_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_episodes_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_live_program_use_case.dart';
+import 'package:cuacfm/domain/usecase/is_favorite_use_case.dart';
+import 'package:cuacfm/domain/usecase/is_in_playlist_use_case.dart';
+import 'package:cuacfm/domain/usecase/remove_favorite_use_case.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/program.dart';
 import 'package:cuacfm/ui/home/home_presenter.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
+import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
+import 'package:cuacfm/utils/safe_map.dart';
 import 'package:injector/injector.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:uuid/uuid.dart';
@@ -32,6 +43,12 @@ class DetailPodcastPresenter {
   GetLiveProgramUseCase getLiveDataUseCase;
   late ConnectionContract connection;
   late CurrentPlayerContract currentPlayer;
+  late IsFavoriteUseCase _isFavoriteUseCase;
+  late AddFavoriteUseCase _addFavoriteUseCase;
+  late RemoveFavoriteUseCase _removeFavoriteUseCase;
+  late IsInPlaylistUseCase _isInPlaylistUseCase;
+  late AddToPlaylistStartUseCase _addToPlaylistStartUseCase;
+  late AddToPlaylistUseCase _addToPlaylistUseCase;
   GetEpisodesUseCase getEpisodesUseCase;
   bool isLoading = false;
   Timer? _timer;
@@ -45,6 +62,26 @@ class DetailPodcastPresenter {
   }) {
     connection = Injector.appInstance.get<ConnectionContract>();
     currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
+    _isFavoriteUseCase = Injector.appInstance.get<IsFavoriteUseCase>();
+    _addFavoriteUseCase = Injector.appInstance.get<AddFavoriteUseCase>();
+    _removeFavoriteUseCase = Injector.appInstance.get<RemoveFavoriteUseCase>();
+    _isInPlaylistUseCase = Injector.appInstance.get<IsInPlaylistUseCase>();
+    _addToPlaylistStartUseCase = Injector.appInstance.get<AddToPlaylistStartUseCase>();
+    _addToPlaylistUseCase = Injector.appInstance.get<AddToPlaylistUseCase>();
+  }
+
+  void checkIsFavorite(String rssUrl, Function(bool) callback) {
+    invoker.execute(_isFavoriteUseCase.withParams(rssUrl)).listen((result) {
+      if (result is Success) callback(result.data ?? false);
+    });
+  }
+
+  void addFavorite(Map program) {
+    invoker.execute(_addFavoriteUseCase.withParams(program)).listen((_) {});
+  }
+
+  void removeFavorite(String rssUrl) {
+    invoker.execute(_removeFavoriteUseCase.withParams(rssUrl)).listen((_) {});
   }
 
   onViewResumed() async {
@@ -90,9 +127,9 @@ class DetailPodcastPresenter {
   bool isSamePodcast(Episode episode) {
     var uuid = Uuid();
     return currentPlayer.episode != null &&
-        uuid.v5(Uuid.NAMESPACE_URL, episode.audio) ==
+        uuid.v5(Namespace.url.value, episode.audio) ==
             uuid.v5(
-              Uuid.NAMESPACE_URL,
+              Namespace.url.value,
               currentPlayer.episode?.audio ?? "no_audio",
             ) &&
         currentPlayer.isPodcast;
@@ -110,31 +147,78 @@ class DetailPodcastPresenter {
     await currentPlayer.pause();
   }
 
-  onSelectedEpisode(Episode episode, String image) async {
+  onSelectedEpisode(Episode episode, String image, String programName) async {
     bool isSameEpisode = isSamePodcast(episode);
-    currentPlayer.isPodcast = true;
-    currentPlayer.episode = episode;
-    currentPlayer.currentSong = episode.title;
-    currentPlayer.currentImage = image;
-    if (currentPlayer.isPlaying()) {
-      _onPlayEpisode(episode);
-    } else if (isSameEpisode) {
-      await currentPlayer.resume();
-    } else {
-      _play();
+
+    void _continueSelection() {
+      currentPlayer.isPodcast = true;
+      currentPlayer.episode = episode;
+      currentPlayer.currentSong = programName;
+      currentPlayer.currentImage = image;
+      if (currentPlayer.isPlaying()) {
+        _onPlayEpisode(episode);
+      } else if (isSameEpisode) {
+        currentPlayer.resume();
+      } else {
+        _play();
+      }
     }
+
+    if (currentPlayer.isPlaying() &&
+        currentPlayer.isPodcast &&
+        !isSameEpisode &&
+        currentPlayer.episode != null) {
+      final current = currentPlayer.episode!;
+      final currentName = currentPlayer.currentSong;
+      final currentImage = currentPlayer.currentImage;
+      invoker.execute(_isInPlaylistUseCase.withParams(current.audio)).listen((result) {
+        if (result is Success && !(result.data ?? false)) {
+          invoker.execute(_addToPlaylistStartUseCase.withParams(
+            AddToPlaylistParams(current, currentName, currentImage))).listen((_) {});
+        }
+        _continueSelection();
+      });
+      return;
+    }
+
+    _continueSelection();
   }
 
-  onShareClicked(Program podcast) {
-    Share.share(podcast.name + " en CUAC FM:  " + podcast.rssUrl);
+  onShareClicked(Program podcast) async {
+    final localization = Injector.appInstance.get<CuacLocalization>();
+    final template = SafeMap.safe(localization.translateMap("actions"), ["share_program"]);
+    final webUrl = podcast.rssUrl.replaceAll(RegExp(r'/rss/?$'), '');
+    final text = template.replaceFirst("%s", podcast.name) + webUrl;
+    try {
+      final response = await http.get(Uri.parse(podcast.logoUrl));
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/share_image.jpg');
+      await file.writeAsBytes(response.bodyBytes);
+      await SharePlus.instance.share(ShareParams(files: [XFile(file.path)], text: text));
+    } catch (_) {
+      SharePlus.instance.share(ShareParams(text: text));
+    }
   }
 
   onDetailPodcast(String title, String subtitle, String content, String link) {
     router.goToNewDetail(New.fromPodcast(title, subtitle, content, link));
   }
 
-  onDetailEpisode(String title, String subtitle, String content, String link) {
-    router.goToNewDetail(New.fromPodcast(title, subtitle, content, link));
+  void addToPlaylistIfNew(Episode episode, String programName, String logoUrl, Function(bool added) callback) {
+    invoker.execute(_isInPlaylistUseCase.withParams(episode.audio)).listen((result) {
+      if (result is Success && (result.data ?? false)) {
+        callback(false);
+      } else {
+        invoker.execute(_addToPlaylistUseCase.withParams(
+            AddToPlaylistParams(episode, programName, logoUrl))).listen((_) {
+          callback(true);
+        });
+      }
+    });
+  }
+
+  onDetailEpisode(Episode episode, String programName, String logoUrl, {Program? program}) {
+    router.goToEpisodeDetail(episode, programName, logoUrl, program: program);
   }
 
   onPodcastControlsClicked(Episode? episode) {

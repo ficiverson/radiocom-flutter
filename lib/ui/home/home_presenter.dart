@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:cuacfm/domain/invoker/invoker.dart';
 import 'package:cuacfm/domain/result/result.dart';
 import 'package:cuacfm/domain/usecase/get_all_podcast_use_case.dart';
+import 'package:cuacfm/domain/usecase/get_favorites_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_live_program_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_news_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_outstanding_use_case.dart';
 import 'package:cuacfm/domain/usecase/get_timetable_use_case.dart';
+import 'package:cuacfm/domain/usecase/remove_favorite_use_case.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
 import 'package:cuacfm/models/outstanding.dart';
@@ -16,6 +18,7 @@ import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/models/time_table.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/player/current_timer.dart';
+import 'package:cuacfm/remote-data-source/network/radioco_api.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
 import 'package:injector/injector.dart';
 import 'package:intl/intl.dart';
@@ -23,6 +26,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain/usecase/get_station_use_case.dart';
+import '../../utils/bottom_bar.dart';
 import '../../utils/notification_subscription_contract.dart';
 import 'home_router.dart';
 
@@ -39,6 +43,8 @@ abstract class HomeView {
   void onLoadPodcasts(List<Program> podcasts);
   void onPodcastError(dynamic error);
 
+  void onLoadFavorites(List<Program> favorites);
+
   void onLoadTimetable(List<TimeTable> programsTimeTable);
   void onTimetableError(dynamic error);
 
@@ -52,11 +58,14 @@ abstract class HomeView {
 
   void onDarkModeStatus(bool status);
 
+  void onMenuReturn(BottomBarOption option);
+
   void onLoadOutstanding(Outstanding outstanding);
+  void onLoadOutstanding2(Outstanding outstanding);
   void onLoadOutstandingError(dynamic error);
 }
 
-enum StatusPlayer { PLAYING, FAILED, STOP }
+enum StatusPlayer { PLAYING, FAILED, STOP, PAUSED }
 
 class HomePresenter {
   HomeView _homeView;
@@ -67,11 +76,14 @@ class HomePresenter {
   GetTimetableUseCase getTimetableUseCase;
   GetNewsUseCase getNewsUseCase;
   GetOutstandingUseCase getOutstandingUseCase;
+  GetFavoritesUseCase getFavoritesUseCase;
+  RemoveFavoriteUseCase removeFavoriteUseCase;
   HomeRouterContract router;
   late ConnectionContract connection;
   late CurrentPlayerContract currentPlayer;
   late CurrentTimerContract currentTimer;
   late NotificationSubscriptionContract notificationSubscription;
+  late RadiocoAPIContract radiocoAPI;
   Timer? _timer;
   bool isLoading = false;
 
@@ -83,12 +95,15 @@ class HomePresenter {
       required this.getLiveDataUseCase,
       required this.getTimetableUseCase,
       required this.getNewsUseCase,
-      required this.getOutstandingUseCase}) {
+      required this.getOutstandingUseCase,
+      required this.getFavoritesUseCase,
+      required this.removeFavoriteUseCase}) {
     currentTimer = Injector.appInstance.get<CurrentTimerContract>();
     connection = Injector.appInstance.get<ConnectionContract>();
     currentPlayer = Injector.appInstance.get<CurrentPlayerContract>();
     notificationSubscription =
         Injector.appInstance.get<NotificationSubscriptionContract>();
+    radiocoAPI = Injector.appInstance.get<RadiocoAPIContract>();
   }
 
   init() async {
@@ -111,7 +126,7 @@ class HomePresenter {
   onHomeResumed() async {
     _homeView.onDarkModeStatus(await _getDarkModeStatus());
     if (await connection.isConnectionAvailable()) {
-      _getLiveProgram(false);
+      _getLiveProgram(true);
     }
   }
 
@@ -132,13 +147,20 @@ class HomePresenter {
   }
 
   onMenuClicked() {
-    router.goToSettings(() {
+    router.goToSettings((option) {
+      _homeView.onMenuReturn(option);
       onHomeResumed();
     });
   }
 
   onPodcastClicked(Program podcast) {
-    router.goToPodcastDetail(podcast);
+    router.goToPodcastDetail(podcast, onReturn: () {
+      if (currentPlayer.isPlaying()) {
+        _homeView.onNotifyUser(StatusPlayer.PLAYING);
+      }
+    }, onTabSelected: (option) {
+      _homeView.onMenuReturn(option);
+    });
   }
 
   onOutstandingClicked(Outstanding outstanding) {
@@ -150,10 +172,8 @@ class HomePresenter {
     }
   }
 
-  onPodcastControlsClicked(Episode? episode) {
-    if (episode != null) {
-      router.goToPodcastControls(episode);
-    }
+  onPodcastControlsClicked(Episode? episode, {TimeTable? liveProgram}) {
+    router.goToPodcastControls(episode, liveProgram: liveProgram);
   }
 
   onLiveSelected(Now now) async {
@@ -183,10 +203,15 @@ class HomePresenter {
   onPausePlayer() async {
     if (currentPlayer.isPodcast) {
       await currentPlayer.pause();
-      _homeView.onNotifyUser(StatusPlayer.STOP);
     } else {
-      _stop();
+      currentPlayer.stop();
     }
+    _homeView.onNotifyUser(StatusPlayer.PAUSED);
+  }
+
+  onStopPlayer() {
+    currentPlayer.stop();
+    _homeView.onNotifyUser(StatusPlayer.STOP);
   }
 
   onGetToken() {
@@ -271,6 +296,7 @@ class HomePresenter {
     }
   }
 
+  // ignore: unused_element
   _stop() {
     currentPlayer.stop();
     _homeView.onNotifyUser(StatusPlayer.STOP);
@@ -318,13 +344,39 @@ class HomePresenter {
   }
 
   _getOutstanding() {
-    invoker.execute(getOutstandingUseCase).listen((result) {
+    invoker.execute(getOutstandingUseCase.withParams(radiocoAPI.outstandingUrl)).listen((result) {
       if (result is Success) {
         _homeView.onLoadOutstanding(result.data);
       } else {
         _homeView.onLoadOutstandingError((result as Error).status);
       }
+      _getOutstanding2();
       _getTimetable();
+    });
+  }
+
+  loadFavorites() {
+    invoker.execute(getFavoritesUseCase).listen((result) {
+      if (result is Success) {
+        _homeView.onLoadFavorites((result.data ?? [])
+            .map((e) => Program.fromFavorite(e))
+            .toList()
+            .cast<Program>());
+      }
+    });
+  }
+
+  removeFavorite(String rssUrl) {
+    invoker.execute(removeFavoriteUseCase.withParams(rssUrl)).listen((_) {
+      loadFavorites();
+    });
+  }
+
+  _getOutstanding2() {
+    invoker.execute(getOutstandingUseCase.withParams(radiocoAPI.outstandingUrl2)).listen((result) {
+      if (result is Success) {
+        _homeView.onLoadOutstanding2(result.data);
+      }
     });
   }
 
@@ -332,9 +384,10 @@ class HomePresenter {
     DateTime nowDate = new DateTime.now();
     var formatter = new DateFormat('dd/MM/yyyy');
     String now = formatter.format(nowDate);
+    String tomorrow = formatter.format(nowDate.add(const Duration(days: 1)));
     invoker
         .execute(
-            getTimetableUseCase.withParams(GetTimetableUseCaseParams(now, now)))
+            getTimetableUseCase.withParams(GetTimetableUseCaseParams(now, tomorrow)))
         .listen((result) {
       if (result is Success) {
         _homeView.onLoadTimetable(result.data);
@@ -350,7 +403,7 @@ class HomePresenter {
     var formatter = new DateFormat('dd/MM/yyyy');
     String now = formatter.format(nowDate);
     String yesterday =
-        formatter.format(nowDate.toUtc().subtract(new Duration(days: 1)));
+        formatter.format(nowDate.toUtc().subtract(new Duration(days: 7)));
     invoker
         .execute(getTimetableUseCase
             .withParams(GetTimetableUseCaseParams(yesterday, now)))

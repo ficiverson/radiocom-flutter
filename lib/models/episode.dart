@@ -109,6 +109,16 @@ class Episode {
   late DateTime pubDate;
   late String duration;
 
+  Episode.fromMap(Map<String, dynamic> map)
+      : title = map['title'] ?? '',
+        link = map['link'] ?? '',
+        audio = map['audio'] ?? '',
+        pubDate = map['pubDate'] != null
+            ? DateTime.parse(map['pubDate'])
+            : DateTime.now(),
+        duration = map['duration'] ?? '__',
+        description = map['description'] ?? '';
+
   Episode.fromInstance(Map<String, dynamic> map)
       :
         title = map["title"]["\$t"],
@@ -121,8 +131,9 @@ class Episode {
         description = map["description"]["\$t"] ?? "";
 
   static DateTime getDate(String content) {
-    return DateFormat("EEE, dd MMM yyyy hh:mm:ss zzzz")
-        .parse(content);
+    return DateFormat("EEE, dd MMM yyyy HH:mm:ss Z", "en_US")
+        .parseUtc(content)
+        .toLocal();
   }
 
   static String getDuration(String duration) {

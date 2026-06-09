@@ -12,10 +12,17 @@ class NewDetailRouter implements NewDetailRouterContract {
   @override
   goToPodcastControls(Episode episode) {
     Navigator.of(Injector.appInstance.get<BuildContext>()).push(
-        MaterialPageRoute(
+        PageRouteBuilder(
             settings: RouteSettings(name: "podcastcontrolsnews"),
-            builder: (BuildContext context) =>
-                PodcastControls(episode: episode),
-            fullscreenDialog: true));
+            pageBuilder: (_, __, ___) => PodcastControls(episode: episode),
+            transitionsBuilder: (_, animation, __, child) {
+              return SlideTransition(
+                position: Tween(begin: const Offset(0, 1), end: Offset.zero)
+                    .chain(CurveTween(curve: Curves.easeOutCubic))
+                    .animate(animation),
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 350)));
   }
 }

@@ -25,7 +25,7 @@ class MockRemoteDataSource extends Mock
   @override Future<Now?> getLiveBroadcast() =>
       super.noSuchMethod(Invocation.method(#getLiveBroadcast, []),returnValue: now(true));
 
-  @override Future<List<TimeTable>> getTimetableData(String? after, String? before) =>
+  @override Future<List<TimeTable>> getTimetableData(dynamic after, dynamic before) =>
       super.noSuchMethod(Invocation.method(#getTimetableData, []),returnValue: timetable(true));
 
   @override Future<List<Program>> getAllPodcasts() =>
@@ -34,11 +34,11 @@ class MockRemoteDataSource extends Mock
   @override Future<List<New>> getNews() =>
       super.noSuchMethod(Invocation.method(#getNews, []),returnValue: news(true));
 
-  @override Future<List<Episode>> getEpisodes(String feedUrl) =>
-      super.noSuchMethod(Invocation.method(#getNews, []),returnValue: episodes(true));
+  @override Future<List<Episode>> getEpisodes(dynamic feedUrl) =>
+      super.noSuchMethod(Invocation.method(#getEpisodes, [feedUrl]),returnValue: episodes(true));
 
-  @override Future<Outstanding?> getOutstanding() =>
-      super.noSuchMethod(Invocation.method(#getOutstanding, []),returnValue: outstanding(true));
+  @override Future<Outstanding?> getOutstanding(dynamic url) =>
+      super.noSuchMethod(Invocation.method(#getOutstanding, [url]),returnValue: outstanding(true));
 
 
   static Future<RadioStation> radioStation(bool isEmpty) {

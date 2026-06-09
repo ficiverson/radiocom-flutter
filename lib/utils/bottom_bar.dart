@@ -1,4 +1,7 @@
 import 'dart:io';
+import 'package:cuacfm/translations/localizations.dart';
+import 'package:cuacfm/utils/safe_map.dart';
+import 'package:flutter/foundation.dart' as Foundation;
 
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:flutter/material.dart';
@@ -9,53 +12,63 @@ import 'neumorfism.dart';
 
 typedef void MenuOptionCallback(BottomBarOption option, bool isMenu);
 
-enum BottomBarOption { HOME, SEARCH, NEWS }
+class _AnimatedBarItem extends StatefulWidget {
+  final Widget Function(double scale) child;
+  final VoidCallback onTap;
+  final String behaviorKey;
 
-class BottomBar extends StatefulWidget {
-  BottomBar({required this.onOptionSelected});
-
-  final MenuOptionCallback onOptionSelected;
+  const _AnimatedBarItem({required this.child, required this.onTap, required this.behaviorKey});
 
   @override
-  State<StatefulWidget> createState() => BottomBarState();
+  State<_AnimatedBarItem> createState() => _AnimatedBarItemState();
 }
 
-class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
-  late RadiocomColorsConract _colors;
-  late AnimationController _resizableController;
-  var bottomBarOption = BottomBarOption.HOME;
+class _AnimatedBarItemState extends State<_AnimatedBarItem> {
+  double _scale = 1.0;
 
-  _onOptionSelected(bool isMenu) {
-    widget.onOptionSelected(bottomBarOption, isMenu);
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      key: Key(widget.behaviorKey),
+      onTapDown: (_) => setState(() => _scale = 1.15),
+      onTapUp: (_) {
+        setState(() => _scale = 1.0);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _scale = 1.0),
+      child: widget.child(_scale),
+    );
   }
+}
+
+enum BottomBarOption { HOME, SEARCH, NEWS, FAVOURITES, NONE, MENU }
+
+class BottomBar extends StatelessWidget {
+  BottomBar({required this.onOptionSelected, this.selectedOption = BottomBarOption.HOME});
+
+  final MenuOptionCallback onOptionSelected;
+  final BottomBarOption selectedOption;
 
   @override
   Widget build(BuildContext context) {
     var queryData = MediaQuery.of(context);
-    _colors = Injector.appInstance.get<RadiocomColorsConract>();
-    if (bottomBarOption != BottomBarOption.HOME) {
-      _resizableController.reverse(from: 25.0);
-    } else {
-      _resizableController.forward(from: 0.0);
-    }
+    final _colors = Injector.appInstance.get<RadiocomColorsConract>();
+    final _localization = Injector.appInstance.get<CuacLocalization>();
+    final tabHome = SafeMap.safe(_localization.translateMap("home"), ["tab_home"]).isNotEmpty ? SafeMap.safe(_localization.translateMap("home"), ["tab_home"]) : "Inicio";
+    final tabPodcasts = SafeMap.safe(_localization.translateMap("home"), ["tab_podcasts"]).isNotEmpty ? SafeMap.safe(_localization.translateMap("home"), ["tab_podcasts"]) : "Podcasts";
+    final tabNews = SafeMap.safe(_localization.translateMap("home"), ["tab_news"]).isNotEmpty ? SafeMap.safe(_localization.translateMap("home"), ["tab_news"]) : "Novas";
+    final tabFavourites = SafeMap.safe(_localization.translateMap("home"), ["tab_favourites"]).isNotEmpty ? SafeMap.safe(_localization.translateMap("home"), ["tab_favourites"]) : "Favoritos";
+    final tabMenu = SafeMap.safe(_localization.translateMap("home"), ["tab_menu"]).isNotEmpty ? SafeMap.safe(_localization.translateMap("home"), ["tab_menu"]) : "Menú";
+
     return Container(
         key: Key("bottom_bar"),
         decoration: BoxDecoration(
           shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.only(
-              topRight: Radius.circular(25.0 - _resizableController.value),
-              topLeft: Radius.circular(25.0 - _resizableController.value)),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: _colors.yellow,
-              blurRadius: 3.0,
-              offset: Offset(0.5, 1.5),
-            )
-          ],
           color: _colors.palidwhite,
         ),
         width: queryData.size.width,
-        height: Platform.isAndroid ? 85 : 100,
+        height: (!Foundation.kIsWeb && Platform.isAndroid) ? 85 : 100,
         child: Column(children: [
           SizedBox(height: 10.0),
           Container(
@@ -63,72 +76,56 @@ class BottomBarState extends State<BottomBar> with TickerProviderStateMixin {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
-                  GestureDetector(
-                      key: Key("bottom_bar_item1"),
-                      onTap: () {
-                        setState(() {
-                          bottomBarOption = BottomBarOption.HOME;
-                          _onOptionSelected(false);
-                        });
-                      },
-                      child: NeumorphicButton(
-                        down: bottomBarOption == BottomBarOption.HOME
-                            ? true
-                            : false,
+                  _AnimatedBarItem(
+                      behaviorKey: "bottom_bar_item1",
+                      onTap: () => onOptionSelected(BottomBarOption.HOME, false),
+                      child: (scale) => NeumorphicButton(
+                        down: selectedOption == BottomBarOption.HOME,
                         icon: Icons.home,
+                        label: tabHome,
+                        iconScale: scale,
+                        iconSize: 23,
                       )),
-                  GestureDetector(
-                      key: Key("bottom_bar_item2"),
-                      onTap: () {
-                        setState(() {
-                          bottomBarOption = BottomBarOption.SEARCH;
-                          _onOptionSelected(false);
-                        });
-                      },
-                      child: NeumorphicButton(
-                        down: bottomBarOption == BottomBarOption.SEARCH
-                            ? true
-                            : false,
+                  _AnimatedBarItem(
+                      behaviorKey: "bottom_bar_item2",
+                      onTap: () => onOptionSelected(BottomBarOption.SEARCH, false),
+                      child: (scale) => NeumorphicButton(
+                        down: selectedOption == BottomBarOption.SEARCH,
                         icon: Icons.headset,
+                        label: tabPodcasts,
+                        iconScale: scale,
                       )),
-                  GestureDetector(
-                      key: Key("bottom_bar_item3"),
-                      onTap: () {
-                        setState(() {
-                          bottomBarOption = BottomBarOption.NEWS;
-                          _onOptionSelected(false);
-                        });
-                      },
-                      child: NeumorphicButton(
-                        down: bottomBarOption == BottomBarOption.NEWS
-                            ? true
-                            : false,
+                  _AnimatedBarItem(
+                      behaviorKey: "bottom_bar_item3",
+                      onTap: () => onOptionSelected(BottomBarOption.NEWS, false),
+                      child: (scale) => NeumorphicButton(
+                        down: selectedOption == BottomBarOption.NEWS,
                         icon: FontAwesomeIcons.newspaper,
+                        label: tabNews,
+                        iconScale: scale,
+                        iconSize: 20,
                       )),
-                  GestureDetector(
-                      key: Key("bottom_bar_item4"),
-                      onTap: () {
-                        setState(() {
-                          _onOptionSelected(true);
-                        });
-                      },
-                      child: NeumorphicButton(
-                        down: false,
+                  _AnimatedBarItem(
+                      behaviorKey: "bottom_bar_item4",
+                      onTap: () => onOptionSelected(BottomBarOption.FAVOURITES, false),
+                      child: (scale) => NeumorphicButton(
+                        down: selectedOption == BottomBarOption.FAVOURITES,
+                        icon: Icons.favorite,
+                        label: tabFavourites,
+                        iconScale: scale,
+                      )),
+                  _AnimatedBarItem(
+                      behaviorKey: "bottom_bar_item5",
+                      onTap: () => onOptionSelected(BottomBarOption.HOME, true),
+                      child: (scale) => NeumorphicButton(
+                        down: selectedOption == BottomBarOption.MENU,
                         icon: Icons.menu,
+                        label: tabMenu,
+                        iconScale: scale,
+                        iconSize: 25,
                       )),
                 ],
               ))
         ]));
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _resizableController = new AnimationController(
-        vsync: this,
-        duration: Duration(milliseconds: 350),
-        value: 25.0,
-        upperBound: 25.0,
-        lowerBound: 0.0);
   }
 }

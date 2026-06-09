@@ -1,3 +1,5 @@
+import 'package:cuacfm/domain/repository/favorites_repository_contract.dart';
+import 'package:cuacfm/domain/repository/playlist_repository_contract.dart';
 import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/domain/result/result.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
@@ -13,6 +15,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:injector/injector.dart';
 import 'package:mockito/mockito.dart';
 
+import '../../instrument/data/local_repository_mock.dart';
 import '../../instrument/data/repository_mock.dart';
 import '../../instrument/helper/helper-instrument.dart';
 import '../../instrument/model/episode_instrument.dart';
@@ -20,6 +23,8 @@ import '../../instrument/ui/mock_podcast_detail_view.dart';
 
 void main() {
   MockRadiocoRepository mockRepository = MockRadiocoRepository();
+  MockFavoritesRepository mockFavoritesRepository = MockFavoritesRepository();
+  MockPlaylistRepository mockPlaylistRepository = MockPlaylistRepository();
   MockPodcastDetailView view = MockPodcastDetailView();
   MockPodcastDetailRouter router = MockPodcastDetailRouter();
   MockConnection mockConnection = MockConnection();
@@ -31,6 +36,12 @@ void main() {
     DependencyInjector().loadModules();
     Injector.appInstance.registerDependency<CuacRepositoryContract>(
         () => mockRepository,
+        override: true);
+    Injector.appInstance.registerDependency<FavoritesRepositoryContract>(
+        () => mockFavoritesRepository,
+        override: true);
+    Injector.appInstance.registerDependency<PlaylistRepositoryContract>(
+        () => mockPlaylistRepository,
         override: true);
     Injector.appInstance
         .registerDependency<DetailPodcastView>(() => view, override: true);
@@ -209,7 +220,7 @@ void main() {
         when(mockPlayer.stopAndPlay()).thenAnswer((_) => Future.value(true));
         mockPlayer.episode = EpisodeInstrument.givenAnEpisode(audioUrl: "http://random");
 
-        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image");
+        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image","Program Name");
         await Future.delayed(Duration(milliseconds: 200));
 
         expect(view.viewState[0], equals(PodcastDetailState.playerStatus));
@@ -231,7 +242,7 @@ void main() {
         when(mockPlayer.stopAndPlay()).thenAnswer((_) => Future.value(false));
         mockPlayer.episode = EpisodeInstrument.givenAnEpisode(audioUrl: "http://random");
 
-        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image");
+        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image","Program Name");
         await Future.delayed(Duration(milliseconds: 200));
 
         expect(view.viewState[0], equals(PodcastDetailState.playerStatus));
@@ -253,7 +264,7 @@ void main() {
         when(mockPlayer.play()).thenAnswer((_) => Future.value(true));
         mockPlayer.episode = EpisodeInstrument.givenAnEpisode(audioUrl: "http://random");
 
-        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image");
+        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image","Program Name");
         await Future.delayed(Duration(milliseconds: 200));
 
         expect(view.viewState[0], equals(PodcastDetailState.playerStatus));
@@ -275,7 +286,7 @@ void main() {
         when(mockPlayer.play()).thenAnswer((_) => Future.value(false));
         mockPlayer.episode = EpisodeInstrument.givenAnEpisode(audioUrl: "http://random");
 
-        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image");
+        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image","Program Name");
         await Future.delayed(Duration(milliseconds: 200));
 
         expect(view.viewState[0], equals(PodcastDetailState.playerStatus));
@@ -297,7 +308,7 @@ void main() {
         when(mockPlayer.resume()).thenAnswer((_) => Future.value());
 
 
-        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image");
+        presenter.onSelectedEpisode(EpisodeInstrument.givenAnEpisode(),"http://image","Program Name");
         await Future.delayed(Duration(milliseconds: 200));
 
         expect(router.viewState.length, equals(0));
@@ -345,10 +356,11 @@ void main() {
             .thenAnswer((_) => Future.value(true));
         mockPlayer.isPodcast = true;
 
-        presenter.onDetailEpisode("title","subtile","content","http://url");
+        final episode = Episode.fromMap({'title': 'title', 'link': 'http://url', 'audio': 'http://url', 'description': 'content', 'duration': '00:00:00'});
+        presenter.onDetailEpisode(episode, "subtile", "http://logo");
         await Future.delayed(Duration(milliseconds: 200));
 
         expect(router.viewState[0], equals(PodcastDetailState.goToEpisodeDetail));
-        expect((router.data[0] as New).title, equals("title"));
+        expect((router.data[0] as Episode).title, equals("title"));
       });
 }
