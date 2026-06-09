@@ -20,7 +20,7 @@ void main() {
   tearDownAll(() async {});
 
   test('that can fetch outstanding info from network', () {
-    when(mockRepository.getOutStanding(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.outstanding());
+    when(mockRepository.getOutStanding(any)).thenAnswer((_) => MockRadiocoRepository.outstanding());
     useCase.withParams("https://example.com/outstanding");
 
     invoker.execute(useCase).listen(expectAsync1((result) {
@@ -31,13 +31,23 @@ void main() {
   });
 
   test('that can fetch outstanding data when error in network', () {
-    when(mockRepository.getOutStanding(argThat(isA<String>()))).thenAnswer((_) => MockRadiocoRepository.outstanding(isEmpty: true));
+    when(mockRepository.getOutStanding(any)).thenAnswer((_) => MockRadiocoRepository.outstanding(isEmpty: true));
     useCase.withParams("https://example.com/outstanding");
 
     invoker.execute(useCase).listen(expectAsync1((result) {
       expect(result.status, equals(Status.fail));
       expect(result is Error, equals(true));
     }));
+  });
+
+  test('that passes the requested url to the repository', () async {
+    when(mockRepository.getOutStanding("https://example.com/outstanding"))
+        .thenAnswer((_) => MockRadiocoRepository.outstanding());
+
+    useCase.withParams("https://example.com/outstanding");
+    await invoker.execute(useCase).first;
+
+    verify(mockRepository.getOutStanding("https://example.com/outstanding")).called(1);
   });
 
 

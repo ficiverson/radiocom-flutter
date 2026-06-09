@@ -114,7 +114,7 @@ void main() {
   });
 
   test('that can fetch outstanding from network', () async {
-    when(mockRemoteDataSource.getOutstanding(argThat(isA<String>())))
+    when(mockRemoteDataSource.getOutstanding(any))
         .thenAnswer((_) => MockRemoteDataSource.outstanding(false));
     Result<Outstanding> result = await repository.getOutStanding("https://example.com/outstanding");
 
@@ -123,11 +123,20 @@ void main() {
   });
 
   test('that can fetch empty outstanding when data from network fail', () async {
-    when(mockRemoteDataSource.getOutstanding(argThat(isA<String>())))
+    when(mockRemoteDataSource.getOutstanding(any))
         .thenAnswer((_) => MockRemoteDataSource.outstanding(true));
     Result<Outstanding> result = await repository.getOutStanding("https://example.com/outstanding");
 
     expect(result.status, equals(Status.fail));
+  });
+
+  test('that forwards the outstanding url to the remote source', () async {
+    when(mockRemoteDataSource.getOutstanding("https://example.com/outstanding"))
+        .thenAnswer((_) => MockRemoteDataSource.outstanding(false));
+
+    await repository.getOutStanding("https://example.com/outstanding");
+
+    verify(mockRemoteDataSource.getOutstanding("https://example.com/outstanding")).called(1);
   });
 
 }
