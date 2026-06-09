@@ -6,9 +6,9 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: subosito/flutter-action@v1
+      - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.5'
+          flutter-version: '3.24.0'
           channel: 'stable'
       - run: flutter pub get
       - run: flutter analyze
