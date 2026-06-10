@@ -212,10 +212,12 @@ class SettingsState extends State<Settings>
 
   Future<void> _requestReview() async {
     final inAppReview = InAppReview.instance;
-    if (await inAppReview.isAvailable()) {
-      await inAppReview.requestReview();
-    } else {
-      await inAppReview.openStoreListing(appStoreId: '1234567890');
+    try {
+      if (await inAppReview.isAvailable()) {
+        await inAppReview.requestReview();
+      }
+    } catch (_) {
+      await inAppReview.openStoreListing(appStoreId: '536600585');
     }
   }
 
