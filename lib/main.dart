@@ -118,7 +118,9 @@ void _applyThemeModeToApp(ThemeMode mode) {
   );
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
+    systemStatusBarContrastEnforced: false,
     systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarContrastEnforced: false,
     systemNavigationBarDividerColor: Colors.transparent,
     systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
     statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,

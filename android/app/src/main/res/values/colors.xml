@@ -3,5 +3,5 @@
     <color name="ic_launcher_background">#000000</color>
     <color name="notification_background">#FDCC03</color>
     <color name="white">#FFFFFF</color>
-    <color name="statusBarColor">#FAF9F6</color>
+    <color name="statusBarColor">#00000000</color>
 </resources>
