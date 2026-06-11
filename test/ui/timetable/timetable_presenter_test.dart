@@ -122,7 +122,7 @@ void main() {
         presenter.onViewResumed();
         await Future.delayed(Duration(milliseconds: 200));
 
-        expect(view.viewState.isEmpty, equals(true));
+        expect(view.viewState, equals([TimeTableState.onNewData]));
 
       });
 

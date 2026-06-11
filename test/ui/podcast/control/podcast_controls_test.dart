@@ -123,6 +123,10 @@ void main() {
     }
 
     expect(find.byType(Slider, skipOffstage: false), findsOneWidget);
+
+    // Flush the timeout timer scheduled internally by
+    // PaletteGenerator.fromImageProvider so it doesn't leak past the test.
+    await tester.pump(const Duration(seconds: 16));
   });
 
   testWidgets('that in podcast controls can put a timer properly',
@@ -189,9 +193,13 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(BottomSheet), findsOneWidget);
-    expect(find.text("1.5x"), findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byType(BottomSheet), matching: find.text("1.5x")),
+        findsOneWidget);
 
-    await tester.tap(find.text("1.5x"));
+    await tester.tap(find.descendant(
+        of: find.byType(BottomSheet), matching: find.text("1.5x")));
     await tester.pumpAndSettle();
 
     expect(find.byType(BottomSheet), findsNothing);
