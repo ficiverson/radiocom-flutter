@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/radiostation.dart';
@@ -6,8 +8,8 @@ import 'package:cuacfm/ui/player/current_timer.dart';
 import 'package:cuacfm/ui/podcast/controls/podcast_controls.dart';
 import 'package:cuacfm/ui/podcast/controls/podcast_controls_presenter.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
-import 'package:cuacfm/utils/neumorfism.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Icons, Slider, BottomSheet;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:injector/injector.dart';
 import 'package:mockito/mockito.dart';
@@ -24,9 +26,11 @@ void main() {
   MockCurrentTimerContract mockCurrentTimerContract =
       MockCurrentTimerContract();
   MockPlayer mockPlayer = MockPlayer();
+  late Directory hiveTempDir;
 
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
+    hiveTempDir = await setupHiveForTest();
     SharedPreferences.setMockInitialValues({});
     DependencyInjector().loadModules();
     mockTranslationsWithLocale();
@@ -56,8 +60,20 @@ void main() {
     Injector.appInstance.removeByKey<PodcastControlsView>();
   });
 
+  tearDownAll(() async {
+    await teardownHiveForTest(hiveTempDir).timeout(
+      const Duration(seconds: 5),
+      onTimeout: () {},
+    );
+  });
+
   testWidgets('that in podcast controls can show info while playing live audio',
       (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(768, 1024);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -71,14 +87,21 @@ void main() {
 
     await tester.pumpWidget(startWidget(
         PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
-    expect(find.byKey(Key("podcast_controls_container"), skipOffstage: true),
-        findsOneWidget);
+    expect(find.text("En directo", skipOffstage: false), findsOneWidget);
   });
 
   testWidgets(
       'that in podcast controls can show info while playing podcast audio',
       (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(768, 1024);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -95,13 +118,20 @@ void main() {
 
     await tester.pumpWidget(startWidget(
         PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
-    expect(find.byKey(Key("podcast_controls_container"), skipOffstage: true),
-        findsOneWidget);
+    expect(find.byType(Slider, skipOffstage: false), findsOneWidget);
   });
 
   testWidgets('that in podcast controls can put a timer properly',
       (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(768, 1024);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -118,20 +148,25 @@ void main() {
 
     await tester.pumpWidget(startWidget(
         PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
-    final gesture = await tester.startGesture(Offset(0, 600));
-    await tester.ensureVisible(find.byKey(Key("timer_chip")));
-    await tester.tap(find.byKey(Key("timer_chip")));
-    await tester.pump();
-    await gesture.moveBy(Offset(0, -600));
-    await tester.pump();
-    await tester.tap(find.byKey(Key("timer_chip_15_min")));
-    await tester.pump(Duration(milliseconds: 300));
+    await tester.tap(find.byIcon(Icons.timer));
+    await tester.pumpAndSettle();
 
-    expect(find.byType(NeumorphicView, skipOffstage: false), findsNWidgets(1));
+    expect(find.byType(BottomSheet), findsOneWidget);
+    expect(find.text("15 min"), findsOneWidget);
+
+    await tester.tap(find.text("15 min"));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(BottomSheet), findsNothing);
   });
 
   testWidgets('that in podcast controls can put playback rate for faster',
       (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(768, 1024);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     when(mockRepository.getLiveBroadcast())
         .thenAnswer((_) => MockRadiocoRepository.now());
     when(mockConnection.isConnectionAvailable())
@@ -150,21 +185,26 @@ void main() {
 
     await tester.pumpWidget(startWidget(
         PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
-    final gesture = await tester.startGesture(Offset(0, 600));
-    await tester.ensureVisible(find.byKey(Key("faster_chip")));
-    await tester.tap(find.byKey(Key("faster_chip")));
-    await tester.pump();
-    await gesture.moveBy(Offset(0, -600));
-    await tester.pump();
-    await tester.tap(find.byKey(Key("faster_chip_3_speed")));
-    await tester.pump(Duration(milliseconds: 300));
+    await tester.tap(find.byIcon(Icons.speed));
+    await tester.pumpAndSettle();
 
-    expect(find.byType(NeumorphicView, skipOffstage: false), findsNWidgets(1));
+    expect(find.byType(BottomSheet), findsOneWidget);
+    expect(find.text("1.5x"), findsOneWidget);
+
+    await tester.tap(find.text("1.5x"));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(BottomSheet), findsNothing);
   });
 
   testWidgets(
       'that in podcast controls can handle error on connection while playing',
           (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(768, 1024);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
         when(mockRepository.getLiveBroadcast())
             .thenAnswer((_) => MockRadiocoRepository.now());
         when(mockConnection.isConnectionAvailable())
@@ -187,7 +227,9 @@ void main() {
         await tester.pumpWidget(startWidget(
             PodcastControls(episode: EpisodeInstrument.givenAnEpisode())));
         mockPlayer.onConnection!(true);
-        await tester.pumpAndSettle();
+        for (var i = 0; i < 10; i++) {
+          await tester.pump(const Duration(milliseconds: 100));
+        }
 
         expect(find.byKey(Key("connection_snackbar"), skipOffstage: true),
             findsOneWidget);

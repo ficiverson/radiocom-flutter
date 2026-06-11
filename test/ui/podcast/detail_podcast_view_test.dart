@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/radiostation.dart';
@@ -21,9 +23,12 @@ void main() {
   MockRadiocoRepository mockRepository = MockRadiocoRepository();
   MockConnection mockConnection = MockConnection();
   MockPlayer mockPlayer = MockPlayer();
+  late Directory hiveTempDir;
 
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
+    await setupFirebaseCoreMocks();
+    hiveTempDir = await setupHiveForTest();
     SharedPreferences.setMockInitialValues({});
     DependencyInjector().loadModules();
     mockTranslationsWithLocale();
@@ -47,6 +52,13 @@ void main() {
 
   tearDown(() async {
     Injector.appInstance.removeByKey<DetailPodcastView>();
+  });
+
+  tearDownAll(() async {
+    await teardownHiveForTest(hiveTempDir).timeout(
+      const Duration(seconds: 5),
+      onTimeout: () {},
+    );
   });
 
   testWidgets('that can show podcast detail while playing an audio', (WidgetTester tester) async{

@@ -107,8 +107,11 @@ class MockPlayer extends Mock implements CurrentPlayerContract {
         returnValue: false,
       );
   @override
-  bool isPaused() =>
-      super.noSuchMethod(Invocation.method(#isPaused, []), returnValue: false);
+  bool isPaused() => super.noSuchMethod(
+        Invocation.method(#isPaused, []),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      );
   @override
   void release() => super.noSuchMethod(Invocation.method(#release, []));
   @override
@@ -174,12 +177,9 @@ void ignoreOverflowErrors(
 
   var exception = details.exception;
   if (exception is FlutterError) {
-    isOverflowError = exception.diagnostics.any(
-      (e) => e.value.toString().startsWith("A RenderFlex overflowed by"),
-    );
-    isUnableToLoadAsset = exception.diagnostics.any(
-      (e) => e.value.toString().startsWith("Unable to load asset"),
-    );
+    final message = exception.toString();
+    isOverflowError = message.contains("A RenderFlex overflowed by");
+    isUnableToLoadAsset = message.contains("Unable to load asset");
   }
   if (isOverflowError || isUnableToLoadAsset) {
     debugPrint('Ignored Error');
