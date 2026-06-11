@@ -5,6 +5,7 @@ import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/podcast/detail_podcast_presenter.dart';
 import 'package:cuacfm/ui/podcast/detail_podcast_view.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
+import 'package:cuacfm/utils/player_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:injector/injector.dart';
@@ -64,7 +65,7 @@ void main() {
 
     await tester.pumpWidget(startWidget(DetailPodcastPage(program: ProgramInstrument.givenAProgram())));
     await tester.pumpAndSettle(Duration(milliseconds: 300));
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 1.0);
+    expect(tester.widget<PlayerView>(find.byType(PlayerView)).shouldShow, true);
     expect(
         find.byKey(PageStorageKey<String>("podcasDetailList"),skipOffstage: true),
         findsOneWidget);
@@ -85,7 +86,7 @@ void main() {
 
 
     await tester.pumpWidget(startWidget(DetailPodcastPage(program: ProgramInstrument.givenAProgram())));
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 0.0);
+    expect(tester.widget<PlayerView>(find.byType(PlayerView)).shouldShow, false);
     expect(
         find.byKey(PageStorageKey<String>("podcasDetailList"),skipOffstage: true),
         findsOneWidget);
@@ -107,7 +108,7 @@ void main() {
 
     await tester.pumpWidget(startWidget(DetailPodcastPage(program: ProgramInstrument.givenAProgram())));
     await tester.pumpAndSettle(Duration(milliseconds: 300));
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 1.0);
+    expect(tester.widget<PlayerView>(find.byType(PlayerView)).shouldShow, true);
     expect(
         find.byKey(PageStorageKey<String>("podcasDetailList"),skipOffstage: true),
         findsOneWidget);

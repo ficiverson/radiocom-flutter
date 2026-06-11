@@ -6,6 +6,7 @@ import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/podcast/all_podcast/all_podcast_presenter.dart';
 import 'package:cuacfm/ui/podcast/all_podcast/all_podcast_view.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
+import 'package:cuacfm/utils/player_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -62,7 +63,7 @@ void main() {
     mockPlayer.currentSong = "mocklive";
 
     await tester.pumpWidget(startWidget(AllPodcast(podcasts: [ProgramInstrument.givenAProgram(),ProgramInstrument.givenAProgram()])));
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 1.0);
+    expect(tester.widget<PlayerView>(find.byType(PlayerView)).shouldShow, true);
     expect(
         find.byKey(PageStorageKey<String>("allpodcastview"),skipOffstage: true),
         findsOneWidget);
@@ -80,7 +81,7 @@ void main() {
     mockPlayer.currentSong = "mocklive";
 
     await tester.pumpWidget(startWidget(AllPodcast(podcasts: [ProgramInstrument.givenAProgram(),ProgramInstrument.givenAProgram()])));
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 0.0);
+    expect(tester.widget<PlayerView>(find.byType(PlayerView)).shouldShow, false);
     expect(
         find.byKey(PageStorageKey<String>("allpodcastview"),skipOffstage: true),
         findsOneWidget);
@@ -99,7 +100,7 @@ void main() {
     mockPlayer.currentSong = "mocklive";
 
     await tester.pumpWidget(startWidget(AllPodcast(podcasts: [ProgramInstrument.givenAProgram(),ProgramInstrument.givenAProgram()],category: Program.getCategory(ProgramCategories.TV))));
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 0.0);
+    expect(tester.widget<PlayerView>(find.byType(PlayerView)).shouldShow, false);
     expect(
         find.byKey(PageStorageKey<String>("allpodcastview"),skipOffstage: true),
         findsOneWidget);
@@ -117,7 +118,7 @@ void main() {
     mockPlayer.currentSong = "mocklive";
 
     await tester.pumpWidget(startWidget(AllPodcast(podcasts: [ProgramInstrument.givenAProgram(),ProgramInstrument.givenAProgram()],category: Program.getCategory(ProgramCategories.SCIENCE))));
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 0.0);
+    expect(tester.widget<PlayerView>(find.byType(PlayerView)).shouldShow, false);
     expect(
         find.byKey(PageStorageKey<String>("allpodcastview"),skipOffstage: true),
         findsOneWidget);
@@ -140,7 +141,7 @@ void main() {
     await tester.enterText(find.byKey(Key("top_bar_search_input")),"Spo");
     await tester.pump(Duration(milliseconds:400));
 
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 0.0);
+    expect(tester.widget<PlayerView>(find.byType(PlayerView)).shouldShow, false);
     expect(
         find.byKey(PageStorageKey<String>("allpodcastview"),skipOffstage: true),
         findsOneWidget);

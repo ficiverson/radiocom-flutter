@@ -5,6 +5,7 @@ import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/settings/settings-detail/settings_detail.dart';
 import 'package:cuacfm/ui/settings/settings-detail/settings_presenter_detail.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
+import 'package:cuacfm/utils/player_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:injector/injector.dart';
@@ -64,9 +65,9 @@ void main() {
         .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.TERMS)));
     expect(
         tester
-            .widget<Opacity>(find.byKey(Key("player_view_container")))
-            .opacity,
-        1.0);
+            .widget<PlayerView>(find.byType(PlayerView))
+            .shouldShow,
+        true);
     expect(find.byKey(ValueKey<String>("termsprivacynote"), skipOffstage: true),
         findsOneWidget);
   });
@@ -88,9 +89,9 @@ void main() {
         .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.TERMS)));
     expect(
         tester
-            .widget<Opacity>(find.byKey(Key("player_view_container")))
-            .opacity,
-        0.0);
+            .widget<PlayerView>(find.byType(PlayerView))
+            .shouldShow,
+        false);
     expect(find.byKey(ValueKey<String>("termsprivacynote"), skipOffstage: true),
         findsOneWidget);
   });
@@ -112,9 +113,9 @@ void main() {
         .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.PRIVACY)));
     expect(
         tester
-            .widget<Opacity>(find.byKey(Key("player_view_container")))
-            .opacity,
-        1.0);
+            .widget<PlayerView>(find.byType(PlayerView))
+            .shouldShow,
+        true);
     expect(find.byKey(ValueKey<String>("termsprivacynote"), skipOffstage: true),
         findsOneWidget);
   });
@@ -136,9 +137,9 @@ void main() {
         .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.PRIVACY)));
     expect(
         tester
-            .widget<Opacity>(find.byKey(Key("player_view_container")))
-            .opacity,
-        0.0);
+            .widget<PlayerView>(find.byType(PlayerView))
+            .shouldShow,
+        false);
     expect(find.byKey(ValueKey<String>("termsprivacynote"), skipOffstage: true),
         findsOneWidget);
   });
@@ -160,9 +161,9 @@ void main() {
         .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.LICENSE)));
     expect(
         tester
-            .widget<Opacity>(find.byKey(Key("player_view_container")))
-            .opacity,
-        1.0);
+            .widget<PlayerView>(find.byType(PlayerView))
+            .shouldShow,
+        true);
     expect(find.byKey(ValueKey<String>("licenseNote"), skipOffstage: true),
         findsOneWidget);
   });
@@ -184,9 +185,9 @@ void main() {
         .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.LICENSE)));
     expect(
         tester
-            .widget<Opacity>(find.byKey(Key("player_view_container")))
-            .opacity,
-        0.0);
+            .widget<PlayerView>(find.byType(PlayerView))
+            .shouldShow,
+        false);
     expect(find.byKey(ValueKey<String>("licenseNote"), skipOffstage: true),
         findsOneWidget);
   });
@@ -208,9 +209,9 @@ void main() {
         .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.NONE)));
     expect(
         tester
-            .widget<Opacity>(find.byKey(Key("player_view_container")))
-            .opacity,
-        1.0);
+            .widget<PlayerView>(find.byType(PlayerView))
+            .shouldShow,
+        true);
     expect(find.byKey(ValueKey<String>("gallery_cotainer"), skipOffstage: true),
         findsOneWidget);
   });
@@ -232,9 +233,9 @@ void main() {
         .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.NONE)));
     expect(
         tester
-            .widget<Opacity>(find.byKey(Key("player_view_container")))
-            .opacity,
-        0.0);
+            .widget<PlayerView>(find.byType(PlayerView))
+            .shouldShow,
+        false);
     expect(find.byKey(ValueKey<String>("gallery_cotainer"), skipOffstage: true),
         findsOneWidget);
   });
@@ -267,9 +268,9 @@ void main() {
 
     expect(
         tester
-            .widget<Opacity>(find.byKey(Key("player_view_container")))
-            .opacity,
-        1.0);
+            .widget<PlayerView>(find.byType(PlayerView))
+            .shouldShow,
+        true);
     expect(find.byKey(Key("connection_snackbar"), skipOffstage: true),
         findsOneWidget);
   });

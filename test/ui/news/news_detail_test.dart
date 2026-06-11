@@ -4,6 +4,7 @@ import 'package:cuacfm/ui/new-detail/new_detail.dart';
 import 'package:cuacfm/ui/new-detail/new_detail_presenter.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/utils/connection_contract.dart';
+import 'package:cuacfm/utils/player_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:injector/injector.dart';
@@ -55,7 +56,7 @@ void main() {
         mockPlayer.currentSong = "mocklive";
 
         await tester.pumpWidget(startWidget(NewDetail(newItem : NewInstrument.givenANew())));
-        expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 1.0);
+        expect(tester.widget<PlayerView>(find.byType(PlayerView)).shouldShow, true);
         expect(
             find.byKey(PageStorageKey<String>("news_detail_container"),skipOffstage: true),
             findsOneWidget);
@@ -75,7 +76,7 @@ void main() {
     mockPlayer.currentSong = "mocklive";
 
     await tester.pumpWidget(startWidget(NewDetail(newItem : NewInstrument.givenANew())));
-    expect(tester.widget<Opacity>(find.byKey(Key("player_view_container"))).opacity, 0.0);
+    expect(find.byType(PlayerView), findsNothing);
     expect(
         find.byKey(PageStorageKey<String>("news_detail_container"),skipOffstage: true),
         findsOneWidget);
@@ -102,7 +103,9 @@ void main() {
 
     await tester.pumpWidget(startWidget(NewDetail(newItem : NewInstrument.givenANew())));
     mockPlayer.onConnection!(true);
-    await tester.pumpAndSettle();
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     expect(
         find.byKey(Key("connection_snackbar"),skipOffstage: true),

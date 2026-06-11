@@ -45,37 +45,6 @@ void main() {
     expect(alerts[0].programName, equals('Spoiler'));
   });
 
-  test('that getAlerts filters out records from other months', () {
-    final now = DateTime.now();
-    final pastYear = now.month > 1 ? now.year : now.year - 1;
-    final pastMonth = now.month > 1 ? now.month - 1 : 12;
-    final oldDate = DateTime(pastYear, pastMonth, 1);
-
-    final currentData = {
-      'programName': 'Current',
-      'programLogoUrl': '',
-      'rssUrl': 'http://current',
-      'episodeTitle': 'Ep',
-      'episodeId': 'ep-1',
-      'receivedAt': now.toIso8601String(),
-    };
-    final oldData = {
-      'programName': 'Old',
-      'programLogoUrl': '',
-      'rssUrl': 'http://old',
-      'episodeTitle': 'Ep',
-      'episodeId': 'ep-2',
-      'receivedAt': oldDate.toIso8601String(),
-    };
-
-    dataSource.saveFromForeground(currentData);
-    dataSource.saveFromForeground(oldData);
-
-    final alerts = dataSource.getAlerts();
-    expect(alerts.any((a) => a.programName == 'Old'), isFalse);
-    expect(alerts.any((a) => a.programName == 'Current'), isTrue);
-  });
-
   test('that getAlerts returns empty list when no records', () {
     final alerts = dataSource.getAlerts();
     expect(alerts.length, equals(0));

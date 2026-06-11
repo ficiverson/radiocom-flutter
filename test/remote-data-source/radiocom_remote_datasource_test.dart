@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cuacfm/injector/dependency_injector.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/new.dart';
@@ -159,7 +161,11 @@ void main() {
   });
 
   test('that can parse a response for outstanding data', () async {
-    server.enqueue(body: Helper.readFile("test_mocks/get_outstanding.json"));
+    final outstandingJson = jsonDecode(Helper.readFile("test_mocks/get_outstanding.json")) as Map<String, dynamic>;
+    (outstandingJson["_links"] as Map)["wp:featuredmedia"] = [
+      {"href": mockUrl}
+    ];
+    server.enqueue(body: jsonEncode(outstandingJson));
     server.enqueue(body: Helper.readFile("test_mocks/get_outstanding_image.json"));
     Outstanding? result = await remoteDataSource.getOutstanding(mockUrl);
     expect(result?.title, contains("mocked"));

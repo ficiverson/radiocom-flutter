@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cuacfm/domain/repository/favorites_repository_contract.dart';
 import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
 import 'package:cuacfm/injector/dependency_injector.dart';
@@ -22,11 +24,14 @@ void main() {
   MockConnection mockConnection = MockConnection();
   MockPlayer mockPlayer = MockPlayer();
   MockNotifcationSubscription notifcationSubscription = MockNotifcationSubscription();
+  late Directory hiveTempDir;
 
   setupCloudFirestoreMocks();
 
   setUpAll(() async {
     WidgetsFlutterBinding.ensureInitialized();
+    await setupFirebaseCoreMocks();
+    hiveTempDir = await setupHiveForTest();
     SharedPreferences.setMockInitialValues({});
     DependencyInjector().loadModules();
     mockTranslationsWithLocale();
@@ -53,6 +58,13 @@ void main() {
 
   tearDown(() async {
     Injector.appInstance.removeByKey<HomeView>();
+  });
+
+  tearDownAll(() async {
+    await teardownHiveForTest(hiveTempDir).timeout(
+      const Duration(seconds: 5),
+      onTimeout: () {},
+    );
   });
 
   testWidgets('that can init the home screen', (WidgetTester tester) async{
@@ -167,7 +179,9 @@ void main() {
 
     await tester.pumpWidget(startWidget(MyHomePage(title: "homi")));
     mockPlayer.onConnection!(true);
-    await tester.pumpAndSettle(Duration(milliseconds: 500));
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     expect(
         find.byKey(Key("connection_snackbar"),skipOffstage: true),
@@ -183,6 +197,7 @@ void main() {
     when(mockRepository.getRadioStationData()).thenAnswer((_) => MockRadiocoRepository.radioStation());
     when(mockRepository.getNews()).thenAnswer((_) => MockRadiocoRepository.news());
     when(mockRepository.getOutStanding("https://cuacfm.org/wp-json/wp/v2/pages/3952")).thenAnswer((_) => MockRadiocoRepository.outstanding());
+    when(mockRepository.getOutStanding("https://cuacfm.org/wp-json/wp/v2/pages/6406")).thenAnswer((_) => MockRadiocoRepository.outstanding());
     when(mockConnection.isConnectionAvailable())
         .thenAnswer((_) => Future.value(true));
     when(mockPlayer.isPlaying()).thenReturn(true);
@@ -192,7 +207,9 @@ void main() {
     mockPlayer.currentSong = "mocklive";
 
     await tester.pumpWidget(startWidget(MyHomePage(title: "homi")));
-    await tester.pumpAndSettle(const Duration(milliseconds: 500));
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     expect(find.byKey(Key("bottom_bar"),skipOffstage: true), findsOneWidget);
   });
