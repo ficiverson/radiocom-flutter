@@ -174,6 +174,7 @@ void ignoreOverflowErrors(
 }) {
   bool isOverflowError = false;
   bool isUnableToLoadAsset = false;
+  bool isNetworkImageLoadError = false;
 
   var exception = details.exception;
   if (exception is FlutterError) {
@@ -181,7 +182,10 @@ void ignoreOverflowErrors(
     isOverflowError = message.contains("A RenderFlex overflowed by");
     isUnableToLoadAsset = message.contains("Unable to load asset");
   }
-  if (isOverflowError || isUnableToLoadAsset) {
+  if (exception is NetworkImageLoadException) {
+    isNetworkImageLoadError = true;
+  }
+  if (isOverflowError || isUnableToLoadAsset || isNetworkImageLoadError) {
     debugPrint('Ignored Error');
   } else if (_originalOnError != null) {
     _originalOnError!(details);

@@ -212,7 +212,7 @@ void main() {
             .widget<PlayerView>(find.byType(PlayerView))
             .shouldShow,
         true);
-    expect(find.byKey(ValueKey<String>("gallery_cotainer"), skipOffstage: true),
+    expect(find.byKey(ValueKey<String>("gallery_container"), skipOffstage: true),
         findsOneWidget);
   });
 
@@ -236,7 +236,7 @@ void main() {
             .widget<PlayerView>(find.byType(PlayerView))
             .shouldShow,
         false);
-    expect(find.byKey(ValueKey<String>("gallery_cotainer"), skipOffstage: true),
+    expect(find.byKey(ValueKey<String>("gallery_container"), skipOffstage: true),
         findsOneWidget);
   });
 
@@ -264,7 +264,9 @@ void main() {
     await tester
         .pumpWidget(startWidget(SettingsDetail(legalType: LegalType.NONE)));
     mockPlayer.onConnection!(true);
-    await tester.pumpAndSettle();
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     expect(
         tester

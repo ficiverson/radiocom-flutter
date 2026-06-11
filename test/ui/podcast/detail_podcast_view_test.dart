@@ -124,6 +124,10 @@ void main() {
     expect(
         find.byKey(PageStorageKey<String>("podcasDetailList"),skipOffstage: true),
         findsOneWidget);
+    await tester.dragUntilVisible(
+        find.byKey(PageStorageKey<String>("emptyState")),
+        find.byKey(PageStorageKey<String>("podcasDetailList")),
+        const Offset(0, -300));
     expect(
         find.byKey(PageStorageKey<String>("emptyState"),skipOffstage: true),
         findsOneWidget);

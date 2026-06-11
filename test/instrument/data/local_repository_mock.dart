@@ -53,6 +53,7 @@ class MockPlaylistRepository extends Mock implements PlaylistRepositoryContract 
   bool isInPlaylist(String audioUrl) => super.noSuchMethod(
         Invocation.method(#isInPlaylist, [audioUrl]),
         returnValue: false,
+        returnValueForMissingStub: false,
       );
   @override
   List<Map<String, dynamic>> getRawItems() => super.noSuchMethod(

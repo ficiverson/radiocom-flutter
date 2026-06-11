@@ -136,8 +136,6 @@ void main() {
     mockPlayer.currentSong = "mocklive";
 
     await tester.pumpWidget(startWidget(AllPodcast(podcasts: [ProgramInstrument.givenAProgram(),ProgramInstrument.givenAProgram()])));
-    await tester.tap(find.byKey(Key("top_bar_search")));
-    await tester.pump(Duration(milliseconds:400));
     await tester.enterText(find.byKey(Key("top_bar_search_input")),"Spo");
     await tester.pump(Duration(milliseconds:400));
 

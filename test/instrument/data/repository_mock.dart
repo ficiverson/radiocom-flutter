@@ -30,7 +30,8 @@ class MockRadiocoRepository extends Mock implements CuacRepositoryContract {
   Future<Result<List<TimeTable>>> getTimetableData(
           dynamic after, dynamic before) =>
       super.noSuchMethod(Invocation.method(#getTimetableData, [after, before]),
-          returnValue: timetables());
+          returnValue: timetables(),
+          returnValueForMissingStub: timetables());
   @override
   Future<Result<List<Program>>> getAllPodcasts() =>
       super.noSuchMethod(Invocation.method(#getAllPodcasts, []),
