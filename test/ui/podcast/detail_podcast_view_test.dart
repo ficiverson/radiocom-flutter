@@ -81,6 +81,10 @@ void main() {
     expect(
         find.byKey(PageStorageKey<String>("podcasDetailList"),skipOffstage: true),
         findsOneWidget);
+
+    // Flush the timeout timer scheduled internally by
+    // PaletteGenerator.fromImageProvider so it doesn't leak past the test.
+    await tester.pump(const Duration(seconds: 16));
   });
 
   testWidgets('that can show podcast detail while not playing an audio', (WidgetTester tester) async{
@@ -102,6 +106,10 @@ void main() {
     expect(
         find.byKey(PageStorageKey<String>("podcasDetailList"),skipOffstage: true),
         findsOneWidget);
+
+    // Flush the timeout timer scheduled internally by
+    // PaletteGenerator.fromImageProvider so it doesn't leak past the test.
+    await tester.pump(const Duration(seconds: 16));
   });
 
   testWidgets('that can show podcast detail whithou any episode', (WidgetTester tester) async{
@@ -131,6 +139,10 @@ void main() {
     expect(
         find.byKey(PageStorageKey<String>("emptyState"),skipOffstage: true),
         findsOneWidget);
+
+    // Flush the timeout timer scheduled internally by
+    // PaletteGenerator.fromImageProvider so it doesn't leak past the test.
+    await tester.pump(const Duration(seconds: 16));
   });
 
   testWidgets('that in detail podcast view can handle no connection while playing music', (WidgetTester tester) async{
@@ -160,6 +172,10 @@ void main() {
     expect(
         find.byKey(Key("connection_snackbar"),skipOffstage: true),
         findsOneWidget);
+
+    // Flush the timeout timer scheduled internally by
+    // PaletteGenerator.fromImageProvider so it doesn't leak past the test.
+    await tester.pump(const Duration(seconds: 16));
   });
 
 }

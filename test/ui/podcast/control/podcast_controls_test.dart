@@ -92,6 +92,10 @@ void main() {
     }
 
     expect(find.text("En directo", skipOffstage: false), findsOneWidget);
+
+    // Flush the timeout timer scheduled internally by
+    // PaletteGenerator.fromImageProvider so it doesn't leak past the test.
+    await tester.pump(const Duration(seconds: 16));
   });
 
   testWidgets(
@@ -162,6 +166,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(BottomSheet), findsNothing);
+
+    // Flush the timeout timer scheduled internally by
+    // PaletteGenerator.fromImageProvider so it doesn't leak past the test.
+    await tester.pump(const Duration(seconds: 16));
   });
 
   testWidgets('that in podcast controls can put playback rate for faster',
@@ -241,5 +249,9 @@ void main() {
 
         expect(find.byKey(Key("connection_snackbar"), skipOffstage: true),
             findsOneWidget);
+
+        // Flush the timeout timer scheduled internally by
+        // PaletteGenerator.fromImageProvider so it doesn't leak past the test.
+        await tester.pump(const Duration(seconds: 16));
       });
 }
