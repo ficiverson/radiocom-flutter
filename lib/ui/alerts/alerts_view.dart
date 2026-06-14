@@ -86,9 +86,11 @@ class _AlertsPageState extends State<AlertsPage>
     _isDark = _dark;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarColor: _isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+        statusBarColor: Colors.transparent,
+        systemStatusBarContrastEnforced: false,
         statusBarIconBrightness: _isDark ? Brightness.light : Brightness.dark,
-        systemNavigationBarColor: _isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarContrastEnforced: false,
         systemNavigationBarIconBrightness: _isDark ? Brightness.light : Brightness.dark,
       ),
       child: Scaffold(

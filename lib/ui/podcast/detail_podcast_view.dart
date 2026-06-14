@@ -140,14 +140,13 @@ class DetailPodcastState extends State<DetailPodcastPage>
     final statusBarNeedsDarkIcons = _paletteColor.computeLuminance() > 0.179;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarColor: _isScrolled
-            ? (isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6))
-            : Colors.transparent,
+        statusBarColor: Colors.transparent,
         systemStatusBarContrastEnforced: false,
         statusBarIconBrightness: _isScrolled
             ? (isDark ? Brightness.light : Brightness.dark)
             : (statusBarNeedsDarkIcons ? Brightness.dark : Brightness.light),
-        systemNavigationBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarContrastEnforced: false,
         systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
       ),
       child: _scaffold,
