@@ -52,12 +52,14 @@ class NewDetailState extends State<NewDetail>
     final isDark = themeMode == ThemeMode.dark || (themeMode == ThemeMode.system && _queryData.platformBrightness == Brightness.dark);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        systemStatusBarContrastEnforced: false,
+        statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
         statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-        systemNavigationBarColor: Colors.transparent,
-        systemNavigationBarContrastEnforced: false,
-        systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        systemNavigationBarColor: shouldShowPlayer
+            ? Colors.black
+            : (isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6)),
+        systemNavigationBarIconBrightness: shouldShowPlayer
+            ? Brightness.light
+            : (isDark ? Brightness.light : Brightness.dark),
       ),
       child: Stack(
         children: [

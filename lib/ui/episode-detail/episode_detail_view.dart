@@ -135,12 +135,14 @@ class _EpisodeDetailState extends State<EpisodeDetail>
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        systemStatusBarContrastEnforced: false,
+        statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
         statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-        systemNavigationBarColor: Colors.transparent,
-        systemNavigationBarContrastEnforced: false,
-        systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        systemNavigationBarColor: showPlayer
+            ? Colors.black
+            : (isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6)),
+        systemNavigationBarIconBrightness: showPlayer
+            ? Brightness.light
+            : (isDark ? Brightness.light : Brightness.dark),
       ),
       child: Scaffold(
         backgroundColor: _colors.palidwhite,
