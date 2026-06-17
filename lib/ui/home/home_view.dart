@@ -277,8 +277,9 @@ class MyHomePageState extends State<MyHomePage>
     return doc.body?.text.trim() ?? '';
   }
 
-  Program findPodcastByName(String url) {
-    return _podcast.where((element) => url == element.rssUrl).first;
+  Program? findPodcastByName(String url) {
+    final matches = _podcast.where((element) => url == element.rssUrl);
+    return matches.isEmpty ? null : matches.first;
   }
 
   generatePodcast() {
@@ -1226,7 +1227,7 @@ Builder(builder: (context) {
                       orElse: () => _timeTable.last,
                     );
                   Program? nextProgram;
-                  try { nextProgram = findPodcastByName(next.rssUrl); } catch (_) {}
+                  nextProgram = findPodcastByName(next.rssUrl);
                   final nextLabel = SafeMap.safe(_localization.translateMap("home"), ["schedule_next"]).isNotEmpty
                       ? SafeMap.safe(_localization.translateMap("home"), ["schedule_next"])
                       : "Next";
@@ -1868,7 +1869,14 @@ Builder(builder: (context) {
         onTap: () async {
           if (_loadingRssUrl != null) return;
           if (item.rssUrl.isEmpty) {
-            _presenter.onPodcastClicked(findPodcastByName(item.rssUrl));
+            final podcast = findPodcastByName(item.rssUrl);
+            if (podcast != null) {
+              _presenter.onPodcastClicked(podcast);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(SafeMap.safe(_localization.translateMap("error"), ["podcast_not_ready"])),
+              ));
+            }
             return;
           }
           if (mounted) setState(() => _loadingRssUrl = item.rssUrl);
@@ -1878,7 +1886,14 @@ Builder(builder: (context) {
           if (mounted) setState(() => _loadingRssUrl = null);
           final episodes = result.data ?? [];
           if (episodes.isEmpty) {
-            _presenter.onPodcastClicked(findPodcastByName(item.rssUrl));
+            final podcast = findPodcastByName(item.rssUrl);
+            if (podcast != null) {
+              _presenter.onPodcastClicked(podcast);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(SafeMap.safe(_localization.translateMap("error"), ["podcast_not_ready"])),
+              ));
+            }
             return;
           }
           episodes.sort((a, b) =>
