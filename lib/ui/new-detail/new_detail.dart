@@ -104,7 +104,7 @@ class NewDetailState extends State<NewDetail>
           Positioned(
             top: 0, left: 0, right: 0,
             height: _queryData.padding.top,
-            child: ColoredBox(color: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6)),
+            child: ColoredBox(color: _colors.palidwhite),
           ),
           if (_isLoadingEpisode)
             Container(
