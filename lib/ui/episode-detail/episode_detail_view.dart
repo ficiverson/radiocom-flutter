@@ -133,54 +133,63 @@ class _EpisodeDetailState extends State<EpisodeDetail>
     final isDark = themeMode == ThemeMode.dark || (themeMode == ThemeMode.system && _queryData.platformBrightness == Brightness.dark);
     final showPlayer = _currentPlayer.isPlaying() || _currentPlayer.isPaused();
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
-        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-        systemNavigationBarColor: showPlayer
-            ? Colors.black
-            : (isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6)),
-        systemNavigationBarIconBrightness: showPlayer
-            ? Brightness.light
-            : (isDark ? Brightness.light : Brightness.dark),
-      ),
-      child: Scaffold(
-        backgroundColor: _colors.palidwhite,
-        body: _getBodyLayout(),
-        bottomNavigationBar: showPlayer
-            ? Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  PlayerView(
-                    shouldShow: true,
-                    isPlayingAudio: _currentPlayer.isPlaying(),
-                    onDetailClicked: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => PodcastControls(
-                          episode: _currentPlayer.episode,
-                        ),
-                      ));
-                    },
-                    onCloseClicked: () {
-                      _currentPlayer.stop();
-                      if (mounted) setState(() {});
-                    },
-                    onMultimediaClicked: (isPlaying) {
-                      if (!mounted) return;
-                      if (isPlaying) {
-                        _currentPlayer.pause();
-                      } else {
-                        _currentPlayer.resume();
-                      }
-                      setState(() {});
-                    },
-                  ),
-                  if (_queryData.padding.bottom > 0)
-                    Container(height: _queryData.padding.bottom, color: Colors.black),
-                ],
-              )
-            : SizedBox.shrink(),
-      ),
+    return Stack(
+      children: [
+        AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle(
+            statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+            statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+            systemNavigationBarColor: showPlayer
+                ? Colors.black
+                : (isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6)),
+            systemNavigationBarIconBrightness: showPlayer
+                ? Brightness.light
+                : (isDark ? Brightness.light : Brightness.dark),
+          ),
+          child: Scaffold(
+            backgroundColor: _colors.palidwhite,
+            body: _getBodyLayout(),
+            bottomNavigationBar: showPlayer
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      PlayerView(
+                        shouldShow: true,
+                        isPlayingAudio: _currentPlayer.isPlaying(),
+                        onDetailClicked: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => PodcastControls(
+                              episode: _currentPlayer.episode,
+                            ),
+                          ));
+                        },
+                        onCloseClicked: () {
+                          _currentPlayer.stop();
+                          if (mounted) setState(() {});
+                        },
+                        onMultimediaClicked: (isPlaying) {
+                          if (!mounted) return;
+                          if (isPlaying) {
+                            _currentPlayer.pause();
+                          } else {
+                            _currentPlayer.resume();
+                          }
+                          setState(() {});
+                        },
+                      ),
+                      if (_queryData.padding.bottom > 0)
+                        Container(height: _queryData.padding.bottom, color: Colors.black),
+                    ],
+                  )
+                : SizedBox.shrink(),
+          ),
+        ),
+        Positioned(
+          top: 0, left: 0, right: 0,
+          height: _queryData.padding.top,
+          child: ColoredBox(color: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6)),
+        ),
+      ],
     );
   }
 
