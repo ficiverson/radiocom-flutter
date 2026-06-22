@@ -235,7 +235,8 @@ class AllPodcastState extends State<AllPodcast>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
+                    AspectRatio(
+                      aspectRatio: 1.0,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: CustomImage(
