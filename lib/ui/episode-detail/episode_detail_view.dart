@@ -157,10 +157,16 @@ class _EpisodeDetailState extends State<EpisodeDetail>
                         shouldShow: true,
                         isPlayingAudio: _currentPlayer.isPlaying(),
                         onDetailClicked: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => PodcastControls(
-                              episode: _currentPlayer.episode,
+                          Navigator.of(context).push(PageRouteBuilder(
+                            settings: const RouteSettings(name: "podcastcontrolsepisodedetail"),
+                            pageBuilder: (_, __, ___) => PodcastControls(episode: _currentPlayer.episode),
+                            transitionsBuilder: (_, animation, __, child) => SlideTransition(
+                              position: Tween(begin: const Offset(0, 1), end: Offset.zero)
+                                  .chain(CurveTween(curve: Curves.easeOutCubic))
+                                  .animate(animation),
+                              child: child,
                             ),
+                            transitionDuration: const Duration(milliseconds: 350),
                           ));
                         },
                         onCloseClicked: () {
