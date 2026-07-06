@@ -162,32 +162,35 @@ class CurrentPlayer implements CurrentPlayerContract {
   StreamSubscription? _durationSubscription;
   StreamSubscription? _positionSubscription;
 
+  bool _pendingLiveRestart = false;
+
   @override
   void restorePlayer(ConnectivityResult connection) async {
-    if (!isPodcast && isPlaying()) {
-      if (connection != ConnectivityResult.none &&
-          connection != connectivityResult &&
-          playerState == AudioPlayerState.play) {
+    if (!isPodcast) {
+      if (connection == ConnectivityResult.none) {
+        if (isPlaying()) {
+          await _stop();
+          _pendingLiveRestart = true;
+          if (onConnection != null) {
+            onConnection!(true);
+          }
+          if (podcastConnectivityResult != null) {
+            podcastConnectivityResult!(true);
+          }
+        }
+      } else if ((isPlaying() && connection != connectivityResult) ||
+          _pendingLiveRestart) {
+        _pendingLiveRestart = false;
         restorePosition = position;
-        restorePosition = duration;
+        restoreDuration = duration;
         tempEpisode = episode;
-        stop();
-        play();
+        await _stop();
+        await play();
         if (onConnection != null) {
           onConnection!(false);
         }
         if (podcastConnectivityResult != null) {
           podcastConnectivityResult!(false);
-        }
-      } else if (connection == ConnectivityResult.none) {
-        stop();
-        release();
-
-        if (onConnection != null) {
-          onConnection!(true);
-        }
-        if (podcastConnectivityResult != null) {
-          podcastConnectivityResult!(true);
         }
       }
     }
@@ -382,7 +385,12 @@ class CurrentPlayer implements CurrentPlayerContract {
   }
 
   @override
-  void stop() async {
+  void stop() {
+    _pendingLiveRestart = false;
+    _stop();
+  }
+
+  Future<void> _stop() async {
     if (playerState == AudioPlayerState.play ||
         playerState == AudioPlayerState.pause) {
       Injector.appInstance.get<Invoker>().execute(Injector.appInstance.get<EndSessionUseCase>()).drain();
