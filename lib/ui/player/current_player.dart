@@ -12,8 +12,9 @@ import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/now.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:flutter/services.dart';
+import 'package:audio_service/audio_service.dart';
+import 'package:cuacfm/ui/player/cuac_audio_handler.dart';
 import 'package:injector/injector.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
@@ -70,13 +71,29 @@ class CurrentPlayer implements CurrentPlayerContract {
   AudioPlayerState playerState = AudioPlayerState.stop;
   @override
   AudioPlayer audioPlayer = Injector.appInstance.get<AudioPlayer>();
+  String _currentSong = ":";
   @override
-  String currentSong = ":";
+  String get currentSong => _currentSong;
+  @override
+  set currentSong(String value) {
+    if (_currentSong == value) return;
+    _currentSong = value;
+    _refreshNotificationMetadata();
+  }
+
   @override
   String currentSubtitle = "";
-  @override
-  String currentImage =
+
+  String _currentImage =
       "https://cuacfm.org/wp-content/uploads/2026/04/cuac_music_cover.png";
+  @override
+  String get currentImage => _currentImage;
+  @override
+  set currentImage(String value) {
+    if (_currentImage == value) return;
+    _currentImage = value;
+    _refreshNotificationMetadata();
+  }
 
   static const _fallbackArtUrl = "https://cuacfm.org/wp-content/uploads/2026/04/cuac_music_cover.png";
   Uri get _artUri {
@@ -85,6 +102,36 @@ class CurrentPlayer implements CurrentPlayerContract {
       return Uri.parse(_fallbackArtUrl);
     }
     return Uri.parse(img);
+  }
+
+  CuacAudioHandler? get _handler {
+    try {
+      return Injector.appInstance.get<CuacAudioHandler>();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  MediaItem _buildMediaItem() {
+    final liveTitle = currentSong.trim();
+    return MediaItem(
+      id: urlToHashId(isPodcast ? episode?.audio ?? "" : now?.streamUrl() ?? ""),
+      album: isPodcast ? "Podcast CUAC FM" : "Directo CUAC FM",
+      title: isPodcast
+          ? episode?.title ?? ""
+          : (liveTitle.isNotEmpty && liveTitle != ":" ? liveTitle : "Streaming en directo"),
+      artist: "CUAC FM",
+      artUri: _artUri,
+    );
+  }
+
+  void _publishNowPlaying() {
+    _handler?.setNowPlaying(_buildMediaItem(), isLive: !isPodcast);
+  }
+
+  void _refreshNotificationMetadata() {
+    if (playerState == AudioPlayerState.stop) return;
+    _publishNowPlaying();
   }
 
   @override
@@ -267,22 +314,11 @@ class CurrentPlayer implements CurrentPlayerContract {
           playbackRate = 1.0;
           audioPlayer.setSpeed(playbackRate);
         }
-        AudioSource audioSource = AudioSource.uri(
-            Uri.parse(isPodcast
-                ? episode?.audio ?? RadioStation.base().streamUrl
-                : now?.streamUrl() ?? RadioStation.base().streamUrl),
-            tag: MediaItem(
-              id: urlToHashId(
-                  isPodcast ? episode?.audio ?? "" : now?.streamUrl() ?? ""),
-              album: isPodcast ? "Podcast CUAC FM" : "Directo CUAC FM",
-              title: isPodcast ? episode?.title ?? "" : "Streaming en directo",
-              artist: "CUAC FM",
-              artUri: _artUri,
-              extras: {
-                'androidCompactActionIndices': [0, 1, 2],
-              },
-            ));
+        AudioSource audioSource = AudioSource.uri(Uri.parse(isPodcast
+            ? episode?.audio ?? RadioStation.base().streamUrl
+            : now?.streamUrl() ?? RadioStation.base().streamUrl));
         audioPlayer.setAudioSource(audioSource);
+        _publishNowPlaying();
         await audioPlayer.play();
         await audioPlayer.seek(position);
         if (audioPlayer.playing) {
@@ -331,22 +367,11 @@ class CurrentPlayer implements CurrentPlayerContract {
       if (!isPodcast) {
         setVolume(1.0);
       }
-      AudioSource audioSource = AudioSource.uri(
-          Uri.parse(isPodcast
-              ? episode?.audio ?? RadioStation.base().streamUrl
-              : now?.streamUrl() ?? RadioStation.base().streamUrl),
-          tag: MediaItem(
-            id: urlToHashId(
-                isPodcast ? episode?.audio ?? "" : now?.streamUrl() ?? ""),
-            album: isPodcast ? "Podcast CUAC FM" : "Directo CUAC FM",
-            title: isPodcast ? episode?.title ?? "" : "Streaming en directo",
-            artist: "CUAC FM",
-            artUri: Uri.parse(currentImage),
-            extras: {
-              'androidCompactActionIndices': [0, 1, 2],
-            },
-          ));
+      AudioSource audioSource = AudioSource.uri(Uri.parse(isPodcast
+          ? episode?.audio ?? RadioStation.base().streamUrl
+          : now?.streamUrl() ?? RadioStation.base().streamUrl));
       audioPlayer.setAudioSource(audioSource);
+      _publishNowPlaying();
       await audioPlayer.play();
       await audioPlayer.seek(position);
       if (audioPlayer.playing) playerState = AudioPlayerState.play;

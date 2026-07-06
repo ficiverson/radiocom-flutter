@@ -19,7 +19,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:injector/injector.dart';
-import 'package:just_audio_background/just_audio_background.dart';
+import 'package:audio_service/audio_service.dart';
+import 'package:cuacfm/ui/player/cuac_audio_handler.dart';
+import 'package:just_audio/just_audio.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -89,14 +91,20 @@ void main() async {
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
       overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
 
-  await JustAudioBackground.init(
-    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
-    androidNotificationChannelName: 'CUAC FM',
-    androidNotificationIcon: 'drawable/ic_notification',
-    androidNotificationOngoing: true,
-    androidStopForegroundOnPause: true,
-    preloadArtwork: true,
+  final audioHandler = await AudioService.init(
+    builder: () => CuacAudioHandler(Injector.appInstance.get<AudioPlayer>()),
+    config: const AudioServiceConfig(
+      androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+      androidNotificationChannelName: 'CUAC FM',
+      androidNotificationIcon: 'drawable/ic_notification',
+      androidNotificationOngoing: true,
+      androidStopForegroundOnPause: true,
+      preloadArtwork: true,
+      fastForwardInterval: Duration(seconds: 30),
+      rewindInterval: Duration(seconds: 30),
+    ),
   );
+  Injector.appInstance.registerSingleton<CuacAudioHandler>(() => audioHandler);
 
   runApp(MyApp());
 }
