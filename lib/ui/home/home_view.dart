@@ -345,6 +345,9 @@ class MyHomePageState extends State<MyHomePage>
               if (!mounted) return;
               setState(() {});
               onConnectionError();
+            } else {
+              _presenter.currentPlayer.restorePlayer(currentValue);
+              onConnectionSuccess();
             }
           });
         });

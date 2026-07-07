@@ -18,7 +18,7 @@ dependencies:
 
   verbal_expressions: ^1.0.0
   just_audio: ^0.10.5
-  just_audio_background: ^0.0.1-beta.16
+  audio_service: ^0.18.18
   intl: ^0.20.2
   xml2json: ^6.2.3
   cupertino_icons: ^1.0.8
