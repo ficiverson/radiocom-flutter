@@ -109,6 +109,9 @@ class MockAlertsRepository extends Mock implements AlertsRepositoryContract {
         returnValue: alerts(),
       );
   @override
+  void cleanOldAlerts({int keepDays = 90}) =>
+      super.noSuchMethod(Invocation.method(#cleanOldAlerts, [], {#keepDays: keepDays}));
+  @override
   Future<int> getUnreadCount() => super.noSuchMethod(
         Invocation.method(#getUnreadCount, []),
         returnValue: Future.value(0),

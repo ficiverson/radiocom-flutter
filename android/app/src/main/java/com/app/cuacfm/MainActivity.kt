@@ -7,15 +7,18 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.StrictMode
+import com.google.android.play.core.review.ReviewManagerFactory
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
 import com.ryanheise.audioservice.AudioServiceActivity
+
 class MainActivity : AudioServiceActivity() {
 
     companion object {
-        private val CHANGE_LOCALE = "cuacfm.flutter.io/changeScreen"
+        private const val CHANGE_LOCALE = "cuacfm.flutter.io/changeScreen"
+        private const val REVIEW_CHANNEL = "cuacfm.flutter.io/review"
     }
 
     private var changeScreen: MethodChannel.Result? = null
@@ -34,6 +37,25 @@ class MainActivity : AudioServiceActivity() {
 
     override fun configureFlutterEngine(flutterEngine : FlutterEngine) {
         GeneratedPluginRegistrant.registerWith(flutterEngine)
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, REVIEW_CHANNEL).setMethodCallHandler { call, channelResult ->
+            if (call.method == "requestReview") {
+                val manager = ReviewManagerFactory.create(this)
+                val reviewFlowTask = manager.requestReviewFlow()
+                reviewFlowTask.addOnCompleteListener { requestTask ->
+                    if (requestTask.isSuccessful) {
+                        val reviewInfo = requestTask.result
+                        manager.launchReviewFlow(this, reviewInfo)
+                            .addOnCompleteListener { channelResult.success(null) }
+                    } else {
+                        channelResult.error("REVIEW_ERROR", requestTask.exception?.message, null)
+                    }
+                }
+            } else {
+                channelResult.notImplemented()
+            }
+        }
+
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANGE_LOCALE).setMethodCallHandler { call, result ->
             if (call.method == "changeScreen") {
                 changeScreen = result

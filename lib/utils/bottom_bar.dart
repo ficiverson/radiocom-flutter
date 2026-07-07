@@ -69,7 +69,6 @@ class BottomBar extends StatelessWidget {
           color: _colors.palidwhite,
         ),
         width: queryData.size.width,
-        height: ((!Foundation.kIsWeb && Platform.isAndroid) ? 85 : 100) + bottomInset,
         child: Column(children: [
           SizedBox(height: 10.0),
           Container(
