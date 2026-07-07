@@ -20,8 +20,8 @@ android {
         applicationId "com.app.cuacfm.radio.coruna"
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion 35
-        versionCode 31
-        versionName "3.6.2"
+        versionCode 32
+        versionName "3.6.3"
         multiDexEnabled true
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
