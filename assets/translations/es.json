@@ -104,7 +104,8 @@
     "title" : "Error",
     "message" : "Whooops hubo un problema no esperado :(",
     "internet_error" : "No dispones de conexión a internet",
-    "connection_error" : "No podemos conectar con el servidor en este momento"
+    "connection_error" : "No podemos conectar con el servidor en este momento",
+    "podcast_not_ready" : "El contenido aún está cargando, inténtalo en unos instantes"
   },
   "actions" : {
     "close" : "Cerrar",

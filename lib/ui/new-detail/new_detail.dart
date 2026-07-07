@@ -54,8 +54,12 @@ class NewDetailState extends State<NewDetail>
       value: SystemUiOverlayStyle(
         statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
         statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-        systemNavigationBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
-        systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        systemNavigationBarColor: shouldShowPlayer
+            ? Colors.black
+            : (isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6)),
+        systemNavigationBarIconBrightness: shouldShowPlayer
+            ? Brightness.light
+            : (isDark ? Brightness.light : Brightness.dark),
       ),
       child: Stack(
         children: [
@@ -66,33 +70,41 @@ class NewDetailState extends State<NewDetail>
         bottomNavigationBar: Container(
           color: _colors.palidwhite,
           child: shouldShowPlayer
-              ? MediaQuery.removePadding(
-                  context: context,
-                  removeBottom: true,
-                  child: PlayerView(
-                      shouldShow: shouldShowPlayer,
-                      isPlayingAudio: _presenter.currentPlayer.isPlaying(),
-                      onDetailClicked: () {
-                        _presenter.onPodcastControlsClicked(
-                            _presenter.currentPlayer.episode);
-                      },
-                      onCloseClicked: () {
-                        _presenter.currentPlayer.stop();
-                        if (mounted) setState(() { shouldShowPlayer = false; });
-                      },
-                      onMultimediaClicked: (isPlaying) {
-                        if (!mounted) return;
-                        setState(() {
-                          if (isPlaying) {
-                            _presenter.onPause();
-                          } else {
-                            _presenter.onResume();
-                          }
-                        });
-                      }),
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    PlayerView(
+                        shouldShow: shouldShowPlayer,
+                        isPlayingAudio: _presenter.currentPlayer.isPlaying(),
+                        onDetailClicked: () {
+                          _presenter.onPodcastControlsClicked(
+                              _presenter.currentPlayer.episode);
+                        },
+                        onCloseClicked: () {
+                          _presenter.currentPlayer.stop();
+                          if (mounted) setState(() { shouldShowPlayer = false; });
+                        },
+                        onMultimediaClicked: (isPlaying) {
+                          if (!mounted) return;
+                          setState(() {
+                            if (isPlaying) {
+                              _presenter.onPause();
+                            } else {
+                              _presenter.onResume();
+                            }
+                          });
+                        }),
+                    if (_queryData.padding.bottom > 0)
+                      Container(height: _queryData.padding.bottom, color: Colors.black),
+                  ],
                 )
-              : SizedBox(height: MediaQuery.of(context).padding.bottom),
+              : SizedBox(height: _queryData.padding.bottom),
         ),
+          ),
+          Positioned(
+            top: 0, left: 0, right: 0,
+            height: _queryData.padding.top,
+            child: ColoredBox(color: _colors.palidwhite),
           ),
           if (_isLoadingEpisode)
             Container(

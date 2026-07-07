@@ -104,7 +104,8 @@
     "title" : "Error",
     "message" : "Whooops something failed :(",
     "internet_error" : "There is no internet connection",
-    "connection_error" : "We cannot contact our servers"
+    "connection_error" : "We cannot contact our servers",
+    "podcast_not_ready" : "Content is still loading, try again in a moment"
   },
   "actions" : {
     "close" : "Close",

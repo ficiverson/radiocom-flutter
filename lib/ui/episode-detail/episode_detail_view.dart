@@ -133,47 +133,69 @@ class _EpisodeDetailState extends State<EpisodeDetail>
     final isDark = themeMode == ThemeMode.dark || (themeMode == ThemeMode.system && _queryData.platformBrightness == Brightness.dark);
     final showPlayer = _currentPlayer.isPlaying() || _currentPlayer.isPaused();
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
-        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-        systemNavigationBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
-        systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-      ),
-      child: Scaffold(
-        backgroundColor: _colors.palidwhite,
-        body: _getBodyLayout(),
-        bottomNavigationBar: showPlayer
-            ? MediaQuery.removePadding(
-                context: context,
-                removeBottom: true,
-                child: PlayerView(
-                  shouldShow: true,
-                  isPlayingAudio: _currentPlayer.isPlaying(),
-                  onDetailClicked: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => PodcastControls(
-                        episode: _currentPlayer.episode,
+    return Stack(
+      children: [
+        AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle(
+            statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+            statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+            systemNavigationBarColor: showPlayer
+                ? Colors.black
+                : (isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6)),
+            systemNavigationBarIconBrightness: showPlayer
+                ? Brightness.light
+                : (isDark ? Brightness.light : Brightness.dark),
+          ),
+          child: Scaffold(
+            backgroundColor: _colors.palidwhite,
+            body: _getBodyLayout(),
+            bottomNavigationBar: showPlayer
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      PlayerView(
+                        shouldShow: true,
+                        isPlayingAudio: _currentPlayer.isPlaying(),
+                        onDetailClicked: () {
+                          Navigator.of(context).push(PageRouteBuilder(
+                            settings: const RouteSettings(name: "podcastcontrolsepisodedetail"),
+                            pageBuilder: (_, __, ___) => PodcastControls(episode: _currentPlayer.episode),
+                            transitionsBuilder: (_, animation, __, child) => SlideTransition(
+                              position: Tween(begin: const Offset(0, 1), end: Offset.zero)
+                                  .chain(CurveTween(curve: Curves.easeOutCubic))
+                                  .animate(animation),
+                              child: child,
+                            ),
+                            transitionDuration: const Duration(milliseconds: 350),
+                          ));
+                        },
+                        onCloseClicked: () {
+                          _currentPlayer.stop();
+                          if (mounted) setState(() {});
+                        },
+                        onMultimediaClicked: (isPlaying) {
+                          if (!mounted) return;
+                          if (isPlaying) {
+                            _currentPlayer.pause();
+                          } else {
+                            _currentPlayer.resume();
+                          }
+                          setState(() {});
+                        },
                       ),
-                    ));
-                  },
-                  onCloseClicked: () {
-                    _currentPlayer.stop();
-                    if (mounted) setState(() {});
-                  },
-                  onMultimediaClicked: (isPlaying) {
-                    if (!mounted) return;
-                    if (isPlaying) {
-                      _currentPlayer.pause();
-                    } else {
-                      _currentPlayer.resume();
-                    }
-                    setState(() {});
-                  },
-                ),
-              )
-            : SizedBox.shrink(),
-      ),
+                      if (_queryData.padding.bottom > 0)
+                        Container(height: _queryData.padding.bottom, color: Colors.black),
+                    ],
+                  )
+                : SizedBox.shrink(),
+          ),
+        ),
+        Positioned(
+          top: 0, left: 0, right: 0,
+          height: _queryData.padding.top,
+          child: ColoredBox(color: _colors.palidwhite),
+        ),
+      ],
     );
   }
 

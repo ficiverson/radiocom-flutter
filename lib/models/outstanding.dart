@@ -1,4 +1,5 @@
 import 'package:cuacfm/translations/localizations.dart';
+import 'package:cuacfm/utils/html_entities.dart';
 import 'package:cuacfm/utils/safe_map.dart';
 import 'package:injector/injector.dart';
 
@@ -10,7 +11,7 @@ class Outstanding {
    DateTime modified = DateTime(0);
 
   Outstanding.fromInstance(Map<String, dynamic> map)
-      : title = _cleanTitle((map["title"] as Map?)?["rendered"] ?? ""),
+      : title = _cleanTitle(HtmlEntities.decode((map["title"] as Map?)?["rendered"] ?? "")),
         description = (map["content"] as Map?)?["rendered"] ?? "",
         logoUrl = _extractLogoUrl(map),
         modified = DateTime.tryParse(map["modified"] ?? "") ?? DateTime(0);

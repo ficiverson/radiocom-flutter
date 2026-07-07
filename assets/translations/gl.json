@@ -104,7 +104,8 @@
     "title" : "Erro",
     "message" : "Ups houbo un problema inesperado :(",
     "internet_error" : "Non dispós de conexión a internet",
-    "connection_error" : "Non podemos conectar co servidor neste momento"
+    "connection_error" : "Non podemos conectar co servidor neste momento",
+    "podcast_not_ready" : "O contido aínda está a cargar, inténtao nuns instantes"
   },
   "actions" : {
     "close" : "Fechar",

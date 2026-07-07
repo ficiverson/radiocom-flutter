@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:cuacfm/domain/repository/radiocom_repository_contract.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:cuacfm/main.dart';
 import 'package:cuacfm/models/episode.dart';
 import 'package:cuacfm/models/program.dart';
@@ -13,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const _yellow = Color(0xFFFCD444);
 const _dark = Color(0xFF1A1A1A);
+const onboardingVersion = 1;
 
 class OnboardingView extends StatefulWidget {
   final VoidCallback onFinished;
@@ -226,10 +226,7 @@ void _toggleFavorite(Program program) {
       MyApp.setLocale(MyApp.parseLocale(_selectedLocale));
     }
     await prefs.setBool('onboarding_completed', true);
-    try {
-      final info = await PackageInfo.fromPlatform();
-      await prefs.setInt('onboarding_version', int.tryParse(info.buildNumber) ?? 0);
-    } catch (_) {}
+    await prefs.setInt('onboarding_version', onboardingVersion);
     widget.onFinished();
   }
 

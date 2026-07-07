@@ -109,10 +109,12 @@ class MyHomePageState extends State<MyHomePage>
         (themeMode == ThemeMode.system && queryData.platformBrightness == Brightness.dark);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+        statusBarColor: Colors.transparent,
+        systemStatusBarContrastEnforced: false,
         statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
         statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-        systemNavigationBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarContrastEnforced: false,
         systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
       ),
       child: Stack(
@@ -275,8 +277,9 @@ class MyHomePageState extends State<MyHomePage>
     return doc.body?.text.trim() ?? '';
   }
 
-  Program findPodcastByName(String url) {
-    return _podcast.where((element) => url == element.rssUrl).first;
+  Program? findPodcastByName(String url) {
+    final matches = _podcast.where((element) => url == element.rssUrl);
+    return matches.isEmpty ? null : matches.first;
   }
 
   generatePodcast() {
@@ -319,11 +322,12 @@ class MyHomePageState extends State<MyHomePage>
     final brightness = WidgetsBinding.instance.platformDispatcher.platformBrightness;
     final isDark = brightness == Brightness.dark;
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      systemStatusBarContrastEnforced: true,
-      statusBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+      systemStatusBarContrastEnforced: false,
+      statusBarColor: Colors.transparent,
       statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
       statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-      systemNavigationBarColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFAF9F6),
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarContrastEnforced: false,
       systemNavigationBarDividerColor: Colors.transparent,
       systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
     ));
@@ -781,30 +785,28 @@ class MyHomePageState extends State<MyHomePage>
         override: true,
       );
       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-          systemStatusBarContrastEnforced: true,
-          statusBarColor: Color(0xFFFAF9F6),
+          systemStatusBarContrastEnforced: false,
+          statusBarColor: Colors.transparent,
           statusBarBrightness: Brightness.light,
           statusBarIconBrightness: Brightness.dark,
-          systemNavigationBarColor: Color(0xFFFAF9F6),
+          systemNavigationBarColor: Colors.transparent,
+          systemNavigationBarContrastEnforced: false,
           systemNavigationBarDividerColor: Colors.transparent,
           systemNavigationBarIconBrightness: Brightness.dark));
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-          overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
     } else {
       Injector.appInstance.registerSingleton<RadiocomColorsConract>(
         () => RadiocomColorsDark(),
         override: true,
       );
       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-          systemStatusBarContrastEnforced: true,
-          statusBarColor: Color(0xFF1A1A1A),
+          systemStatusBarContrastEnforced: false,
+          statusBarColor: Colors.transparent,
           statusBarBrightness: Brightness.dark,
           statusBarIconBrightness: Brightness.light,
-          systemNavigationBarColor: Color(0xFF1A1A1A),
+          systemNavigationBarColor: Colors.transparent,
+          systemNavigationBarContrastEnforced: false,
           systemNavigationBarDividerColor: Colors.transparent,
           systemNavigationBarIconBrightness: Brightness.light));
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-          overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
     }
   }
 
@@ -1225,7 +1227,7 @@ Builder(builder: (context) {
                       orElse: () => _timeTable.last,
                     );
                   Program? nextProgram;
-                  try { nextProgram = findPodcastByName(next.rssUrl); } catch (_) {}
+                  nextProgram = findPodcastByName(next.rssUrl);
                   final nextLabel = SafeMap.safe(_localization.translateMap("home"), ["schedule_next"]).isNotEmpty
                       ? SafeMap.safe(_localization.translateMap("home"), ["schedule_next"])
                       : "Next";
@@ -1867,7 +1869,14 @@ Builder(builder: (context) {
         onTap: () async {
           if (_loadingRssUrl != null) return;
           if (item.rssUrl.isEmpty) {
-            _presenter.onPodcastClicked(findPodcastByName(item.rssUrl));
+            final podcast = findPodcastByName(item.rssUrl);
+            if (podcast != null) {
+              _presenter.onPodcastClicked(podcast);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(SafeMap.safe(_localization.translateMap("error"), ["podcast_not_ready"])),
+              ));
+            }
             return;
           }
           if (mounted) setState(() => _loadingRssUrl = item.rssUrl);
@@ -1877,7 +1886,14 @@ Builder(builder: (context) {
           if (mounted) setState(() => _loadingRssUrl = null);
           final episodes = result.data ?? [];
           if (episodes.isEmpty) {
-            _presenter.onPodcastClicked(findPodcastByName(item.rssUrl));
+            final podcast = findPodcastByName(item.rssUrl);
+            if (podcast != null) {
+              _presenter.onPodcastClicked(podcast);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(SafeMap.safe(_localization.translateMap("error"), ["podcast_not_ready"])),
+              ));
+            }
             return;
           }
           episodes.sort((a, b) =>

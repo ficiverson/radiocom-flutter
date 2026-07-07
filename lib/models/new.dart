@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cuacfm/models/outstanding.dart';
 import 'package:cuacfm/translations/localizations.dart';
+import 'package:cuacfm/utils/html_entities.dart';
 import 'package:cuacfm/utils/safe_map.dart';
 import 'package:injector/injector.dart';
 import 'package:html/parser.dart' show parse;
@@ -19,7 +20,7 @@ class New {
   New(this.title, this.link, this.description, this.image, this.pubDate, {this.pubDateTime, this.category = ""});
 
   New.fromInstance(Map<String, dynamic> map)
-      : title = map["title"]?["\$t"] ?? map["title"] ?? "",
+      : title = HtmlEntities.decode(map["title"]?["\$t"] ?? map["title"] ?? ""),
         link = map["link"]?["\$t"] ?? map["link"] ?? "",
         pubDate = getDate(map["pubDate"]?["\$t"] ?? map["pubDate"] ?? ""),
         pubDateTime = parseDateTime(map["pubDate"]?["\$t"] ?? map["pubDate"] ?? ""),

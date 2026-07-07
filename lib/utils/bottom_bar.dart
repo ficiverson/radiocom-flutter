@@ -60,6 +60,7 @@ class BottomBar extends StatelessWidget {
     final tabNews = SafeMap.safe(_localization.translateMap("home"), ["tab_news"]).isNotEmpty ? SafeMap.safe(_localization.translateMap("home"), ["tab_news"]) : "Novas";
     final tabFavourites = SafeMap.safe(_localization.translateMap("home"), ["tab_favourites"]).isNotEmpty ? SafeMap.safe(_localization.translateMap("home"), ["tab_favourites"]) : "Favoritos";
     final tabMenu = SafeMap.safe(_localization.translateMap("home"), ["tab_menu"]).isNotEmpty ? SafeMap.safe(_localization.translateMap("home"), ["tab_menu"]) : "Menú";
+    final bottomInset = queryData.padding.bottom;
 
     return Container(
         key: Key("bottom_bar"),
@@ -68,7 +69,7 @@ class BottomBar extends StatelessWidget {
           color: _colors.palidwhite,
         ),
         width: queryData.size.width,
-        height: (!Foundation.kIsWeb && Platform.isAndroid) ? 85 : 100,
+        height: ((!Foundation.kIsWeb && Platform.isAndroid) ? 85 : 100) + bottomInset,
         child: Column(children: [
           SizedBox(height: 10.0),
           Container(
@@ -125,7 +126,8 @@ class BottomBar extends StatelessWidget {
                         iconSize: 25,
                       )),
                 ],
-              ))
+              )),
+          if (bottomInset > 0) SizedBox(height: bottomInset),
         ]));
   }
 }
