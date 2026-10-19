@@ -23,7 +23,7 @@
     "news" : "News",
     "news_error" : "There is no news at this moment.",
     "podcast" : "Podcasts",
-    "podcast_error" : "There is no podcast at this moment.",
+    "podcast_error" : "We can't load the podcasts right now.",
     "podcast_retry" : "Try again in a little while.",
     "categories" : "Categories",
     "see_all" : "See all"
@@ -125,7 +125,8 @@
     "from" : "From ",
     "to" : " to ",
     "season" : "Season",
-    "episode" : "Episode"
+    "episode" : "Episode",
+    "notification" : "Notification"
   },
   "categories" : {
     "others" : "Others",

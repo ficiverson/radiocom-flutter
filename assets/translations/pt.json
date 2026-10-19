@@ -125,7 +125,8 @@
     "from" : "De ",
     "to" : " a ",
     "season" : "Temporada",
-    "episode" : "Episódio"
+    "episode" : "Episódio",
+    "notification" : "Notificação"
   },
   "categories" : {
     "others" : "Outros",

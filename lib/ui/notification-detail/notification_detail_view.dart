@@ -81,12 +81,23 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
         body: SafeArea(
           child: Column(
             children: [
-              Align(
-                alignment: Alignment.centerRight,
-                child: IconButton(
-                  icon: Icon(Icons.close, color: _colors.font),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.arrow_back, color: _colors.font),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  Text(
+                    SafeMap.safe(
+                        _localization.translateMap("general"), ["notification"]),
+                    style: TextStyle(
+                      color: _colors.font,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ],
               ),
               Expanded(
                 child: SingleChildScrollView(
@@ -136,33 +147,6 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
                           ),
                         ),
                     ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _colors.yellow,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(
-                      SafeMap.safe(
-                          _localization.translateMap("actions"), ["close"]),
-                      style: TextStyle(
-                        color: _colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0,
-                      ),
-                    ),
                   ),
                 ),
               ),
