@@ -62,7 +62,7 @@
     "rating_title" : "Are you enjoying the app and our broadcasts?",
     "rating_body" : "Please consider rating us on the app store so more people can discover CUAC.",
     "station_section" : {
-      "name" : "STATION",
+      "name" : "About us",
       "item1" : "History",
       "item2" : "Gallery"
     },
@@ -71,7 +71,7 @@
       "empty" : "No alerts this month."
     },
     "config_section" : {
-      "name" : "CONFIGURATION",
+      "name" : "Configuration",
       "item1" : "Theme",
       "item1_light" : "Light",
       "item1_dark" : "Dark",
@@ -82,20 +82,20 @@
       "item3_system" : "System"
     },
     "social_section" : {
-      "name" : "SOCIAL NETWORK",
+      "name" : "Social media",
       "item1" : "Facebook",
       "item2" : "Bluesky",
       "item3" : "Instagram",
       "item4" : "TikTok"
     },
     "more_info_section" : {
-      "name" : "MORE INFO",
+      "name" : "More info",
       "item1" : "Web page",
       "item2" : "Localization",
       "item3" : "Contact"
     },
     "legal_info_section" : {
-      "name" : "LEGAL",
+      "name" : "Legal",
       "item1" : "Privacy policy",
       "item2" : "Terms and conditions",
       "item3" : "Software license"
@@ -126,7 +126,8 @@
     "to" : " to ",
     "season" : "Season",
     "episode" : "Episode",
-    "notification" : "Notification"
+    "notification" : "Notification",
+    "reconnecting" : "Reconnecting…"
   },
   "categories" : {
     "others" : "Others",

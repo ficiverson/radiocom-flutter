@@ -716,18 +716,10 @@ class SettingsState extends State<Settings>
                   ),
                   SizedBox(height: 20),
                   // ── STATION ──────────────────────────────────────────────
-                  Text(
+                  _expandableSection(
                     SafeMap.safe(_localization.translateMap("settings"),
                         ["station_section", "name"]),
-                    maxLines: 1,
-                    textAlign: TextAlign.left,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                        letterSpacing: 0,
-                        color: _colors.font,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18),
-                  ),
+                    [
                   Material(
                       color: _colors.transparent,
                       child: InkWell(
@@ -772,19 +764,13 @@ class SettingsState extends State<Settings>
                               ),
                               trailing: FaIcon(FontAwesomeIcons.images,
                                   color: _colors.grey, size: 25.0)))),
-                  SizedBox(height: 20),
-                  Text(
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  _expandableSection(
                     SafeMap.safe(_localization.translateMap("settings"),
                         ["social_section", "name"]),
-                    maxLines: 1,
-                    textAlign: TextAlign.left,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                        letterSpacing: 0,
-                        color: _colors.font,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18),
-                  ),
+                    [
                   Material(
                       color: _colors.transparent,
                       child: InkWell(
@@ -875,19 +861,13 @@ class SettingsState extends State<Settings>
                               ),
                               trailing: FaIcon(FontAwesomeIcons.tiktok,
                                   color: _colors.grey, size: 25.0)))),
-                  SizedBox(height: 15),
-                  Text(
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  _expandableSection(
                     SafeMap.safe(_localization.translateMap("settings"),
                         ["more_info_section", "name"]),
-                    maxLines: 1,
-                    textAlign: TextAlign.left,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                        letterSpacing: 0,
-                        color: _colors.font,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18),
-                  ),
+                    [
                   Material(
                       color: _colors.transparent,
                       child: InkWell(
@@ -951,19 +931,13 @@ class SettingsState extends State<Settings>
                               ),
                               trailing: FaIcon(FontAwesomeIcons.envelope,
                                   color: _colors.grey, size: 25.0)))),
-                  SizedBox(height: 15),
-                  Text(
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  _expandableSection(
                     SafeMap.safe(_localization.translateMap("settings"),
                         ["legal_info_section", "name"]),
-                    maxLines: 1,
-                    textAlign: TextAlign.left,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                        letterSpacing: 0,
-                        color: _colors.font,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18),
-                  ),
+                    [
                   Material(
                       color: _colors.transparent,
                       child: InkWell(
@@ -1032,6 +1006,8 @@ class SettingsState extends State<Settings>
                               ),
                               trailing: FaIcon(FontAwesomeIcons.fileCode,
                                   color: _colors.grey, size: 25.0)))),
+                    ],
+                  ),
                   SizedBox(height: 32),
                   Center(
                     child: Image.asset(
@@ -1044,4 +1020,34 @@ class SettingsState extends State<Settings>
                 ]))));
   }
 
+  Widget _expandableSection(String name, List<Widget> items) {
+    return Container(
+      decoration: BoxDecoration(
+        color: _colors.palidwhitedark,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          iconColor: _colors.grey,
+          collapsedIconColor: _colors.grey,
+          title: Text(
+            name,
+            maxLines: 1,
+            textAlign: TextAlign.left,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+                letterSpacing: 0,
+                color: _colors.font,
+                fontWeight: FontWeight.w600,
+                fontSize: 18),
+          ),
+          children: items,
+        ),
+      ),
+    );
+  }
 }
