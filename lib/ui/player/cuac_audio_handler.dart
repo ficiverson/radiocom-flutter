@@ -62,6 +62,9 @@ class CuacAudioHandler extends BaseAudioHandler {
   final AudioPlayer _player;
   bool _isLive = false;
 
+  static const _episodeCacheMax = 30;
+  static const _allProgramsCacheTtl = Duration(minutes: 30);
+
   final Map<String, List<Episode>> _episodesByRss = {};
   final Map<String, TimeTable> _recentByKey = {};
   final Map<String, Program> _favoriteByRss = {};
@@ -71,6 +74,7 @@ class CuacAudioHandler extends BaseAudioHandler {
   bool _wasPlaying = false;
   List<Map<String, dynamic>> _playlistItems = [];
   List<Program> _allProgramsCache = [];
+  DateTime? _allProgramsCacheTime;
   Now? _liveNow;
 
   CuacRepositoryContract get _repository =>
@@ -164,6 +168,7 @@ class CuacAudioHandler extends BaseAudioHandler {
     try {
       Injector.appInstance.get<CurrentPlayerContract>().stop();
     } catch (_) {}
+    _allProgramsCacheTime = null; // invalidate on stop so next session fetches fresh
     await _player.stop();
     await super.stop();
   }
@@ -443,6 +448,9 @@ class CuacAudioHandler extends BaseAudioHandler {
         episodes = List<Episode>.from(result.data ?? []);
       }
     } catch (_) {}
+    if (_episodesByRss.length >= _episodeCacheMax) {
+      _episodesByRss.remove(_episodesByRss.keys.first);
+    }
     _episodesByRss[rssUrl] = episodes;
     return episodes;
   }
@@ -595,11 +603,15 @@ class CuacAudioHandler extends BaseAudioHandler {
   }
 
   Future<List<Program>> _allPrograms() async {
-    if (_allProgramsCache.isNotEmpty) return _allProgramsCache;
+    final now = DateTime.now();
+    final cacheValid = _allProgramsCacheTime != null &&
+        now.difference(_allProgramsCacheTime!) < _allProgramsCacheTtl;
+    if (_allProgramsCache.isNotEmpty && cacheValid) return _allProgramsCache;
     try {
       final result = await _repository.getAllPodcasts();
       if (result is Success) {
         _allProgramsCache = List<Program>.from(result.data ?? []);
+        _allProgramsCacheTime = now;
       }
     } catch (_) {}
     return _allProgramsCache;

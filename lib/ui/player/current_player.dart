@@ -138,6 +138,8 @@ class CurrentPlayer implements CurrentPlayerContract {
     );
   }
 
+  // Max entries kept in memory; oldest entry is evicted when limit is reached.
+  static const _artCacheMax = 50;
   final Map<String, Uri> _squareArtCache = {};
   int _artToken = 0;
 
@@ -162,13 +164,18 @@ class CurrentPlayer implements CurrentPlayerContract {
   Future<Uri?> _squareArt(Uri src) async {
     final key = src.toString();
     if (_squareArtCache.containsKey(key)) return _squareArtCache[key];
+    // Defer so that audio startup gets priority on the event loop.
+    // dart:ui decode APIs (instantiateImageCodec, toImage) must run on the
+    // root isolate and cannot be moved to compute(); the delay ensures they
+    // do not compete with setAudioSource / play() scheduling.
+    await Future.delayed(const Duration(milliseconds: 300));
     try {
       final dir = await getTemporaryDirectory();
       final file = File(
           '${dir.path}/art2_${md5.convert(utf8.encode(key)).toString()}.png');
       if (await file.exists()) {
         final uri = Uri.file(file.path);
-        _squareArtCache[key] = uri;
+        _cacheArt(key, uri);
         return uri;
       }
       final response = await http.get(src);
@@ -178,7 +185,7 @@ class CurrentPlayer implements CurrentPlayerContract {
       final minSide = math.min(image.width, image.height);
       final maxSide = math.max(image.width, image.height);
       if (minSide / maxSide >= 0.9) {
-        _squareArtCache[key] = src;
+        _cacheArt(key, src);
         return src;
       }
       final side = minSide;
@@ -196,11 +203,18 @@ class CurrentPlayer implements CurrentPlayerContract {
       if (data == null) return null;
       await file.writeAsBytes(data.buffer.asUint8List());
       final uri = Uri.file(file.path);
-      _squareArtCache[key] = uri;
+      _cacheArt(key, uri);
       return uri;
     } catch (_) {
       return null;
     }
+  }
+
+  void _cacheArt(String key, Uri value) {
+    if (_squareArtCache.length >= _artCacheMax) {
+      _squareArtCache.remove(_squareArtCache.keys.first);
+    }
+    _squareArtCache[key] = value;
   }
 
   void _startWrappedSession() {
@@ -521,7 +535,7 @@ class CurrentPlayer implements CurrentPlayerContract {
           restoreDuration = Duration(seconds: 0);
           restorePosition = Duration(seconds: 0);
         }
-        audioPlayer.setAudioSource(audioSource, initialPosition: resumeAt);
+        await audioPlayer.setAudioSource(audioSource, initialPosition: resumeAt);
         _publishNowPlaying();
         await audioPlayer.play();
         if (resumeAt == null) await audioPlayer.seek(position);
@@ -564,7 +578,7 @@ class CurrentPlayer implements CurrentPlayerContract {
           ? episode?.audio ?? RadioStation.base().streamUrl
           : now?.streamUrl() ?? RadioStation.base().streamUrl));
       final resumeAt = isPodcast ? _savedResumePosition() : null;
-      audioPlayer.setAudioSource(audioSource, initialPosition: resumeAt);
+      await audioPlayer.setAudioSource(audioSource, initialPosition: resumeAt);
       _publishNowPlaying();
       await audioPlayer.play();
       if (resumeAt == null) await audioPlayer.seek(position);
