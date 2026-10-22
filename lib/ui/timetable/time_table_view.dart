@@ -132,7 +132,7 @@ class TimetableState extends State<Timetable>
     }
     _localization = Injector.appInstance.get<CuacLocalization>();
     _presenter = Injector.appInstance.get<TimeTablePresenter>();
-    shouldShowPlayer = _presenter.currentPlayer.isPlaying();
+    shouldShowPlayer = _presenter.currentPlayer.isPlaying() || _presenter.currentPlayer.isPaused();
     _timetable = widget.timeTables ?? [];
     _selectedDay = DateTime.now().weekday;
     _presenter.getTimetable();

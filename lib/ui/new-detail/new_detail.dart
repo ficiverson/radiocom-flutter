@@ -128,7 +128,7 @@ class NewDetailState extends State<NewDetail>
           'changeScreen', {"currentScreen": "new_detail", "close": false});
     }
     _presenter = Injector.appInstance.get<NewDetailPresenter>();
-    shouldShowPlayer = _presenter.currentPlayer.isPlaying();
+    shouldShowPlayer = _presenter.currentPlayer.isPlaying() || _presenter.currentPlayer.isPaused();
 
     _presenter.currentPlayer.onConnection = (isError) {
       if (mounted) {

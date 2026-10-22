@@ -44,6 +44,7 @@ void main() async {
   await Hive.openBox('favourites');
   await Hive.openBox('episodes_cache');
   await Hive.openBox('alerts');
+  await Hive.openBox('episode_progress');
   await Hive.openBox('wrapped_${DateTime.now().year}');
   if (DateTime.now().month == 2) await WrappedLocalDataSource.cleanOldData();
 
@@ -60,10 +61,7 @@ void main() async {
   // Notificación cando a app estaba pechada
   final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
   if (initialMessage != null) {
-    final rssUrl = initialMessage.data['rss_url'] as String?;
-    final episodeId = initialMessage.data['episode_id'] as String?;
-    if (rssUrl != null) pendingNotificationRssUrl.value = rssUrl;
-    if (episodeId != null) pendingNotificationEpisodeId.value = episodeId;
+    _handleNotificationTap(initialMessage);
   }
 
   // Notificación en primeiro plano — gardar no historial
@@ -81,12 +79,7 @@ void main() async {
   });
 
   // Notificación cando a app estaba en segundo plano
-  FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    final rssUrl = message.data['rss_url'] as String?;
-    final episodeId = message.data['episode_id'] as String?;
-    if (rssUrl != null) pendingNotificationRssUrl.value = rssUrl;
-    if (episodeId != null) pendingNotificationEpisodeId.value = episodeId;
-  });
+  FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTap);
   //Setting SystmeUIMode
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
       overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
@@ -114,6 +107,36 @@ final ValueNotifier<ThemeMode> appThemeModeNotifier = ValueNotifier(ThemeMode.sy
 final ValueNotifier<Locale?> appLocaleNotifier = ValueNotifier(null);
 final ValueNotifier<String?> pendingNotificationRssUrl = ValueNotifier(null);
 final ValueNotifier<String?> pendingNotificationEpisodeId = ValueNotifier(null);
+final ValueNotifier<Map<String, String>?> pendingManualNotification =
+    ValueNotifier(null);
+
+void _handleNotificationTap(RemoteMessage message) {
+  final rssUrl = message.data['rss_url'] as String?;
+  if (message.data['type'] == 'new_episode' ||
+      (rssUrl != null && rssUrl.isNotEmpty)) {
+    final episodeId = message.data['episode_id'] as String?;
+    if (rssUrl != null) pendingNotificationRssUrl.value = rssUrl;
+    if (episodeId != null) pendingNotificationEpisodeId.value = episodeId;
+    return;
+  }
+  final title =
+      message.notification?.title ?? (message.data['title'] as String?) ?? '';
+  final body = message.notification?.body ??
+      (message.data['body'] as String?) ??
+      (message.data['message'] as String?) ??
+      '';
+  final image = message.notification?.android?.imageUrl ??
+      (message.data['image'] as String?) ??
+      (message.data['logo_url'] as String?) ??
+      '';
+  if (title.isNotEmpty || body.isNotEmpty) {
+    pendingManualNotification.value = {
+      'title': title,
+      'body': body,
+      'image': image,
+    };
+  }
+}
 
 void _applyThemeModeToApp(ThemeMode mode) {
   final isDark = mode == ThemeMode.dark ||

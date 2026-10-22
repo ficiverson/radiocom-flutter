@@ -50,7 +50,7 @@ class AllPodcastState extends State<AllPodcast>
     queryData = MediaQuery.of(context);
     _colors = Injector.appInstance.get<RadiocomColorsConract>();
     if (_presenter.currentPlayer.isPodcast) {
-      shouldShowPlayer = _presenter.currentPlayer.isPlaying();
+      shouldShowPlayer = _presenter.currentPlayer.isPlaying() || _presenter.currentPlayer.isPaused();
     }
     final themeMode = appThemeModeNotifier.value;
     final isDark = themeMode == ThemeMode.dark || (themeMode == ThemeMode.system && MediaQuery.of(context).platformBrightness == Brightness.dark);
@@ -147,7 +147,7 @@ class AllPodcastState extends State<AllPodcast>
     }
     _localization = Injector.appInstance.get<CuacLocalization>();
     _presenter = Injector.appInstance.get<AllPodcastPresenter>();
-    shouldShowPlayer = _presenter.currentPlayer.isPlaying();
+    shouldShowPlayer = _presenter.currentPlayer.isPlaying() || _presenter.currentPlayer.isPaused();
     _podcasts = widget.podcasts;
     _podcastWithFilter = widget.podcasts;
 

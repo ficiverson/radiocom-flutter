@@ -24,6 +24,7 @@
     "news_error" : "Não conseguimos carregar as notícias neste momento.",
     "podcast" : "Podcasts",
     "podcast_error" : "Não conseguimos carregar os podcasts neste momento.",
+    "podcast_retry" : "Tenta de novo dentro de um bocado.",
     "categories" : "Categorias",
     "see_all" : "Ver todos"
   },
@@ -124,7 +125,8 @@
     "from" : "De ",
     "to" : " a ",
     "season" : "Temporada",
-    "episode" : "Episódio"
+    "episode" : "Episódio",
+    "notification" : "Notificação"
   },
   "categories" : {
     "others" : "Outros",

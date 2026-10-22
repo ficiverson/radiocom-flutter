@@ -152,7 +152,7 @@ class SettingsState extends State<Settings>
     _localization = Injector.appInstance.get<CuacLocalization>();
     _presenter = Injector.appInstance.get<SettingsPresenter>();
     _presenter.init();
-    shouldShowPlayer = _presenter.currentPlayer.isPlaying();
+    shouldShowPlayer = _presenter.currentPlayer.isPlaying() || _presenter.currentPlayer.isPaused();
     _radioStation = Injector.appInstance.get<RadioStation>();
 
     _presenter.currentPlayer.onConnection = (isError) {

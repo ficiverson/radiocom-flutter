@@ -23,7 +23,8 @@
     "news" : "Noticias",
     "news_error" : "No podemos cargar las noticias ahora mismo.",
     "podcast" : "Podcasts",
-    "podcast_error" : "No podemos cargar los podcast en este momento",
+    "podcast_error" : "No podemos cargar los podcasts en este momento.",
+    "podcast_retry" : "Inténtalo de nuevo dentro de un rato.",
     "categories" : "Categorías",
     "see_all" : "Ver todos"
   },
@@ -124,7 +125,8 @@
     "from" : "De ",
     "to" : " a ",
     "season" : "Temporada",
-    "episode" : "Episodio"
+    "episode" : "Episodio",
+    "notification" : "Notificación"
   },
   "categories" : {
     "others" : "Otros",

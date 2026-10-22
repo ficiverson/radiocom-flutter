@@ -8,6 +8,8 @@ import 'package:cuacfm/models/time_table.dart';
 import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/ui/player/current_player.dart';
 import 'package:cuacfm/ui/podcast/controls/podcast_controls_presenter.dart';
+import 'package:cuacfm/data/datasource/episode_progress_local_datasource_contract.dart';
+import 'package:cuacfm/utils/pie_progress.dart';
 import 'package:cuacfm/utils/radiocom_colors.dart';
 import 'package:cuacfm/utils/safe_map.dart';
 import 'package:flutter/material.dart';
@@ -723,6 +725,38 @@ class PodcastControlsState extends State<PodcastControls>
                                 ],
                               ),
                             ),
+                            Builder(builder: (_) {
+                              final saved = Injector.appInstance
+                                  .get<EpisodeProgressLocalDataSourceContract>()
+                                  .getProgress(item['audio'] as String? ?? '');
+                              final int pos = (saved?['position'] as num?)?.toInt() ?? 0;
+                              final int dur = (saved?['duration'] as num?)?.toInt() ?? 0;
+                              final bool done = saved?['completed'] == true;
+                              final double frac = dur > 0 ? (pos / dur).clamp(0.0, 1.0) : 0.0;
+                              return Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (frac > 0 || done) ...[
+                                    Text(
+                                      '${done ? 100 : (frac * 100).round()}%',
+                                      style: TextStyle(
+                                        color: _colors.fontGrey,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 5),
+                                  ],
+                                  PieProgress(
+                                    size: 18,
+                                    color: _colors.yellow,
+                                    progress: frac,
+                                    completed: done,
+                                  ),
+                                ],
+                              );
+                            }),
                             GestureDetector(
                               onTap: () {
                                 _presenter.removeFromPlaylist(item['audio'] as String, () => setSheetState(() {}));

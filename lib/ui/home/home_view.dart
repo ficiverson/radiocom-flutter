@@ -30,7 +30,8 @@ import 'package:intl/intl.dart';
 import 'package:cuacfm/ui/episode-detail/episode_detail_view.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'dart:convert';
-import 'package:cuacfm/main.dart' show appThemeModeNotifier, appLocaleNotifier, pendingNotificationRssUrl, pendingNotificationEpisodeId;
+import 'package:cuacfm/main.dart' show appThemeModeNotifier, appLocaleNotifier, pendingNotificationRssUrl, pendingNotificationEpisodeId, pendingManualNotification;
+import 'package:cuacfm/ui/notification-detail/notification_detail_view.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -69,6 +70,8 @@ class MyHomePageState extends State<MyHomePage>
   List<TimeTable> _timeTable = [];
   List<TimeTable> _recentPodcast = [];
   List<TimeTable> _weeklyPodcast = [];
+  final Map<String, String> _episodeTitleByCard = {};
+  final Set<String> _resolvingCard = {};
   List categories = [];
   Map<int, List<Program>> _podcastByCategory = {};
   RadiocomColorsConract _colors =
@@ -102,7 +105,7 @@ class MyHomePageState extends State<MyHomePage>
     _colors = Injector.appInstance.get<RadiocomColorsConract>();
     _localization = Injector.appInstance.get<CuacLocalization>();
     if (_presenter.currentPlayer.isPodcast && !_isPodcastPaused) {
-      shouldShowPlayer = _presenter.currentPlayer.isPlaying();
+      shouldShowPlayer = _presenter.currentPlayer.isPlaying() || _presenter.currentPlayer.isPaused();
     }
     final themeMode = appThemeModeNotifier.value;
     final isDark = themeMode == ThemeMode.dark ||
@@ -265,6 +268,7 @@ class MyHomePageState extends State<MyHomePage>
     appThemeModeNotifier.removeListener(_onAppSettingsChanged);
     appLocaleNotifier.removeListener(_onAppSettingsChanged);
     pendingNotificationRssUrl.removeListener(_onPendingNotification);
+    pendingManualNotification.removeListener(_onPendingManualNotification);
     super.dispose();
   }
 
@@ -383,6 +387,28 @@ class MyHomePageState extends State<MyHomePage>
     if (pendingNotificationRssUrl.value != null) {
       setState(() => _navigatingFromNotification = true);
     }
+    pendingManualNotification.addListener(_onPendingManualNotification);
+    if (pendingManualNotification.value != null) {
+      WidgetsBinding.instance.addPostFrameCallback(
+          (_) => _onPendingManualNotification());
+    }
+  }
+
+  void _onPendingManualNotification() {
+    final data = pendingManualNotification.value;
+    if (data == null || !mounted) return;
+    pendingManualNotification.value = null;
+    Navigator.of(context).push(PageRouteBuilder(
+      settings: const RouteSettings(name: "notificationdetail"),
+      pageBuilder: (_, __, ___) => NotificationDetailPage(
+        title: data['title'] ?? '',
+        body: data['body'] ?? '',
+        imageUrl: data['image'] ?? '',
+      ),
+      transitionsBuilder: (_, animation, __, child) =>
+          FadeTransition(opacity: animation, child: child),
+      transitionDuration: const Duration(milliseconds: 200),
+    ));
   }
 
   void _onPendingNotification() {
@@ -552,6 +578,14 @@ class MyHomePageState extends State<MyHomePage>
   void onLoadFavorites(List<Program> favorites) {
     if (!mounted) return;
     setState(() => _favorites = favorites);
+  }
+
+  String _freshLogo(Program program) {
+    try {
+      final match = _podcast.firstWhere((p) => p.rssUrl == program.rssUrl);
+      if (match.logoUrl.isNotEmpty) return match.logoUrl;
+    } catch (_) {}
+    return program.logoUrl;
   }
 
   void onLoadPodcasts(List<Program> podcasts) {
@@ -1350,6 +1384,7 @@ Builder(builder: (context) {
                             isEmptyHome
                   ? SizedBox(
                       height: 280.0,
+                      width: double.infinity,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -1862,11 +1897,41 @@ Builder(builder: (context) {
     );
   }
 
+  String _cardKey(TimeTable item) =>
+      '${item.rssUrl}|${item.start.millisecondsSinceEpoch}';
+
+  void _resolveEpisodeTitle(TimeTable item) {
+    if (item.rssUrl.isEmpty) return;
+    final key = _cardKey(item);
+    if (_episodeTitleByCard.containsKey(key) || _resolvingCard.contains(key)) {
+      return;
+    }
+    _resolvingCard.add(key);
+    Injector.appInstance
+        .get<CuacRepositoryContract>()
+        .getEpisodes(item.rssUrl)
+        .then((result) {
+      _resolvingCard.remove(key);
+      final episodes = result.data ?? [];
+      if (episodes.isEmpty) return;
+      episodes.sort((a, b) => (a.pubDate.difference(item.start).inSeconds.abs())
+          .compareTo(b.pubDate.difference(item.start).inSeconds.abs()));
+      final title = episodes.first.title;
+      if (title.isEmpty) return;
+      _episodeTitleByCard[key] = title;
+      if (mounted) setState(() {});
+    }).catchError((_) {
+      _resolvingCard.remove(key);
+    });
+  }
+
   Widget _buildRecentRow(TimeTable item) {
     final monthKeys = ["jan","feb","mar","apr","may","jun","jul","ago","sep","oct","nov","dec"];
     final monthKey = monthKeys[item.start.month - 1];
     final monthStr = SafeMap.safe(_localization.translateMap("months"), [monthKey]).toUpperCase();
     final String dateLabel = "${item.start.day} $monthStr · ${DateFormat('HH:mm').format(item.start)}";
+    _resolveEpisodeTitle(item);
+    final String episodeTitle = _episodeTitleByCard[_cardKey(item)] ?? item.name;
     return Expanded(
       child: GestureDetector(
         onTap: () async {
@@ -1961,7 +2026,9 @@ Builder(builder: (context) {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      dateLabel.toUpperCase(),
+                      "$dateLabel · ${item.name}".toUpperCase(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         letterSpacing: 0,
                         color: _colors.fontGrey,
@@ -1971,7 +2038,7 @@ Builder(builder: (context) {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      item.name,
+                      episodeTitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -2215,6 +2282,7 @@ Builder(builder: (context) {
                   ),
                   SizedBox(
                     height: 280.0,
+                    width: double.infinity,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -2224,6 +2292,15 @@ Builder(builder: (context) {
                           SafeMap.safe(_localization.translateMap("home"), ["podcast_error"]),
                           textAlign: TextAlign.center,
                           style: TextStyle(color: _colors.fontGrey, fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0),
+                        ),
+                        SizedBox(height: 6),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 32),
+                          child: Text(
+                            SafeMap.safe(_localization.translateMap("home"), ["podcast_retry"]),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: _colors.fontGrey.withValues(alpha: 0.7), fontSize: 13, fontWeight: FontWeight.w400, letterSpacing: 0),
+                          ),
                         ),
                       ],
                     ),
@@ -2463,7 +2540,7 @@ Builder(builder: (context) {
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: CustomImage(
-                                    resPath: program.logoUrl,
+                                    resPath: _freshLogo(program),
                                     fit: BoxFit.cover,
                                     radius: 10,
                                     width: 60,

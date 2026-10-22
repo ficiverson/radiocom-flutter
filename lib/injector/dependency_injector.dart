@@ -5,6 +5,7 @@ import 'package:cuacfm/data/datasource/favorites_local_datasource_contract.dart'
 import 'package:cuacfm/data/datasource/playlist_local_datasource_contract.dart';
 import 'package:cuacfm/data/datasource/radioco_remote_datasource.dart';
 import 'package:cuacfm/data/datasource/wrapped_local_datasource_contract.dart';
+import 'package:cuacfm/data/datasource/episode_progress_local_datasource_contract.dart';
 import 'package:cuacfm/data/favorites_repository.dart';
 import 'package:cuacfm/data/playlist_repository.dart';
 import 'package:cuacfm/data/wrapped_repository.dart';
@@ -40,6 +41,7 @@ import 'package:cuacfm/local-data-source/alerts_local_datasource.dart';
 import 'package:cuacfm/local-data-source/favorites_local_datasource.dart';
 import 'package:cuacfm/local-data-source/playlist_local_datasource.dart';
 import 'package:cuacfm/local-data-source/wrapped_local_datasource.dart';
+import 'package:cuacfm/local-data-source/episode_progress_local_datasource.dart';
 import 'package:cuacfm/models/radiostation.dart';
 import 'package:cuacfm/remote-data-source/network/radioco_api.dart';
 import 'package:cuacfm/data/radiocom-repository.dart';
@@ -127,6 +129,9 @@ class DependencyInjector {
   loadLocalDatasourceModules() {
     injector.registerSingleton<WrappedLocalDataSourceContract>(() {
       return WrappedLocalDataSource();
+    });
+    injector.registerSingleton<EpisodeProgressLocalDataSourceContract>(() {
+      return EpisodeProgressLocalDataSource();
     });
     injector.registerDependency<FavoritesLocalDataSourceContract>(() {
       return FavoritesLocalDataSource();

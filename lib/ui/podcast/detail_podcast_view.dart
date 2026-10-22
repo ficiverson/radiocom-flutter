@@ -10,6 +10,8 @@ import 'package:cuacfm/translations/localizations.dart';
 import 'package:cuacfm/ui/home/home_presenter.dart';
 import 'package:cuacfm/ui/podcast/detail_podcast_presenter.dart';
 import 'package:cuacfm/utils/custom_image.dart';
+import 'package:cuacfm/utils/play_progress_button.dart';
+import 'package:cuacfm/data/datasource/episode_progress_local_datasource_contract.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cuacfm/utils/bottom_bar.dart';
 import 'package:cuacfm/utils/player_view.dart';
@@ -90,7 +92,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
   Widget build(BuildContext context) {
     queryData = MediaQuery.of(context);
     _colors = Injector.appInstance.get<RadiocomColorsConract>();
-    shouldShowPlayer = _presenter.currentPlayer.isPlaying();
+    shouldShowPlayer = _presenter.currentPlayer.isPlaying() || _presenter.currentPlayer.isPaused();
     _scaffold = new Scaffold(
         key: _scaffoldKey,
         backgroundColor: _colors.palidwhite,
@@ -167,7 +169,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
       parameters: {'program_name': _program.name},
     );
     _presenter = Injector.appInstance.get<DetailPodcastPresenter>();
-    shouldShowPlayer = _presenter.currentPlayer.isPlaying();
+    shouldShowPlayer = _presenter.currentPlayer.isPlaying() || _presenter.currentPlayer.isPaused();
     _presenter.checkIsFavorite(_program.rssUrl, (isFav) {
       if (mounted) setState(() => _isFavorite = isFav);
     });
@@ -194,6 +196,10 @@ class DetailPodcastState extends State<DetailPodcastPage>
       }
     };
 
+    _presenter.currentPlayer.onUpdate = () {
+      if (mounted) setState(() {});
+    };
+
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -216,6 +222,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
 
   @override
   void dispose() {
+    _presenter.currentPlayer.onUpdate = null;
     _scrollController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     Injector.appInstance.removeByKey<DetailPodcastView>();
@@ -262,7 +269,7 @@ class DetailPodcastState extends State<DetailPodcastPage>
     isLoadingEpisode = false;
     if (!mounted) return;
     setState(() {
-      shouldShowPlayer = _presenter.currentPlayer.isPlaying();
+      shouldShowPlayer = _presenter.currentPlayer.isPlaying() || _presenter.currentPlayer.isPaused();
     });
   }
 
@@ -291,6 +298,29 @@ class DetailPodcastState extends State<DetailPodcastPage>
         ),
       ),
     );
+  }
+
+  double _episodeFraction(Episode ep) {
+    final player = _presenter.currentPlayer;
+    if (_presenter.isSamePodcast(ep) && player.duration.inSeconds > 0) {
+      return (player.position.inSeconds / player.duration.inSeconds)
+          .clamp(0.0, 1.0);
+    }
+    final saved = Injector.appInstance
+        .get<EpisodeProgressLocalDataSourceContract>()
+        .getProgress(ep.audio);
+    if (saved == null) return 0.0;
+    final p = (saved['position'] as num?)?.toInt() ?? 0;
+    final d = (saved['duration'] as num?)?.toInt() ?? 0;
+    return d > 0 ? (p / d).clamp(0.0, 1.0) : 0.0;
+  }
+
+  bool _episodeCompleted(Episode ep) {
+    if (_presenter.isSamePodcast(ep)) return false;
+    final saved = Injector.appInstance
+        .get<EpisodeProgressLocalDataSourceContract>()
+        .getProgress(ep.audio);
+    return saved != null && saved['completed'] == true;
   }
 
   Widget _buildHeader() {
@@ -692,18 +722,18 @@ class DetailPodcastState extends State<DetailPodcastPage>
                                     if (!mounted) return;
                                     setState(() {});
                                   },
-                                  child: SizedBox(
-                                    width: 38,
-                                    height: 38,
-                                    child: Center(
-                                      child: isLoadingEpisode &&
-                                              _presenter.isSamePodcast(ep)
-                                          ? getLoadingStatePlayer()
-                                          : isPlaying
-                                              ? EqualizerIcon(size: 24.0)
-                                              : Icon(Icons.play_circle_outline,
-                                                  color: _colors.yellow, size: 38.0),
-                                    ),
+                                  child: PlayProgressButton(
+                                    size: 40,
+                                    color: _colors.yellow,
+                                    progress: _episodeFraction(ep),
+                                    completed: _episodeCompleted(ep),
+                                    child: isLoadingEpisode &&
+                                            _presenter.isSamePodcast(ep)
+                                        ? getLoadingStatePlayer()
+                                        : isPlaying
+                                            ? EqualizerIcon(size: 20.0)
+                                            : Icon(Icons.play_arrow,
+                                                color: _colors.yellow, size: 24.0),
                                   ),
                                 ),
                               ],
