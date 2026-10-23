@@ -63,6 +63,7 @@ abstract class CurrentPlayerContract {
   bool isPlaying();
   bool isStreamingAudio();
   bool isPaused();
+  bool isLiveReconnecting();
   void release();
   double getPlaybackRate();
   void setPlaybackRate(double playbackRate);
@@ -337,6 +338,7 @@ class CurrentPlayer implements CurrentPlayerContract {
   Timer? _liveRetryTimer;
   bool _userPaused = false;
   bool _userWantsLive = false;
+  bool _liveReconnecting = false;
 
   @override
   void restorePlayer(ConnectivityResult connection) async {
@@ -443,6 +445,7 @@ class CurrentPlayer implements CurrentPlayerContract {
             event.processingState == ProcessingState.ready) {
           _liveRetryCount = 0;
           _liveRetryTimer?.cancel();
+          _setReconnecting(false);
         }
         if (isPodcast && event.processingState == ProcessingState.completed) {
           final finishedId = episode?.audio ?? '';
@@ -465,6 +468,11 @@ class CurrentPlayer implements CurrentPlayerContract {
             isPodcast = false;
             if (onUpdate != null) onUpdate!();
           }
+        } else if (!isPodcast &&
+            event.processingState == ProcessingState.buffering &&
+            _userWantsLive &&
+            !_userPaused) {
+          _scheduleLiveRetry();
         } else if (event.playing && playerState == AudioPlayerState.pause) {
           playerState = AudioPlayerState.play;
           if (onUpdate != null) onUpdate!();
@@ -505,7 +513,6 @@ class CurrentPlayer implements CurrentPlayerContract {
         } else {
           position = Duration(seconds: 1);
           duration = Duration(hours: 24);
-          _liveRetryCount = 0;
         }
       });
 
@@ -596,6 +603,7 @@ class CurrentPlayer implements CurrentPlayerContract {
   void _scheduleLiveRetry() {
     if (_liveRetryTimer?.isActive ?? false) return;
     if (!_userWantsLive || _userPaused) return;
+    _setReconnecting(true);
     _liveRetryCount++;
     final delaySec = (5 * _liveRetryCount).clamp(5, 30);
     _liveRetryTimer = Timer(Duration(seconds: delaySec), () async {
@@ -605,6 +613,7 @@ class CurrentPlayer implements CurrentPlayerContract {
       if (audioPlayer.playing &&
           audioPlayer.processingState == ProcessingState.ready) {
         _liveRetryCount = 0;
+        _setReconnecting(false);
         return;
       }
       _suppressLiveLog = true;
@@ -621,6 +630,7 @@ class CurrentPlayer implements CurrentPlayerContract {
     _userWantsLive = false;
     _liveRetryTimer?.cancel();
     _liveRetryCount = 0;
+    _setReconnecting(false);
     _stop();
   }
 
@@ -659,6 +669,7 @@ class CurrentPlayer implements CurrentPlayerContract {
   Future pause() async {
     if (playerState == AudioPlayerState.play) {
       _userPaused = true;
+      _setReconnecting(false);
       await audioPlayer.pause();
       if (!audioPlayer.playing) playerState = AudioPlayerState.pause;
       _saveProgress();
@@ -678,6 +689,17 @@ class CurrentPlayer implements CurrentPlayerContract {
   @override
   bool isPaused() {
     return playerState == AudioPlayerState.pause;
+  }
+
+  @override
+  bool isLiveReconnecting() {
+    return _liveReconnecting;
+  }
+
+  void _setReconnecting(bool value) {
+    if (_liveReconnecting == value) return;
+    _liveReconnecting = value;
+    if (onUpdate != null) onUpdate!();
   }
 
   @override

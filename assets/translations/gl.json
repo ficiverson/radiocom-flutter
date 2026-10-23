@@ -62,7 +62,7 @@
     "rating_title" : "Estás a gozar da app e das nosas emisións?",
     "rating_body" : "Por favor, considera valorarnos na tenda de aplicacións para que máis xente descubra CUAC.",
     "station_section" : {
-      "name" : "EMISORA",
+      "name" : "Sobre nós",
       "item1" : "Historia",
       "item2" : "Galería"
     },
@@ -71,7 +71,7 @@
       "empty" : "Non hai alertas este mes."
     },
     "config_section" : {
-      "name" : "CONFIGURACIÓN",
+      "name" : "Configuración",
       "item1" : "Tema",
       "item1_light" : "Claro",
       "item1_dark" : "Escuro",
@@ -82,20 +82,20 @@
       "item3_system" : "Sistema"
     },
     "social_section" : {
-      "name" : "REDES SOCIAIS",
+      "name" : "Redes sociais",
       "item1" : "Facebook",
       "item2" : "Bluesky",
       "item3" : "Instagram",
       "item4" : "TikTok"
     },
     "more_info_section" : {
-      "name" : "MÁIS INFORMACIÓN",
+      "name" : "Máis información",
       "item1" : "Páxina web",
       "item2" : "Localización",
       "item3" : "Contactar"
     },
     "legal_info_section" : {
-      "name" : "LEGAL",
+      "name" : "Legal",
       "item1" : "Política de privacidade",
       "item2" : "Termos de uso",
       "item3" : "Licenzas de software"
@@ -126,7 +126,8 @@
     "to" : " a ",
     "season" : "Temporada",
     "episode" : "Episodio",
-    "notification" : "Notificación"
+    "notification" : "Notificación",
+    "reconnecting" : "Reconectando…"
   },
   "categories" : {
     "others" : "Outros",

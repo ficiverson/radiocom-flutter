@@ -152,7 +152,17 @@ class DependencyInjector {
       return CurrentPlayer();
     });
     injector.registerSingleton<AudioPlayer>(() {
-      return AudioPlayer();
+      return AudioPlayer(
+        audioLoadConfiguration: const AudioLoadConfiguration(
+          androidLoadControl: AndroidLoadControl(
+            minBufferDuration: Duration(seconds: 15),
+            maxBufferDuration: Duration(seconds: 30),
+            bufferForPlaybackDuration: Duration(milliseconds: 2500),
+            bufferForPlaybackAfterRebufferDuration: Duration(seconds: 4),
+            prioritizeTimeOverSizeThresholds: true,
+          ),
+        ),
+      );
     });
   }
 

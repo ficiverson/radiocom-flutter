@@ -376,7 +376,7 @@ class MyHomePageState extends State<MyHomePage>
 
     _presenter.currentPlayer.onUpdate = () {
       if (mounted) setState(() {
-        shouldShowPlayer = _presenter.currentPlayer.isPlaying() || _presenter.currentPlayer.isPaused();
+        shouldShowPlayer = _presenter.currentPlayer.isPlaying() || _presenter.currentPlayer.isPaused() || _presenter.currentPlayer.isLiveReconnecting();
       });
     };
 
@@ -906,7 +906,7 @@ class MyHomePageState extends State<MyHomePage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 16.0),
+            padding: const EdgeInsets.fromLTRB(15.0, 28.0, 15.0, 16.0),
             child: Text(
               SafeMap.safe(_localization.translateMap("home"), ["categories"]),
               textAlign: TextAlign.left,
@@ -1925,15 +1925,14 @@ Builder(builder: (context) {
     });
   }
 
-  Widget _buildRecentRow(TimeTable item) {
+  Widget _buildRecentRow(TimeTable item, {bool expand = true}) {
     final monthKeys = ["jan","feb","mar","apr","may","jun","jul","ago","sep","oct","nov","dec"];
     final monthKey = monthKeys[item.start.month - 1];
     final monthStr = SafeMap.safe(_localization.translateMap("months"), [monthKey]).toUpperCase();
     final String dateLabel = "${item.start.day} $monthStr · ${DateFormat('HH:mm').format(item.start)}";
     _resolveEpisodeTitle(item);
     final String episodeTitle = _episodeTitleByCard[_cardKey(item)] ?? item.name;
-    return Expanded(
-      child: GestureDetector(
+    final Widget row = GestureDetector(
         onTap: () async {
           if (_loadingRssUrl != null) return;
           if (item.rssUrl.isEmpty) {
@@ -2069,8 +2068,8 @@ Builder(builder: (context) {
             ],
           ),
         ),
-      ),
     );
+    return expand ? Expanded(child: row) : row;
   }
 
   Widget _getWeeklyEpisodesSection() {
@@ -2079,7 +2078,7 @@ Builder(builder: (context) {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
+          padding: const EdgeInsets.fromLTRB(20.0, 28.0, 20.0, 16.0),
           child: Text(
             SafeMap.safe(_localization.translateMap("home"), ["recent_msg"]),
             style: TextStyle(
@@ -2091,7 +2090,7 @@ Builder(builder: (context) {
           ),
         ),
         SizedBox(
-          height: 390.0,
+          height: 350.0,
           child: ListView.builder(
             key: PageStorageKey<String>("weekly_episodes"),
             physics: BouncingScrollPhysics(),
@@ -2110,16 +2109,15 @@ Builder(builder: (context) {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    _buildRecentRow(_weeklyPodcast[i1]),
+                    _buildRecentRow(_weeklyPodcast[i1], expand: false),
                     if (has2) ...[
-                      Container(height: 1, color: _colors.fontGrey.withValues(alpha: 0.2)),
-                      _buildRecentRow(_weeklyPodcast[i2]),
+                      Container(height: 1, margin: const EdgeInsets.symmetric(vertical: 20), color: _colors.fontGrey.withValues(alpha: 0.2)),
+                      _buildRecentRow(_weeklyPodcast[i2], expand: false),
                     ],
                     if (has3) ...[
-                      Container(height: 1, color: _colors.fontGrey.withValues(alpha: 0.2)),
-                      _buildRecentRow(_weeklyPodcast[i3]),
+                      Container(height: 1, margin: const EdgeInsets.symmetric(vertical: 20), color: _colors.fontGrey.withValues(alpha: 0.2)),
+                      _buildRecentRow(_weeklyPodcast[i3], expand: false),
                     ],
-                    if (!has2 || !has3) Spacer(),
                   ],
                 ),
               );
@@ -2161,7 +2159,7 @@ Builder(builder: (context) {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 16.0),
+          padding: const EdgeInsets.fromLTRB(20.0, 28.0, 20.0, 16.0),
           child: GestureDetector(
             onTap: () => _presenter.onSeeAllPodcast(_podcast),
             child: Row(
@@ -2367,6 +2365,9 @@ Builder(builder: (context) {
   }
 
   String _getLiveSubtitle() {
+    if (_presenter.currentPlayer.isLiveReconnecting()) {
+      return SafeMap.safe(_localization.translateMap("general"), ["reconnecting"]);
+    }
     final current = _getCurrentTimeTable();
     final subtitle = current == null
         ? "CUAC FM 103.4"

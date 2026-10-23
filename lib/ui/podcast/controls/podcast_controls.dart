@@ -390,10 +390,14 @@ class PodcastControlsState extends State<PodcastControls>
               children: [
                 _LiveDot(),
                 const SizedBox(width: 5),
-                const Text(
-                  "En directo",
+                Text(
+                  currentPlayer.isLiveReconnecting()
+                      ? SafeMap.safe(_localization.translateMap("general"), ["reconnecting"])
+                      : "En directo",
                   style: TextStyle(
-                    color: Color(0xFF00C853),
+                    color: currentPlayer.isLiveReconnecting()
+                        ? const Color(0xFFFFA000)
+                        : const Color(0xFF00C853),
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0,
