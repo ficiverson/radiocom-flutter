@@ -1021,11 +1021,9 @@ class SettingsState extends State<Settings>
   }
 
   Widget _expandableSection(String name, List<Widget> items) {
-    return Container(
-      decoration: BoxDecoration(
-        color: _colors.palidwhitedark,
-        borderRadius: BorderRadius.circular(16),
-      ),
+    return Material(
+      color: _colors.palidwhitedark,
+      borderRadius: BorderRadius.circular(16),
       clipBehavior: Clip.antiAlias,
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
