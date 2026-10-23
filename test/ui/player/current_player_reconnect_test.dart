@@ -224,11 +224,11 @@ void main() {
       expect(player.isLiveReconnecting(), isFalse);
     });
 
-    test('isLiveReconnecting() returns false after release()', () async {
+    test('isLiveReconnecting() returns false after release()', () {
       final fake = _FakeAudioPlayer();
       final player = _makePlayer(fake);
 
-      await player.release();
+      player.release();
 
       expect(player.isLiveReconnecting(), isFalse);
     });
