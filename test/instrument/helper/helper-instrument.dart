@@ -113,6 +113,12 @@ class MockPlayer extends Mock implements CurrentPlayerContract {
         returnValueForMissingStub: false,
       );
   @override
+  bool isLiveReconnecting() => super.noSuchMethod(
+        Invocation.method(#isLiveReconnecting, []),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      );
+  @override
   void release() => super.noSuchMethod(Invocation.method(#release, []));
   @override
   double getPlaybackRate() => super.noSuchMethod(
